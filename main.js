@@ -156,7 +156,10 @@ class Body
 		sphereGeom = new THREE.SphereGeometry(this.size, 16, 8);
 		sphereGeom.rotateX(Math.PI / 2);
 
-		this.obj3d = new THREE.Mesh(sphereGeom, new THREE.MeshBasicMaterial({color: this.color, wireframe: true}));
+		this.obj3d = new THREE.Mesh(
+			sphereGeom,
+			new THREE.MeshBasicMaterial({color: this.color, wireframe: true})
+		);
 		scene.add(this.obj3d);
 	}
 
@@ -263,7 +266,7 @@ earthOrbit = new KeplerianOrbit(
 	rad(90),  // raan
 	rad(90),  // aop
 	rad(110), // ta
-	1,
+	0,
 	'blue'
 );
 
@@ -271,4 +274,4 @@ sun = new Body('Sun', sunPosition, 20, 'yellow');
 earth = new Body('Earth', earthOrbit, 5, 'blue');
 
 earth.render(true);
-render();
+render(time);
