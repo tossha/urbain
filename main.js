@@ -1,277 +1,270 @@
-var camera, scene, renderer, controls;
+/* global THREE */
+/* global numeric */
+(function() {
+  let camera;
+  let scene;
+  let renderer;
+  let controls;
 
-var sunPosition, earthOrbit;
-var sun, earth;
+  let sunPosition;
+  let earthOrbit;
+  let earth;
 
-var time;
+  let time;
 
-class Trajectory
-{
-	constructor() {}
+  class Trajectory
+  {
+    get position() {
+      return {x: 0, y: 0, z: 0};
+    }
 
-	get position()
-	{
-		return {x: 0, y: 0, z: 0};
-	}
+    render() {}
+  }
 
-	render() {}
-}
+  class KeplerianOrbit extends Trajectory
+  {
+    constructor(parent, sma, e, inc, raan, aop, ta, epoch, color) {
+      super();
 
+      this.parentTrajectory = parent;
 
-class KeplerianOrbit extends Trajectory
-{
-	constructor(parent, sma, e, inc, raan, aop, ta, epoch, color)
-	{
-		super();
+      this.sma = sma;
+      this.e = e;
+      this.inc = inc;
+      this.raan = raan;
+      this.aop = aop;
+      this.ta = ta;
+      this.epoch = epoch;
+      this.color = color;
 
-		this.parentTrajectory = parent;
+      this.obj3d = new THREE.Line(
+        new THREE.Geometry(),
+        new THREE.LineBasicMaterial({color: this.color})
+      );
 
-		this.sma    = sma;
-		this.e      = e;
-		this.inc    = inc;
-		this.raan   = raan;
-		this.aop    = aop;
-		this.ta     = ta;
-		this.epoch  = epoch;
-		this.color  = color;
+      scene.add(this.obj3d);
+    }
 
-		this.obj3d = new THREE.Line(
-			new THREE.Geometry(),
-			new THREE.LineBasicMaterial({color: this.color})
-		);
+    get position() {
+      const r = this.sma * (1 - this.e * this.e) /
+        (1 + this.e * Math.cos(this.ta));
+      const parentPosition = this.parentTrajectory.position;
 
-		scene.add(this.obj3d);
-	}
+      const Rot1 = [
+        [Math.cos(this.aop), -Math.sin(this.aop), 0],
+        [Math.sin(this.aop), Math.cos(this.aop), 0],
+        [0, 0, 1]
+      ];
 
-	get position()
-	{
-		var r = this.sma * (1 - this.e * this.e) / (1 + this.e * Math.cos(this.ta));
-		var parentPosition = this.parentTrajectory.position;
+      const Rot2 = [
+        [1, 0, 0],
+        [0, Math.cos(this.inc), -Math.sin(this.inc)],
+        [0, Math.sin(this.inc), Math.cos(this.inc)]
+      ];
 
-		var Rot1 = [
-			[Math.cos(this.aop), -Math.sin(this.aop), 0],
-			[Math.sin(this.aop),  Math.cos(this.aop), 0],
-			[                 0,                   0, 1]
-		];
+      const Rot3 = [
+        [Math.cos(this.raan), -Math.sin(this.raan), 0],
+        [Math.sin(this.raan), Math.cos(this.raan), 0],
+        [0, 0, 1]
+      ];
 
-		var Rot2 = [
-			[1,                  0,                   0],
-			[0, Math.cos(this.inc), -Math.sin(this.inc)],
-			[0, Math.sin(this.inc),  Math.cos(this.inc)]
-		];
+      let pos = [r * Math.cos(this.ta), r * Math.sin(this.ta), 0];
 
-		var Rot3 = [
-			[Math.cos(this.raan), -Math.sin(this.raan), 0],
-			[Math.sin(this.raan),  Math.cos(this.raan), 0],
-			[                 0,                   0, 1]
-		];
+      pos = numeric.dot(Rot1, pos);
+      pos = numeric.dot(Rot2, pos);
+      pos = numeric.dot(Rot3, pos);
 
-		var pos = [r * Math.cos(this.ta), r * Math.sin(this.ta), 0];
+      return {
+        x: parentPosition.x + pos[0],
+        y: parentPosition.y + pos[1],
+        z: parentPosition.z + pos[2]
+      };
+    }
 
-		pos = numeric.dot(Rot1, pos);
-		pos = numeric.dot(Rot2, pos);
-		pos = numeric.dot(Rot3, pos);
+    render() {
+      let pos;
+      const dr = -this.sma * this.e;
+      let ang = Math.acos(
+        (this.e + Math.cos(this.ta)) / (1 + this.e * Math.cos(this.ta))
+      );
 
-		return {
-			x: parentPosition.x + pos[0],
-			y: parentPosition.y + pos[1],
-			z: parentPosition.z + pos[2]
-		}
-	}
+      if (this.ta > Math.PI) {
+        ang = 2 * Math.PI - ang;
+      }
 
-	render()
-	{
-		var pos;
-		var dr = -this.sma * this.e;
-		var ang = Math.acos(
-			(this.e + Math.cos(this.ta)) / (1 + this.e * Math.cos(this.ta))
-		);
+      this.obj3d.geometry = (new THREE.Path(
+        (new THREE.EllipseCurve(
+          dr * Math.cos(this.aop),
+          dr * Math.sin(this.aop),
+          this.sma,
+          this.sma * Math.sqrt(1 - this.e * this.e),
+          ang,
+          2 * Math.PI + ang,
+          false,
+          this.aop
+        )).getPoints(100)
+      )).createPointsGeometry(100).rotateX(this.inc);
 
-		if (this.ta > Math.PI) {
-			ang = 2 * Math.PI - ang;
-		}
+      this.obj3d.rotation.z = this.raan;
 
-		this.obj3d.geometry = (new THREE.Path(
-			(new THREE.EllipseCurve(
-				dr * Math.cos(this.aop),
-				dr * Math.sin(this.aop),
-				this.sma,
-				this.sma * Math.sqrt(1 - this.e * this.e),
-				ang,
-				2 * Math.PI + ang,
-				false,
-				this.aop
-			)).getPoints(100)
-		)).createPointsGeometry(100).rotateX(this.inc);
+      pos = this.parentTrajectory.position;
+      this.obj3d.position.set(pos.x, pos.y, pos.z);
+    }
+  }
 
-		this.obj3d.rotation.z = this.raan;
+  class StaticPosition extends Trajectory
+  {
+    constructor(x, y, z, parent) {
+      super();
 
-		pos = this.parentTrajectory.position;
-		this.obj3d.position.set(pos.x, pos.y, pos.z);
-	}
-}
+      this.parentTrajectory = parent;
 
+      this.x = x;
+      this.y = y;
+      this.z = z;
+    }
 
-class StaticPosition extends Trajectory
-{
-	constructor(x, y, z, parent)
-	{
-		super();
+    get position() {
+      let parentPosition = {x: 0, y: 0, z: 0};
 
-		this.parentTrajectory = parent;
+      if (this.parentTrajectory) {
+        parentPosition = this.parentTrajectory.position;
+      }
 
-		this.x = x;
-		this.y = y;
-		this.z = z;
-	}
+      return {
+        x: this.x + parentPosition.x,
+        y: this.y + parentPosition.y,
+        z: this.z + parentPosition.z
+      };
+    }
+  }
 
-	get position()
-	{
-		var parentPosition = {x: 0, y: 0, z: 0};
+  class Body
+  {
+    constructor(name, trajectory, size, color) {
+      let sphereGeom;
 
-		if (this.parentTrajectory) {
-			parentPosition = this.parentTrajectory.position;
-		}
+      this.name = name;
+      this.trajectory = trajectory;
+      this.size = size;
+      this.color = color;
 
-		return {
-			x: this.x + parentPosition.x,
-			y: this.y + parentPosition.y,
-			z: this.z + parentPosition.z
-		};
-	}
-}
+      sphereGeom = new THREE.SphereGeometry(this.size, 16, 8);
+      sphereGeom.rotateX(Math.PI / 2);
 
+      this.obj3d = new THREE.Mesh(
+        sphereGeom,
+        new THREE.MeshBasicMaterial({color: this.color, wireframe: true})
+      );
+      scene.add(this.obj3d);
+    }
 
-class Body
-{
-	constructor(name, trajectory, size, color)
-	{
-		var sphereGeom;
+    get position() {
+      return this.trajectory.position;
+    }
 
-		this.name       = name;
-		this.trajectory = trajectory;
-		this.size       = size;
-		this.color      = color;
+    render(isTrajectoryRenderingNeeded) {
+      const pos = this.position;
+      this.obj3d.position.set(pos.x, pos.y, pos.z);
 
-		sphereGeom = new THREE.SphereGeometry(this.size, 16, 8);
-		sphereGeom.rotateX(Math.PI / 2);
+      if (isTrajectoryRenderingNeeded) {
+        this.trajectory.render();
+      }
+    }
+  }
 
-		this.obj3d = new THREE.Mesh(
-			sphereGeom,
-			new THREE.MeshBasicMaterial({color: this.color, wireframe: true})
-		);
-		scene.add(this.obj3d);
-	}
+  function init() {
+    camera = new THREE.PerspectiveCamera(75,
+      window.innerWidth / window.innerHeight, 1, 10000);
+    camera.position.x = 300;
+    camera.position.y = 300;
+    camera.position.z = 300;
+    camera.up = new THREE.Vector3(0, 0, 1);
 
-	get position()
-	{
-		return this.trajectory.position;
-	}
+    scene = new THREE.Scene();
 
-	render(isTrajectoryRenderingNeeded)
-	{
-		var pos = this.position;
-		this.obj3d.position.set(pos.x, pos.y, pos.z);  
+    scene.add(new THREE.AxisHelper(300));
 
-		if (isTrajectoryRenderingNeeded) {
-			this.trajectory.render();
-		}
-	}
-}
+    renderer = new THREE.WebGLRenderer();
+    renderer.setSize(window.innerWidth, window.innerHeight);
 
+    controls = new THREE.OrbitControls(camera, renderer.domElement);
 
-function init()
-{
-	camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 1, 10000);
-	camera.position.x = 300;
-	camera.position.y = 300;
-	camera.position.z = 300;
-	camera.up = new THREE.Vector3(0, 0, 1);
+    document.body.appendChild(renderer.domElement);
 
-	scene = new THREE.Scene();
+    time = (new Date()).getTime();
+  }
 
-	scene.add(new THREE.AxisHelper(300));
+  function eccAnomaly(ec, m) {
+    const dp = 8;
+    const maxIter = 30;
+    let i = 0;
+    const delta = Math.pow(10, -dp);
+    let E;
+    let F;
 
-	renderer = new THREE.WebGLRenderer();
-	renderer.setSize(window.innerWidth, window.innerHeight);
+    m /= 360.0;
+    m = 2.0 * Math.PI * (m - Math.floor(m));
 
-	controls = new THREE.OrbitControls(camera, renderer.domElement);
+    if (ec < 0.8) {
+      E = m;
+    } else {
+      E = Math.PI;
+    }
 
-	document.body.appendChild(renderer.domElement);
+    F = E - ec * Math.sin(m) - m;
 
-	time = (new Date()).getTime();
-}
+    while ((Math.abs(F) > delta) && (i < maxIter)) {
+      E -= F / (1.0 - ec * Math.cos(E));
+      F = E - ec * Math.sin(E) - m;
+      i += 1;
+    }
 
-function eccAnomaly(ec, m)
-{
-	var dp = 8;
-	var K = Math.PI / 180.0;
-	var maxIter = 30, i = 0;
-	var delta = Math.pow(10, -dp);
-	var E, F;
+    return angle(ec, E, dp);
+  }
 
-	m = m / 360.0;
-	m = 2.0 * Math.PI * (m - Math.floor(m));
+  function angle(ec, E, dp) {
+    const S = Math.sin(E);
+    const C = Math.cos(E);
+    const fak = Math.sqrt(1.0 - ec * ec);
+    const phi = Math.atan2(fak * S, C - ec);
+    return (phi > 0) ? phi : (phi + 2 * Math.PI);
+  }
 
-	if (ec < 0.8) {
-		E = m;
-	} else {
-		E = Math.PI;
-	}
+  function rad(degrees) {
+    return degrees * Math.PI / 180;
+  }
 
-	F = E - ec * Math.sin(m) - m;
+  function render(curTime) {
+    requestAnimationFrame(render);
+    controls.update();
 
-	while ((Math.abs(F) > delta) && (i < maxIter)) {
-		E = E - F / (1.0 - ec * Math.cos(E));
-		F = E - ec * Math.sin(E) - m;
-		i = i + 1;
-	}
+    earth.trajectory.ta = eccAnomaly(earth.trajectory.e,
+      ((curTime - time) / 15) % 360);
 
-	return angle(ec, E, dp);
-}
+    earth.render(false);
+    renderer.render(scene, camera);
+  }
 
-function angle(ec, E, dp)
-{
-	K = Math.PI / 180.0;
-	S = Math.sin(E);
-	C = Math.cos(E);
-	fak = Math.sqrt(1.0 - ec * ec);
-	phi = Math.atan2(fak * S, C - ec);
-	return (phi > 0) ? phi : (phi + 2 * Math.PI);
-}
+  init();
 
-function rad(degrees)
-{
-	return degrees * Math.PI / 180;
-}
+  sunPosition = new StaticPosition(0, 0, 0);
+  earthOrbit = new KeplerianOrbit(
+    sunPosition,
+    300,
+    0.8,
+    rad(10), // inc
+    rad(90), // raan
+    rad(90), // aop
+    rad(110), // ta
+    0,
+    'blue'
+  );
 
-function render(curTime) {
-	requestAnimationFrame(render);
-	controls.update();
+  // eslint-disable-next-line no-unused-vars
+  const sun = new Body('Sun', sunPosition, 20, 'yellow');
+  earth = new Body('Earth', earthOrbit, 5, 'blue');
 
-	earth.trajectory.ta = eccAnomaly(earth.trajectory.e, ((curTime - time) / 15) % 360);
-
-	earth.render(false);
-	renderer.render(scene, camera);
-}
-
-init();
-
-sunPosition = new StaticPosition(0, 0, 0);
-earthOrbit = new KeplerianOrbit(
-	sunPosition,
-	300,
-	0.8,
-	rad(10),  // inc
-	rad(90),  // raan
-	rad(90),  // aop
-	rad(110), // ta
-	0,
-	'blue'
-);
-
-sun = new Body('Sun', sunPosition, 20, 'yellow');
-earth = new Body('Earth', earthOrbit, 5, 'blue');
-
-earth.render(true);
-render(time);
+  earth.render(true);
+  render(time);
+})();

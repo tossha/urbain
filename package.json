@@ -1,0 +1,10 @@
+{
+  "name": "verrier",
+  "scripts": {
+    "lint": "eslint -c ./.eslint.js ."
+  },
+  "eslintConfig": {
+    "extends": "google",
+    "env": { "browser": true }
+  }
+}
