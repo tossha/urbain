@@ -16,7 +16,7 @@ class VisualBodyModel
         this.shape   = shape;   // class VisualShapeAbstract
         this.texture = texture;
 
-        this.body = null;
+        this.body = null; // class Body
 
         // ...
     }
@@ -103,8 +103,8 @@ class StateVector
 
 class TrajectoryAbstract
 {
-    constructor() {
-        this.referenceFrame = null; // class ReferenceFrame
+    constructor(referenceFrame) {
+        this.referenceFrame = referenceFrame || null; // class ReferenceFrame
     }
 
     getStateByEpoch(epoch, referenceFrame) {
@@ -123,13 +123,13 @@ class TrajectoryAbstract
 class TrajectoryStateArray extends TrajectoryAbstract
 {
     constructor() {
-        this.states = []; // array of [class StateVector, epoch]
+        this.states = []; // array of [epoch, class StateVector]
         this.minEpoch = null;
         this.maxEpoch = null;
     }
 
     addState(state, epoch) {
-        this.state.push([state, epoch]);
+        this.state.push([epoch, state]);
 
         if ((this.minEpoch === null)
             || (epoch < this.minEpoch)
