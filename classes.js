@@ -12,13 +12,17 @@ class Body
 
 class VisualBodyModel
 {
-    constructor(shape, model, texture) {
+    constructor(shape, texture) {
         this.shape   = shape;   // class VisualShapeAbstract
         this.texture = texture;
 
         this.body = null; // class Body
 
         // ...
+    }
+
+    render(epoch) {
+        // @todo implement
     }
 }
 
