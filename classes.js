@@ -128,7 +128,7 @@ class TrajectoryStateArray extends TrajectoryAbstract
         this.maxEpoch = null;
     }
 
-    addState(state, epoch) {
+    addState(epoch, state) {
         this.state.push([epoch, state]);
 
         if ((this.minEpoch === null)
