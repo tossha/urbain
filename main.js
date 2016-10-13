@@ -171,7 +171,7 @@ class Body
 	render(isTrajectoryRenderingNeeded)
 	{
 		var pos = this.position;
-		this.obj3d.position.set(pos.x, pos.y, pos.z);  
+		this.obj3d.position.set(pos.x, pos.y, pos.z);
 
 		if (isTrajectoryRenderingNeeded) {
 			this.trajectory.render();
