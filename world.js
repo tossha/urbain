@@ -240,7 +240,7 @@ class TrajectoryStateArray extends TrajectoryAbstract
         }
     }
 
-    getStateByEpoch(epoch, referenceFrame) {
+    getStateInOwnFrameByEpoch(epoch) {
         // @todo implement
     }
 }
