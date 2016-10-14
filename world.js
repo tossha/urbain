@@ -2,7 +2,7 @@
 class ReferenceFrame
 {
     constructor(origin, type) {
-        this.origin = origin || SOLAR_SYSTEM_BARYCENTER; // or maybe just EARTH?
+        this.origin = origin;
         this.type = type || RF_TYPE_INERTIAL; // RF_TYPE_INERTIAL или RF_TYPE_ROTATING
     }
 
@@ -10,36 +10,34 @@ class ReferenceFrame
         // @todo implement
     }
 
+    transformStateVectorByEpoch(epoch, state, referenceFrame) {
+        if (this.type !== RF_TYPE_INERTIAL) {
+            // @tofo implement
+            console.log('Rotating frames are not supported yet');
+            return;
+        }
+
+        let pos1 = TRAJECTORIES[this.origin].getPositionByEpoch(epoch, RF_BASE);
+        let pos2 = TRAJECTORIES[referenceFrame.origin].getPositionByEpoch(epoch, RF_BASE);
+        let diff = pos1.sub(pos2);
+        return new StateVector(
+            state.x + diff.x,
+            state.y + diff.y,
+            state.z + diff.z,
+            state.vx,
+            state.vy,
+            state.vz
+        );
+    }
+
     getTransformationMatrixByEpoch(epoch, destinationFrame) {
         if ((this.origin === destinationFrame.origin)
             && (this.type === destinationFrame.type)
         ) {
-            return false; // @todo think about identity matrix here
+            return IDENTITY_MATRIX6; // @todo think about optimization here
         }
 
         // @todo implement
-    }
-}
-
-class StateVector
-{
-    constructor(x, y, z, vx, vy, vz) {
-        this.vector = new Float64Array([
-            x || 0,
-            y || 0,
-            z || 0,
-            vx || 0,
-            vy || 0,
-            vz || 0
-        ]);
-    }
-
-    get position() {
-        return new Vector3(this.vector[0], this.vector[1], this.vector[2]);
-    }
-
-    get velocity() {
-        return new Vector3(this.vector[3], this.vector[4], this.vector[5]);
     }
 }
 
@@ -49,8 +47,13 @@ class TrajectoryAbstract
         this.referenceFrame = referenceFrame || null; // class ReferenceFrame
     }
 
-    getStateByEpoch(epoch, referenceFrame) {
+    getStateInOwnFrameByEpoch(epoch) {
         return ZERO_STATE_VECTOR;
+    }
+
+    getStateByEpoch(epoch, referenceFrame) {
+        let state = this.getStateInOwnFrameByEpoch(epoch);
+        return this.referenceFrame.transformStateVectorByEpoch(epoch, state, referenceFrame);
     }
 
     getPositionByEpoch(epoch, referenceFrame) {
@@ -62,7 +65,20 @@ class TrajectoryAbstract
     }
 }
 
-class TrajectoryKeplerianOrbit
+class TrajectoryStaticPosition extends TrajectoryAbstract
+{
+    constructor(referenceFrame, pos) {
+        super(referenceFrame);
+
+        this.pos = pos;
+    }
+
+    getStateInOwnFrameByEpoch(epoch) {
+        return new StateVector(this.pos.x, this.pos.y, this.pos.z, 0, 0, 0);
+    }
+}
+
+class TrajectoryKeplerianOrbit extends TrajectoryAbstract
 {
     constructor(referenceFrame, mu, sma, e, inc, raan, aop, m0, epoch, color)
     {
@@ -119,7 +135,7 @@ class TrajectoryKeplerianOrbit
     /**
      *  @see http://microsat.sm.bmstu.ru/e-library/Ballistics/kepler.pdf
      */
-    getStateByEpoch(epoch, referenceFrame) {
+    getStateInOwnFrameByEpoch(epoch) {
         let E = this.getEccentricAnomaly(epoch);
         let cos = Math.cos(E);
         let sin = Math.sin(E);
@@ -140,7 +156,6 @@ class TrajectoryKeplerianOrbit
         pos = pos.rotateZ(this.aop).rotateX(this.inc).rotateZ(this.raan);
         vel = vel.rotateZ(this.aop).rotateX(this.inc).rotateZ(this.raan);
 
-        // @todo account for reference frame
         return new StateVector(
             pos.x, pos.y, pos.z,
             vel.x, vel.y, vel.z
@@ -176,5 +191,3 @@ class TrajectoryStateArray extends TrajectoryAbstract
         // @todo implement
     }
 }
-
-const ZERO_STATE_VECTOR = new StateVector();
