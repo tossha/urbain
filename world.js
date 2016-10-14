@@ -10,15 +10,23 @@ class ReferenceFrame
         // @todo implement
     }
 
-    transformStateVectorByEpoch(epoch, state, referenceFrame) {
-        if (this.type !== RF_TYPE_INERTIAL) {
+    transformStateVectorByEpoch(epoch, state, destinationFrame) {
+        if ((this.type !== RF_TYPE_INERTIAL)
+            || (destinationFrame.type !== RF_TYPE_INERTIAL)
+        ) {
             // @tofo implement
             console.log('Rotating frames are not supported yet');
             return;
         }
 
+        if ((this.origin === destinationFrame.origin)
+            && (this.type === destinationFrame.type)
+        ) {
+            return state;
+        }
+
         let pos1 = TRAJECTORIES[this.origin].getPositionByEpoch(epoch, RF_BASE);
-        let pos2 = TRAJECTORIES[referenceFrame.origin].getPositionByEpoch(epoch, RF_BASE);
+        let pos2 = TRAJECTORIES[destinationFrame.origin].getPositionByEpoch(epoch, RF_BASE);
         let diff = pos1.sub(pos2);
         return new StateVector(
             state.x + diff.x,
@@ -28,6 +36,14 @@ class ReferenceFrame
             state.vy,
             state.vz
         );
+    }
+
+    transformPositionByEpoch(epoch, pos, destinationFrame) {
+        return this.transformStateVectorByEpoch(
+            epoch,
+            new StateVector(pos.x, pos.y, pos.z, 0, 0, 0),
+            destinationFrame
+        ).position;
     }
 
     getTransformationMatrixByEpoch(epoch, destinationFrame) {
@@ -63,6 +79,8 @@ class TrajectoryAbstract
     getVelocityByEpoch(epoch, referenceFrame) {
         return this.getStateByEpoch(epoch, referenceFrame).velocity;
     }
+
+    render(epoch) {}
 }
 
 class TrajectoryStaticPosition extends TrajectoryAbstract
@@ -80,8 +98,7 @@ class TrajectoryStaticPosition extends TrajectoryAbstract
 
 class TrajectoryKeplerianOrbit extends TrajectoryAbstract
 {
-    constructor(referenceFrame, mu, sma, e, inc, raan, aop, m0, epoch, color)
-    {
+    constructor(referenceFrame, mu, sma, e, inc, raan, aop, m0, epoch, color) {
         super(referenceFrame);
 
         this.mu     = mu;
@@ -113,7 +130,7 @@ class TrajectoryKeplerianOrbit extends TrajectoryAbstract
         let M = this.getMeanAnomaly(epoch) / (2.0 * Math.PI);
         let maxIter = 30, i = 0;
         let delta = 0.00000001;
-        let E, F, phi;
+        let E, F;
 
         M = 2.0 * Math.PI * (M - Math.floor(M));
 
@@ -127,8 +144,12 @@ class TrajectoryKeplerianOrbit extends TrajectoryAbstract
             i = i + 1;
         }
 
-        phi = Math.atan2(Math.sqrt(1.0 - this.e * this.e) * Math.sin(E), Math.cos(E) - this.e);
+        return E;
+    }
 
+    getTrueAnomaly(epoch) {
+        let E = this.getEccentricAnomaly(epoch);
+        let phi = Math.atan2(Math.sqrt(1.0 - this.e * this.e) * Math.sin(E), Math.cos(E) - this.e);
         return (phi > 0) ? phi : (phi + 2 * Math.PI);
     }
 
@@ -161,11 +182,43 @@ class TrajectoryKeplerianOrbit extends TrajectoryAbstract
             vel.x, vel.y, vel.z
         );
     }
+
+    render(epoch) {
+        let centerPos = this.referenceFrame.transformPositionByEpoch(epoch, ZERO_VECTOR, RF_BASE);
+        let dr = -this.sma * this.e;
+        let ta = this.getTrueAnomaly(epoch);
+        let ang = Math.acos(
+            (this.e + Math.cos(ta)) / (1 + this.e * Math.cos(ta))
+        );
+
+        if (ta > Math.PI) {
+            ang = 2 * Math.PI - ang;
+        }
+
+        this.threeObj.geometry = (new THREE.Path(
+            (new THREE.EllipseCurve(
+                dr * Math.cos(this.aop),
+                dr * Math.sin(this.aop),
+                this.sma,
+                this.sma * Math.sqrt(1 - this.e * this.e),
+                ang,
+                2 * Math.PI + ang,
+                false,
+                this.aop
+            )).getPoints(100)
+        )).createPointsGeometry(100).rotateX(this.inc);
+
+        this.threeObj.rotation.z = this.raan;
+
+        this.threeObj.position.set(centerPos.x, centerPos.y, centerPos.z);
+    }
 }
 
 class TrajectoryStateArray extends TrajectoryAbstract
 {
-    constructor() {
+    constructor(referenceFrame) {
+        super(referenceFrame);
+
         this.states = []; // array of [epoch, class StateVector]
         this.minEpoch = null;
         this.maxEpoch = null;

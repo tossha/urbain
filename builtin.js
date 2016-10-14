@@ -21,26 +21,9 @@ const RF_NEPTUNE = new ReferenceFrame(NEPTUNE, RF_TYPE_INERTIAL);
 const RF_PLUTO = new ReferenceFrame(PLUTO, RF_TYPE_INERTIAL);
 
 const MU = [];
-
-MU[SUN] = 1;
-
-
 const TRAJECTORIES = [];
+const BODIES = [];
 
-TRAJECTORIES[EARTH_BARYCENTER] = new TrajectoryKeplerianOrbit(
-    RF_BASE,    // reference frame
-    MU[SUN],    // mu
-    149598261,  // sma
-    0.01671123, // e
-    0,          // inc
-    deg2rad(348.73936),  // raan
-    deg2rad(114.20783),  // aop
-    0,          // m0
-    0,          // epoch
-    'blue'      // color
-);
-
-TRAJECTORIES[EARTH] = new TrajectoryStaticPosition(
-    RF_EARTH_B, // reference frame
-    ZERO_VECTOR
-);
+MU[SUN]   = 132712440017.99;
+MU[EARTH] = 398600.4415;
+MU[MOON]  = 4902.8005821478;

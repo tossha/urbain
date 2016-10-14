@@ -19,6 +19,8 @@ const URANUS  = 799;
 const NEPTUNE = 899;
 const PLUTO   = 999;
 
+const MOON = 301;
+
 const RF_TYPE_INERTIAL = 0; // reference frame type: inertial
 const RF_TYPE_ROTATING = 1; // reference frame type: rotating with the body
 

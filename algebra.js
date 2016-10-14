@@ -38,7 +38,7 @@ class Vector3
     }
 
     mulMatrix(mat) {
-        let result = new Vector3();
+        let result = new Vector3(0, 0, 0);
         for (let i = 0; i < 3; ++i) {
             for (let j = 0; j < 3; ++j) {
                 result.vector[i] += mat.matrix[i * 3 + j] * this.vector[j];
@@ -126,7 +126,7 @@ class StateVector
     }
 
     mulMatrix(mat) {
-        let result = new StateVector();
+        let result = new StateVector(0, 0, 0, 0, 0, 0);
         for (let i = 0; i < 6; ++i) {
             for (let j = 0; j < 6; ++j) {
                 result.vector[i] += mat.matrix[i * 6 + j] * this.vector[j];

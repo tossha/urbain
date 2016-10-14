@@ -1,3 +1,4 @@
+"use_strict";
 
 class VisualBodyModel
 {
@@ -15,7 +16,7 @@ class VisualBodyModel
     }
 
     render(epoch) {
-        var pos = this.body.getPositionByEpoch(epoch);
+        var pos = this.body.getPositionByEpoch(epoch, RF_BASE);
         this.threeObj.position.set(pos.x, pos.y, pos.z);
     }
 }
@@ -28,8 +29,10 @@ class VisualShapeAbstract
 class VisualShapeSphere extends VisualShapeAbstract
 {
     constructor(radius) {
+        super();
+
         this.radius = radius;
-        this.threeGeometry = new THREE.SphereGeometry(this.size, 16, 8);
+        this.threeGeometry = new THREE.SphereGeometry(radius, 16, 8);
         this.threeGeometry.rotateX(Math.PI / 2);
     }
 
@@ -41,6 +44,8 @@ class VisualShapeSphere extends VisualShapeAbstract
 class VisualShapeModel extends VisualShapeAbstract
 {
     constructor(modelFile) {
+        super();
+        
         this.modelFile = modelFile;
     }
 
