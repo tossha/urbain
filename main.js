@@ -31,15 +31,15 @@ class Time
         this.epoch = initialEpoch;
         this.settings = settings;
         
-        settings.timeLine = this.epoch;
-        settings.timeScale = initialSpeed;
+        this.settings.timeLine = this.epoch;
+        this.settings.timeScale = initialSpeed;
     }
 
     tick(timePassed) {
-        if (settings.isTimeRunning) {
+        if (this.settings.isTimeRunning) {
             this.epoch += timePassed * settings.timeScale;
-            settings.timeLine = this.epoch;
-            settings.timeLineController.updateDisplay();
+            this.settings.timeLine = this.epoch;
+            this.settings.timeLineController.updateDisplay();
         }
     }
 
