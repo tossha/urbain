@@ -241,7 +241,7 @@ class TrajectoryStateArray extends TrajectoryAbstract
     }
 
     getStateInOwnFrameByEpoch(epoch) {
-        if (!this.minEpoch || !this.maxEpoch ||
+        if (this.minEpoch === null || this.maxEpoch === null ||
             epoch < this.minEpoch || this.maxEpoch < epoch) {
             return null;
         }
