@@ -202,7 +202,7 @@ class TrajectoryKeplerianOrbit extends TrajectoryAbstract
                 this.sma,
                 this.sma * Math.sqrt(1 - this.e * this.e),
                 ang,
-                2 * Math.PI + ang,
+                2 * Math.PI + ang - 0.0000000000001,  // protection from rounding errors
                 false,
                 this.aop
             )).getPoints(100)
