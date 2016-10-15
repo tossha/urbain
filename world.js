@@ -116,7 +116,7 @@ class TrajectoryKeplerianOrbit extends TrajectoryAbstract
         // @todo remove this from here
         this.threeObj = new THREE.Line(
             new THREE.Geometry(),
-            new THREE.LineBasicMaterial({color: this.color})
+            new THREE.LineBasicMaterial({color: this.color, vertexColors: THREE.VertexColors})
         );
 
         scene.add(this.threeObj);
@@ -184,9 +184,12 @@ class TrajectoryKeplerianOrbit extends TrajectoryAbstract
     }
 
     render(epoch) {
+        const endingBrightness = 0.15;
         let centerPos = this.referenceFrame.transformPositionByEpoch(epoch, ZERO_VECTOR, RF_BASE);
         let dr = -this.sma * this.e;
         let ta = this.getTrueAnomaly(epoch);
+        let mainColor = new THREE.Color(this.color);
+        let lastVertexIdx;
         let ang = Math.acos(
             (this.e + Math.cos(ta)) / (1 + this.e * Math.cos(ta))
         );
@@ -207,6 +210,17 @@ class TrajectoryKeplerianOrbit extends TrajectoryAbstract
                 this.aop
             )).getPoints(100)
         )).createPointsGeometry(100).rotateX(this.inc);
+
+        lastVertexIdx = this.threeObj.geometry.vertices.length - 1;
+
+        for (let i = 0; i <= lastVertexIdx; i++) {
+            let curColor = (new THREE.Color()).copy(mainColor);
+            let mult = endingBrightness + (1 - endingBrightness) * i / lastVertexIdx;
+            
+            this.threeObj.geometry.colors.push(
+                curColor.multiplyScalar(mult)
+            );
+        }
 
         this.threeObj.rotation.z = this.raan;
 
