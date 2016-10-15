@@ -225,7 +225,7 @@ class TrajectoryStateArray extends TrajectoryAbstract
     }
 
     addState(epoch, state) {
-        this.state.push([epoch, state]);
+        this.states.push([epoch, state]);
 
         if ((this.minEpoch === null)
             || (epoch < this.minEpoch)
@@ -242,5 +242,19 @@ class TrajectoryStateArray extends TrajectoryAbstract
 
     getStateInOwnFrameByEpoch(epoch) {
         // @todo implement
+		if (this.states.length === 0) return;
+		for (var i = 1; i < this.states.length; ++i) {
+			var next = this.states[i];
+			if (next[0] >= epoch) {
+				var prev = this.states[i - 1];
+				var acceleration = (next[1].velocity - prev[1].velocity) / (next[0] - prev[0]);
+				var time = epoch - prev[0];
+				var newVelocity = prev[1].velocity + acceleration.mul(time);
+				var newPosition = prev[1].position + newVelocity.add(prev[1].velocity).mul(time / 2);
+				return new StateVector(
+						newPosition.x, newPosition.y, newPosition.z,
+						newVelocity.x, newVelocity.y, newVelocity.z);
+			}
+		}
     }
 }
