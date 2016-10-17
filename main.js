@@ -12,7 +12,7 @@ class Settings
 
         this.timeLine = 0;
         this.timeScale = 200;
-        this.sizeScale = 20;
+        this.sizeScale = 1;
         this.isTimeRunning = true;
 
         this.timeLineController = this.guiTimeLine.add(this, 'timeLine', 0, 31557600);
@@ -94,6 +94,19 @@ function init()
 
 function initBuiltIn()
 {
+    for (id in SSDATA) {
+        let traj;
+        let trajConfig = SSDATA[id].traj;
+        let frame = new ReferenceFrame(trajConfig.rf.origin, trajConfig.rf.type);
+
+        if (SSDATA[id].traj.type === 'static') {
+            traj = new TrajectoryStaticPosition(frame, new Vector3(trajConfig.data[0], trajConfig.data[1], trajConfig.data[2]));
+        } else if (SSDATA[id].traj.type === 'keplerian') {
+            traj = new TrajectoryKeplerianOrbit(frame, 10, trajConfig.data.sma, trajConfig.data.e, trajConfig.data.inc, trajConfig.data.raan, trajConfig.data.aop, trajConfig.data.ta, trajConfig.data.epoch, color);
+        }
+    }
+
+    /*
     TRAJECTORIES[SOLAR_SYSTEM_BARYCENTER] = new TrajectoryStaticPosition(
         RF_BASE, // reference frame
         ZERO_VECTOR
@@ -143,6 +156,7 @@ function initBuiltIn()
         TRAJECTORIES[MOON],
         null
     );
+    */
 }
 
 function firstRender(curTime) {
@@ -151,8 +165,14 @@ function firstRender(curTime) {
 }
 
 function render(curTime) {
+    let earthPos;
+
     time.tick(curTime - globalTime);
     globalTime = curTime;
+
+    earthPos = BODIES[EARTH].getPositionByEpoch(time.epoch, RF_BASE);
+
+    controls.target = new THREE.Vector3(earthPos.x, earthPos.y, earthPos.z);
 
     controls.update();
 
