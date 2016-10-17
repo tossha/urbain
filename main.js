@@ -134,58 +134,6 @@ function initBuiltIn()
 		    );
         }
     }
-
-    /*
-    TRAJECTORIES[SOLAR_SYSTEM_BARYCENTER] = new TrajectoryStaticPosition(
-        RF_BASE, // reference frame
-        ZERO_VECTOR
-    );
-
-    TRAJECTORIES[EARTH_BARYCENTER] = new TrajectoryKeplerianOrbit(
-        RF_BASE,    // reference frame
-        MU[SUN],    // mu
-        149598261,  // sma
-        0.01671123, // e
-        0,          // inc
-        deg2rad(348.73936),  // raan
-        deg2rad(114.20783),  // aop
-        0,          // m0
-        0,          // epoch
-        'blue'      // color
-    );
-
-    TRAJECTORIES[EARTH] = new TrajectoryStaticPosition(
-        RF_EARTH_B, // reference frame
-        ZERO_VECTOR
-    );
-
-    TRAJECTORIES[MOON] = new TrajectoryKeplerianOrbit(
-        RF_EARTH_B,      // reference frame
-        MU[EARTH],       // mu
-        384399,          // sma
-        0.0549,          // e
-        deg2rad(5.145),  // inc
-        deg2rad(0),      // raan
-        deg2rad(0),      // aop
-        0,               // m0
-        0,               // epoch
-        'white'          // color
-    );
-
-    BODIES[EARTH] = new Body(
-        new VisualBodyModel(new VisualShapeSphere(6378.1363 * settings.sizeScale), 'blue'),
-        new PhysicalBodyModel(MU[EARTH], 6378.1363),
-        TRAJECTORIES[EARTH],
-        null
-    );
-
-    BODIES[MOON] = new Body(
-        new VisualBodyModel(new VisualShapeSphere(1738.2 * settings.sizeScale), 'white'),
-        new PhysicalBodyModel(MU[MOON], 1738.2),
-        TRAJECTORIES[MOON],
-        null
-    );
-    */
 }
 
 function firstRender(curTime) {

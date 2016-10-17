@@ -20,13 +20,8 @@ const RF_URANUS = new ReferenceFrame(URANUS, RF_TYPE_INERTIAL);
 const RF_NEPTUNE = new ReferenceFrame(NEPTUNE, RF_TYPE_INERTIAL);
 const RF_PLUTO = new ReferenceFrame(PLUTO, RF_TYPE_INERTIAL);
 
-const MU = [];
 const TRAJECTORIES = [];
 const BODIES = [];
-
-MU[SUN]   = 132712440017.99;
-MU[EARTH] = 398600.4415;
-MU[MOON]  = 4902.8005821478;
 
 const SSDATA = {
     "0": {
