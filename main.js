@@ -1,7 +1,7 @@
 
 class Settings
 {
-    constructor() {
+    constructor(initial) {
         this.guiMain = new dat.GUI({width: 350});
         this.guiTimeLine = new dat.GUI({
             autoPlace: false,
@@ -10,12 +10,12 @@ class Settings
 
         document.getElementById('bottomPanel').appendChild(this.guiTimeLine.domElement);
 
-        this.timeLine = 0;
-        this.timeScale = 200;
-        this.sizeScale = 1;
-        this.isTimeRunning = true;
+        this.timeLine = initial.timeLinePos;
+        this.timeScale = initial.timeScale;
+        this.sizeScale = initial.sizeScale;
+        this.isTimeRunning = initial.isTimeRunning;
 
-        this.timeLineController = this.guiTimeLine.add(this, 'timeLine', 504921600, 504921600 + 31557600);
+        this.timeLineController = this.guiTimeLine.add(this, 'timeLine', initial.timeLineStart, initial.timeLineEnd);
         this.guiMain.add(this, 'timeScale', -2000, 2000);
         this.guiMain.add(this, 'isTimeRunning');
 
@@ -27,17 +27,14 @@ class Settings
 
 class Time
 {
-    constructor(settings, initialEpoch, initialSpeed) {
-        this.epoch = initialEpoch;
+    constructor(settings) {
+        this.epoch = settings.timeLine;
         this.settings = settings;
-
-        this.settings.timeLine = this.epoch;
-        this.settings.timeScale = initialSpeed;
     }
 
     tick(timePassed) {
         if (this.settings.isTimeRunning) {
-            this.epoch += timePassed * settings.timeScale;
+            this.epoch += timePassed * this.settings.timeScale;
             this.settings.timeLine = this.epoch;
             this.settings.timeLineController.updateDisplay();
         }
@@ -87,9 +84,16 @@ function init()
 
     document.getElementById('viewport').appendChild(renderer.domElement);
 
-    settings = new Settings();
+    settings = new Settings({
+        timeLineStart: 504921600,
+        timeLineEnd:   504921600 + 31557600,
+        timeLinePos:   504921600,
+        timeScale:     100,
+        isTimeRunning: true,
+        sizeScale:     1
+    });
 
-    time = new Time(settings, 504921600, 200);
+    time = new Time(settings);
 }
 
 function initBuiltIn()
@@ -103,35 +107,35 @@ function initBuiltIn()
         if (SSDATA[id].traj.type === 'static') {
             traj = new TrajectoryStaticPosition(frame, new Vector3(trajConfig.data[0], trajConfig.data[1], trajConfig.data[2]));
         } else if (SSDATA[id].traj.type === 'keplerian') {
-        	let color = null;
+            let color = null;
 
-        	if (trajConfig.color !== undefined) {
-        		color = trajConfig.color;
-        	}
+            if (trajConfig.color !== undefined) {
+                color = trajConfig.color;
+            }
 
             traj = new TrajectoryKeplerianOrbit(
-            	frame,
-            	trajConfig.data.mu,
-            	trajConfig.data.sma,
-            	trajConfig.data.e,
-            	deg2rad(trajConfig.data.inc),
-            	deg2rad(trajConfig.data.raan),
-            	deg2rad(trajConfig.data.aop),
-            	deg2rad(trajConfig.data.ta),
-            	trajConfig.data.epoch,
-            	color
-        	);
+                frame,
+                trajConfig.data.mu,
+                trajConfig.data.sma,
+                trajConfig.data.e,
+                deg2rad(trajConfig.data.inc),
+                deg2rad(trajConfig.data.raan),
+                deg2rad(trajConfig.data.aop),
+                deg2rad(trajConfig.data.ta),
+                trajConfig.data.epoch,
+                color
+            );
         }
 
         TRAJECTORIES[bodyId] = traj;
 
         if (SSDATA[id].type === 'body') {
-    	    BODIES[bodyId] = new Body(
-		        new VisualBodyModel(new VisualShapeSphere(SSDATA[id].vis.r * settings.sizeScale), SSDATA[id].vis.color),
-		        new PhysicalBodyModel(SSDATA[id].phys.mu, SSDATA[id].phys.r),
-		        traj,
-		        null
-		    );
+            BODIES[bodyId] = new Body(
+                new VisualBodyModel(new VisualShapeSphere(SSDATA[id].vis.r * settings.sizeScale), SSDATA[id].vis.color),
+                new PhysicalBodyModel(SSDATA[id].phys.mu, SSDATA[id].phys.r),
+                traj,
+                null
+            );
         }
     }
 }
@@ -142,14 +146,8 @@ function firstRender(curTime) {
 }
 
 function render(curTime) {
-    let earthPos;
-
     time.tick(curTime - globalTime);
     globalTime = curTime;
-
-    earthPos = BODIES[EARTH].getPositionByEpoch(time.epoch, RF_BASE);
-
-    //controls.target = new THREE.Vector3(earthPos.x, earthPos.y, earthPos.z);
 
     controls.update();
 
