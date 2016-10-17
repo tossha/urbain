@@ -1,6 +1,52 @@
-var camera, scene, renderer, controls;
 
-var startTime = null, timeScale = 200, sizeScale = 30;
+class Settings
+{
+    constructor() {
+        this.guiMain = new dat.GUI({width: 350});
+        this.guiTimeLine = new dat.GUI({
+            autoPlace: false,
+            width: window.innerWidth * 0.9
+        });
+
+        document.getElementById('bottomPanel').appendChild(this.guiTimeLine.domElement);
+
+        this.timeLine = 0;
+        this.timeScale = 200;
+        this.sizeScale = 20;
+        this.isTimeRunning = true;
+
+        this.timeLineController = this.guiTimeLine.add(this, 'timeLine', 0, 31557600);
+        this.guiMain.add(this, 'timeScale', -2000, 2000);
+        this.guiMain.add(this, 'isTimeRunning');
+
+        this.timeLineController.onChange(function(value) {
+            time.forceEpoch(value);
+        });
+    }
+}
+
+class Time
+{
+    constructor(settings, initialEpoch, initialSpeed) {
+        this.epoch = initialEpoch;
+        this.settings = settings;
+        
+        this.settings.timeLine = this.epoch;
+        this.settings.timeScale = initialSpeed;
+    }
+
+    tick(timePassed) {
+        if (this.settings.isTimeRunning) {
+            this.epoch += timePassed * settings.timeScale;
+            this.settings.timeLine = this.epoch;
+            this.settings.timeLineController.updateDisplay();
+        }
+    }
+
+    forceEpoch(newEpoch) {
+        this.epoch = newEpoch;
+    }
+}
 
 class Body
 {
@@ -39,7 +85,11 @@ function init()
 
     controls = new THREE.OrbitControls(camera, renderer.domElement);
 
-    document.body.appendChild(renderer.domElement);
+    document.getElementById('viewport').appendChild(renderer.domElement);
+
+    settings = new Settings();
+
+    time = new Time(settings, 0, 200);
 }
 
 function initBuiltIn()
@@ -81,43 +131,48 @@ function initBuiltIn()
     );
 
     BODIES[EARTH] = new Body(
-        new VisualBodyModel(new VisualShapeSphere(6378.1363 * sizeScale), 'blue'),
+        new VisualBodyModel(new VisualShapeSphere(6378.1363 * settings.sizeScale), 'blue'),
         new PhysicalBodyModel(MU[EARTH], 6378.1363),
         TRAJECTORIES[EARTH],
         null
     );
 
     BODIES[MOON] = new Body(
-        new VisualBodyModel(new VisualShapeSphere(1738.2 * sizeScale), 'white'),
+        new VisualBodyModel(new VisualShapeSphere(1738.2 * settings.sizeScale), 'white'),
         new PhysicalBodyModel(MU[MOON], 1738.2),
         TRAJECTORIES[MOON],
         null
     );
 }
 
+function firstRender(curTime) {
+    globalTime = curTime;
+    requestAnimationFrame(render);
+}
 
 function render(curTime) {
-    if (startTime === null) {
-        startTime = curTime;
-    }
-    
-    let epoch = (curTime - startTime) * timeScale;
+    time.tick(curTime - globalTime);
+    globalTime = curTime;
 
     controls.update();
 
     for (bodyIdx in BODIES) {
-        BODIES[bodyIdx].render(epoch);
+        BODIES[bodyIdx].render(time.epoch);
     }
 
     for (trajIdx in TRAJECTORIES) {
-        TRAJECTORIES[trajIdx].render(epoch);
+        TRAJECTORIES[trajIdx].render(time.epoch);
     }
 
     renderer.render(scene, camera);
     requestAnimationFrame(render);
 }
 
-init();
-initBuiltIn();
+var camera, scene, renderer, controls;
+var settings, time, globalTime;
 
-requestAnimationFrame(render);
+window.onload = function () {
+    init();
+    initBuiltIn();
+    requestAnimationFrame(firstRender);
+}
