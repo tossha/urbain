@@ -1,7 +1,7 @@
 
 class Settings
 {
-    constructor() {
+    constructor(initial) {
         this.guiMain = new dat.GUI({width: 350});
         this.guiTimeLine = new dat.GUI({
             autoPlace: false,
@@ -10,12 +10,12 @@ class Settings
 
         document.getElementById('bottomPanel').appendChild(this.guiTimeLine.domElement);
 
-        this.timeLine = 0;
-        this.timeScale = 200;
-        this.sizeScale = 20;
-        this.isTimeRunning = true;
+        this.timeLine = initial.timeLinePos;
+        this.timeScale = initial.timeScale;
+        this.sizeScale = initial.sizeScale;
+        this.isTimeRunning = initial.isTimeRunning;
 
-        this.timeLineController = this.guiTimeLine.add(this, 'timeLine', 0, 31557600);
+        this.timeLineController = this.guiTimeLine.add(this, 'timeLine', initial.timeLineStart, initial.timeLineEnd);
         this.guiMain.add(this, 'timeScale', -2000, 2000);
         this.guiMain.add(this, 'isTimeRunning');
 
@@ -27,17 +27,14 @@ class Settings
 
 class Time
 {
-    constructor(settings, initialEpoch, initialSpeed) {
-        this.epoch = initialEpoch;
+    constructor(settings) {
+        this.epoch = settings.timeLine;
         this.settings = settings;
-        
-        this.settings.timeLine = this.epoch;
-        this.settings.timeScale = initialSpeed;
     }
 
     tick(timePassed) {
         if (this.settings.isTimeRunning) {
-            this.epoch += timePassed * settings.timeScale;
+            this.epoch += timePassed * this.settings.timeScale;
             this.settings.timeLine = this.epoch;
             this.settings.timeLineController.updateDisplay();
         }
@@ -87,62 +84,60 @@ function init()
 
     document.getElementById('viewport').appendChild(renderer.domElement);
 
-    settings = new Settings();
+    settings = new Settings({
+        timeLineStart: 504921600,
+        timeLineEnd:   504921600 + 31557600,
+        timeLinePos:   504921600,
+        timeScale:     100,
+        isTimeRunning: true,
+        sizeScale:     1
+    });
 
-    time = new Time(settings, 0, 200);
+    time = new Time(settings);
 }
 
 function initBuiltIn()
 {
-    TRAJECTORIES[SOLAR_SYSTEM_BARYCENTER] = new TrajectoryStaticPosition(
-        RF_BASE, // reference frame
-        ZERO_VECTOR
-    );
+    for (id in SSDATA) {
+        let traj;
+        let trajConfig = SSDATA[id].traj;
+        let frame = new ReferenceFrame(trajConfig.rf.origin, trajConfig.rf.type);
+        let bodyId = parseInt(id);
 
-    TRAJECTORIES[EARTH_BARYCENTER] = new TrajectoryKeplerianOrbit(
-        RF_BASE,    // reference frame
-        MU[SUN],    // mu
-        149598261,  // sma
-        0.01671123, // e
-        0,          // inc
-        deg2rad(348.73936),  // raan
-        deg2rad(114.20783),  // aop
-        0,          // m0
-        0,          // epoch
-        'blue'      // color
-    );
+        if (SSDATA[id].traj.type === 'static') {
+            traj = new TrajectoryStaticPosition(frame, new Vector3(trajConfig.data[0], trajConfig.data[1], trajConfig.data[2]));
+        } else if (SSDATA[id].traj.type === 'keplerian') {
+            let color = null;
 
-    TRAJECTORIES[EARTH] = new TrajectoryStaticPosition(
-        RF_EARTH_B, // reference frame
-        ZERO_VECTOR
-    );
+            if (trajConfig.color !== undefined) {
+                color = trajConfig.color;
+            }
 
-    TRAJECTORIES[MOON] = new TrajectoryKeplerianOrbit(
-        RF_EARTH_B,      // reference frame
-        MU[EARTH],       // mu
-        384399,          // sma
-        0.0549,          // e
-        deg2rad(5.145),  // inc
-        deg2rad(0),      // raan
-        deg2rad(0),      // aop
-        0,               // m0
-        0,               // epoch
-        'white'          // color
-    );
+            traj = new TrajectoryKeplerianOrbit(
+                frame,
+                trajConfig.data.mu,
+                trajConfig.data.sma,
+                trajConfig.data.e,
+                deg2rad(trajConfig.data.inc),
+                deg2rad(trajConfig.data.raan),
+                deg2rad(trajConfig.data.aop),
+                deg2rad(trajConfig.data.ta),
+                trajConfig.data.epoch,
+                color
+            );
+        }
 
-    BODIES[EARTH] = new Body(
-        new VisualBodyModel(new VisualShapeSphere(6378.1363 * settings.sizeScale), 'blue'),
-        new PhysicalBodyModel(MU[EARTH], 6378.1363),
-        TRAJECTORIES[EARTH],
-        null
-    );
+        TRAJECTORIES[bodyId] = traj;
 
-    BODIES[MOON] = new Body(
-        new VisualBodyModel(new VisualShapeSphere(1738.2 * settings.sizeScale), 'white'),
-        new PhysicalBodyModel(MU[MOON], 1738.2),
-        TRAJECTORIES[MOON],
-        null
-    );
+        if (SSDATA[id].type === 'body') {
+            BODIES[bodyId] = new Body(
+                new VisualBodyModel(new VisualShapeSphere(SSDATA[id].vis.r * settings.sizeScale), SSDATA[id].vis.color),
+                new PhysicalBodyModel(SSDATA[id].phys.mu, SSDATA[id].phys.r),
+                traj,
+                null
+            );
+        }
+    }
 }
 
 function firstRender(curTime) {

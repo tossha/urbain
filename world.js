@@ -98,7 +98,7 @@ class TrajectoryStaticPosition extends TrajectoryAbstract
 
 class TrajectoryKeplerianOrbit extends TrajectoryAbstract
 {
-    constructor(referenceFrame, mu, sma, e, inc, raan, aop, m0, epoch, color) {
+    constructor(referenceFrame, mu, sma, e, inc, raan, aop, ta, epoch, color) {
         super(referenceFrame);
 
         this.mu     = mu;
@@ -107,19 +107,40 @@ class TrajectoryKeplerianOrbit extends TrajectoryAbstract
         this.inc    = inc;
         this.raan   = raan;
         this.aop    = aop;
-        this.m0     = m0;
         this.epoch  = epoch;
         this.color  = color;
 
-        this.meanMotion = Math.sqrt(mu / sma) / sma;
-
-        // @todo remove this from here
-        this.threeObj = new THREE.Line(
-            new THREE.Geometry(),
-            new THREE.LineBasicMaterial({color: this.color, vertexColors: THREE.VertexColors})
+        this.m0 = this.getMeanAnomalyByEccentricAnomaly(
+            this.getEccentricAnomalyByTrueAnomaly(ta)
         );
 
-        scene.add(this.threeObj);
+        this.meanMotion = Math.sqrt(mu / sma) / sma;
+
+        if (color) {
+            // @todo remove this from here
+            this.threeObj = new THREE.Line(
+                new THREE.Geometry(),
+                new THREE.LineBasicMaterial({color: this.color, vertexColors: THREE.VertexColors})
+            );
+
+            scene.add(this.threeObj);
+        }
+    }
+
+    getEccentricAnomalyByTrueAnomaly(ta) {
+        const cos = Math.cos(ta);
+        const sin = Math.sin(ta);
+        const cosE = (this.e + cos) / (1 + this.e * cos);
+        const sinE = Math.sqrt(1 - this.e * this.e) * sin / (1 + this.e * cos);
+        const ang = Math.acos(cosE);
+
+        return (sinE > 0)
+            ? ang
+            : (2 * Math.PI - ang);
+    }
+
+    getMeanAnomalyByEccentricAnomaly(ea) {
+        return ea - this.e * Math.sin(ea);
     }
 
     getMeanAnomaly(epoch) {
@@ -184,7 +205,11 @@ class TrajectoryKeplerianOrbit extends TrajectoryAbstract
     }
 
     render(epoch) {
-        const endingBrightness = 0.15;
+        if (!this.color) {
+            return;
+        }
+
+        const endingBrightness = 0.35;
         let centerPos = this.referenceFrame.transformPositionByEpoch(epoch, ZERO_VECTOR, RF_BASE);
         let dr = -this.sma * this.e;
         let ta = this.getTrueAnomaly(epoch);
@@ -198,6 +223,7 @@ class TrajectoryKeplerianOrbit extends TrajectoryAbstract
             ang = 2 * Math.PI - ang;
         }
 
+        this.threeObj.geometry.dispose();
         this.threeObj.geometry = (new THREE.Path(
             (new THREE.EllipseCurve(
                 dr * Math.cos(this.aop),
@@ -216,7 +242,7 @@ class TrajectoryKeplerianOrbit extends TrajectoryAbstract
         for (let i = 0; i <= lastVertexIdx; i++) {
             let curColor = (new THREE.Color()).copy(mainColor);
             let mult = endingBrightness + (1 - endingBrightness) * i / lastVertexIdx;
-            
+
             this.threeObj.geometry.colors.push(
                 curColor.multiplyScalar(mult)
             );
