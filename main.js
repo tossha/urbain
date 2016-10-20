@@ -14,10 +14,14 @@ class Settings
         this.timeScale = initial.timeScale;
         this.sizeScale = initial.sizeScale;
         this.isTimeRunning = initial.isTimeRunning;
+        this.trackingObject = initial.trackingObject;
 
         this.timeLineController = this.guiTimeLine.add(this, 'timeLine', initial.timeLineStart, initial.timeLineEnd);
         this.guiMain.add(this, 'timeScale', -2000, 2000);
         this.guiMain.add(this, 'isTimeRunning');
+        this.guiMain.add(this, 'trackingObject', initial.objectsForTracking).onChange(function(value) {
+            trackingCoords = TRAJECTORIES[value].getPositionByEpoch(time.epoch, RF_BASE);
+        });
 
         this.timeLineController.onChange(function(value) {
             time.forceEpoch(value);
@@ -65,8 +69,9 @@ class Body
     }
 }
 
-function init()
-{
+function init() {
+	let objectsForTracking = {};
+
     camera = new THREE.PerspectiveCamera(60, window.innerWidth / window.innerHeight, 1, 1000000000);
     camera.position.x = 300000000;
     camera.position.y = 300000000;
@@ -84,20 +89,25 @@ function init()
 
     document.getElementById('viewport').appendChild(renderer.domElement);
 
+    for (objId in SSDATA) {
+    	objectsForTracking[SSDATA[objId].name] = objId;
+    }
+
     settings = new Settings({
-        timeLineStart: 504921600,
-        timeLineEnd:   504921600 + 31557600,
-        timeLinePos:   504921600,
-        timeScale:     100,
-        isTimeRunning: true,
-        sizeScale:     1
+        timeLineStart:      504921600,
+        timeLineEnd:        504921600 + 31557600,
+        timeLinePos:        504921600,
+        timeScale:          100,
+        isTimeRunning:      true,
+        sizeScale:          1,
+        trackingObject:     EARTH_BARYCENTER,
+        objectsForTracking: objectsForTracking,
     });
 
     time = new Time(settings);
 }
 
-function initBuiltIn()
-{
+function initBuiltIn() {
     for (id in SSDATA) {
         let traj;
         let trajConfig = SSDATA[id].traj;
@@ -142,12 +152,26 @@ function initBuiltIn()
 
 function firstRender(curTime) {
     globalTime = curTime;
+    trackingCoords = TRAJECTORIES[settings.trackingObject].getPositionByEpoch(time.epoch, RF_BASE);
     requestAnimationFrame(render);
 }
 
 function render(curTime) {
+	let newTrackingCoords;
     time.tick(curTime - globalTime);
     globalTime = curTime;
+
+    newTrackingCoords = TRAJECTORIES[settings.trackingObject].getPositionByEpoch(time.epoch, RF_BASE);
+
+    controls.object.position.x += newTrackingCoords.x - trackingCoords.x;
+    controls.object.position.y += newTrackingCoords.y - trackingCoords.y;
+    controls.object.position.z += newTrackingCoords.z - trackingCoords.z;
+
+    controls.target.x = newTrackingCoords.x;
+    controls.target.y = newTrackingCoords.y;
+    controls.target.z = newTrackingCoords.z;
+
+    trackingCoords = newTrackingCoords;
 
     controls.update();
 
@@ -164,7 +188,7 @@ function render(curTime) {
 }
 
 var camera, scene, renderer, controls;
-var settings, time, globalTime;
+var settings, time, globalTime, trackingCoords;
 
 window.onload = function () {
     init();
