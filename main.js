@@ -70,7 +70,7 @@ class Body
 }
 
 function init() {
-	let objectsForTracking = {};
+    let objectsForTracking = {};
 
     camera = new THREE.PerspectiveCamera(60, window.innerWidth / window.innerHeight, 1, 1000000000);
     camera.position.x = 300000000;
@@ -90,7 +90,7 @@ function init() {
     document.getElementById('viewport').appendChild(renderer.domElement);
 
     for (objId in SSDATA) {
-    	objectsForTracking[SSDATA[objId].name] = objId;
+        objectsForTracking[SSDATA[objId].name] = objId;
     }
 
     settings = new Settings({
@@ -157,7 +157,7 @@ function firstRender(curTime) {
 }
 
 function render(curTime) {
-	let newTrackingCoords;
+    let newTrackingCoords;
     time.tick(curTime - globalTime);
     globalTime = curTime;
 
