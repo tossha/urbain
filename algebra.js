@@ -193,3 +193,15 @@ function deg2rad(degrees) {
 function red2deg(radians) {
     return radians * 180 / Math.PI;
 }
+
+function getRotationOnGlobalAngel(x, y, z)
+{
+    var q1 = new THREE.Quaternion;
+    var q2 = new THREE.Quaternion;
+    var q3 = new THREE.Quaternion;
+    
+    q1.setFromAxisAngle( new THREE.Vector3(1, 0, 0), x); // X
+    q2.setFromAxisAngle( new THREE.Vector3(0, 1, 0), y); // Y
+    q3.setFromAxisAngle( new THREE.Vector3(0, 0, 1), z); // Z
+    return q1.multiply(q2).multiply(q3);
+}

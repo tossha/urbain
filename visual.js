@@ -1,40 +1,44 @@
 "use_strict";
-const CommonTetxurePath = '../texture/';
-var   loader = new THREE.TextureLoader;
 
 class VisualBodyModel
 {
     constructor(shape, color, texturePath) {
         this.shape = shape;   // class VisualShapeAbstract
         this.color = color;
-
         this.body = null; // class Body
+        this.texture = null;
 		
-		this.texture = null;
-		this.material = new THREE.MeshBasicMaterial( {color: this.color, wireframe: true} );
-		
-		this.threeObj = new THREE.Mesh(
+        this.threeObj = new THREE.Mesh(
             this.shape.getThreeGeometry(),
-            this.material
+            new THREE.MeshBasicMaterial( {color: this.color, wireframe: true} )
         );
 		
         scene.add(this.threeObj);
 		
-		if(texturePath !== undefined){
-			var that = this;
+        if(texturePath !== undefined){
+		    var that = this;
 			
-			loader.load(
-				CommonTetxurePath + texturePath,
-				function( txt ) { that.threeObj.material = new THREE.MeshBasicMaterial( {map: txt} ) },
-				function(     ) {                                                                    },
-				function( err ) { console.log(err);                                                  }
-			);
-		}
+            textureLoader.load(
+                COMMON_TEXTURE_PATH + texturePath,
+                function( txt ) {
+                    that.threeObj.material = new THREE.MeshBasicMaterial( {map: txt} ) 
+                },
+                null,
+                function( err ) { 
+                    console.log(err);
+                }					
+            );
+        }
     }
 
     render(epoch) {
         var pos = this.body.getPositionByEpoch(epoch, RF_BASE);
         this.threeObj.position.set(pos.x, pos.y, pos.z);
+		
+        if(this.body.orientation != undefined){
+            var rot = this.body.orientation.getOrientationByEpoch(epoch);
+            this.threeObj.quaternion.slerp(rot, 1);
+        }
     }
 }
 

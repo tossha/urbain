@@ -88,7 +88,9 @@ function init() {
     controls = new THREE.OrbitControls(camera, renderer.domElement);
 
     document.getElementById('viewport').appendChild(renderer.domElement);
-
+    
+	textureLoader = new THREE.TextureLoader();
+	
     for (objId in SSDATA) {
         objectsForTracking[SSDATA[objId].name] = objId;
     }
@@ -141,10 +143,16 @@ function initBuiltIn() {
 
         if (SSDATA[id].type === 'body') {
             BODIES[bodyId] = new Body(
-                new VisualBodyModel(new VisualShapeSphere(SSDATA[id].vis.r * settings.sizeScale), SSDATA[id].vis.color, SSDATA[id].vis.txt),
+                new VisualBodyModel(
+                    new VisualShapeSphere(SSDATA[id].vis.r * settings.sizeScale), 
+                    SSDATA[id].vis.color, SSDATA[id].vis.texture
+                ),
                 new PhysicalBodyModel(SSDATA[id].phys.mu, SSDATA[id].phys.r),
                 traj,
-                null
+                new Orientation(
+                    getRotationOnGlobalAngel(SSDATA[id].orient.sx, SSDATA[id].orient.sy, SSDATA[id].orient.sz), 
+                    SSDATA[id].orient.dx, SSDATA[id].orient.dy, SSDATA[id].orient.dz
+                )
             );
         }
     }
@@ -189,6 +197,7 @@ function render(curTime) {
 
 var camera, scene, renderer, controls;
 var settings, time, globalTime, trackingCoords;
+var textureLoader;
 
 window.onload = function () {
     init();

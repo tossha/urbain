@@ -54,7 +54,15 @@ const SSDATA = {
         vis: {
             color: 'yellow',
             r: 695990,
-			txt: 'SunTexture.jpg'
+            texture: 'SunTexture.jpg'
+        },
+        orient: {
+            sx: 0,
+            sy: 0,
+            sz: 0,
+            dx: 0,
+            dy: 0,
+            dz: 0
         }
     },
     "199": {
@@ -85,6 +93,14 @@ const SSDATA = {
         vis: {
             color: 'azure',
             r: 2440
+        },
+        orient: {
+            sx: 0,
+            sy: 0,
+            sz: 0,
+            dx: 0,
+            dy: 0,
+            dz: 0
         }
     },
     "299": {
@@ -115,7 +131,15 @@ const SSDATA = {
         vis: {
             color: 'orange',
             r: 6051.9,
-			txt: 'VenusTexture.jpg'
+            texture: 'VenusTexture.jpg'
+        },
+        orient: {
+            sx: 0,
+            sy: 0,
+            sz: 0,
+            dx: 0,
+            dy: 0,
+            dz: 0
         }
     },
     "3": {
@@ -163,12 +187,20 @@ const SSDATA = {
         },
         phys: {
             mu: 398600.4415,
-            r: 6378.1363
+            r: 6378.1363,
         },
         vis: {
             color: 'blue',
             r: 6378.1363,
-			txt: 'EarthTexture.jpg'
+            texture: 'EarthTexture.jpg'
+        },
+        orient: {
+            sx: 0.5,
+            sy: 0,
+            sz: 0,
+            dx: 0,
+            dy: 0,
+            dz: 0.05
         }
     },
     "301": {
@@ -199,7 +231,15 @@ const SSDATA = {
         vis: {
             color: 'white',
             r: 1738.2,
-			txt: 'MoonTexture.jpg'
+            texture: 'MoonTexture.jpg'
+        },
+        orient: {
+            sx: 0,
+            sy: 0,
+            sz: 0,
+            dx: 0,
+            dy: 0,
+            dz: 0
         }
     },
     "499": {
@@ -230,6 +270,14 @@ const SSDATA = {
         vis: {
             color: 'red',
             r: 6051.9
+        },
+        orient: {
+            sx: 0,
+            sy: 0,
+            sz: 0,
+            dx: 0,
+            dy: 0,
+            dz: 0
         }
     },
     "599": {
@@ -260,6 +308,14 @@ const SSDATA = {
         vis: {
             color: 'burlywood',
             r: 69911
+        },
+        orient: {
+            sx: 0,
+            sy: 0,
+            sz: 0,
+            dx: 0,
+            dy: 0,
+            dz: 0
         }
     },
     "699": {
@@ -290,6 +346,14 @@ const SSDATA = {
         vis: {
             color: 'sandybrown',
             r: 58232
+        },
+        orient: {
+            sx: 0,
+            sy: 0,
+            sz: 0,
+            dx: 0,
+            dy: 0,
+            dz: 0
         }
     },
     "799": {
@@ -320,6 +384,14 @@ const SSDATA = {
         vis: {
             color: 'lightskyblue',
             r: 25362
+        },
+        orient: {
+            sx: 0,
+            sy: 0,
+            sz: 0,
+            dx: 0,
+            dy: 0,
+            dz: 0
         }
     },
     "899": {
@@ -350,6 +422,14 @@ const SSDATA = {
         vis: {
             color: 'steelblue',
             r: 24624
+        },
+        orient: {
+            sx: 0,
+            sy: 0,
+            sz: 0,
+            dx: 0,
+            dy: 0,
+            dz: 0
         }
     },
     "9": {
@@ -402,6 +482,14 @@ const SSDATA = {
         vis: {
             color: 'tan',
             r: 1195
+        },
+        orient: {
+            sx: 0,
+            sy: 0,
+            sz: 0,
+            dx: 0,
+            dy: 0,
+            dz: 0
         }
     },
     "901": {
@@ -432,6 +520,14 @@ const SSDATA = {
         vis: {
             color: 'rosybrown',
             r: 605
+        },
+        orient: {
+            sx: 0,
+            sy: 0,
+            sz: 0,
+            dx: 0,
+            dy: 0,
+            dz: 0
         }
     }
 };
