@@ -1,18 +1,35 @@
 "use_strict";
+const CommonTetxurePath = '../texture/';
+var   loader = new THREE.TextureLoader;
 
 class VisualBodyModel
 {
-    constructor(shape, texture) {
-        this.shape   = shape;   // class VisualShapeAbstract
-        this.texture = texture;
+    constructor(shape, color, texturePath) {
+        this.shape = shape;   // class VisualShapeAbstract
+        this.color = color;
 
         this.body = null; // class Body
-
-        this.threeObj = new THREE.Mesh(
+		
+		this.texture = null;
+		this.material = new THREE.MeshBasicMaterial( {color: this.color, wireframe: true} );
+		
+		this.threeObj = new THREE.Mesh(
             this.shape.getThreeGeometry(),
-            new THREE.MeshBasicMaterial({color: this.texture, wireframe: true})
+            this.material
         );
+		
         scene.add(this.threeObj);
+		
+		if(texturePath !== undefined){
+			var that = this;
+			
+			loader.load(
+				CommonTetxurePath + texturePath,
+				function( txt ) { that.threeObj.material = new THREE.MeshBasicMaterial( {map: txt} ) },
+				function(     ) {                                                                    },
+				function( err ) { console.log(err);                                                  }
+			);
+		}
     }
 
     render(epoch) {

@@ -141,7 +141,7 @@ function initBuiltIn() {
 
         if (SSDATA[id].type === 'body') {
             BODIES[bodyId] = new Body(
-                new VisualBodyModel(new VisualShapeSphere(SSDATA[id].vis.r * settings.sizeScale), SSDATA[id].vis.color),
+                new VisualBodyModel(new VisualShapeSphere(SSDATA[id].vis.r * settings.sizeScale), SSDATA[id].vis.color, SSDATA[id].vis.txt),
                 new PhysicalBodyModel(SSDATA[id].phys.mu, SSDATA[id].phys.r),
                 traj,
                 null
