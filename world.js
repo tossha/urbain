@@ -225,8 +225,11 @@ class TrajectoryStateArray extends TrajectoryAbstract
     }
 
     addState(epoch, state) {
-        this.states.push([epoch, state]);
-
+        this.states.push({
+            "time": epoch,
+            "state": state
+        });
+        
         if ((this.minEpoch === null)
             || (epoch < this.minEpoch)
         ) {
@@ -249,19 +252,30 @@ class TrajectoryStateArray extends TrajectoryAbstract
             return null;
         }
         
+        // Поиск перебором. Потом можно заменить на бинпоиск, но сейчас это неоправданно усложнит код
         for (let i = 1; i < this.states.length; ++i) {
             const next = this.states[i];
-            if (next[0] >= epoch) {
-                const prev = this.states[i - 1];
-                const acceleration = next[1].velocity.sub(prev[1].velocity).div(next[0] - prev[0]);
-                const timeDiff = epoch - prev[0];
-                const newVelocity = acceleration.mul(timeDiff).add(prev[1].velocity);
-                const newPosition = newVelocity.add(prev[1].velocity).
-                        mul(timeDiff / 2).add(prev[1].position);
-                return new StateVector(
-                    newPosition.x, newPosition.y, newPosition.z,
-                    newVelocity.x, newVelocity.y, newVelocity.z);
+            if (next.time < epoch) {
+                continue;
             }
+            
+            const prev = this.states[i - 1];
+            // Ускорение -- отношение изменения скорости ко времени, за которое оно произошло
+            const acceleration = next.state.velocity.sub(prev.state.velocity).div(next.time - prev.time);
+            const timeDiff = epoch - prev.time;
+            /* Считаем скорость и положение на данном отрезке по формулам для равноускоренного движения,
+               так как на заданном малом промежутке времени движение можно считать равноускоренным:
+               v1 = v0 + a * t
+               r1 = r0 + (v0 + v1) / 2 * t
+               Где v1 -- новый вектор скорости, v0 -- предыдущий вектор скорости,
+               a -- вектор ускорения, t -- время, за которое произошло движение,
+               r1 -- новый вектор положения, r0 -- предыдущий вектор положения */
+            const newVelocity = acceleration.mul(timeDiff).add(prev.state.velocity);
+            const newPosition = newVelocity.add(prev.state.velocity).
+                    mul(timeDiff / 2).add(prev.state.position);
+            return new StateVector(
+                newPosition.x, newPosition.y, newPosition.z,
+                newVelocity.x, newVelocity.y, newVelocity.z);
         }
     }
 }
