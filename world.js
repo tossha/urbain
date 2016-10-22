@@ -226,8 +226,8 @@ class TrajectoryStateArray extends TrajectoryAbstract
 
     addState(epoch, state) {
         this.states.push({
-            "time": epoch,
-            "state": state
+            epoch: epoch,
+            state: state
         });
         
         if ((this.minEpoch === null)
