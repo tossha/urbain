@@ -7,29 +7,34 @@ class PhysicalBodyModel
     }
 }
 
-class TrajectoryCalculator
+class Propagator
 {
-    constructor(referenceFrame, baseEpoch, baseState, timeStep) {
+    /*constructor(referenceFrame, baseEpoch, baseState, timeStep) {
         this.trajectory = new TrajectoryStateArray(referenceFrame);
         this.trajectory.addState(baseEpoch, baseState);
         this.timeStep = timeStep;
+    }*/
+
+    constructor(significantBodies, timeStep) {
+        this.significantBodies = significantBodies;
+        this.timeStep = timeStep;
     }
     
-    calculateTo(newEpoch) {
-        const states = this.trajectory.states;
-        for (let currentEpoch = states[states.length - 1].time; currentEpoch < newEpoch; currentEpoch += this.timeStep) {
+    propagateTrajectory(trajectory, /* exitCondition */ exitTime) {
+        const states = trajectory.states;
+        for (let currentEpoch = states[states.length - 1].time; currentEpoch < exitTime; currentEpoch += this.timeStep) {
             const lastPoint = states[states.length - 1];
             
             let acceleration = ZERO_VECTOR;
-            for (bodyId in BODIES) {
-                const body = BODIES[bodyId];
+            for (bodyIdId in this.significantBodies) {
+                const body = BODIES[this.significantBodies[bodyIdId]];
                 if (body.physicalModel.mu == 0) {
                     continue;
                 }
-                const vec12 = body.trajectory.getPositionByEpoch(currentEpoch,
+                const rvec = body.trajectory.getPositionByEpoch(currentEpoch,
                         this.trajectory.referenceFrame).sub(lastPoint.position);
-                const abs = vec12.abs();
-                acceleration = vec12.mul(body.physicalModel.mu / abs / abs / abs).add(acceleration);
+                const abs = rvec.abs();
+                acceleration = rvec.mul(body.physicalModel.mu / abs / abs / abs).add(acceleration);
             }
             
             const newVelocity = acceleration.mul(this.timeStep).add(lastPoint.velocity);
