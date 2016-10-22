@@ -9,12 +9,6 @@ class PhysicalBodyModel
 
 class Propagator
 {
-    /*constructor(referenceFrame, baseEpoch, baseState, timeStep) {
-        this.trajectory = new TrajectoryStateArray(referenceFrame);
-        this.trajectory.addState(baseEpoch, baseState);
-        this.timeStep = timeStep;
-    }*/
-
     constructor(significantBodies, timeStep) {
         this.significantBodies = significantBodies;
         this.timeStep = timeStep;
@@ -22,11 +16,11 @@ class Propagator
     
     propagateTrajectory(trajectory, /* exitCondition */ exitEpoch) {
         const states = trajectory.states;
-        for (let currentEpoch = states[states.length - 1].time; currentEpoch < exitEpoch; currentEpoch += this.timeStep) {
+        for (let currentEpoch = states[states.length - 1].epoch; currentEpoch < exitEpoch; currentEpoch += this.timeStep) {
             const lastPoint = states[states.length - 1];
             
             let acceleration = ZERO_VECTOR;
-            for (bodyIdIdx in this.significantBodies) {
+            for (let bodyIdIdx in this.significantBodies) {
                 const body = BODIES[this.significantBodies[bodyIdIdx]];
                 if (!body.physicalModel.mu) {
                     continue;
