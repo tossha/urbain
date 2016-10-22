@@ -295,14 +295,14 @@ class TrajectoryStateArray extends TrajectoryAbstract
         // Поиск перебором. Потом можно заменить на бинпоиск, но сейчас это неоправданно усложнит код
         for (let i = 1; i < this.states.length; ++i) {
             const next = this.states[i];
-            if (next.time < epoch) {
+            if (next.epoch < epoch) {
                 continue;
             }
             
             const prev = this.states[i - 1];
             // Ускорение -- отношение изменения скорости ко времени, за которое оно произошло
-            const acceleration = next.state.velocity.sub(prev.state.velocity).div(next.time - prev.time);
-            const timeDiff = epoch - prev.time;
+            const acceleration = next.state.velocity.sub(prev.state.velocity).div(next.epoch - prev.epoch);
+            const timeDiff = epoch - prev.epoch;
             /* Считаем скорость и положение на данном отрезке по формулам для равноускоренного движения,
                так как на заданном малом промежутке времени движение можно считать равноускоренным:
                v1 = v0 + a * t
