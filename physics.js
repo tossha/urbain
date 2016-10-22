@@ -17,7 +17,7 @@ class TrajectoryCalculator
     
     calculateTo(newEpoch) {
         const states = this.trajectory.states;
-        for (let currentEpoch = lastPoint.time; currentEpoch < newEpoch; currentEpoch += this.timeStep) {
+        for (let currentEpoch = states[states.length - 1].time; currentEpoch < newEpoch; currentEpoch += this.timeStep) {
             const lastPoint = states[states.length - 1];
             
             let acceleration = ZERO_VECTOR;
