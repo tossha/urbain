@@ -26,6 +26,44 @@ class Settings
         this.timeLineController.onChange(function(value) {
             time.forceEpoch(value);
         });
+        
+        
+        this.guiAddTrajectory = new dat.GUI({
+            autoPlace: false,
+            width: 350
+        });
+        this.trajectoryFrame = initial.trackingObject;
+        this.guiAddTrajectory.add(this, 'trajectoryFrame', initial.objectsForTracking);
+        this.trajectoryMu    =         1; this.guiAddTrajectory.add(this, 'trajectoryMu'   );
+        this.trajectorySma   =         1; this.guiAddTrajectory.add(this, 'trajectorySma'  );
+        this.trajectoryE     =         1; this.guiAddTrajectory.add(this, 'trajectoryE'    );
+        this.trajectoryInc   =         1; this.guiAddTrajectory.add(this, 'trajectoryInc'  );
+        this.trajectoryRaan  =         1; this.guiAddTrajectory.add(this, 'trajectoryRaan' );
+        this.trajectoryAop   =         1; this.guiAddTrajectory.add(this, 'trajectoryAop'  );
+        this.trajectoryTa    =         1; this.guiAddTrajectory.add(this, 'trajectoryTa'   );
+        this.trajectoryEpoch =         1; this.guiAddTrajectory.add(this, 'trajectoryEpoch');
+        this.trajectoryColor = '#ffffff'; this.guiAddTrajectory.add(this, 'trajectoryColor');
+        
+        const that = this;
+        this.trajectoryAdd = function() {
+            const newOrbit = new TrajectoryKeplerianOrbit(
+                RF_BASE,
+                that.trajectoryMu,
+                that.trajectorySma,
+                that.trajectoryE,
+                deg2rad(that.trajectoryInc ),
+                deg2rad(that.trajectoryRaan),
+                deg2rad(that.trajectoryAop ),
+                deg2rad(that.trajectoryTa  ),
+                that.trajectoryEpoch,
+                that.trajectoryColor
+            );
+            FAKE_TRAJECTORY_IDXS.push(TRAJECTORIES.length);
+            TRAJECTORIES.push(newOrbit);
+            scene.add(newOrbit.threeObj);
+        };
+        this.guiAddTrajectory.add(this, 'trajectoryAdd');
+        document.getElementById('leftPanel').appendChild(this.guiAddTrajectory.domElement);
     }
 }
 
