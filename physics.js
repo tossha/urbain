@@ -15,34 +15,38 @@ class Propagator
     }
     
     propagateTrajectory(trajectory, /* exitCondition */ exitEpoch) {
-        const states = trajectory.states;
-        for (let currentEpoch = states[states.length - 1].epoch; currentEpoch < exitEpoch; currentEpoch += this.timeStep) {
-            const lastPoint = states[states.length - 1];
-            
+        const lastState = trajectory.states[trajectory.states.length - 1];
+        let currentPosition = lastState.state.position;
+        let currentVelocity = lastState.state.velocity;
+        let currentEpoch = lastState.epoch;
+        while (currentEpoch <= exitEpoch) {
             let acceleration = ZERO_VECTOR;
             for (let bodyIdIdx in this.significantBodies) {
                 const body = BODIES[this.significantBodies[bodyIdIdx]];
                 if (!body.physicalModel.mu) {
                     continue;
                 }
+
                 const rvec = body.trajectory.getPositionByEpoch(
                     currentEpoch,
                     trajectory.referenceFrame
-                ).sub(lastPoint.state.position);
-                
+                ).sub(currentPosition);
+
                 const mag = rvec.mag();
                 acceleration = rvec.mul(body.physicalModel.mu / mag / mag / mag).add(acceleration);
             }
-            
-            const newVelocity = acceleration.mul(this.timeStep).add(lastPoint.state.velocity);
-            const newPosition = newVelocity.add(lastPoint.state.velocity).mul(this.timeStep / 2).add(lastPoint.state.position);
-            
-            states.push({
-                epoch: currentEpoch + this.timeStep,
-                state: new StateVector(
-                        newPosition.x, newPosition.y, newPosition.z,
-                        newVelocity.x, newVelocity.y, newVelocity.z)
-            });
+
+            const newVelocity = acceleration.mul(this.timeStep).add(currentVelocity);
+            const newPosition = newVelocity.add(currentVelocity).mul(this.timeStep / 2).add(currentPosition);
+
+            currentPosition = newPosition;
+            currentVelocity = newVelocity;
+            currentEpoch += this.timeStep;
+
+            trajectory.addState(currentEpoch, new StateVector(
+                currentPosition.x, currentPosition.y, currentPosition.z,
+                currentVelocity.x, currentVelocity.y, currentVelocity.z
+            ));
         }
     }
 }
