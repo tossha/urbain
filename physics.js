@@ -20,29 +20,32 @@ class Propagator
         this.timeStep = timeStep;
     }
     
-    propagateTrajectory(trajectory, /* exitCondition */ exitTime) {
+    propagateTrajectory(trajectory, /* exitCondition */ exitEpoch) {
         const states = trajectory.states;
-        for (let currentEpoch = states[states.length - 1].time; currentEpoch < exitTime; currentEpoch += this.timeStep) {
+        for (let currentEpoch = states[states.length - 1].time; currentEpoch < exitEpoch; currentEpoch += this.timeStep) {
             const lastPoint = states[states.length - 1];
             
             let acceleration = ZERO_VECTOR;
-            for (bodyIdId in this.significantBodies) {
-                const body = BODIES[this.significantBodies[bodyIdId]];
-                if (body.physicalModel.mu == 0) {
+            for (bodyIdIdx in this.significantBodies) {
+                const body = BODIES[this.significantBodies[bodyIdIdx]];
+                if (!body.physicalModel.mu) {
                     continue;
                 }
-                const rvec = body.trajectory.getPositionByEpoch(currentEpoch,
-                        this.trajectory.referenceFrame).sub(lastPoint.position);
-                const abs = rvec.abs();
-                acceleration = rvec.mul(body.physicalModel.mu / abs / abs / abs).add(acceleration);
+                const rvec = body.trajectory.getPositionByEpoch(
+                    currentEpoch,
+                    trajectory.referenceFrame
+                ).sub(lastPoint.state.position);
+                
+                const mag = rvec.mag();
+                acceleration = rvec.mul(body.physicalModel.mu / mag / mag / mag).add(acceleration);
             }
             
-            const newVelocity = acceleration.mul(this.timeStep).add(lastPoint.velocity);
-            const newPosition = newVelocity.add(lastPoint.velocity).mul(this.timeStep / 2).add(lastPoint.position);
+            const newVelocity = acceleration.mul(this.timeStep).add(lastPoint.state.velocity);
+            const newPosition = newVelocity.add(lastPoint.state.velocity).mul(this.timeStep / 2).add(lastPoint.state.position);
             
             states.push({
-                "time": currentEpoch + this.timeStep,
-                "state": new StateVector(
+                epoch: currentEpoch + this.timeStep,
+                state: new StateVector(
                         newPosition.x, newPosition.y, newPosition.z,
                         newVelocity.x, newVelocity.y, newVelocity.z)
             });

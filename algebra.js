@@ -17,7 +17,7 @@ class Vector3
         return this.vector[2];
     }
 
-    abs() {
+    mag() {
         return Math.sqrt(this.vector[0] * this.vector[0] + this.vector[1] * this.vector[1] + this.vector[2] * this.vector[2]);
     }
 
