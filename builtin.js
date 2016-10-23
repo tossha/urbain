@@ -53,7 +53,8 @@ const SSDATA = {
         },
         vis: {
             color: 'yellow',
-            r: 695990
+            r: 695990,
+            texture: 'SunTexture.jpg'
         }
     },
     "199": {
@@ -113,7 +114,8 @@ const SSDATA = {
         },
         vis: {
             color: 'orange',
-            r: 6051.9
+            r: 6051.9,
+            texture: 'VenusTexture.jpg'
         }
     },
     "3": {
@@ -165,7 +167,8 @@ const SSDATA = {
         },
         vis: {
             color: 'blue',
-            r: 6378.1363
+            r: 6378.1363,
+            texture: 'EarthTexture.jpg'
         }
     },
     "301": {
@@ -195,7 +198,8 @@ const SSDATA = {
         },
         vis: {
             color: 'white',
-            r: 1738.2
+            r: 1738.2,
+            texture: 'MoonTexture.jpg'
         }
     },
     "499": {
