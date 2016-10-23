@@ -6,7 +6,6 @@ class VisualBodyModel
         this.shape = shape;   // class VisualShapeAbstract
         this.color = color;
         this.body = null; // class Body
-        this.texture = null;
         
         this.threeObj = new THREE.Mesh(
             this.shape.getThreeGeometry(),
@@ -21,6 +20,7 @@ class VisualBodyModel
             textureLoader.load(
                 COMMON_TEXTURE_PATH + texturePath,
                 function(txt) {
+					that.threeObj.material.dispose();
                     that.threeObj.material = new THREE.MeshBasicMaterial({map: txt}) 
                 },
                 null,
