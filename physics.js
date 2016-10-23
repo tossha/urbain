@@ -19,8 +19,10 @@ class Propagator
         let currentPosition = lastState.state.position;
         let currentVelocity = lastState.state.velocity;
         let currentEpoch = lastState.epoch;
+
         while (currentEpoch < exitEpoch) {
             let acceleration = ZERO_VECTOR;
+
             for (let bodyIdIdx in this.significantBodies) {
                 const body = BODIES[this.significantBodies[bodyIdIdx]];
                 if (!body.physicalModel.mu) {

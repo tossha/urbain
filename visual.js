@@ -44,11 +44,11 @@ class VisualShapeAbstract
 
 class VisualShapeSphere extends VisualShapeAbstract
 {
-    constructor(radius) {
+    constructor(radius, segments) {
         super();
 
         this.radius = radius;
-        this.threeGeometry = new THREE.SphereGeometry(radius, 16, 8);
+        this.threeGeometry = new THREE.SphereGeometry(radius, segments * 2, segments);
         this.threeGeometry.rotateX(Math.PI / 2);
     }
 

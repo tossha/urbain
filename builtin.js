@@ -20,8 +20,8 @@ const RF_URANUS = new ReferenceFrame(URANUS, RF_TYPE_INERTIAL);
 const RF_NEPTUNE = new ReferenceFrame(NEPTUNE, RF_TYPE_INERTIAL);
 const RF_PLUTO = new ReferenceFrame(PLUTO, RF_TYPE_INERTIAL);
 
-const TRAJECTORIES = [];
-const BODIES = [];
+const TRAJECTORIES = {};
+const BODIES = {};
 
 const SSDATA = {
     "0": {

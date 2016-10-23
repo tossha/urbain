@@ -91,7 +91,7 @@ function init() {
     
     textureLoader = new THREE.TextureLoader();
     
-    for (objId in SSDATA) {
+    for (let objId in SSDATA) {
         objectsForTracking[SSDATA[objId].name] = objId;
     }
 
@@ -110,15 +110,16 @@ function init() {
 }
 
 function initBuiltIn() {
-    for (id in SSDATA) {
+    for (let id in SSDATA) {
+        const body = SSDATA[id];
+        const bodyId = parseInt(id);
+        const trajConfig = body.traj;
+        const frame = new ReferenceFrame(trajConfig.rf.origin, trajConfig.rf.type);
         let traj;
-        let trajConfig = SSDATA[id].traj;
-        let frame = new ReferenceFrame(trajConfig.rf.origin, trajConfig.rf.type);
-        let bodyId = parseInt(id);
 
-        if (SSDATA[id].traj.type === 'static') {
+        if (trajConfig.type === 'static') {
             traj = new TrajectoryStaticPosition(frame, new Vector3(trajConfig.data[0], trajConfig.data[1], trajConfig.data[2]));
-        } else if (SSDATA[id].traj.type === 'keplerian') {
+        } else if (trajConfig.type === 'keplerian') {
             let color = null;
 
             if (trajConfig.color !== undefined) {
@@ -141,16 +142,19 @@ function initBuiltIn() {
 
         TRAJECTORIES[bodyId] = traj;
 
-        if (SSDATA[id].type === 'body') {
+        if (body.type === 'body') {
             BODIES[bodyId] = new Body(
                 new VisualBodyModel(
-                    new VisualShapeSphere(SSDATA[id].vis.r * settings.sizeScale), 
-                    SSDATA[id].vis.color, 
-                    SSDATA[id].vis.texture
+                    new VisualShapeSphere(
+                        body.vis.r * settings.sizeScale,
+                        body.vis.texture ? 16 : 8
+                    ),
+                    body.vis.color,
+                    body.vis.texture
                 ),
                 new PhysicalBodyModel(
-                    SSDATA[id].phys.mu, 
-                    SSDATA[id].phys.r
+                    body.phys.mu,
+                    body.phys.r
                 ),
                 traj,
                 null
@@ -184,11 +188,11 @@ function render(curTime) {
 
     controls.update();
 
-    for (bodyIdx in BODIES) {
+    for (let bodyIdx in BODIES) {
         BODIES[bodyIdx].render(time.epoch);
     }
 
-    for (trajIdx in TRAJECTORIES) {
+    for (let trajIdx in TRAJECTORIES) {
         TRAJECTORIES[trajIdx].render(time.epoch);
     }
 
@@ -204,4 +208,4 @@ window.onload = function () {
     init();
     initBuiltIn();
     requestAnimationFrame(firstRender);
-}
+};
