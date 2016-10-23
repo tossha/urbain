@@ -17,6 +17,18 @@ class Vector3
         return this.vector[2];
     }
 
+    set x(val) {
+        this.vector[0] = val;
+    }
+
+    set y(val) {
+        this.vector[1] = val;
+    }
+
+    set z(val) {
+        this.vector[2] = val;
+    }
+
     mag() {
         return Math.sqrt(this.vector[0] * this.vector[0] + this.vector[1] * this.vector[1] + this.vector[2] * this.vector[2]);
     }

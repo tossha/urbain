@@ -204,4 +204,4 @@ window.onload = function () {
     init();
     initBuiltIn();
     requestAnimationFrame(firstRender);
-}
+};
