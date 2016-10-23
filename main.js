@@ -89,8 +89,8 @@ function init() {
 
     document.getElementById('viewport').appendChild(renderer.domElement);
     
-	textureLoader = new THREE.TextureLoader();
-	
+    textureLoader = new THREE.TextureLoader();
+    
     for (objId in SSDATA) {
         objectsForTracking[SSDATA[objId].name] = objId;
     }
@@ -145,14 +145,15 @@ function initBuiltIn() {
             BODIES[bodyId] = new Body(
                 new VisualBodyModel(
                     new VisualShapeSphere(SSDATA[id].vis.r * settings.sizeScale), 
-                    SSDATA[id].vis.color, SSDATA[id].vis.texture
+                    SSDATA[id].vis.color, 
+                    SSDATA[id].vis.texture
                 ),
-                new PhysicalBodyModel(SSDATA[id].phys.mu, SSDATA[id].phys.r),
+                new PhysicalBodyModel(
+                    SSDATA[id].phys.mu, 
+                    SSDATA[id].phys.r
+                ),
                 traj,
-                new Orientation(
-                    getRotationOnGlobalAngel(SSDATA[id].orient.sx, SSDATA[id].orient.sy, SSDATA[id].orient.sz), 
-                    SSDATA[id].orient.dx, SSDATA[id].orient.dy, SSDATA[id].orient.dz
-                )
+                null
             );
         }
     }

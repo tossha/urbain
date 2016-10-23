@@ -284,22 +284,3 @@ class TrajectoryStateArray extends TrajectoryAbstract
         // @todo implement
     }
 }
-
-class Orientation
-{
-    constructor(startOrientation, dx, dy, dz){
-        this.startOrientation = startOrientation;
-        this.dx = dx;
-        this.dy = dy;
-        this.dz = dz;
-    }
-    
-    getOrientationByEpoch(epoch){
-        var sp = new THREE.Quaternion;
-        sp.copy(this.startOrientation);
-        
-        var tk = epoch / 1000;
-        
-        return sp.multiply(getRotationOnGlobalAngel(this.dx*tk % (Math.PI*2), this.dy*tk % (Math.PI*2), this.dz*tk % (Math.PI*2)));
-    }
-}

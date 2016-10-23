@@ -7,26 +7,26 @@ class VisualBodyModel
         this.color = color;
         this.body = null; // class Body
         this.texture = null;
-		
+        
         this.threeObj = new THREE.Mesh(
             this.shape.getThreeGeometry(),
-            new THREE.MeshBasicMaterial( {color: this.color, wireframe: true} )
+            new THREE.MeshBasicMaterial({color: this.color, wireframe: true})
         );
-		
+        
         scene.add(this.threeObj);
-		
-        if(texturePath !== undefined){
-		    var that = this;
-			
+        
+        if (texturePath !== undefined) {
+            var that = this;
+            
             textureLoader.load(
                 COMMON_TEXTURE_PATH + texturePath,
-                function( txt ) {
-                    that.threeObj.material = new THREE.MeshBasicMaterial( {map: txt} ) 
+                function(txt) {
+                    that.threeObj.material = new THREE.MeshBasicMaterial({map: txt}) 
                 },
                 null,
-                function( err ) { 
+                function(err) { 
                     console.log(err);
-                }					
+                }                    
             );
         }
     }
@@ -34,11 +34,6 @@ class VisualBodyModel
     render(epoch) {
         var pos = this.body.getPositionByEpoch(epoch, RF_BASE);
         this.threeObj.position.set(pos.x, pos.y, pos.z);
-		
-        if(this.body.orientation != undefined){
-            var rot = this.body.orientation.getOrientationByEpoch(epoch);
-            this.threeObj.quaternion.slerp(rot, 1);
-        }
     }
 }
 
