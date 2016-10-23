@@ -20,7 +20,7 @@ class VisualBodyModel
             textureLoader.load(
                 COMMON_TEXTURE_PATH + texturePath,
                 function(txt) {
-					that.threeObj.material.dispose();
+                    that.threeObj.material.dispose();
                     that.threeObj.material = new THREE.MeshBasicMaterial({map: txt}) 
                 },
                 null,
