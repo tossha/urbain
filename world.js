@@ -266,7 +266,7 @@ class TrajectoryStateArray extends TrajectoryAbstract
         
         if (color) {
             this.threeObj = new THREE.Line(
-                new Geometry(),
+                new THREE.Geometry(),
                 new THREE.LineBasicMaterial({ color: this.color, vertexColors: THREE.VertexColors })
             );
             
@@ -331,10 +331,16 @@ class TrajectoryStateArray extends TrajectoryAbstract
     
     render(epoch) {
         if (!this.threeObj || this.states.length < 2) return;
-        /*const vertexCount = this.threeObj.geometry.vertices.length;
-        for (let i = 0; i < vertexCount; ++i) {
-            let curColor = new THREE.Color("#ffffff");
-            this.threeObj.geometry.colors.push(curColor);
-        }*/
+        this.threeObj.geometry.dispose();
+        const geometry = new THREE.Geometry();
+        for (let i = 0; i < this.states.length; ++i) {
+            geometry.vertices.push(new THREE.Vector3(
+                this.states[i].state.position.x,
+                this.states[i].state.position.y,
+                this.states[i].state.position.z
+            ));
+            geometry.colors.push(new THREE.Color(this.color));
+        }
+        this.threeObj.geometry = geometry;
     }
 }
