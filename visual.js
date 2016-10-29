@@ -33,12 +33,10 @@ class VisualBodyModel
 
     render(epoch) {
         var pos = this.body.getPositionByEpoch(epoch, RF_BASE);
-        this.threeObj.position.set(pos.x, pos.y, pos.z);
+        var orient = this.body.orientation.getOrientationByEpoch(epoch);
 
-        if(this.body.orientation != null){
-            var orient = this.body.orientation.getOrientationByEpoch(epoch);
-            this.threeObj.quaternion.slerp(orient, 1);    
-        }
+        this.threeObj.position.set(pos.x, pos.y, pos.z);
+        this.threeObj.quaternion.slerp(orient, 1);    
     }
 }
 

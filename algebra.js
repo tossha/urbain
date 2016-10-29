@@ -206,23 +206,23 @@ function red2deg(radians) {
     return radians * 180 / Math.PI;
 }
 
-function getQuaternionByEuler(x, y, z){
+function getQuaternionByEuler(x, y, z) {
     return (new THREE.Quaternion()).setFromEuler(new THREE.Euler(x, y, z));
 }
 
-function multiplyOrientationByConstant(orientationQuat, constant){
+function multiplyQuaternionByConstant(orientationQuat, constant) {
     var orientationAngle = Math.acos(orientationQuat.w) * 2;
     var lastSin = Math.sin(orientationAngle / 2);
 
-    orientationAngle = (orientationAngle * constant) % (Math.PI * 2);
+    orientationAngle *= constant;
     
     var newSin = Math.sin(orientationAngle / 2);
-    var K = newSin / lastSin;
+    var koeff = newSin / lastSin;
 
     orientationQuat.w = Math.cos(orientationAngle / 2);
-    orientationQuat.x *= K; 
-    orientationQuat.y *= K;
-    orientationQuat.z *= K;
+    orientationQuat.x *= koeff; 
+    orientationQuat.y *= koeff;
+    orientationQuat.z *= koeff;
 
     orientationQuat.normalize();
 

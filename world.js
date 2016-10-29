@@ -322,22 +322,21 @@ class TrajectoryStateArray extends TrajectoryAbstract
 
 class Orientation
 {
-    constructor(epoch, axisOrientation, angularVel){
+    constructor(epoch, axisOrientation, angularVel) {
         this.epoch = epoch;
         this.axisOrientation = axisOrientation;
         this.angularVel = angularVel;
     }
 
-    getOrientationByEpoch(epoch){
+    getOrientationByEpoch(epoch) {
         var angVel = new THREE.Quaternion();
         angVel.copy(this.angularVel);
 
         var axisOrient = new THREE.Quaternion();
         axisOrient.copy(this.axisOrientation);
 
-        var angOrient = new THREE.Quaternion();
-        angOrient = multiplyOrientationByConstant(angVel, epoch - this.epoch);
-
-        return axisOrient.multiply(angOrient);
+        if ((angVel.x != 0) || (angVel.y != 0) || (angVel.z != 0))
+            return axisOrient.multiply(multiplyQuaternionByConstant(angVel, epoch - this.epoch));
+        return axisOrient;
     }
 }

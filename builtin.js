@@ -57,7 +57,7 @@ const SSDATA = {
             texture: 'SunTexture.jpg'
         },
         orientation: {
-            used: false,
+            epoch: 0,
             axisX: 0,
             axisY: 0,
             axisZ: 0,
@@ -96,6 +96,7 @@ const SSDATA = {
             r: 2440
         },
         orientation: {
+            epoch: 0,
             axisX: 0,
             axisY: 0,
             axisZ: 0,
@@ -135,7 +136,7 @@ const SSDATA = {
             texture: 'VenusTexture.jpg'
         },
         orientation: {
-            used: false,
+            epoch: 0,
             axisX: 0,
             axisY: 0,
             axisZ: 0,
@@ -197,7 +198,7 @@ const SSDATA = {
             texture: 'EarthTexture.jpg'
         },
         orientation: {
-            used: true,
+            epoch: 0,
             axisX: deg2rad(27),
             axisY: 0,
             axisZ: 0,
@@ -237,7 +238,7 @@ const SSDATA = {
             texture: 'MoonTexture.jpg'
         },
         orientation: {
-            used: false,
+            epoch: 0,
             axisX: 0,
             axisY: 0,
             axisZ: 0,
@@ -276,7 +277,7 @@ const SSDATA = {
             r: 6051.9
         },
         orientation: {
-            used: false,
+            epoch: 0,
             axisX: 0,
             axisY: 0,
             axisZ: 0,
@@ -315,7 +316,7 @@ const SSDATA = {
             r: 69911
         },
         orientation: {
-            used: false,
+            epoch: 0,
             axisX: 0,
             axisY: 0,
             axisZ: 0,
@@ -354,7 +355,7 @@ const SSDATA = {
             r: 58232
         },
         orientation: {
-            used: false,
+            epoch: 0,
             axisX: 0,
             axisY: 0,
             axisZ: 0,
@@ -393,7 +394,7 @@ const SSDATA = {
             r: 25362
         },
         orientation: {
-            used: false,
+            epoch: 0,
             axisX: 0,
             axisY: 0,
             axisZ: 0,
@@ -432,7 +433,7 @@ const SSDATA = {
             r: 24624
         },
         orientation: {
-            used: false,
+            epoch: 0,
             axisX: 0,
             axisY: 0,
             axisZ: 0,
@@ -493,7 +494,7 @@ const SSDATA = {
             r: 1195
         },
         orientation: {
-            used: false,
+            epoch: 0,
             axisX: 0,
             axisY: 0,
             axisZ: 0,
@@ -532,7 +533,7 @@ const SSDATA = {
             r: 605
         },
         orientation: {
-            used: false,
+            epoch: 0,
             axisX: 0,
             axisY: 0,
             axisZ: 0,
