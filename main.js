@@ -32,6 +32,7 @@ class Settings
             width: 350
         });
 
+        const that = this;
         this.trajectorySettings = {
             sma: 120000000,
             e: 0.01,
@@ -41,25 +42,21 @@ class Settings
             ta: 0.01,
             epoch: 0.01,
             
-            trajectoryAdd: null
+            addTrajectory: function() {
+                TRAJECTORIES[--lastTrajectoryId] = new TrajectoryKeplerianOrbit(
+                    RF_SUN,
+                    BODIES[SUN].physicalModel.mu,
+                    that.trajectorySettings.sma,
+                    that.trajectorySettings.e,
+                    deg2rad(that.trajectorySettings.inc ),
+                    deg2rad(that.trajectorySettings.raan),
+                    deg2rad(that.trajectorySettings.aop ),
+                    deg2rad(that.trajectorySettings.ta  ),
+                    that.trajectorySettings.epoch,
+                    '#00ff00'
+                );
+            }
         };
-        
-        const that = this;
-        this.trajectorySettings.trajectoryAdd = function() {
-            const newOrbit = new TrajectoryKeplerianOrbit(
-                RF_BASE,
-                BODIES[SUN].physicalModel.mu,
-                that.trajectorySettings.sma,
-                that.trajectorySettings.e,
-                deg2rad(that.trajectorySettings.inc ),
-                deg2rad(that.trajectorySettings.raan),
-                deg2rad(that.trajectorySettings.aop ),
-                deg2rad(that.trajectorySettings.ta  ),
-                that.trajectorySettings.epoch,
-                '#00ff00'
-            );
-            TRAJECTORIES[--lastTrajectoryId] = newOrbit;
-        }
 
         this.guiAddTrajectory.add(this.trajectorySettings, 'sma', 1500000, 8000000000).onChange(function(value) {
             const trajectory = TRAJECTORIES[lastTrajectoryId];
@@ -110,7 +107,7 @@ class Settings
             }
         });
 
-        this.guiAddTrajectory.add(this.trajectorySettings, 'trajectoryAdd');
+        this.guiAddTrajectory.add(this.trajectorySettings, 'addTrajectory');
         document.getElementById('leftPanel').appendChild(this.guiAddTrajectory.domElement);
     }
 }
