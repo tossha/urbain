@@ -10,7 +10,6 @@ class Settings
         document.getElementById('bottomPanel').appendChild(this.guiTimeLine.domElement);
         this.timeLine = initial.timeLinePos;
         this.timeScale = initial.timeScale;
-        this.sizeScale = initial.sizeScale;
         this.isTimeRunning = initial.isTimeRunning;
         this.trackingObject = initial.trackingObject;
 
@@ -164,8 +163,11 @@ function init() {
     renderer.setSize(window.innerWidth, window.innerHeight);
 
     controls = new THREE.OrbitControls(camera, renderer.domElement);
+    controls.zoomSpeed = 3;
 
     document.getElementById('viewport').appendChild(renderer.domElement);
+
+    window.addEventListener('resize', onWindowResize);
     
     textureLoader = new THREE.TextureLoader();
     
@@ -179,7 +181,6 @@ function init() {
         timeLinePos:        504921600,
         timeScale:          100,
         isTimeRunning:      true,
-        sizeScale:          1,
         trackingObject:     EARTH_BARYCENTER,
         objectsForTracking: objectsForTracking,
     });
@@ -224,11 +225,11 @@ function initBuiltIn() {
             BODIES[bodyId] = new Body(
                 new VisualBodyModel(
                     new VisualShapeSphere(
-                        body.vis.r * settings.sizeScale,
-                        body.vis.texture ? 16 : 8
+                        body.visual.r,
+                        body.visual.texture ? 32 : 12
                     ),
-                    body.vis.color,
-                    body.vis.texture
+                    body.visual.color,
+                    body.visual.texture
                 ),
                 new PhysicalBodyModel(
                     body.phys.mu,
@@ -283,6 +284,12 @@ function render(curTime) {
 
     renderer.render(scene, camera);
     requestAnimationFrame(render);
+}
+
+function onWindowResize() {
+    camera.aspect = window.innerWidth / window.innerHeight;
+    camera.updateProjectionMatrix();
+    renderer.setSize(window.innerWidth, window.innerHeight);
 }
 
 var camera, scene, renderer, controls;

@@ -23,7 +23,7 @@ class VisualBodyModel
                     that.threeObj.material.dispose();
                     that.threeObj.material = new THREE.MeshBasicMaterial({map: txt}) 
                 },
-                null,
+                undefined,
                 function(err) { 
                     console.log(err);
                 }                    
