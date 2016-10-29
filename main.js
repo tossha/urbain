@@ -265,11 +265,11 @@ function render(curTime) {
     trackingCoords = newTrackingCoords;
     controls.update();
 
-    for (bodyIdx in BODIES) {
+    for (let bodyIdx in BODIES) {
         BODIES[bodyIdx].render(time.epoch);
     }
 
-    for (trajIdx in TRAJECTORIES) {
+    for (let trajIdx in TRAJECTORIES) {
         TRAJECTORIES[trajIdx].render(time.epoch);
     }
 
