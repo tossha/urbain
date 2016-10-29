@@ -72,6 +72,9 @@ class Body
 function init() {
     let objectsForTracking = {};
 
+	mouse = new THREE.Vector2();
+	raycaster = new THREE.Raycaster();
+	
     camera = new THREE.PerspectiveCamera(60, window.innerWidth / window.innerHeight, 1, 1000000000);
     camera.position.x = 300000000;
     camera.position.y = 300000000;
@@ -88,6 +91,7 @@ function init() {
     controls = new THREE.OrbitControls(camera, renderer.domElement);
 
     document.getElementById('viewport').appendChild(renderer.domElement);
+	window.addEventListener( 'mousemove', onMouseMove, false );
     
     textureLoader = new THREE.TextureLoader();
     
@@ -196,16 +200,42 @@ function render(curTime) {
         TRAJECTORIES[trajIdx].render(time.epoch);
     }
 
+	//console.log(mouse.x, mouse.y);
+	
+	initRaycaster();
+	
     renderer.render(scene, camera);
     requestAnimationFrame(render);
 }
 
-var camera, scene, renderer, controls;
+function onMouseMove( event ) {
+	mouse.x = (event.clientX / window.innerWidth ) * 2 - 1;
+	mouse.y = - (event.clientY / window.innerHeight ) * 2 + 1;		
+}
+
+function initRaycaster() {
+	
+	raycaster.linePrecision = 2500;
+	raycaster.setFromCamera( mouse, camera );
+	
+	for (let trajIdx in TRAJECTORIES) {
+		if (TRAJECTORIES[trajIdx] instanceof TrajectoryKeplerianOrbit) {
+			var intersects = raycaster.intersectObject( TRAJECTORIES[trajIdx].threeObj, true );
+			if(intersects.length > 0){
+				console.log("Found KeplerianOrbit");
+			}
+		}
+    }
+}
+
+
+var camera, scene, renderer, controls, mouse, raycaster;
 var settings, time, globalTime, trackingCoords;
 var textureLoader;
 
 window.onload = function () {
     init();
     initBuiltIn();
+	console.log(mouse.x, mouse.y);
     requestAnimationFrame(firstRender);
 };
