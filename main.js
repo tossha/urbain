@@ -143,6 +143,23 @@ function initBuiltIn() {
         TRAJECTORIES[bodyId] = traj;
 
         if (body.type === 'body') {
+            var orientation = null;
+            if(body.orientation.used == true){
+                orientation = new Orientation(
+                    0,
+                    getQuaternionByEuler(
+                        body.orientation.axisX,
+                        body.orientation.axisY,
+                        body.orientation.axisZ
+                    ),
+                    getQuaternionByEuler(
+                        body.orientation.angVelX,
+                        body.orientation.angVelY,
+                        body.orientation.angVelZ
+                    )
+                )
+            }
+
             BODIES[bodyId] = new Body(
                 new VisualBodyModel(
                     new VisualShapeSphere(
@@ -157,7 +174,7 @@ function initBuiltIn() {
                     body.phys.r
                 ),
                 traj,
-                null
+                orientation   
             );
         }
     }

@@ -55,6 +55,15 @@ const SSDATA = {
             color: 'yellow',
             r: 695990,
             texture: 'SunTexture.jpg'
+        },
+        orientation: {
+            used: false,
+            axisX: 0,
+            axisY: 0,
+            axisZ: 0,
+            angVelX: 0.00000,
+            angVelY: 0.00000,
+            angVelZ: 0.00000
         }
     },
     "199": {
@@ -85,6 +94,14 @@ const SSDATA = {
         vis: {
             color: 'azure',
             r: 2440
+        },
+        orientation: {
+            axisX: 0,
+            axisY: 0,
+            axisZ: 0,
+            angVelX: 0.00000,
+            angVelY: 0.00000,
+            angVelZ: 0.00000
         }
     },
     "299": {
@@ -116,6 +133,15 @@ const SSDATA = {
             color: 'orange',
             r: 6051.9,
             texture: 'VenusTexture.jpg'
+        },
+        orientation: {
+            used: false,
+            axisX: 0,
+            axisY: 0,
+            axisZ: 0,
+            angVelX: 0.00000,
+            angVelY: 0.00000,
+            angVelZ: 0.00000
         }
     },
     "3": {
@@ -169,6 +195,15 @@ const SSDATA = {
             color: 'blue',
             r: 6378.1363,
             texture: 'EarthTexture.jpg'
+        },
+        orientation: {
+            used: true,
+            axisX: deg2rad(27),
+            axisY: 0,
+            axisZ: 0,
+            angVelX: 0.00000,
+            angVelY: 0.00000,
+            angVelZ: Math.PI * 2 / ((24 * 60 + 56) * 60)
         }
     },
     "301": {
@@ -200,6 +235,15 @@ const SSDATA = {
             color: 'white',
             r: 1738.2,
             texture: 'MoonTexture.jpg'
+        },
+        orientation: {
+            used: false,
+            axisX: 0,
+            axisY: 0,
+            axisZ: 0,
+            angVelX: 0.00000,
+            angVelY: 0.00000,
+            angVelZ: 0.00000
         }
     },
     "499": {
@@ -230,6 +274,15 @@ const SSDATA = {
         vis: {
             color: 'red',
             r: 6051.9
+        },
+        orientation: {
+            used: false,
+            axisX: 0,
+            axisY: 0,
+            axisZ: 0,
+            angVelX: 0.00000,
+            angVelY: 0.00000,
+            angVelZ: 0.00000
         }
     },
     "599": {
@@ -260,6 +313,15 @@ const SSDATA = {
         vis: {
             color: 'burlywood',
             r: 69911
+        },
+        orientation: {
+            used: false,
+            axisX: 0,
+            axisY: 0,
+            axisZ: 0,
+            angVelX: 0.00000,
+            angVelY: 0.00000,
+            angVelZ: 0.00000
         }
     },
     "699": {
@@ -290,6 +352,15 @@ const SSDATA = {
         vis: {
             color: 'sandybrown',
             r: 58232
+        },
+        orientation: {
+            used: false,
+            axisX: 0,
+            axisY: 0,
+            axisZ: 0,
+            angVelX: 0.00000,
+            angVelY: 0.00000,
+            angVelZ: 0.00000
         }
     },
     "799": {
@@ -320,6 +391,15 @@ const SSDATA = {
         vis: {
             color: 'lightskyblue',
             r: 25362
+        },
+        orientation: {
+            used: false,
+            axisX: 0,
+            axisY: 0,
+            axisZ: 0,
+            angVelX: 0.00000,
+            angVelY: 0.00000,
+            angVelZ: 0.00000
         }
     },
     "899": {
@@ -350,6 +430,15 @@ const SSDATA = {
         vis: {
             color: 'steelblue',
             r: 24624
+        },
+        orientation: {
+            used: false,
+            axisX: 0,
+            axisY: 0,
+            axisZ: 0,
+            angVelX: 0.00000,
+            angVelY: 0.00000,
+            angVelZ: 0.00000
         }
     },
     "9": {
@@ -402,6 +491,15 @@ const SSDATA = {
         vis: {
             color: 'tan',
             r: 1195
+        },
+        orientation: {
+            used: false,
+            axisX: 0,
+            axisY: 0,
+            axisZ: 0,
+            angVelX: 0.00000,
+            angVelY: 0.00000,
+            angVelZ: 0.00000
         }
     },
     "901": {
@@ -432,6 +530,15 @@ const SSDATA = {
         vis: {
             color: 'rosybrown',
             r: 605
+        },
+        orientation: {
+            used: false,
+            axisX: 0,
+            axisY: 0,
+            axisZ: 0,
+            angVelX: 0.00000,
+            angVelY: 0.00000,
+            angVelZ: 0.00000
         }
     }
 };
