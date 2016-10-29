@@ -7,18 +7,21 @@ class Settings
             autoPlace: false,
             width: window.innerWidth * 0.9
         });
+
         document.getElementById('bottomPanel').appendChild(this.guiTimeLine.domElement);
         this.timeLine = initial.timeLinePos;
         this.timeScale = initial.timeScale;
         this.sizeScale = initial.sizeScale;
         this.isTimeRunning = initial.isTimeRunning;
         this.trackingObject = initial.trackingObject;
+
         this.timeLineController = this.guiTimeLine.add(this, 'timeLine', initial.timeLineStart, initial.timeLineEnd);
         this.guiMain.add(this, 'timeScale', -2000, 2000);
         this.guiMain.add(this, 'isTimeRunning');
         this.guiMain.add(this, 'trackingObject', initial.objectsForTracking).onChange(function(value) {
             trackingCoords = TRAJECTORIES[value].getPositionByEpoch(time.epoch, RF_BASE);
         });
+
         this.timeLineController.onChange(function(value) {
             time.forceEpoch(value);
         });
@@ -104,6 +107,7 @@ class Settings
         document.getElementById('leftPanel').appendChild(this.guiAddTrajectory.domElement);
     }
 }
+
 class Time
 {
     constructor(settings) {
@@ -117,10 +121,12 @@ class Time
             this.settings.timeLineController.updateDisplay();
         }
     }
+
     forceEpoch(newEpoch) {
         this.epoch = newEpoch;
     }
 }
+
 class Body
 {
     constructor(visualModel, physicalModel, trajectory, orientation) {
@@ -130,25 +136,33 @@ class Body
         this.orientation   = orientation;
         this.visualModel.body = this;
     }
+
     getPositionByEpoch(epoch, referenceFrame) {
         return this.trajectory.getPositionByEpoch(epoch, referenceFrame);
     }
+
     render(epoch) {
         return this.visualModel.render(epoch);
     }
 }
+
 function init() {
     let objectsForTracking = {};
+
     camera = new THREE.PerspectiveCamera(60, window.innerWidth / window.innerHeight, 1, 1000000000);
     camera.position.x = 300000000;
     camera.position.y = 300000000;
     camera.position.z = 300000000;
     camera.up = new THREE.Vector3(0, 0, 1);
+
     scene = new THREE.Scene();
     scene.add(new THREE.AxisHelper(100000000));
+
     renderer = new THREE.WebGLRenderer();
     renderer.setSize(window.innerWidth, window.innerHeight);
+
     controls = new THREE.OrbitControls(camera, renderer.domElement);
+
     document.getElementById('viewport').appendChild(renderer.domElement);
     
     textureLoader = new THREE.TextureLoader();
@@ -156,6 +170,7 @@ function init() {
     for (let objId in SSDATA) {
         objectsForTracking[SSDATA[objId].name] = objId;
     }
+
     settings = new Settings({
         timeLineStart:      504921600,
         timeLineEnd:        504921600 + 31557600,
@@ -166,8 +181,10 @@ function init() {
         trackingObject:     EARTH_BARYCENTER,
         objectsForTracking: objectsForTracking,
     });
+
     time = new Time(settings);
 }
+
 function initBuiltIn() {
     for (let id in SSDATA) {
         const body = SSDATA[id];
@@ -180,9 +197,11 @@ function initBuiltIn() {
             traj = new TrajectoryStaticPosition(frame, new Vector3(trajConfig.data[0], trajConfig.data[1], trajConfig.data[2]));
         } else if (trajConfig.type === 'keplerian') {
             let color = null;
+
             if (trajConfig.color !== undefined) {
                 color = trajConfig.color;
             }
+
             traj = new TrajectoryKeplerianOrbit(
                 frame,
                 trajConfig.data.mu,
@@ -196,13 +215,10 @@ function initBuiltIn() {
                 color
             );
         }
+
         TRAJECTORIES[bodyId] = traj;
-<<<<<<< HEAD
 
         if (body.type === 'body') {
-=======
-        if (SSDATA[id].type === 'body') {
->>>>>>> Added changing orbit state in real-time
             BODIES[bodyId] = new Body(
                 new VisualBodyModel(
                     new VisualShapeSphere(
@@ -222,49 +238,47 @@ function initBuiltIn() {
         }
     }
 }
+
 function firstRender(curTime) {
     globalTime = curTime;
     trackingCoords = TRAJECTORIES[settings.trackingObject].getPositionByEpoch(time.epoch, RF_BASE);
     requestAnimationFrame(render);
 }
+
 function render(curTime) {
     let newTrackingCoords;
     time.tick(curTime - globalTime);
     globalTime = curTime;
+
     newTrackingCoords = TRAJECTORIES[settings.trackingObject].getPositionByEpoch(time.epoch, RF_BASE);
+
     controls.object.position.x += newTrackingCoords.x - trackingCoords.x;
     controls.object.position.y += newTrackingCoords.y - trackingCoords.y;
     controls.object.position.z += newTrackingCoords.z - trackingCoords.z;
+
     controls.target.x = newTrackingCoords.x;
     controls.target.y = newTrackingCoords.y;
     controls.target.z = newTrackingCoords.z;
+
     trackingCoords = newTrackingCoords;
     controls.update();
-<<<<<<< HEAD
 
-    for (let bodyIdx in BODIES) {
-        BODIES[bodyIdx].render(time.epoch);
-    }
-
-    for (let trajIdx in TRAJECTORIES) {
-=======
     for (bodyIdx in BODIES) {
         BODIES[bodyIdx].render(time.epoch);
     }
+
     for (trajIdx in TRAJECTORIES) {
->>>>>>> Added changing orbit state in real-time
         TRAJECTORIES[trajIdx].render(time.epoch);
     }
+
     renderer.render(scene, camera);
     requestAnimationFrame(render);
 }
+
 var camera, scene, renderer, controls;
 var settings, time, globalTime, trackingCoords;
-<<<<<<< HEAD
 var textureLoader;
 
-=======
->>>>>>> Added changing orbit state in real-time
 window.onload = function () {
     init();
     initBuiltIn();
