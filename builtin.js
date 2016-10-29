@@ -51,7 +51,7 @@ const SSDATA = {
             mu: 132712440017.99,
             r: 695990
         },
-        vis: {
+        visual: {
             color: 'yellow',
             r: 695990,
             texture: 'SunTexture.jpg'
@@ -89,9 +89,10 @@ const SSDATA = {
             mu: 22032.09,
             r: 2440
         },
-        vis: {
+        visual: {
             color: 'azure',
-            r: 2440
+            r: 2440,
+            texture: 'MercuryTexture.jpg'
         },
         orientation: {
             epoch: 0,
@@ -126,7 +127,7 @@ const SSDATA = {
             mu: 324858.59882646,
             r: 6051.9
         },
-        vis: {
+        visual: {
             color: 'orange',
             r: 6051.9,
             texture: 'VenusTexture.jpg'
@@ -186,7 +187,7 @@ const SSDATA = {
             mu: 398600.4415,
             r: 6378.1363
         },
-        vis: {
+        visual: {
             color: 'blue',
             r: 6378.1363,
             texture: 'EarthTexture.jpg'
@@ -224,7 +225,7 @@ const SSDATA = {
             mu: 4902.8005821478,
             r: 1738.2
         },
-        vis: {
+        visual: {
             color: 'white',
             r: 1738.2,
             texture: 'MoonTexture.jpg'
@@ -260,11 +261,12 @@ const SSDATA = {
         },
         phys: {
             mu: 42828.3,
-            r: 6051.9
+            r: 3389.5
         },
-        vis: {
+        visual: {
             color: 'red',
-            r: 6051.9
+            r: 3389.5,
+            texture: 'MarsTexture.jpg'
         },
         orientation: {
             epoch: 0,
@@ -299,9 +301,10 @@ const SSDATA = {
             mu: 126686511,
             r: 69911
         },
-        vis: {
+        visual: {
             color: 'burlywood',
-            r: 69911
+            r: 69911,
+            texture: 'JupiterTexture.jpg'
         },
         orientation: {
             epoch: 0,
@@ -336,7 +339,7 @@ const SSDATA = {
             mu: 37931207.8,
             r: 58232
         },
-        vis: {
+        visual: {
             color: 'sandybrown',
             r: 58232
         },
@@ -373,7 +376,7 @@ const SSDATA = {
             mu: 5793966,
             r: 25362
         },
-        vis: {
+        visual: {
             color: 'lightskyblue',
             r: 25362
         },
@@ -410,7 +413,7 @@ const SSDATA = {
             mu: 6835107,
             r: 24624
         },
-        vis: {
+        visual: {
             color: 'steelblue',
             r: 24624
         },
@@ -469,7 +472,7 @@ const SSDATA = {
             mu: 872.4,
             r: 1195
         },
-        vis: {
+        visual: {
             color: 'tan',
             r: 1195
         },
@@ -506,7 +509,7 @@ const SSDATA = {
             mu: 102.271,
             r: 605
         },
-        vis: {
+        visual: {
             color: 'rosybrown',
             r: 605
         },
