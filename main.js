@@ -58,50 +58,56 @@ class Settings
                 that.trajectorySettings.epoch,
                 '#00ff00'
             );
-            TRAJECTORIES[`${(--lastTrajectoryId)}`] = newOrbit;
+            TRAJECTORIES[--lastTrajectoryId] = newOrbit;
         }
 
         this.guiAddTrajectory.add(this.trajectorySettings, 'sma', 1500000, 8000000000).onChange(function(value) {
-            const trajectory = TRAJECTORIES[`${lastTrajectoryId}`];
+            const trajectory = TRAJECTORIES[lastTrajectoryId];
             if (trajectory) {
                 trajectory.sma = value;
             }
         });
 
         this.guiAddTrajectory.add(this.trajectorySettings, 'e', 0, 1).onChange(function(value) {
-            const trajectory = TRAJECTORIES[`${lastTrajectoryId}`];
+            const trajectory = TRAJECTORIES[lastTrajectoryId];
             if (trajectory) {
                 trajectory.e = value;
             }
         });
 
         this.guiAddTrajectory.add(this.trajectorySettings, 'inc', 0, 180).onChange(function(value) {
-            const trajectory = TRAJECTORIES[`${lastTrajectoryId}`];
+            const trajectory = TRAJECTORIES[lastTrajectoryId];
             if (trajectory) {
                 trajectory.inc = deg2rad(value);
             }
         });
 
         this.guiAddTrajectory.add(this.trajectorySettings, 'raan', 0, 360).onChange(function(value) {
-            const trajectory = TRAJECTORIES[`${lastTrajectoryId}`];
+            const trajectory = TRAJECTORIES[lastTrajectoryId];
             if (trajectory) {
                 trajectory.raan = deg2rad(value);
             }
         });
 
         this.guiAddTrajectory.add(this.trajectorySettings, 'aop', 0, 360).onChange(function(value) {
-            const trajectory = TRAJECTORIES[`${lastTrajectoryId}`];
-            trajectory.aop = deg2rad(value);
+            const trajectory = TRAJECTORIES[lastTrajectoryId];
+            if (trajectory) {
+                trajectory.aop = deg2rad(value);
+            }
         });
 
         this.guiAddTrajectory.add(this.trajectorySettings, 'ta', 0, 360).onChange(function(value) {
-            const trajectory = TRAJECTORIES[`${lastTrajectoryId}`];
-            trajectory.ta = deg2rad(value);
+            const trajectory = TRAJECTORIES[lastTrajectoryId];
+            if (trajectory) {
+                trajectory.ta = deg2rad(value);
+            }
         });
 
         this.guiAddTrajectory.add(this.trajectorySettings, 'epoch', 0, 360).onChange(function(value) {
-            const trajectory = TRAJECTORIES[`${lastTrajectoryId}`];
-            trajectory.epoch = value;
+            const trajectory = TRAJECTORIES[lastTrajectoryId];
+            if (trajectory) {
+                trajectory.epoch = value;
+            }
         });
 
         this.guiAddTrajectory.add(this.trajectorySettings, 'trajectoryAdd');
