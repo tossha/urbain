@@ -35,7 +35,9 @@ class VisualBodyModel
         var pos = this.body.getPositionByEpoch(epoch, RF_BASE);
 
         this.threeObj.position.set(pos.x, pos.y, pos.z);
-        this.threeObj.quaternion.copy(this.body.orientation.getOrientationByEpoch(epoch));   
+        this.threeObj.quaternion.copy(
+            this.body.orientation.getOrientationByEpoch(epoch)
+        );
     }
 }
 
