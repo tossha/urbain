@@ -1,5 +1,3 @@
-var lastTrajectoryId = 0;
-
 class Settings
 {
     constructor(initial) {
@@ -282,6 +280,7 @@ function render(curTime) {
 var camera, scene, renderer, controls;
 var settings, time, globalTime, trackingCoords;
 var textureLoader;
+var lastTrajectoryId = 0;
 
 window.onload = function () {
     init();
