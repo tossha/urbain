@@ -335,8 +335,10 @@ class Orientation
         var axisOrient = new THREE.Quaternion();
         axisOrient.copy(this.axisOrientation);
 
-        if ((angVel.x != 0) || (angVel.y != 0) || (angVel.z != 0))
+        if (angVel.x || angVel.y || angVel.z) {
             return axisOrient.multiply(multiplyQuaternionByConstant(angVel, epoch - this.epoch));
+        }
+
         return axisOrient;
     }
 }

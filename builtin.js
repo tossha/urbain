@@ -199,12 +199,12 @@ const SSDATA = {
         },
         orientation: {
             epoch: 0,
-            axisX: deg2rad(27),
+            axisX: 0.4087561108170719,
             axisY: 0,
             axisZ: 0,
             angVelX: 0.00000,
             angVelY: 0.00000,
-            angVelZ: Math.PI * 2 / ((24 * 60 + 56) * 60)
+            angVelZ: 7e-5
         }
     },
     "301": {
