@@ -329,16 +329,9 @@ class Orientation
     }
 
     getOrientationByEpoch(epoch) {
-        var angVel = new THREE.Quaternion();
-        angVel.copy(this.angularVel);
-
         var axisOrient = new THREE.Quaternion();
         axisOrient.copy(this.axisOrientation);
 
-        if (angVel.x || angVel.y || angVel.z) {
-            return axisOrient.multiply(multiplyQuaternionByConstant(angVel, epoch - this.epoch));
-        }
-
-        return axisOrient;
+        return axisOrient.multiply(getQuaternionByEuler(0, 0, (epoch - this.epoch) * this.angularVel));
     }
 }

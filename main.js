@@ -164,11 +164,7 @@ function initBuiltIn() {
                         body.orientation.axisY,
                         body.orientation.axisZ
                     ),
-                    getQuaternionByEuler(
-                        body.orientation.angVelX,
-                        body.orientation.angVelY,
-                        body.orientation.angVelZ
-                    )
+                    body.orientation.angVel
                 )   
             );
         }

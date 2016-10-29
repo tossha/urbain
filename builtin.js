@@ -61,9 +61,7 @@ const SSDATA = {
             axisX: 0,
             axisY: 0,
             axisZ: 0,
-            angVelX: 0.00000,
-            angVelY: 0.00000,
-            angVelZ: 0.00000
+            angVel: 0.00000
         }
     },
     "199": {
@@ -100,9 +98,7 @@ const SSDATA = {
             axisX: 0,
             axisY: 0,
             axisZ: 0,
-            angVelX: 0.00000,
-            angVelY: 0.00000,
-            angVelZ: 0.00000
+            angVel: 0.00000
         }
     },
     "299": {
@@ -140,9 +136,7 @@ const SSDATA = {
             axisX: 0,
             axisY: 0,
             axisZ: 0,
-            angVelX: 0.00000,
-            angVelY: 0.00000,
-            angVelZ: 0.00000
+            angVel: 0.00000
         }
     },
     "3": {
@@ -202,9 +196,7 @@ const SSDATA = {
             axisX: 0.4087561108170719,
             axisY: 0,
             axisZ: 0,
-            angVelX: 0.00000,
-            angVelY: 0.00000,
-            angVelZ: 0.00007292123516990375
+            angVel: 7e-5
         }
     },
     "301": {
@@ -242,9 +234,7 @@ const SSDATA = {
             axisX: 0,
             axisY: 0,
             axisZ: 0,
-            angVelX: 0.00000,
-            angVelY: 0.00000,
-            angVelZ: 0.00000
+            angVel: 0.00000
         }
     },
     "499": {
@@ -281,9 +271,7 @@ const SSDATA = {
             axisX: 0,
             axisY: 0,
             axisZ: 0,
-            angVelX: 0.00000,
-            angVelY: 0.00000,
-            angVelZ: 0.00000
+            angVel: 0.00000
         }
     },
     "599": {
@@ -320,9 +308,7 @@ const SSDATA = {
             axisX: 0,
             axisY: 0,
             axisZ: 0,
-            angVelX: 0.00000,
-            angVelY: 0.00000,
-            angVelZ: 0.00000
+            angVel: 0.00000
         }
     },
     "699": {
@@ -359,9 +345,7 @@ const SSDATA = {
             axisX: 0,
             axisY: 0,
             axisZ: 0,
-            angVelX: 0.00000,
-            angVelY: 0.00000,
-            angVelZ: 0.00000
+            angVel: 0.00000
         }
     },
     "799": {
@@ -398,9 +382,7 @@ const SSDATA = {
             axisX: 0,
             axisY: 0,
             axisZ: 0,
-            angVelX: 0.00000,
-            angVelY: 0.00000,
-            angVelZ: 0.00000
+            angVel: 0.00000
         }
     },
     "899": {
@@ -437,9 +419,7 @@ const SSDATA = {
             axisX: 0,
             axisY: 0,
             axisZ: 0,
-            angVelX: 0.00000,
-            angVelY: 0.00000,
-            angVelZ: 0.00000
+            angVel: 0.00000
         }
     },
     "9": {
@@ -498,9 +478,7 @@ const SSDATA = {
             axisX: 0,
             axisY: 0,
             axisZ: 0,
-            angVelX: 0.00000,
-            angVelY: 0.00000,
-            angVelZ: 0.00000
+            angVel: 0.00000
         }
     },
     "901": {
@@ -537,9 +515,7 @@ const SSDATA = {
             axisX: 0,
             axisY: 0,
             axisZ: 0,
-            angVelX: 0.00000,
-            angVelY: 0.00000,
-            angVelZ: 0.00000
+            angVel: 0.00000
         }
     }
 };

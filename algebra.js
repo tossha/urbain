@@ -209,22 +209,3 @@ function red2deg(radians) {
 function getQuaternionByEuler(x, y, z) {
     return (new THREE.Quaternion()).setFromEuler(new THREE.Euler(x, y, z));
 }
-
-function multiplyQuaternionByConstant(orientationQuat, constant) {
-    var orientationAngle = Math.acos(orientationQuat.w) * 2;
-    var lastSin = Math.sin(orientationAngle / 2);
-
-    orientationAngle *= constant;
-    
-    var newSin = Math.sin(orientationAngle / 2);
-    var koeff = newSin / lastSin;
-
-    orientationQuat.w = Math.cos(orientationAngle / 2);
-    orientationQuat.x *= koeff; 
-    orientationQuat.y *= koeff;
-    orientationQuat.z *= koeff;
-
-    orientationQuat.normalize();
-
-    return orientationQuat;
-}

@@ -36,7 +36,7 @@ class VisualBodyModel
         var orient = this.body.orientation.getOrientationByEpoch(epoch);
 
         this.threeObj.position.set(pos.x, pos.y, pos.z);
-        this.threeObj.quaternion.slerp(orient, 1);    
+        this.threeObj.quaternion.copy(orient);   
     }
 }
 
