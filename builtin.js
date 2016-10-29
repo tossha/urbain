@@ -196,7 +196,7 @@ const SSDATA = {
             axisX: 0.4087561108170719,
             axisY: 0,
             axisZ: 0,
-            angVel: 7e-5
+            angVel: 0.00007292123516990375
         }
     },
     "301": {
