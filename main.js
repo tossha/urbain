@@ -1,4 +1,3 @@
-
 class Settings
 {
     constructor(initial) {
@@ -9,7 +8,6 @@ class Settings
         });
 
         document.getElementById('bottomPanel').appendChild(this.guiTimeLine.domElement);
-
         this.timeLine = initial.timeLinePos;
         this.timeScale = initial.timeScale;
         this.sizeScale = initial.sizeScale;
@@ -26,6 +24,89 @@ class Settings
         this.timeLineController.onChange(function(value) {
             time.forceEpoch(value);
         });
+
+        this.guiAddTrajectory = new dat.GUI({
+            autoPlace: false,
+            width: 350
+        });
+
+        const that = this;
+        this.trajectorySettings = {
+            sma: 120000000,
+            e: 0.01,
+            inc: 0.01,
+            raan: 0.01,
+            aop: 0.01,
+            ta: 0.01,
+            epoch: 0.01,
+            
+            addTrajectory: function() {
+                TRAJECTORIES[--lastTrajectoryId] = new TrajectoryKeplerianOrbit(
+                    RF_SUN,
+                    BODIES[SUN].physicalModel.mu,
+                    that.trajectorySettings.sma,
+                    that.trajectorySettings.e,
+                    deg2rad(that.trajectorySettings.inc ),
+                    deg2rad(that.trajectorySettings.raan),
+                    deg2rad(that.trajectorySettings.aop ),
+                    deg2rad(that.trajectorySettings.ta  ),
+                    that.trajectorySettings.epoch,
+                    '#00ff00'
+                );
+            }
+        };
+
+        this.guiAddTrajectory.add(this.trajectorySettings, 'sma', 1500000, 8000000000).onChange(function(value) {
+            const trajectory = TRAJECTORIES[lastTrajectoryId];
+            if (trajectory) {
+                trajectory.sma = value;
+            }
+        });
+
+        this.guiAddTrajectory.add(this.trajectorySettings, 'e', 0, 1).onChange(function(value) {
+            const trajectory = TRAJECTORIES[lastTrajectoryId];
+            if (trajectory) {
+                trajectory.e = value;
+            }
+        });
+
+        this.guiAddTrajectory.add(this.trajectorySettings, 'inc', 0, 180).onChange(function(value) {
+            const trajectory = TRAJECTORIES[lastTrajectoryId];
+            if (trajectory) {
+                trajectory.inc = deg2rad(value);
+            }
+        });
+
+        this.guiAddTrajectory.add(this.trajectorySettings, 'raan', 0, 360).onChange(function(value) {
+            const trajectory = TRAJECTORIES[lastTrajectoryId];
+            if (trajectory) {
+                trajectory.raan = deg2rad(value);
+            }
+        });
+
+        this.guiAddTrajectory.add(this.trajectorySettings, 'aop', 0, 360).onChange(function(value) {
+            const trajectory = TRAJECTORIES[lastTrajectoryId];
+            if (trajectory) {
+                trajectory.aop = deg2rad(value);
+            }
+        });
+
+        this.guiAddTrajectory.add(this.trajectorySettings, 'ta', 0, 360).onChange(function(value) {
+            const trajectory = TRAJECTORIES[lastTrajectoryId];
+            if (trajectory) {
+                trajectory.ta = deg2rad(value);
+            }
+        });
+
+        this.guiAddTrajectory.add(this.trajectorySettings, 'epoch', 0, 360).onChange(function(value) {
+            const trajectory = TRAJECTORIES[lastTrajectoryId];
+            if (trajectory) {
+                trajectory.epoch = value;
+            }
+        });
+
+        this.guiAddTrajectory.add(this.trajectorySettings, 'addTrajectory');
+        document.getElementById('leftPanel').appendChild(this.guiAddTrajectory.domElement);
     }
 }
 
@@ -35,7 +116,6 @@ class Time
         this.epoch = settings.timeLine;
         this.settings = settings;
     }
-
     tick(timePassed) {
         if (this.settings.isTimeRunning) {
             this.epoch += timePassed * this.settings.timeScale;
@@ -56,7 +136,6 @@ class Body
         this.physicalModel = physicalModel;  // class PhysicalBodyModel
         this.trajectory    = trajectory;     // class TrajectoryAbstract
         this.orientation   = orientation;
-
         this.visualModel.body = this;
     }
 
@@ -79,7 +158,6 @@ function init() {
     camera.up = new THREE.Vector3(0, 0, 1);
 
     scene = new THREE.Scene();
-
     scene.add(new THREE.AxisHelper(100000000));
 
     renderer = new THREE.WebGLRenderer();
@@ -185,7 +263,6 @@ function render(curTime) {
     controls.target.z = newTrackingCoords.z;
 
     trackingCoords = newTrackingCoords;
-
     controls.update();
 
     for (let bodyIdx in BODIES) {
@@ -203,6 +280,7 @@ function render(curTime) {
 var camera, scene, renderer, controls;
 var settings, time, globalTime, trackingCoords;
 var textureLoader;
+var lastTrajectoryId = 0;
 
 window.onload = function () {
     init();
