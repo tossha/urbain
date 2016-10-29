@@ -204,7 +204,7 @@ const SSDATA = {
             axisZ: 0,
             angVelX: 0.00000,
             angVelY: 0.00000,
-            angVelZ: 7e-5
+            angVelZ: 0.00007292123516990375
         }
     },
     "301": {
