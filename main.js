@@ -56,7 +56,6 @@ class Settings
             );
             FAKE_TRAJECTORY_IDXS.push(TRAJECTORIES.length);
             TRAJECTORIES.push(newOrbit);
-            scene.add(newOrbit.threeObj);
         }
 
         this.guiAddTrajectory.add(this.trajectorySettings, 'sma', 1500000, 8000000000).onChange(function(value) {
