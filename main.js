@@ -235,7 +235,15 @@ function initBuiltIn() {
                     body.phys.r
                 ),
                 traj,
-                null
+                new Orientation(
+                    body.orientation.epoch,
+                    getQuaternionByEuler(
+                        body.orientation.axisX,
+                        body.orientation.axisY,
+                        body.orientation.axisZ
+                    ),
+                    body.orientation.angVel
+                )   
             );
         }
     }

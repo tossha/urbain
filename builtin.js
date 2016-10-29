@@ -55,6 +55,13 @@ const SSDATA = {
             color: 'yellow',
             r: 695990,
             texture: 'SunTexture.jpg'
+        },
+        orientation: {
+            epoch: 0,
+            axisX: 0,
+            axisY: 0,
+            axisZ: 0,
+            angVel: 0.00000
         }
     },
     "199": {
@@ -85,6 +92,13 @@ const SSDATA = {
         vis: {
             color: 'azure',
             r: 2440
+        },
+        orientation: {
+            epoch: 0,
+            axisX: 0,
+            axisY: 0,
+            axisZ: 0,
+            angVel: 0.00000
         }
     },
     "299": {
@@ -116,6 +130,13 @@ const SSDATA = {
             color: 'orange',
             r: 6051.9,
             texture: 'VenusTexture.jpg'
+        },
+        orientation: {
+            epoch: 0,
+            axisX: 0,
+            axisY: 0,
+            axisZ: 0,
+            angVel: 0.00000
         }
     },
     "3": {
@@ -169,6 +190,13 @@ const SSDATA = {
             color: 'blue',
             r: 6378.1363,
             texture: 'EarthTexture.jpg'
+        },
+        orientation: {
+            epoch: 0,
+            axisX: 0.4087561108170719,
+            axisY: 0,
+            axisZ: 0,
+            angVel: 0.00007292123516990375
         }
     },
     "301": {
@@ -200,6 +228,13 @@ const SSDATA = {
             color: 'white',
             r: 1738.2,
             texture: 'MoonTexture.jpg'
+        },
+        orientation: {
+            epoch: 0,
+            axisX: 0,
+            axisY: 0,
+            axisZ: 0,
+            angVel: 0.00000
         }
     },
     "499": {
@@ -230,6 +265,13 @@ const SSDATA = {
         vis: {
             color: 'red',
             r: 6051.9
+        },
+        orientation: {
+            epoch: 0,
+            axisX: 0,
+            axisY: 0,
+            axisZ: 0,
+            angVel: 0.00000
         }
     },
     "599": {
@@ -260,6 +302,13 @@ const SSDATA = {
         vis: {
             color: 'burlywood',
             r: 69911
+        },
+        orientation: {
+            epoch: 0,
+            axisX: 0,
+            axisY: 0,
+            axisZ: 0,
+            angVel: 0.00000
         }
     },
     "699": {
@@ -290,6 +339,13 @@ const SSDATA = {
         vis: {
             color: 'sandybrown',
             r: 58232
+        },
+        orientation: {
+            epoch: 0,
+            axisX: 0,
+            axisY: 0,
+            axisZ: 0,
+            angVel: 0.00000
         }
     },
     "799": {
@@ -320,6 +376,13 @@ const SSDATA = {
         vis: {
             color: 'lightskyblue',
             r: 25362
+        },
+        orientation: {
+            epoch: 0,
+            axisX: 0,
+            axisY: 0,
+            axisZ: 0,
+            angVel: 0.00000
         }
     },
     "899": {
@@ -350,6 +413,13 @@ const SSDATA = {
         vis: {
             color: 'steelblue',
             r: 24624
+        },
+        orientation: {
+            epoch: 0,
+            axisX: 0,
+            axisY: 0,
+            axisZ: 0,
+            angVel: 0.00000
         }
     },
     "9": {
@@ -402,6 +472,13 @@ const SSDATA = {
         vis: {
             color: 'tan',
             r: 1195
+        },
+        orientation: {
+            epoch: 0,
+            axisX: 0,
+            axisY: 0,
+            axisZ: 0,
+            angVel: 0.00000
         }
     },
     "901": {
@@ -432,6 +509,13 @@ const SSDATA = {
         vis: {
             color: 'rosybrown',
             r: 605
+        },
+        orientation: {
+            epoch: 0,
+            axisX: 0,
+            axisY: 0,
+            axisZ: 0,
+            angVel: 0.00000
         }
     }
 };

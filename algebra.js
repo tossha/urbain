@@ -205,3 +205,7 @@ function deg2rad(degrees) {
 function red2deg(radians) {
     return radians * 180 / Math.PI;
 }
+
+function getQuaternionByEuler(x, y, z) {
+    return (new THREE.Quaternion()).setFromEuler(new THREE.Euler(x, y, z));
+}
