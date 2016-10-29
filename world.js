@@ -256,12 +256,22 @@ class TrajectoryKeplerianOrbit extends TrajectoryAbstract
 
 class TrajectoryStateArray extends TrajectoryAbstract
 {
-    constructor(referenceFrame) {
+    constructor(referenceFrame, color) {
         super(referenceFrame);
 
         this.states = []; // array of [epoch, class StateVector]
         this.minEpoch = null;
         this.maxEpoch = null;
+        this.color = color;
+        
+        if (color) {
+            this.threeObj = new THREE.Line(
+                new Geometry(),
+                new THREE.LineBasicMaterial({ color: this.color, vertexColors: THREE.VertexColors })
+            );
+            
+            scene.add(this.threeObj);
+        }
     }
 
     addState(epoch, state) {
@@ -317,5 +327,14 @@ class TrajectoryStateArray extends TrajectoryAbstract
                 newPosition.x, newPosition.y, newPosition.z,
                 newVelocity.x, newVelocity.y, newVelocity.z);
         }
+    }
+    
+    render(epoch) {
+        if (!this.threeObj || this.states.length < 2) return;
+        /*const vertexCount = this.threeObj.geometry.vertices.length;
+        for (let i = 0; i < vertexCount; ++i) {
+            let curColor = new THREE.Color("#ffffff");
+            this.threeObj.geometry.colors.push(curColor);
+        }*/
     }
 }
