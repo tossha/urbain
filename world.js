@@ -330,17 +330,22 @@ class TrajectoryStateArray extends TrajectoryAbstract
     }
     
     render(epoch) {
-        if (!this.threeObj || this.states.length < 2) return;
+        if (!this.threeObj || this.states.length < 2) {
+            return;
+        }
+
         this.threeObj.geometry.dispose();
         const geometry = new THREE.Geometry();
         for (let i = 0; i < this.states.length; ++i) {
+            const position = this.states[i].state.position;
             geometry.vertices.push(new THREE.Vector3(
-                this.states[i].state.position.x,
-                this.states[i].state.position.y,
-                this.states[i].state.position.z
+                position.x,
+                position.y,
+                position.z
             ));
             geometry.colors.push(new THREE.Color(this.color));
         }
+
         this.threeObj.geometry = geometry;
     }
 }
