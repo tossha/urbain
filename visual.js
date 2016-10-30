@@ -2,16 +2,16 @@
 
 class VisualBodyModel
 {
-    constructor(shape, color, texturePath, srcOfLight) {
+    constructor(shape, color, texturePath) {
         this.shape = shape;   // class VisualShapeAbstract
         this.color = color;
         this.body = null; // class Body
         
+        this.pos = new THREE.Vector3();
+
         this.threeObj = new THREE.Mesh(
             this.shape.getThreeGeometry(),
-            srcOfLight ?
-                new THREE.MeshBasicMaterial({color: this.color, wireframe: true}) :
-                new THREE.MeshStandardMaterial({color: this.color, wireframe: true, metalness: 0})
+            this.getMaterial({color: this.color, wireframe: true})
         );
         
         scene.add(this.threeObj);
@@ -23,10 +23,7 @@ class VisualBodyModel
                 COMMON_TEXTURE_PATH + texturePath,
                 function(txt) {
                     that.threeObj.material.dispose();
-                    that.threeObj.material = 
-                        srcOfLight ?
-                            new THREE.MeshBasicMaterial({map: txt}) : 
-                            new THREE.MeshStandardMaterial({map: txt, metalness: 0}) 
+                    that.threeObj.material = that.getMaterial({map: txt});
                 },
                 undefined,
                 function(err) { 
@@ -36,9 +33,12 @@ class VisualBodyModel
         }
     }
 
-    render(epoch) {
-        var pos = this.body.getPositionByEpoch(epoch, RF_BASE);
+    getMaterial(parameters) {
+    	parameters.metalness = 0;
+    	return new THREE.MeshStandardMaterial(parameters);
+    }
 
+    render(epoch, pos) {
         this.threeObj.position.set(pos.x, pos.y, pos.z);
         this.threeObj.quaternion.copy(
             this.body.orientation.getOrientationByEpoch(epoch)
@@ -48,21 +48,20 @@ class VisualBodyModel
 
 class VisualBodyModelLight extends VisualBodyModel
 {
-    constructor(shape, color, texturePath, srcOfLight, lightColor, lightIntensity, lightDistance, lightDecay) {
-        super(shape, color, texturePath, srcOfLight);
+    constructor(shape, color, texturePath, lightColor, lightIntensity, lightDistance, lightDecay) {
+        super(shape, color, texturePath);
 
         this.light = new THREE.PointLight(lightColor, lightIntensity, lightDistance, lightDecay);
         scene.add(this.light);
     }
 
-    render(epoch) {
-        var pos = this.body.getPositionByEpoch(epoch, RF_BASE);
-
-        this.threeObj.position.set(pos.x, pos.y, pos.z);
+    render(epoch, pos) {
+        super.render(epoch, pos);
         this.light.position.set(pos.x, pos.y, pos.z);
-        this.threeObj.quaternion.copy(
-            this.body.orientation.getOrientationByEpoch(epoch)
-        );  
+    }
+
+    getMaterial(parameters) {
+    	return new THREE.MeshBasicMaterial(parameters);
     }
 }
 

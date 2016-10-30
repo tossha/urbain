@@ -143,7 +143,10 @@ class Body
     }
 
     render(epoch) {
-        return this.visualModel.render(epoch);
+        return this.visualModel.render(
+            epoch, 
+            this.getPositionByEpoch(epoch, RF_BASE)
+        );
     }
 }
 
@@ -224,28 +227,26 @@ function initBuiltIn() {
 
         if (body.type === 'body') {
             BODIES[bodyId] = new Body(
-                body.visual.srcOfLight ?
-                    new VisualBodyModelLight(
+                bodyId == SUN
+                    ? new VisualBodyModelLight(
                         new VisualShapeSphere(
                             body.visual.r,
                             body.visual.texture ? 32 : 12
                         ),
                         body.visual.color,
                         body.visual.texture,
-                        true,
                         body.visual.lightColor,
                         body.visual.lightIntensity,
                         body.visual.lightDistance,
                         body.visual.lightDecay
-                    ) :
-                    new VisualBodyModel(
+                    )
+                    : new VisualBodyModel(
                         new VisualShapeSphere(
                             body.visual.r,
                             body.visual.texture ? 32 : 12
                         ),
                         body.visual.color,
-                        body.visual.texture,
-                        false
+                        body.visual.texture
                     ),
 
                 new PhysicalBodyModel(
