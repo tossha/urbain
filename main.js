@@ -226,29 +226,28 @@ function initBuiltIn() {
         TRAJECTORIES[bodyId] = traj;
 
         if (body.type === 'body') {
-            BODIES[bodyId] = new Body(
-                bodyId == SUN
-                    ? new VisualBodyModelLight(
-                        new VisualShapeSphere(
-                            body.visual.r,
-                            body.visual.texture ? 32 : 12
-                        ),
-                        body.visual.color,
-                        body.visual.texture,
-                        body.visual.lightColor,
-                        body.visual.lightIntensity,
-                        body.visual.lightDistance,
-                        body.visual.lightDecay
-                    )
-                    : new VisualBodyModel(
-                        new VisualShapeSphere(
-                            body.visual.r,
-                            body.visual.texture ? 32 : 12
-                        ),
-                        body.visual.color,
-                        body.visual.texture
-                    ),
+            let visualShape = new VisualShapeSphere(
+                body.visual.r,
+                body.visual.texture ? 32 : 12
+            );
+            let visualModel = (bodyId == SUN)
+                ? new VisualBodyModelLight(
+                    visualShape,
+                    body.visual.color,
+                    body.visual.texture,
+                    body.visual.lightColor,
+                    body.visual.lightIntensity,
+                    body.visual.lightDistance,
+                    body.visual.lightDecay
+                )
+                : new VisualBodyModel(
+                    visualShape,
+                    body.visual.color,
+                    body.visual.texture
+                );
 
+            BODIES[bodyId] = new Body(
+                visualModel,
                 new PhysicalBodyModel(
                     body.phys.mu,
                     body.phys.r
