@@ -33,6 +33,7 @@ class VisualBodyModel
 
     getMaterial(parameters) {
     	parameters.metalness = 0;
+    	parameters.roughness = 1;
     	return new THREE.MeshStandardMaterial(parameters);
     }
 
