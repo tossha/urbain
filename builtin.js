@@ -52,6 +52,7 @@ const SSDATA = {
             r: 695990
         },
         visual: {
+            srcOfLight: true,
             color: 'yellow',
             r: 695990,
             texture: 'SunTexture.jpg'
@@ -90,6 +91,7 @@ const SSDATA = {
             r: 2440
         },
         visual: {
+            srcOfLight: false,
             color: 'azure',
             r: 2440,
             texture: 'MercuryTexture.jpg'
@@ -128,6 +130,7 @@ const SSDATA = {
             r: 6051.9
         },
         visual: {
+            srcOfLight: false,
             color: 'orange',
             r: 6051.9,
             texture: 'VenusTexture.jpg'
@@ -188,6 +191,7 @@ const SSDATA = {
             r: 6378.1363
         },
         visual: {
+            srcOfLight: false,
             color: 'blue',
             r: 6378.1363,
             texture: 'EarthTexture.jpg'
@@ -226,6 +230,7 @@ const SSDATA = {
             r: 1738.2
         },
         visual: {
+            srcOfLight: false,
             color: 'white',
             r: 1738.2,
             texture: 'MoonTexture.jpg'
@@ -264,6 +269,7 @@ const SSDATA = {
             r: 3389.5
         },
         visual: {
+            srcOfLight: false,
             color: 'red',
             r: 3389.5,
             texture: 'MarsTexture.jpg'
@@ -302,6 +308,7 @@ const SSDATA = {
             r: 69911
         },
         visual: {
+            srcOfLight: false,
             color: 'burlywood',
             r: 69911,
             texture: 'JupiterTexture.jpg'
@@ -340,6 +347,7 @@ const SSDATA = {
             r: 58232
         },
         visual: {
+            srcOfLight: false,
             color: 'sandybrown',
             r: 58232
         },
@@ -414,6 +422,7 @@ const SSDATA = {
             r: 24624
         },
         visual: {
+            srcOfLight: false,
             color: 'steelblue',
             r: 24624
         },
@@ -473,6 +482,7 @@ const SSDATA = {
             r: 1195
         },
         visual: {
+            srcOfLight: false,
             color: 'tan',
             r: 1195
         },
@@ -510,6 +520,7 @@ const SSDATA = {
             r: 605
         },
         visual: {
+            srcOfLight: false,
             color: 'rosybrown',
             r: 605
         },

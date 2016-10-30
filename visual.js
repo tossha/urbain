@@ -2,18 +2,20 @@
 
 class VisualBodyModel
 {
-    constructor(shape, color, texturePath) {
+    constructor(shape, color, texturePath, srcOfLight) {
         this.shape = shape;   // class VisualShapeAbstract
         this.color = color;
         this.body = null; // class Body
         
         this.threeObj = new THREE.Mesh(
             this.shape.getThreeGeometry(),
-            new THREE.MeshBasicMaterial({color: this.color, wireframe: true})
+            srcOfLight ?
+                new THREE.MeshBasicMaterial({color: this.color, wireframe: true}) :
+                new THREE.MeshStandardMaterial({color: this.color, wireframe: true, metalness: 0})
         );
         
         scene.add(this.threeObj);
-        
+
         if (texturePath !== undefined) {
             var that = this;
             
@@ -21,7 +23,10 @@ class VisualBodyModel
                 COMMON_TEXTURE_PATH + texturePath,
                 function(txt) {
                     that.threeObj.material.dispose();
-                    that.threeObj.material = new THREE.MeshBasicMaterial({map: txt}) 
+                    that.threeObj.material = 
+                        srcOfLight ?
+                            new THREE.MeshBasicMaterial({map: txt}) : 
+                            new THREE.MeshStandardMaterial({map: txt, metalness: 0}) 
                 },
                 undefined,
                 function(err) { 
@@ -38,6 +43,26 @@ class VisualBodyModel
         this.threeObj.quaternion.copy(
             this.body.orientation.getOrientationByEpoch(epoch)
         );
+    }
+}
+
+class VisualBodyModelLight extends VisualBodyModel
+{
+    constructor(shape, color, texturePath, srcOfLight, lightColor, lightIntensity, lightDistance, lightDecay) {
+        super(shape, color, texturePath, srcOfLight);
+
+        this.light = new THREE.PointLight(lightColor, lightIntensity, lightDistance, lightDecay);
+        scene.add(this.light);
+    }
+
+    render(epoch) {
+        var pos = this.body.getPositionByEpoch(epoch, RF_BASE);
+
+        this.threeObj.position.set(pos.x, pos.y, pos.z);
+        this.light.position.set(pos.x, pos.y, pos.z);
+        this.threeObj.quaternion.copy(
+            this.body.orientation.getOrientationByEpoch(epoch)
+        );  
     }
 }
 

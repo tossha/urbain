@@ -158,6 +158,7 @@ function init() {
 
     scene = new THREE.Scene();
     scene.add(new THREE.AxisHelper(100000000));
+    scene.add(new THREE.AmbientLight(0xFFEFD5, 0.15));
 
     renderer = new THREE.WebGLRenderer();
     renderer.setSize(window.innerWidth, window.innerHeight);
@@ -223,14 +224,30 @@ function initBuiltIn() {
 
         if (body.type === 'body') {
             BODIES[bodyId] = new Body(
-                new VisualBodyModel(
-                    new VisualShapeSphere(
-                        body.visual.r,
-                        body.visual.texture ? 32 : 12
+                body.visual.srcOfLight ?
+                    new VisualBodyModelLight(
+                        new VisualShapeSphere(
+                            body.visual.r,
+                            body.visual.texture ? 32 : 12
+                        ),
+                        body.visual.color,
+                        body.visual.texture,
+                        true,
+                        body.visual.lightColor,
+                        body.visual.lightIntensity,
+                        body.visual.lightDistance,
+                        body.visual.lightDecay
+                    ) :
+                    new VisualBodyModel(
+                        new VisualShapeSphere(
+                            body.visual.r,
+                            body.visual.texture ? 32 : 12
+                        ),
+                        body.visual.color,
+                        body.visual.texture,
+                        false
                     ),
-                    body.visual.color,
-                    body.visual.texture
-                ),
+
                 new PhysicalBodyModel(
                     body.phys.mu,
                     body.phys.r
