@@ -52,6 +52,8 @@ const SSDATA = {
             r: 695990
         },
         visual: {
+            lightColor: 0xFFFFFF,
+            lightIntensity: 1.5,
             color: 'yellow',
             r: 695990,
             texture: 'SunTexture.jpg'

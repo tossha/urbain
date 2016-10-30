@@ -143,7 +143,10 @@ class Body
     }
 
     render(epoch) {
-        return this.visualModel.render(epoch);
+        return this.visualModel.render(
+            epoch, 
+            this.getPositionByEpoch(epoch, RF_BASE)
+        );
     }
 }
 
@@ -158,6 +161,7 @@ function init() {
 
     scene = new THREE.Scene();
     scene.add(new THREE.AxisHelper(100000000));
+    scene.add(new THREE.AmbientLight(0xFFEFD5, 0.15));
 
     renderer = new THREE.WebGLRenderer();
     renderer.setSize(window.innerWidth, window.innerHeight);
@@ -222,15 +226,28 @@ function initBuiltIn() {
         TRAJECTORIES[bodyId] = traj;
 
         if (body.type === 'body') {
-            BODIES[bodyId] = new Body(
-                new VisualBodyModel(
-                    new VisualShapeSphere(
-                        body.visual.r,
-                        body.visual.texture ? 32 : 12
-                    ),
+            let visualShape = new VisualShapeSphere(
+                body.visual.r,
+                body.visual.texture ? 32 : 12
+            );
+            let visualModel = (bodyId == SUN)
+                ? new VisualBodyModelLight(
+                    visualShape,
+                    body.visual.color,
+                    body.visual.texture,
+                    body.visual.lightColor,
+                    body.visual.lightIntensity,
+                    body.visual.lightDistance,
+                    body.visual.lightDecay
+                )
+                : new VisualBodyModel(
+                    visualShape,
                     body.visual.color,
                     body.visual.texture
-                ),
+                );
+
+            BODIES[bodyId] = new Body(
+                visualModel,
                 new PhysicalBodyModel(
                     body.phys.mu,
                     body.phys.r
