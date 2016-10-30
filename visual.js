@@ -7,8 +7,6 @@ class VisualBodyModel
         this.color = color;
         this.body = null; // class Body
         
-        this.pos = new THREE.Vector3();
-
         this.threeObj = new THREE.Mesh(
             this.shape.getThreeGeometry(),
             this.getMaterial({color: this.color, wireframe: true})
