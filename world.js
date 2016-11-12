@@ -62,7 +62,15 @@ class TrajectoryAbstract
     constructor(referenceFrame) {
         this.referenceFrame = referenceFrame || null; // class ReferenceFrame
     }
-
+    
+    drop() {
+        for (let trajIdx in TRAJECTORIES) {
+            if (this === TRAJECTORIES[trajIdx]) {
+                TRAJECTORIES[trajIdx] = undefined;
+            }
+        }
+    }
+    
     getStateInOwnFrameByEpoch(epoch) {
         return ZERO_STATE_VECTOR;
     }
@@ -125,6 +133,11 @@ class TrajectoryKeplerianOrbit extends TrajectoryAbstract
         }
     }
 
+    drop() {
+        super.drop();
+        scene.remove(this.threeObj);
+    }
+    
     getEccentricAnomalyByTrueAnomaly(ta) {
         const cos = Math.cos(ta);
         const sin = Math.sin(ta);

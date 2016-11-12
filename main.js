@@ -54,19 +54,33 @@ class Settings
                 that.trajectorySettings.raan = that.baseTrajectorySettings.raan;
                 that.trajectorySettings.aop  = that.baseTrajectorySettings.aop;
                 that.trajectorySettings.ta   = that.baseTrajectorySettings.ta;
-                    
-                TRAJECTORIES[--lastTrajectoryId] = new TrajectoryKeplerianOrbit(
-                    RF_SUN,
-                    BODIES[SUN].physicalModel.mu,
-                    that.trajectorySettings.sma,
-                    that.trajectorySettings.e,
-                    deg2rad(that.trajectorySettings.inc ),
-                    deg2rad(that.trajectorySettings.raan),
-                    deg2rad(that.trajectorySettings.aop ),
-                    deg2rad(that.trajectorySettings.ta  ),
-                    time.epoch,
-                    '#00ff00'
-                );
+                
+                const lastTrajectory = TRAJECTORIES[lastTrajectoryId];
+                if (!lastTrajectory) {
+                    TRAJECTORIES[lastTrajectoryId] = new TrajectoryKeplerianOrbit(
+                        RF_SUN,
+                        BODIES[SUN].physicalModel.mu,
+                        that.trajectorySettings.sma,
+                        that.trajectorySettings.e,
+                        deg2rad(that.trajectorySettings.inc ),
+                        deg2rad(that.trajectorySettings.raan),
+                        deg2rad(that.trajectorySettings.aop ),
+                        deg2rad(that.trajectorySettings.ta  ),
+                        time.epoch,
+                        '#00ff00'
+                    );
+                } else {
+                    lastTrajectory.sma  = that.trajectorySettings.sma;
+                    lastTrajectory.e    = that.trajectorySettings.e;
+                    lastTrajectory.inc  = deg2rad(that.trajectorySettings.inc );
+                    lastTrajectory.raan = deg2rad(that.trajectorySettings.raan);
+                    lastTrajectory.aop  = deg2rad(that.trajectorySettings.aop );
+                    lastTrajectory.ta   = deg2rad(that.trajectorySettings.ta  );
+                }
+            },
+            
+            saveTrajectory: function() {
+                --lastTrajectoryId;
             }
         };
 
@@ -113,6 +127,7 @@ class Settings
         });
 
         this.guiAddTrajectory.add(this.trajectorySettings, 'addTrajectory');
+        this.guiAddTrajectory.add(this.trajectorySettings, 'saveTrajectory');
         document.getElementById('leftPanel').appendChild(this.guiAddTrajectory.domElement);
     }
 }
@@ -323,7 +338,7 @@ function onWindowResize() {
 var camera, scene, renderer, controls;
 var settings, time, globalTime, trackingCoords;
 var textureLoader;
-var lastTrajectoryId = 0;
+var lastTrajectoryId = -1;
 
 window.onload = function () {
     init();
