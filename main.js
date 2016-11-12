@@ -112,13 +112,6 @@ class Settings
             }
         });
 
-        this.guiAddTrajectory.add(this.trajectorySettings, 'epoch', 0, 360).onChange(function(value) {
-            const trajectory = TRAJECTORIES[lastTrajectoryId];
-            if (trajectory) {
-                trajectory.epoch = value;
-            }
-        });
-
         this.guiAddTrajectory.add(this.trajectorySettings, 'addTrajectory');
         document.getElementById('leftPanel').appendChild(this.guiAddTrajectory.domElement);
     }
