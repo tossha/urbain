@@ -73,14 +73,8 @@ class Settings
                         time.epoch,
                         '#00ff00'
                     );
-                } else {
-                    lastTrajectory.sma  = that.trajectorySettings.sma;
-                    lastTrajectory.e    = that.trajectorySettings.e;
-                    lastTrajectory.inc  = deg2rad(that.trajectorySettings.inc );
-                    lastTrajectory.raan = deg2rad(that.trajectorySettings.raan);
-                    lastTrajectory.aop  = deg2rad(that.trajectorySettings.aop );
-                    lastTrajectory.ta   = deg2rad(that.trajectorySettings.ta  );
                 }
+                
             },
             
             saveTrajectory: function() {
