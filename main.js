@@ -62,7 +62,7 @@ class Settings
                 const lastTrajectory = TRAJECTORIES[lastTrajectoryId];
                 if (!lastTrajectory) {
                     TRAJECTORIES[lastTrajectoryId] = new TrajectoryKeplerianOrbit(
-                        RF_SUN,
+                        new ReferenceFrame(that.trackingObject),
                         BODIES[SUN].physicalModel.mu,
                         that.trajectorySettings.sma,
                         that.trajectorySettings.e,
