@@ -83,7 +83,11 @@ class TrajectoryAbstract
         return this.getStateByEpoch(epoch, referenceFrame).velocity;
     }
 
-    render(epoch) {}
+    render(epoch) {
+        if (this.visualModel) {
+            this.visualModel.render(epoch);
+        }
+    }
 }
 
 class TrajectoryStaticPosition extends TrajectoryAbstract
@@ -118,22 +122,13 @@ class TrajectoryKeplerianOrbit extends TrajectoryAbstract
         this.meanMotion = Math.sqrt(mu / sma) / sma;
 
         if (color) {
-            // @todo remove this from here
-            this.threeObj = new THREE.Line(
-                new THREE.Geometry(),
-                new THREE.LineBasicMaterial({color: this.color, vertexColors: THREE.VertexColors})
-            );
-
-            scene.add(this.threeObj);
+            this.visualModel = new VisualTrajectoryModelKeplerianOrbit(this, color);
         }
     }
 
     drop() {
+        this.visualModel.drop();
         super.drop();
-        scene.remove(this.threeObj);
-        this.threeObj.geometry.dispose();
-        this.threeObj.material.dispose();
-        this.threeObj = null;
     }
 
     getEccentricAnomalyByTrueAnomaly(ta) {
@@ -218,55 +213,6 @@ class TrajectoryKeplerianOrbit extends TrajectoryAbstract
             vel.x, vel.y, vel.z
         );
     }
-
-    render(epoch) {
-        if (!this.color) {
-            return;
-        }
-
-        const endingBrightness = 0.35;
-        let centerPos = this.referenceFrame.transformPositionByEpoch(epoch, ZERO_VECTOR, RF_BASE);
-        let dr = -this.sma * this.e;
-        let ta = this.getTrueAnomaly(epoch);
-        let mainColor = new THREE.Color(this.color);
-        let lastVertexIdx;
-        let ang = Math.acos(
-            (this.e + Math.cos(ta)) / (1 + this.e * Math.cos(ta))
-        );
-
-        if (ta > Math.PI) {
-            ang = 2 * Math.PI - ang;
-        }
-
-        this.threeObj.geometry.dispose();
-        this.threeObj.geometry = (new THREE.Path(
-            (new THREE.EllipseCurve(
-                dr * Math.cos(this.aop),
-                dr * Math.sin(this.aop),
-                this.sma,
-                this.sma * Math.sqrt(1 - this.e * this.e),
-                ang,
-                2 * Math.PI + ang - 0.0000000000001,  // protection from rounding errors
-                false,
-                this.aop
-            )).getPoints(100)
-        )).createPointsGeometry(100).rotateX(this.inc);
-
-        lastVertexIdx = this.threeObj.geometry.vertices.length - 1;
-
-        for (let i = 0; i <= lastVertexIdx; i++) {
-            let curColor = (new THREE.Color()).copy(mainColor);
-            let mult = endingBrightness + (1 - endingBrightness) * i / lastVertexIdx;
-
-            this.threeObj.geometry.colors.push(
-                curColor.multiplyScalar(mult)
-            );
-        }
-
-        this.threeObj.rotation.z = this.raan;
-
-        this.threeObj.position.set(centerPos.x, centerPos.y, centerPos.z);
-    }
 }
 
 class TrajectoryStateArray extends TrajectoryAbstract
@@ -280,12 +226,7 @@ class TrajectoryStateArray extends TrajectoryAbstract
         this.color = color;
 
         if (color) {
-            this.threeObj = new THREE.Line(
-                new THREE.Geometry(),
-                new THREE.LineBasicMaterial({ color: this.color, vertexColors: THREE.VertexColors })
-            );
-
-            scene.add(this.threeObj);
+            this.visualModel = new VisualTrajectoryModelStateArray(this, color);
         }
     }
 
@@ -342,26 +283,6 @@ class TrajectoryStateArray extends TrajectoryAbstract
                 newPosition.x, newPosition.y, newPosition.z,
                 newVelocity.x, newVelocity.y, newVelocity.z);
         }
-    }
-
-    render(epoch) {
-        if (!this.threeObj || this.states.length < 2) {
-            return;
-        }
-
-        this.threeObj.geometry.dispose();
-        const geometry = new THREE.Geometry();
-        for (let i = 0; i < this.states.length; ++i) {
-            const position = this.states[i].state.position;
-            geometry.vertices.push(new THREE.Vector3(
-                position.x,
-                position.y,
-                position.z
-            ));
-            geometry.colors.push(new THREE.Color(this.color));
-        }
-
-        this.threeObj.geometry = geometry;
     }
 }
 
