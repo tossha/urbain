@@ -32,28 +32,32 @@ class Settings
         const that = this;
         this.baseTrajectorySettings = {
             sma  : 120000000,
-            e    : 0.01,
-            inc  : 0.01,
-            raan : 0.01,
-            aop  : 0.01,
-            ta   : 0.01,
+            e    : 0,
+            inc  : 0,
+            raan : 0,
+            aop  : 0,
+            ta   : 0,
+        };
+        
+        this.guiAddTrajectoryElements = {
+            sma: null, e: null, inc: null, raan: null, aop: null, ta: null
         };
         
         this.trajectorySettings = {
-            sma  : that.baseTrajectorySettings.sma,
-            e    : that.baseTrajectorySettings.e,
-            inc  : that.baseTrajectorySettings.inc,
-            raan : that.baseTrajectorySettings.raan,
-            aop  : that.baseTrajectorySettings.aop,
-            ta   : that.baseTrajectorySettings.ta,
+            sma  : that.baseTrajectorySettings.sma  + 1e-2,
+            e    : that.baseTrajectorySettings.e    + 1e-2,
+            inc  : that.baseTrajectorySettings.inc  + 1e-2,
+            raan : that.baseTrajectorySettings.raan + 1e-2,
+            aop  : that.baseTrajectorySettings.aop  + 1e-2,
+            ta   : that.baseTrajectorySettings.ta   + 1e-2,
             
             addTrajectory: function() {
-                that.trajectorySettings.sma  = that.baseTrajectorySettings.sma;
-                that.trajectorySettings.e    = that.baseTrajectorySettings.e;
-                that.trajectorySettings.inc  = that.baseTrajectorySettings.inc;
-                that.trajectorySettings.raan = that.baseTrajectorySettings.raan;
-                that.trajectorySettings.aop  = that.baseTrajectorySettings.aop;
-                that.trajectorySettings.ta   = that.baseTrajectorySettings.ta;
+                that.guiAddTrajectoryElements.sma .setValue(that.baseTrajectorySettings.sma);
+                that.guiAddTrajectoryElements.e   .setValue(that.baseTrajectorySettings.e  );
+                that.guiAddTrajectoryElements.inc .setValue(deg2rad(that.baseTrajectorySettings.inc ));
+                that.guiAddTrajectoryElements.raan.setValue(deg2rad(that.baseTrajectorySettings.raan));
+                that.guiAddTrajectoryElements.aop .setValue(deg2rad(that.baseTrajectorySettings.aop ));
+                that.guiAddTrajectoryElements.ta  .setValue(deg2rad(that.baseTrajectorySettings.ta  ));
                 
                 const lastTrajectory = TRAJECTORIES[lastTrajectoryId];
                 if (!lastTrajectory) {
@@ -84,42 +88,42 @@ class Settings
             }
         };
 
-        this.guiAddTrajectory.add(this.trajectorySettings, 'sma', 1500000, 8000000000).onChange(function(value) {
+        this.guiAddTrajectoryElements.sma = this.guiAddTrajectory.add(this.trajectorySettings, 'sma', 1500000, 8000000000).onChange(function(value) {
             const trajectory = TRAJECTORIES[lastTrajectoryId];
             if (trajectory) {
                 trajectory.sma = value;
             }
         });
 
-        this.guiAddTrajectory.add(this.trajectorySettings, 'e', 0, 1).onChange(function(value) {
+        this.guiAddTrajectoryElements.e = this.guiAddTrajectory.add(this.trajectorySettings, 'e', 0, 1).onChange(function(value) {
             const trajectory = TRAJECTORIES[lastTrajectoryId];
             if (trajectory) {
                 trajectory.e = value;
             }
         });
 
-        this.guiAddTrajectory.add(this.trajectorySettings, 'inc', 0, 180).onChange(function(value) {
+        this.guiAddTrajectoryElements.inc = this.guiAddTrajectory.add(this.trajectorySettings, 'inc', 0, 180).onChange(function(value) {
             const trajectory = TRAJECTORIES[lastTrajectoryId];
             if (trajectory) {
                 trajectory.inc = deg2rad(value);
             }
         });
 
-        this.guiAddTrajectory.add(this.trajectorySettings, 'raan', 0, 360).onChange(function(value) {
+        this.guiAddTrajectoryElements.raan = this.guiAddTrajectory.add(this.trajectorySettings, 'raan', 0, 360).onChange(function(value) {
             const trajectory = TRAJECTORIES[lastTrajectoryId];
             if (trajectory) {
                 trajectory.raan = deg2rad(value);
             }
         });
 
-        this.guiAddTrajectory.add(this.trajectorySettings, 'aop', 0, 360).onChange(function(value) {
+        this.guiAddTrajectoryElements.aop = this.guiAddTrajectory.add(this.trajectorySettings, 'aop', 0, 360).onChange(function(value) {
             const trajectory = TRAJECTORIES[lastTrajectoryId];
             if (trajectory) {
                 trajectory.aop = deg2rad(value);
             }
         });
 
-        this.guiAddTrajectory.add(this.trajectorySettings, 'ta', 0, 360).onChange(function(value) {
+        this.guiAddTrajectoryElements.ta = this.guiAddTrajectory.add(this.trajectorySettings, 'ta', 0, 360).onChange(function(value) {
             const trajectory = TRAJECTORIES[lastTrajectoryId];
             if (trajectory) {
                 trajectory.m0 = trajectory.getMeanAnomalyByTrueAnomaly(deg2rad(value));
