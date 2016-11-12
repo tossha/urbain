@@ -110,9 +110,7 @@ class TrajectoryKeplerianOrbit extends TrajectoryAbstract
         this.epoch  = epoch;
         this.color  = color;
 
-        this.m0 = this.getMeanAnomalyByEccentricAnomaly(
-            this.getEccentricAnomalyByTrueAnomaly(ta)
-        );
+        this.m0 = this.getMeanAnomalyByTrueAnomaly(ta);
 
         this.meanMotion = Math.sqrt(mu / sma) / sma;
 
@@ -137,6 +135,12 @@ class TrajectoryKeplerianOrbit extends TrajectoryAbstract
         return (sinE > 0)
             ? ang
             : (2 * Math.PI - ang);
+    }
+    
+    getMeanAnomalyByTrueAnomaly(ta) {
+        return this.getMeanAnomalyByEccentricAnomaly(
+            this.getEccentricAnomalyByTrueAnomaly(ta)
+        );
     }
 
     getMeanAnomalyByEccentricAnomaly(ea) {
