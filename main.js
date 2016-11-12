@@ -31,32 +31,29 @@ class Settings
 
         const that = this;
         this.baseTrajectorySettings = {
-            sma: 120000000,
-            e: 0.01,
-            inc: 0.01,
-            raan: 0.01,
-            aop: 0.01,
-            ta: 0.01,
-            epoch: 0.01,
+            sma  : 120000000,
+            e    : 0.01,
+            inc  : 0.01,
+            raan : 0.01,
+            aop  : 0.01,
+            ta   : 0.01,
         };
         
         this.trajectorySettings = {
-            sma   : that.baseTrajectorySettings.sma,
-            e     : that.baseTrajectorySettings.e,
-            inc   : that.baseTrajectorySettings.inc,
-            raan  : that.baseTrajectorySettings.raan,
-            aop   : that.baseTrajectorySettings.aop,
-            ta    : that.baseTrajectorySettings.ta,
-            epoch : that.baseTrajectorySettings.epoch,
+            sma  : that.baseTrajectorySettings.sma,
+            e    : that.baseTrajectorySettings.e,
+            inc  : that.baseTrajectorySettings.inc,
+            raan : that.baseTrajectorySettings.raan,
+            aop  : that.baseTrajectorySettings.aop,
+            ta   : that.baseTrajectorySettings.ta,
             
             addTrajectory: function() {
-                that.trajectorySettings.sma   = that.baseTrajectorySettings.sma;
-                that.trajectorySettings.e     = that.baseTrajectorySettings.e;
-                that.trajectorySettings.inc   = that.baseTrajectorySettings.inc;
-                that.trajectorySettings.raan  = that.baseTrajectorySettings.raan;
-                that.trajectorySettings.aop   = that.baseTrajectorySettings.aop;
-                that.trajectorySettings.ta    = that.baseTrajectorySettings.ta;
-                that.trajectorySettings.epoch = that.baseTrajectorySettings.epoch;
+                that.trajectorySettings.sma  = that.baseTrajectorySettings.sma;
+                that.trajectorySettings.e    = that.baseTrajectorySettings.e;
+                that.trajectorySettings.inc  = that.baseTrajectorySettings.inc;
+                that.trajectorySettings.raan = that.baseTrajectorySettings.raan;
+                that.trajectorySettings.aop  = that.baseTrajectorySettings.aop;
+                that.trajectorySettings.ta   = that.baseTrajectorySettings.ta;
                     
                 TRAJECTORIES[--lastTrajectoryId] = new TrajectoryKeplerianOrbit(
                     RF_SUN,
@@ -314,7 +311,7 @@ function render(curTime) {
     }
 
     for (let trajIdx in TRAJECTORIES) {
-        if (trajIdx === lastTrajectoryId) {
+        if (trajIdx == lastTrajectoryId) {
             TRAJECTORIES[trajIdx].epoch = time.epoch;
         }
         TRAJECTORIES[trajIdx].render(time.epoch);
