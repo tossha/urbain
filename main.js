@@ -373,6 +373,34 @@ function initBuiltIn() {
             );
         }
     }
+
+    let StarGeometry = new THREE.Geometry();
+
+    for(let params of STARDATA){
+
+        console.log(params);
+
+        StarGeometry.vertices.push(new THREE.Vector3(
+            1e12 * Math.cos(deg2rad(params[0])) * Math.sin(deg2rad(params[1])), 
+            1e12 * Math.sin(deg2rad(params[0])) * Math.sin(deg2rad(params[1])), 
+            1e12 * Math.cos(deg2rad(params[1]))
+        ));
+
+        StarGeometry.colors.push(new THREE.Color(
+            params[2] / 100,
+            params[2] / 100,
+            params[2] / 100
+        )); 
+    }
+
+    scene.add(new THREE.Points(
+        StarGeometry,
+        new THREE.PointsMaterial({
+            size: 2, 
+            sizeAttenuation: false,
+            vertexColors: THREE.VertexColors
+        })
+    ));
 }
 
 function firstRender(curTime) {
