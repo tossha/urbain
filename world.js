@@ -136,6 +136,9 @@ class TrajectoryKeplerianOrbit extends TrajectoryAbstract
     drop() {
         super.drop();
         scene.remove(this.threeObj);
+        this.threeObj.geometry.dispose();
+        this.threeObj.material.dispose();
+        this.threeObj = null;
     }
     
     getEccentricAnomalyByTrueAnomaly(ta) {

@@ -20,6 +20,46 @@ class Settings
             trackingCoords = TRAJECTORIES[value].getPositionByEpoch(time.epoch, RF_BASE);
         });
 
+        const trajectoryMenu = {
+            velocity: {
+                folder: null,
+                x: null,
+                y: null,
+                z: null,
+                
+                values: {
+                    x: "0",
+                    y: "0",
+                    z: "0"
+                }
+            },
+            
+            position: {
+                folder: null,
+                x: null,
+                y: null,
+                z: null,
+                
+                values: {
+                    x: "0",
+                    y: "0",
+                    z: "0"
+                }
+            }
+        };
+        
+        trajectoryMenu.velocity.folder = this.guiMain.addFolder("velocity");
+        trajectoryMenu.velocity.x = trajectoryMenu.velocity.folder.add(trajectoryMenu.velocity.values, 'x');
+        trajectoryMenu.velocity.y = trajectoryMenu.velocity.folder.add(trajectoryMenu.velocity.values, 'y');
+        trajectoryMenu.velocity.z = trajectoryMenu.velocity.folder.add(trajectoryMenu.velocity.values, 'z');
+
+        trajectoryMenu.position.folder = this.guiMain.addFolder("position");
+        trajectoryMenu.position.x = trajectoryMenu.position.folder.add(trajectoryMenu.position.values, 'x');
+        trajectoryMenu.position.y = trajectoryMenu.position.folder.add(trajectoryMenu.position.values, 'y');
+        trajectoryMenu.position.z = trajectoryMenu.position.folder.add(trajectoryMenu.position.values, 'z');
+        
+        this.currentTrajectory = trajectoryMenu;
+
         this.timeLineController.onChange(function(value) {
             time.forceEpoch(value);
         });
@@ -82,8 +122,23 @@ class Settings
             },
             
             saveTrajectory: function() {
-                --lastTrajectoryId;
+                while (TRAJECTORIES[lastTrajectoryId])
+                    --lastTrajectoryId;
 
+                that.guiAddTrajectoryElements.addTrajectoryFolder.open();
+                that.guiAddTrajectoryElements.settingsFolder.close();
+            },
+            
+            dropLastTrajectory: function() {
+                while (!TRAJECTORIES[lastTrajectoryId] && lastTrajectoryId != -1) {
+                    ++lastTrajectoryId;
+                }
+                
+                if (TRAJECTORIES[lastTrajectoryId]) {
+                    TRAJECTORIES[lastTrajectoryId].drop();
+                    TRAJECTORIES[lastTrajectoryId] = undefined;
+                }
+                
                 that.guiAddTrajectoryElements.addTrajectoryFolder.open();
                 that.guiAddTrajectoryElements.settingsFolder.close();
             }
@@ -144,6 +199,8 @@ class Settings
         this.guiAddTrajectoryElements.addTrajectoryFolder.add(this.trajectorySettings, 'addTrajectory');
         this.guiAddTrajectoryElements.settingsFolder.add(this.trajectorySettings, 'saveTrajectory');
         this.guiAddTrajectoryElements.addTrajectoryFolder.open();
+        
+        this.guiAddTrajectory.add(this.trajectorySettings, 'dropLastTrajectory');
         document.getElementById('leftPanel').appendChild(this.guiAddTrajectory.domElement);
     }
 }
@@ -335,6 +392,10 @@ function render(curTime) {
     }
 
     for (let trajIdx in TRAJECTORIES) {
+        if (!TRAJECTORIES[trajIdx]) {
+            continue;
+        }
+        
         if (trajIdx == lastTrajectoryId) {
             TRAJECTORIES[trajIdx].epoch = time.epoch;
         }
