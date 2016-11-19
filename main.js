@@ -23,42 +23,44 @@ class Settings
         const trajectoryMenu = {
             velocity: {
                 folder: null,
-                x: null,
-                y: null,
-                z: null,
+                x   : null,
+                y   : null,
+                z   : null,
+                mag : null,
                 
                 values: {
-                    x: "0",
-                    y: "0",
-                    z: "0"
+                    x   : "",
+                    y   : "",
+                    z   : "",
+                    mag : ""
                 }
             },
             
             position: {
                 folder: null,
-                x: null,
-                y: null,
-                z: null,
+                x   : null,
+                y   : null,
+                z   : null,
+                mag : null,
                 
                 values: {
-                    x: "0",
-                    y: "0",
-                    z: "0"
+                    x   : "",
+                    y   : "",
+                    z   : "",
+                    mag : ""
                 }
             }
         };
         
-        trajectoryMenu.velocity.folder = this.guiMain.addFolder("velocity");
-        trajectoryMenu.velocity.x = trajectoryMenu.velocity.folder.add(trajectoryMenu.velocity.values, 'x');
-        trajectoryMenu.velocity.y = trajectoryMenu.velocity.folder.add(trajectoryMenu.velocity.values, 'y');
-        trajectoryMenu.velocity.z = trajectoryMenu.velocity.folder.add(trajectoryMenu.velocity.values, 'z');
-
-        trajectoryMenu.position.folder = this.guiMain.addFolder("position");
-        trajectoryMenu.position.x = trajectoryMenu.position.folder.add(trajectoryMenu.position.values, 'x');
-        trajectoryMenu.position.y = trajectoryMenu.position.folder.add(trajectoryMenu.position.values, 'y');
-        trajectoryMenu.position.z = trajectoryMenu.position.folder.add(trajectoryMenu.position.values, 'z');
+        for (let group of ['velocity', 'position']) {
+            trajectoryMenu[group].folder = this.guiMain.addFolder(group);
+            for (let id of ['x', 'y', 'z', 'mag']) {
+                console.log(group, id, trajectoryMenu[group], trajectoryMenu[group].values);
+                trajectoryMenu[group][id] = trajectoryMenu[group].folder.add(trajectoryMenu[group].values, id);
+            }
+        }
         
-        this.currentTrajectory = trajectoryMenu;
+        this.currentTrajectoryMenu = trajectoryMenu;
 
         this.timeLineController.onChange(function(value) {
             time.forceEpoch(value);
@@ -402,6 +404,16 @@ function render(curTime) {
         TRAJECTORIES[trajIdx].render(time.epoch);
     }
 
+    const trajectoryMenu = settings.currentTrajectoryMenu;
+    const state = TRAJECTORIES[settings.trackingObject].getStateByEpoch(time.epoch, RF_BASE);
+    for (let group of ['velocity', 'position']) {
+        const trajectoryGroup = trajectoryMenu[group];
+        const stateGroup = state[group];
+        for (let id of ['x', 'y', 'z', 'mag']) {
+            trajectoryGroup[id].setValue("" + stateGroup[id]);
+        }
+    }
+    
     renderer.render(scene, camera);
     requestAnimationFrame(render);
 }
