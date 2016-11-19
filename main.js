@@ -134,7 +134,8 @@ class Settings
 
             dropLastTrajectory: function() {
                 while (!TRAJECTORIES[lastTrajectoryId]
-                        && (lastTrajectoryId != -1)) {
+                    && (lastTrajectoryId !== -1)
+                ) {
                     ++lastTrajectoryId;
                 }
 
@@ -151,7 +152,8 @@ class Settings
         this.guiAddTrajectoryElements.settingsFolder = this.guiAddTrajectory.addFolder("trajectory settings");
 
         this.guiAddTrajectoryElements.sma = this.guiAddTrajectoryElements.settingsFolder.add(
-                this.trajectorySettings, 'sma', 1500000, 8000000000).onChange(function(value) {
+            this.trajectorySettings, 'sma', 1500000, 8000000000
+        ).onChange(function(value) {
             const trajectory = TRAJECTORIES[lastTrajectoryId];
             if (trajectory) {
                 trajectory.sma = value;
@@ -159,7 +161,8 @@ class Settings
         });
 
         this.guiAddTrajectoryElements.e = this.guiAddTrajectoryElements.settingsFolder.add(
-                this.trajectorySettings, 'e', 0, 1).onChange(function(value) {
+            this.trajectorySettings, 'e', 0, 1
+        ).onChange(function(value) {
             const trajectory = TRAJECTORIES[lastTrajectoryId];
             if (trajectory) {
                 trajectory.e = value;
@@ -167,7 +170,8 @@ class Settings
         });
 
         this.guiAddTrajectoryElements.inc = this.guiAddTrajectoryElements.settingsFolder.add(
-                this.trajectorySettings, 'inc', 0, 180).onChange(function(value) {
+            this.trajectorySettings, 'inc', 0, 180
+        ).onChange(function(value) {
             const trajectory = TRAJECTORIES[lastTrajectoryId];
             if (trajectory) {
                 trajectory.inc = deg2rad(value);
@@ -175,7 +179,8 @@ class Settings
         });
 
         this.guiAddTrajectoryElements.raan = this.guiAddTrajectoryElements.settingsFolder.add(
-                this.trajectorySettings, 'raan', 0, 360).onChange(function(value) {
+            this.trajectorySettings, 'raan', 0, 360
+        ).onChange(function(value) {
             const trajectory = TRAJECTORIES[lastTrajectoryId];
             if (trajectory) {
                 trajectory.raan = deg2rad(value);
@@ -183,7 +188,8 @@ class Settings
         });
 
         this.guiAddTrajectoryElements.aop = this.guiAddTrajectoryElements.settingsFolder.add(
-                this.trajectorySettings, 'aop', 0, 360).onChange(function(value) {
+            this.trajectorySettings, 'aop', 0, 360
+        ).onChange(function(value) {
             const trajectory = TRAJECTORIES[lastTrajectoryId];
             if (trajectory) {
                 trajectory.aop = deg2rad(value);
@@ -191,7 +197,8 @@ class Settings
         });
 
         this.guiAddTrajectoryElements.ta = this.guiAddTrajectoryElements.settingsFolder.add(
-                this.trajectorySettings, 'ta', 0, 360).onChange(function(value) {
+            this.trajectorySettings, 'ta', 0, 360
+        ).onChange(function(value) {
             const trajectory = TRAJECTORIES[lastTrajectoryId];
             if (trajectory) {
                 trajectory.m0 = trajectory.getMeanAnomalyByTrueAnomaly(deg2rad(value));
