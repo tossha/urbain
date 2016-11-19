@@ -63,15 +63,9 @@ class TrajectoryAbstract
     constructor(referenceFrame) {
         this.referenceFrame = referenceFrame || null; // class ReferenceFrame
     }
-    
-    drop() {
-        for (let trajIdx in TRAJECTORIES) {
-            if (this === TRAJECTORIES[trajIdx]) {
-                TRAJECTORIES[trajIdx] = undefined;
-            }
-        }
-    }
-    
+
+    drop() {}
+
     getStateInOwnFrameByEpoch(epoch) {
         return ZERO_STATE_VECTOR;
     }
@@ -110,14 +104,14 @@ class TrajectoryKeplerianOrbit extends TrajectoryAbstract
     constructor(referenceFrame, mu, sma, e, inc, raan, aop, ta, epoch, color) {
         super(referenceFrame);
 
-        this.mu     = mu;
-        this.sma    = sma;
-        this.e      = e;
-        this.inc    = inc;
-        this.raan   = raan;
-        this.aop    = aop;
-        this.epoch  = epoch;
-        this.color  = color;
+        this.mu    = mu;
+        this.sma   = sma;
+        this.e     = e;
+        this.inc   = inc;
+        this.raan  = raan;
+        this.aop   = aop;
+        this.epoch = epoch;
+        this.color = color;
 
         this.m0 = this.getMeanAnomalyByTrueAnomaly(ta);
 
@@ -141,7 +135,7 @@ class TrajectoryKeplerianOrbit extends TrajectoryAbstract
         this.threeObj.material.dispose();
         this.threeObj = null;
     }
-    
+
     getEccentricAnomalyByTrueAnomaly(ta) {
         const cos = Math.cos(ta);
         const sin = Math.sin(ta);
@@ -153,7 +147,7 @@ class TrajectoryKeplerianOrbit extends TrajectoryAbstract
             ? ang
             : (2 * Math.PI - ang);
     }
-    
+
     getMeanAnomalyByTrueAnomaly(ta) {
         return this.getMeanAnomalyByEccentricAnomaly(
             this.getEccentricAnomalyByTrueAnomaly(ta)
@@ -284,13 +278,13 @@ class TrajectoryStateArray extends TrajectoryAbstract
         this.minEpoch = null;
         this.maxEpoch = null;
         this.color = color;
-        
+
         if (color) {
             this.threeObj = new THREE.Line(
                 new THREE.Geometry(),
                 new THREE.LineBasicMaterial({ color: this.color, vertexColors: THREE.VertexColors })
             );
-            
+
             scene.add(this.threeObj);
         }
     }
@@ -300,7 +294,7 @@ class TrajectoryStateArray extends TrajectoryAbstract
             epoch: epoch,
             state: state
         });
-        
+
         if ((this.minEpoch === null)
             || (epoch < this.minEpoch)
         ) {
@@ -322,14 +316,14 @@ class TrajectoryStateArray extends TrajectoryAbstract
         ) {
             return null;
         }
-        
+
         // Поиск перебором. Потом можно заменить на бинпоиск, но сейчас это неоправданно усложнит код
         for (let i = 1; i < this.states.length; ++i) {
             const next = this.states[i];
             if (next.epoch < epoch) {
                 continue;
             }
-            
+
             const prev = this.states[i - 1];
             // Ускорение -- отношение изменения скорости ко времени, за которое оно произошло
             const acceleration = next.state.velocity.sub(prev.state.velocity).div(next.epoch - prev.epoch);
@@ -349,7 +343,7 @@ class TrajectoryStateArray extends TrajectoryAbstract
                 newVelocity.x, newVelocity.y, newVelocity.z);
         }
     }
-    
+
     render(epoch) {
         if (!this.threeObj || this.states.length < 2) {
             return;

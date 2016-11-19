@@ -27,7 +27,7 @@ class Settings
                 y   : null,
                 z   : null,
                 mag : null,
-                
+
                 values: {
                     x   : "",
                     y   : "",
@@ -35,14 +35,14 @@ class Settings
                     mag : ""
                 }
             },
-            
+
             position: {
                 folder: null,
                 x   : null,
                 y   : null,
                 z   : null,
                 mag : null,
-                
+
                 values: {
                     x   : "",
                     y   : "",
@@ -51,7 +51,7 @@ class Settings
                 }
             }
         };
-        
+
         for (let group of ['velocity', 'position']) {
             trajectoryMenu[group].folder = this.guiMain.addFolder(group);
             for (let id of ['x', 'y', 'z', 'mag']) {
@@ -59,7 +59,7 @@ class Settings
                 trajectoryMenu[group][id] = trajectoryMenu[group].folder.add(trajectoryMenu[group].values, id);
             }
         }
-        
+
         this.currentTrajectoryMenu = trajectoryMenu;
 
         this.timeLineController.onChange(function(value) {
@@ -80,34 +80,34 @@ class Settings
             aop  : 0,
             ta   : 0,
         };
-        
+
         this.guiAddTrajectoryElements = {
             sma: null, e: null, inc: null, raan: null, aop: null, ta: null,
             settingsFolder: null, addTrajectoryFolder: null
         };
-        
+
         this.trajectorySettings = {
-            sma  : that.baseTrajectorySettings.sma  + 1e-2,
-            e    : that.baseTrajectorySettings.e    + 1e-2,
-            inc  : that.baseTrajectorySettings.inc  + 1e-2,
-            raan : that.baseTrajectorySettings.raan + 1e-2,
-            aop  : that.baseTrajectorySettings.aop  + 1e-2,
-            ta   : that.baseTrajectorySettings.ta   + 1e-2,
-            
+            sma  : this.baseTrajectorySettings.sma  + 1e-2,
+            e    : this.baseTrajectorySettings.e    + 1e-2,
+            inc  : this.baseTrajectorySettings.inc  + 1e-2,
+            raan : this.baseTrajectorySettings.raan + 1e-2,
+            aop  : this.baseTrajectorySettings.aop  + 1e-2,
+            ta   : this.baseTrajectorySettings.ta   + 1e-2,
+
             addTrajectory: function() {
                 that.guiAddTrajectoryElements.sma  .setValue(that.baseTrajectorySettings.sma);
                 that.guiAddTrajectoryElements.e    .setValue(that.baseTrajectorySettings.e  );
-                
+
                 that.guiAddTrajectoryElements.inc  .setValue(deg2rad(that.baseTrajectorySettings.inc ));
                 that.guiAddTrajectoryElements.raan .setValue(deg2rad(that.baseTrajectorySettings.raan));
                 that.guiAddTrajectoryElements.aop  .setValue(deg2rad(that.baseTrajectorySettings.aop ));
                 that.guiAddTrajectoryElements.ta   .setValue(deg2rad(that.baseTrajectorySettings.ta  ));
-                
-                const lastTrajectory = TRAJECTORIES[lastTrajectoryId];
-                if (!lastTrajectory) {
+
+                if (!TRAJECTORIES[lastTrajectoryId]) {
                     TRAJECTORIES[lastTrajectoryId] = new TrajectoryKeplerianOrbit(
                         new ReferenceFrame(that.trackingObject),
-                        BODIES[SUN].physicalModel.mu,
+                        BODIES[that.trackingObject] ?
+                            BODIES[that.trackingObject].physicalModel.mu : 0,
                         that.trajectorySettings.sma,
                         that.trajectorySettings.e,
                         deg2rad(that.trajectorySettings.inc ),
@@ -118,36 +118,38 @@ class Settings
                         '#00ff00'
                     );
                 }
-                
+
                 that.guiAddTrajectoryElements.addTrajectoryFolder.close();
                 that.guiAddTrajectoryElements.settingsFolder.open();
             },
-            
+
             saveTrajectory: function() {
-                while (TRAJECTORIES[lastTrajectoryId])
+                while (TRAJECTORIES[lastTrajectoryId]) {
                     --lastTrajectoryId;
+                }
 
                 that.guiAddTrajectoryElements.addTrajectoryFolder.open();
                 that.guiAddTrajectoryElements.settingsFolder.close();
             },
-            
+
             dropLastTrajectory: function() {
-                while (!TRAJECTORIES[lastTrajectoryId] && lastTrajectoryId != -1) {
+                while (!TRAJECTORIES[lastTrajectoryId]
+                        && (lastTrajectoryId != -1)) {
                     ++lastTrajectoryId;
                 }
-                
+
                 if (TRAJECTORIES[lastTrajectoryId]) {
                     TRAJECTORIES[lastTrajectoryId].drop();
-                    TRAJECTORIES[lastTrajectoryId] = undefined;
+                    delete TRAJECTORIES[lastTrajectoryId];
                 }
-                
+
                 that.guiAddTrajectoryElements.addTrajectoryFolder.open();
                 that.guiAddTrajectoryElements.settingsFolder.close();
             }
         };
 
         this.guiAddTrajectoryElements.settingsFolder = this.guiAddTrajectory.addFolder("trajectory settings");
-        
+
         this.guiAddTrajectoryElements.sma = this.guiAddTrajectoryElements.settingsFolder.add(
                 this.trajectorySettings, 'sma', 1500000, 8000000000).onChange(function(value) {
             const trajectory = TRAJECTORIES[lastTrajectoryId];
@@ -197,11 +199,11 @@ class Settings
         });
 
         this.guiAddTrajectoryElements.addTrajectoryFolder = this.guiAddTrajectory.addFolder("");
-        
+
         this.guiAddTrajectoryElements.addTrajectoryFolder.add(this.trajectorySettings, 'addTrajectory');
         this.guiAddTrajectoryElements.settingsFolder.add(this.trajectorySettings, 'saveTrajectory');
         this.guiAddTrajectoryElements.addTrajectoryFolder.open();
-        
+
         this.guiAddTrajectory.add(this.trajectorySettings, 'dropLastTrajectory');
         document.getElementById('leftPanel').appendChild(this.guiAddTrajectory.domElement);
     }
@@ -242,7 +244,7 @@ class Body
 
     render(epoch) {
         return this.visualModel.render(
-            epoch, 
+            epoch,
             this.getPositionByEpoch(epoch, RF_BASE)
         );
     }
@@ -270,9 +272,9 @@ function init() {
     document.getElementById('viewport').appendChild(renderer.domElement);
 
     window.addEventListener('resize', onWindowResize);
-    
+
     textureLoader = new THREE.TextureLoader();
-    
+
     for (let objId in SSDATA) {
         objectsForTracking[SSDATA[objId].name] = objId;
     }
@@ -359,7 +361,7 @@ function initBuiltIn() {
                         body.orientation.axisZ
                     ),
                     body.orientation.angVel
-                )   
+                )
             );
         }
     }
@@ -394,10 +396,6 @@ function render(curTime) {
     }
 
     for (let trajIdx in TRAJECTORIES) {
-        if (!TRAJECTORIES[trajIdx]) {
-            continue;
-        }
-        
         if (trajIdx == lastTrajectoryId) {
             TRAJECTORIES[trajIdx].epoch = time.epoch;
         }
@@ -413,7 +411,7 @@ function render(curTime) {
             trajectoryGroup[id].setValue("" + stateGroup[id]);
         }
     }
-    
+
     renderer.render(scene, camera);
     requestAnimationFrame(render);
 }
