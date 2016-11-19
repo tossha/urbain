@@ -22,6 +22,11 @@ const RF_PLUTO = new ReferenceFrame(PLUTO, RF_TYPE_INERTIAL);
 const TRAJECTORIES = {};
 const BODIES = {};
 
+STARDATA = [];
+STARDATA.push([0, 0, 100]);
+STARDATA.push([45, 80, 50]);
+STARDATA.push([90, 90 , 100]);
+
 const SSDATA = {
     "0": {
         type: 'point',

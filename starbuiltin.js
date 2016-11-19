@@ -1,3 +1,0 @@
-STARDATA = [];
-STARDATA.push([30, 150, 50]);
-STARDATA.push([10, 320, 97]);
