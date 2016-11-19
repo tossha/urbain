@@ -34,7 +34,7 @@ class Propagator
                     trajectory.referenceFrame
                 ).sub(currentPosition);
 
-                const mag = rvec.mag();
+                const mag = rvec.mag;
                 acceleration = rvec.mul(body.physicalModel.mu / mag / mag / mag).add(acceleration);
             }
 

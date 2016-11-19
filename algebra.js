@@ -29,7 +29,7 @@ class Vector3
         this.vector[2] = val;
     }
 
-    mag() {
+    get mag() {
         return Math.sqrt(this.vector[0] * this.vector[0] + this.vector[1] * this.vector[1] + this.vector[2] * this.vector[2]);
     }
 
