@@ -25,16 +25,17 @@ class ReferenceFrame
             return state;
         }
 
-        let pos1 = TRAJECTORIES[this.origin].getPositionByEpoch(epoch, RF_BASE);
-        let pos2 = TRAJECTORIES[destinationFrame.origin].getPositionByEpoch(epoch, RF_BASE);
-        let diff = pos1.sub(pos2);
+        let state1 = TRAJECTORIES[this.origin].getStateByEpoch(epoch, RF_BASE);
+        let state2 = TRAJECTORIES[destinationFrame.origin].getStateByEpoch(epoch, RF_BASE);
+        let diffPos = state1.position.sub(state2.position);
+        let diffVel = state1.velocity.sub(state2.velocity);
         return new StateVector(
-            state.x + diff.x,
-            state.y + diff.y,
-            state.z + diff.z,
-            state.vx,
-            state.vy,
-            state.vz
+            state.x + diffPos.x,
+            state.y + diffPos.y,
+            state.z + diffPos.z,
+            state.vx + diffVel.x,
+            state.vy + diffVel.y,
+            state.vz + diffVel.z
         );
     }
 
