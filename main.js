@@ -40,7 +40,8 @@ class Settings
         };
         
         this.guiAddTrajectoryElements = {
-            sma: null, e: null, inc: null, raan: null, aop: null, ta: null
+            sma: null, e: null, inc: null, raan: null, aop: null, ta: null,
+            settingsFolder: null, addTrajectoryFolder: null
         };
         
         this.trajectorySettings = {
@@ -52,12 +53,13 @@ class Settings
             ta   : that.baseTrajectorySettings.ta   + 1e-2,
             
             addTrajectory: function() {
-                that.guiAddTrajectoryElements.sma .setValue(that.baseTrajectorySettings.sma);
-                that.guiAddTrajectoryElements.e   .setValue(that.baseTrajectorySettings.e  );
-                that.guiAddTrajectoryElements.inc .setValue(deg2rad(that.baseTrajectorySettings.inc ));
-                that.guiAddTrajectoryElements.raan.setValue(deg2rad(that.baseTrajectorySettings.raan));
-                that.guiAddTrajectoryElements.aop .setValue(deg2rad(that.baseTrajectorySettings.aop ));
-                that.guiAddTrajectoryElements.ta  .setValue(deg2rad(that.baseTrajectorySettings.ta  ));
+                that.guiAddTrajectoryElements.sma  .setValue(that.baseTrajectorySettings.sma);
+                that.guiAddTrajectoryElements.e    .setValue(that.baseTrajectorySettings.e  );
+                
+                that.guiAddTrajectoryElements.inc  .setValue(deg2rad(that.baseTrajectorySettings.inc ));
+                that.guiAddTrajectoryElements.raan .setValue(deg2rad(that.baseTrajectorySettings.raan));
+                that.guiAddTrajectoryElements.aop  .setValue(deg2rad(that.baseTrajectorySettings.aop ));
+                that.guiAddTrajectoryElements.ta   .setValue(deg2rad(that.baseTrajectorySettings.ta  ));
                 
                 const lastTrajectory = TRAJECTORIES[lastTrajectoryId];
                 if (!lastTrajectory) {
@@ -75,57 +77,73 @@ class Settings
                     );
                 }
                 
+                that.guiAddTrajectoryElements.addTrajectoryFolder.close();
+                that.guiAddTrajectoryElements.settingsFolder.open();
             },
             
             saveTrajectory: function() {
                 --lastTrajectoryId;
+
+                that.guiAddTrajectoryElements.addTrajectoryFolder.open();
+                that.guiAddTrajectoryElements.settingsFolder.close();
             }
         };
 
-        this.guiAddTrajectoryElements.sma = this.guiAddTrajectory.add(this.trajectorySettings, 'sma', 1500000, 8000000000).onChange(function(value) {
+        this.guiAddTrajectoryElements.settingsFolder = this.guiAddTrajectory.addFolder("trajectory settings");
+        
+        this.guiAddTrajectoryElements.sma = this.guiAddTrajectoryElements.settingsFolder.add(
+                this.trajectorySettings, 'sma', 1500000, 8000000000).onChange(function(value) {
             const trajectory = TRAJECTORIES[lastTrajectoryId];
             if (trajectory) {
                 trajectory.sma = value;
             }
         });
 
-        this.guiAddTrajectoryElements.e = this.guiAddTrajectory.add(this.trajectorySettings, 'e', 0, 1).onChange(function(value) {
+        this.guiAddTrajectoryElements.e = this.guiAddTrajectoryElements.settingsFolder.add(
+                this.trajectorySettings, 'e', 0, 1).onChange(function(value) {
             const trajectory = TRAJECTORIES[lastTrajectoryId];
             if (trajectory) {
                 trajectory.e = value;
             }
         });
 
-        this.guiAddTrajectoryElements.inc = this.guiAddTrajectory.add(this.trajectorySettings, 'inc', 0, 180).onChange(function(value) {
+        this.guiAddTrajectoryElements.inc = this.guiAddTrajectoryElements.settingsFolder.add(
+                this.trajectorySettings, 'inc', 0, 180).onChange(function(value) {
             const trajectory = TRAJECTORIES[lastTrajectoryId];
             if (trajectory) {
                 trajectory.inc = deg2rad(value);
             }
         });
 
-        this.guiAddTrajectoryElements.raan = this.guiAddTrajectory.add(this.trajectorySettings, 'raan', 0, 360).onChange(function(value) {
+        this.guiAddTrajectoryElements.raan = this.guiAddTrajectoryElements.settingsFolder.add(
+                this.trajectorySettings, 'raan', 0, 360).onChange(function(value) {
             const trajectory = TRAJECTORIES[lastTrajectoryId];
             if (trajectory) {
                 trajectory.raan = deg2rad(value);
             }
         });
 
-        this.guiAddTrajectoryElements.aop = this.guiAddTrajectory.add(this.trajectorySettings, 'aop', 0, 360).onChange(function(value) {
+        this.guiAddTrajectoryElements.aop = this.guiAddTrajectoryElements.settingsFolder.add(
+                this.trajectorySettings, 'aop', 0, 360).onChange(function(value) {
             const trajectory = TRAJECTORIES[lastTrajectoryId];
             if (trajectory) {
                 trajectory.aop = deg2rad(value);
             }
         });
 
-        this.guiAddTrajectoryElements.ta = this.guiAddTrajectory.add(this.trajectorySettings, 'ta', 0, 360).onChange(function(value) {
+        this.guiAddTrajectoryElements.ta = this.guiAddTrajectoryElements.settingsFolder.add(
+                this.trajectorySettings, 'ta', 0, 360).onChange(function(value) {
             const trajectory = TRAJECTORIES[lastTrajectoryId];
             if (trajectory) {
                 trajectory.m0 = trajectory.getMeanAnomalyByTrueAnomaly(deg2rad(value));
             }
         });
 
-        this.guiAddTrajectory.add(this.trajectorySettings, 'addTrajectory');
-        this.guiAddTrajectory.add(this.trajectorySettings, 'saveTrajectory');
+        this.guiAddTrajectoryElements.addTrajectoryFolder = this.guiAddTrajectory.addFolder("");
+        
+        this.guiAddTrajectoryElements.addTrajectoryFolder.add(this.trajectorySettings, 'addTrajectory');
+        this.guiAddTrajectoryElements.settingsFolder.add(this.trajectorySettings, 'saveTrajectory');
+        this.guiAddTrajectoryElements.addTrajectoryFolder.open();
         document.getElementById('leftPanel').appendChild(this.guiAddTrajectory.domElement);
     }
 }
