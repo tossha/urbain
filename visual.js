@@ -208,14 +208,13 @@ class VisualStarsModel
 
     createStars() {
         scene.add(new THREE.Points(
-                this.threeGeometry,
-                new THREE.PointsMaterial({
-                    vertexColors: THREE.VertexColors,
-                    size: 2,
-                    sizeAttenuation: false
-                })
-            )
-        );
+            this.threeGeometry,
+            new THREE.PointsMaterial({
+                vertexColors: THREE.VertexColors,
+                size: 2,
+                sizeAttenuation: false
+            })
+        ));
     }
 }
 
