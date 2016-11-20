@@ -188,17 +188,17 @@ class VisualStarsModel
 {
     constructor(data) {
 
-        this.threeGeometry = new THREE.Geometry();
+        let threeGeometry = new THREE.Geometry();
 
         for(let params of STARDATA) {
 
-            this.threeGeometry.vertices.push(new THREE.Vector3(
+            threeGeometry.vertices.push(new THREE.Vector3(
                 1e12 * Math.cos(deg2rad(params[0])) * Math.sin(deg2rad(params[1])), 
                 1e12 * Math.sin(deg2rad(params[0])) * Math.sin(deg2rad(params[1])), 
                 1e12 * Math.cos(deg2rad(params[1]))
             ));
 
-            this.threeGeometry.colors.push(new THREE.Color(
+            threeGeometry.colors.push(new THREE.Color(
                 params[2] / 100,
                 params[2] / 100,
                 params[2] / 100
@@ -206,7 +206,7 @@ class VisualStarsModel
         }
 
         this.threeObj = new THREE.Points(
-            this.threeGeometry,
+            threeGeometry,
             new THREE.PointsMaterial({
                 vertexColors: THREE.VertexColors,
                 size: 2,
