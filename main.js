@@ -277,14 +277,9 @@ function init() {
     controls = new THREE.OrbitControls(camera, renderer.domElement);
     controls.zoomSpeed = 3;
 
-    mouseCoords = new THREE.Vector2();
-    raycaster = new THREE.Raycaster();
-    raycaster.linePrecision = 25000;
-
     document.getElementById('viewport').appendChild(renderer.domElement);
 
     window.addEventListener('resize', onWindowResize);
-    window.addEventListener('mousemove', onMouseMove);
 
     textureLoader = new THREE.TextureLoader();
 
@@ -404,8 +399,6 @@ function render(curTime) {
     trackingCoords = newTrackingCoords;
     controls.update();
 
-    raycast();
-
     for (let bodyIdx in BODIES) {
         BODIES[bodyIdx].render(time.epoch);
     }
@@ -431,33 +424,13 @@ function render(curTime) {
     requestAnimationFrame(render);
 }
 
-function raycast() {
-    raycaster.setFromCamera(mouseCoords, camera);
-
-    console.log(raycaster.ray.direction);
-
-    for (let trajIdx in TRAJECTORIES) {
-        if (trajIdx == EARTH && (time.epoch > 506000000)) {
-            stop = 1;
-        }
-        if (TRAJECTORIES[trajIdx].visualModel) {
-            TRAJECTORIES[trajIdx].visualModel.findIntersection(raycaster);
-        }
-    }
-}
-
 function onWindowResize() {
     camera.aspect = window.innerWidth / window.innerHeight;
     camera.updateProjectionMatrix();
     renderer.setSize(window.innerWidth, window.innerHeight);
 }
 
-function onMouseMove(event) {
-    mouseCoords.x =  (event.clientX / window.innerWidth)  * 2 - 1;
-    mouseCoords.y = -(event.clientY / window.innerHeight) * 2 + 1;
-}
-
-var camera, scene, renderer, controls, raycaster, mouseCoords;
+var camera, scene, renderer, controls;
 var settings, time, globalTime, trackingCoords;
 var textureLoader;
 var lastTrajectoryId = -1;

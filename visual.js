@@ -78,14 +78,6 @@ class VisualTrajectoryModelAbstract
         scene.add(this.threeObj);
     }
 
-    findIntersection(raycaster) {
-        let intersections = raycaster.intersectObject(this.threeObj, true);
-
-        if (intersections.length > 0) {
-            //console.log(intersections);
-        }
-    }
-
     drop()
     {
         scene.remove(this.threeObj);
