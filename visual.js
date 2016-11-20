@@ -187,15 +187,16 @@ class VisualShapeSphere extends VisualShapeAbstract
 class VisualStarsModel
 {
     constructor(data) {
+        const starDistance = 1e12;
 
         let threeGeometry = new THREE.Geometry();
-
+        
         for(let params of STARDATA) {
 
             threeGeometry.vertices.push(new THREE.Vector3(
-                1e12 * Math.cos(deg2rad(params[0])) * Math.sin(deg2rad(params[1])), 
-                1e12 * Math.sin(deg2rad(params[0])) * Math.sin(deg2rad(params[1])), 
-                1e12 * Math.cos(deg2rad(params[1]))
+                starDistance * Math.cos(deg2rad(params[0])) * Math.sin(deg2rad(params[1])), 
+                starDistance * Math.sin(deg2rad(params[0])) * Math.sin(deg2rad(params[1])), 
+                starDistance * Math.cos(deg2rad(params[1]))
             ));
 
             threeGeometry.colors.push(new THREE.Color(
