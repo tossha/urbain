@@ -106,8 +106,9 @@ class Settings
                 if (!TRAJECTORIES[lastTrajectoryId]) {
                     TRAJECTORIES[lastTrajectoryId] = new TrajectoryKeplerianOrbit(
                         new ReferenceFrame(that.trackingObject),
-                        BODIES[that.trackingObject] ?
-                            BODIES[that.trackingObject].physicalModel.mu : 0,
+                        BODIES[that.trackingObject]
+                            ? BODIES[that.trackingObject].physicalModel.mu
+                            : 0,
                         that.trajectorySettings.sma,
                         that.trajectorySettings.e,
                         deg2rad(that.trajectorySettings.inc ),
@@ -201,7 +202,7 @@ class Settings
         ).onChange(function(value) {
             const trajectory = TRAJECTORIES[lastTrajectoryId];
             if (trajectory) {
-                trajectory.m0 = trajectory.getMeanAnomalyByTrueAnomaly(deg2rad(value));
+                trajectory.ta = deg2rad(value);
             }
         });
 
