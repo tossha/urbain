@@ -293,7 +293,7 @@ function init() {
         timeLinePos:        504921600,
         timeScale:          100,
         isTimeRunning:      true,
-        trackingObject:     EARTH_BARYCENTER,
+        trackingObject:     SUN,
         objectsForTracking: objectsForTracking,
     });
 
