@@ -64,7 +64,18 @@ class TrajectoryAbstract
         this.referenceFrame = referenceFrame || null; // class ReferenceFrame
     }
 
-    drop() {}
+    drop() {
+        if (this.visualModel) {
+            this.visualModel.drop();
+        }
+
+        for (let trajIdx in TRAJECTORIES) {
+            if (this === TRAJECTORIES[trajIdx]) {
+                delete TRAJECTORIES[trajIdx];
+                break;
+            }
+        }
+    }
 
     getStateInOwnFrameByEpoch(epoch) {
         return ZERO_STATE_VECTOR;
@@ -83,7 +94,11 @@ class TrajectoryAbstract
         return this.getStateByEpoch(epoch, referenceFrame).velocity;
     }
 
-    render(epoch) {}
+    render(epoch) {
+        if (this.visualModel) {
+            this.visualModel.render(epoch);
+        }
+    }
 }
 
 class TrajectoryStaticPosition extends TrajectoryAbstract
@@ -104,43 +119,98 @@ class TrajectoryKeplerianOrbit extends TrajectoryAbstract
     constructor(referenceFrame, mu, sma, e, inc, raan, aop, ta, epoch, color) {
         super(referenceFrame);
 
-        this.mu    = mu;
-        this.sma   = sma;
-        this.e     = e;
-        this.inc   = inc;
-        this.raan  = raan;
-        this.aop   = aop;
-        this.epoch = epoch;
-        this.color = color;
+        this._mu    = mu;
+        this._sma   = sma;
+        this._e     = e;
+        this._inc   = inc;
+        this._raan  = raan;
+        this._aop   = aop;
+        this._epoch = epoch;
 
-        this.m0 = this.getMeanAnomalyByTrueAnomaly(ta);
+        this.ta = ta;
 
-        this.meanMotion = Math.sqrt(mu / sma) / sma;
+        this.updateMeanMotion();
 
         if (color) {
-            // @todo remove this from here
-            this.threeObj = new THREE.Line(
-                new THREE.Geometry(),
-                new THREE.LineBasicMaterial({color: this.color, vertexColors: THREE.VertexColors})
-            );
-
-            scene.add(this.threeObj);
+            this.visualModel = new VisualTrajectoryModelKeplerianOrbit(this, color);
         }
     }
 
-    drop() {
-        super.drop();
-        scene.remove(this.threeObj);
-        this.threeObj.geometry.dispose();
-        this.threeObj.material.dispose();
-        this.threeObj = null;
+    updateMeanMotion() {
+        this.meanMotion = Math.sqrt(this._mu / this._sma) / this._sma;
+    }
+
+    get mu() {
+        return this._mu;
+    }
+
+    set mu(value) {
+        this._mu = value;
+        this.updateMeanMotion();
+    }
+
+    get sma() {
+        return this._sma;
+    }
+
+    set sma(value) {
+        this._sma = value;
+        this.updateMeanMotion();
+    }
+
+    get e() {
+        return this._e;
+    }
+
+    set e(value) {
+        this._e = value;
+    }
+
+    get inc() {
+        return this._inc;
+    }
+
+    set inc(value) {
+        this._inc = value;
+    }
+
+    get raan() {
+        return this._raan;
+    }
+
+    set raan(value) {
+        this._raan = value;
+    }
+
+    get aop() {
+        return this._aop;
+    }
+
+    set aop(value) {
+        this._aop = value;
+    }
+
+    get ta() {
+        return this.getTrueAnomaly(this._epoch);
+    }
+
+    set ta(value) {
+        this.m0 = this.getMeanAnomalyByTrueAnomaly(value);
+    }
+
+    get epoch() {
+        return this._epoch;
+    }
+
+    set epoch(value) {
+        this._epoch = value;
     }
 
     getEccentricAnomalyByTrueAnomaly(ta) {
         const cos = Math.cos(ta);
         const sin = Math.sin(ta);
-        const cosE = (this.e + cos) / (1 + this.e * cos);
-        const sinE = Math.sqrt(1 - this.e * this.e) * sin / (1 + this.e * cos);
+        const cosE = (this._e + cos) / (1 + this._e * cos);
+        const sinE = Math.sqrt(1 - this._e * this._e) * sin / (1 + this._e * cos);
         const ang = Math.acos(cosE);
 
         return (sinE > 0)
@@ -155,11 +225,11 @@ class TrajectoryKeplerianOrbit extends TrajectoryAbstract
     }
 
     getMeanAnomalyByEccentricAnomaly(ea) {
-        return ea - this.e * Math.sin(ea);
+        return ea - this._e * Math.sin(ea);
     }
 
     getMeanAnomaly(epoch) {
-        return this.m0 + this.meanMotion * (epoch - this.epoch);
+        return this.m0 + this.meanMotion * (epoch - this._epoch);
     }
 
     getEccentricAnomaly(epoch) {
@@ -170,13 +240,13 @@ class TrajectoryKeplerianOrbit extends TrajectoryAbstract
 
         M = 2.0 * Math.PI * (M - Math.floor(M));
 
-        E = (this.e < 0.8) ? M : Math.PI;
+        E = (this._e < 0.8) ? M : Math.PI;
 
-        F = E - this.e * Math.sin(M) - M;
+        F = E - this._e * Math.sin(M) - M;
 
         while ((Math.abs(F) > delta) && (i < maxIter)) {
-            E = E - F / (1.0 - this.e * Math.cos(E));
-            F = E - this.e * Math.sin(E) - M;
+            E = E - F / (1.0 - this._e * Math.cos(E));
+            F = E - this._e * Math.sin(E) - M;
             i = i + 1;
         }
 
@@ -185,7 +255,7 @@ class TrajectoryKeplerianOrbit extends TrajectoryAbstract
 
     getTrueAnomaly(epoch) {
         let E = this.getEccentricAnomaly(epoch);
-        let phi = Math.atan2(Math.sqrt(1.0 - this.e * this.e) * Math.sin(E), Math.cos(E) - this.e);
+        let phi = Math.atan2(Math.sqrt(1.0 - this._e * this._e) * Math.sin(E), Math.cos(E) - this._e);
         return (phi > 0) ? phi : (phi + 2 * Math.PI);
     }
 
@@ -198,74 +268,25 @@ class TrajectoryKeplerianOrbit extends TrajectoryAbstract
         let sin = Math.sin(E);
 
         let pos = new Vector3(
-            this.sma * (cos - this.e),
-            this.sma * Math.sqrt(1 - this.e * this.e) * sin,
+            this._sma * (cos - this._e),
+            this._sma * Math.sqrt(1 - this._e * this._e) * sin,
             0
         );
 
-        let koeff = this.meanMotion * this.sma / (1 - this.e * cos);
+        let koeff = this.meanMotion * this._sma / (1 - this._e * cos);
         let vel = new Vector3(
             -koeff * sin,
-            koeff * Math.sqrt(1 - this.e * this.e) * cos,
+            koeff * Math.sqrt(1 - this._e * this._e) * cos,
             0
         );
 
-        pos = pos.rotateZ(this.aop).rotateX(this.inc).rotateZ(this.raan);
-        vel = vel.rotateZ(this.aop).rotateX(this.inc).rotateZ(this.raan);
+        pos = pos.rotateZ(this._aop).rotateX(this._inc).rotateZ(this._raan);
+        vel = vel.rotateZ(this._aop).rotateX(this._inc).rotateZ(this._raan);
 
         return new StateVector(
             pos.x, pos.y, pos.z,
             vel.x, vel.y, vel.z
         );
-    }
-
-    render(epoch) {
-        if (!this.color) {
-            return;
-        }
-
-        const endingBrightness = 0.35;
-        let centerPos = this.referenceFrame.transformPositionByEpoch(epoch, ZERO_VECTOR, RF_BASE);
-        let dr = -this.sma * this.e;
-        let ta = this.getTrueAnomaly(epoch);
-        let mainColor = new THREE.Color(this.color);
-        let lastVertexIdx;
-        let ang = Math.acos(
-            (this.e + Math.cos(ta)) / (1 + this.e * Math.cos(ta))
-        );
-
-        if (ta > Math.PI) {
-            ang = 2 * Math.PI - ang;
-        }
-
-        this.threeObj.geometry.dispose();
-        this.threeObj.geometry = (new THREE.Path(
-            (new THREE.EllipseCurve(
-                dr * Math.cos(this.aop),
-                dr * Math.sin(this.aop),
-                this.sma,
-                this.sma * Math.sqrt(1 - this.e * this.e),
-                ang,
-                2 * Math.PI + ang - 0.0000000000001,  // protection from rounding errors
-                false,
-                this.aop
-            )).getPoints(100)
-        )).createPointsGeometry(100).rotateX(this.inc);
-
-        lastVertexIdx = this.threeObj.geometry.vertices.length - 1;
-
-        for (let i = 0; i <= lastVertexIdx; i++) {
-            let curColor = (new THREE.Color()).copy(mainColor);
-            let mult = endingBrightness + (1 - endingBrightness) * i / lastVertexIdx;
-
-            this.threeObj.geometry.colors.push(
-                curColor.multiplyScalar(mult)
-            );
-        }
-
-        this.threeObj.rotation.z = this.raan;
-
-        this.threeObj.position.set(centerPos.x, centerPos.y, centerPos.z);
     }
 }
 
@@ -280,12 +301,7 @@ class TrajectoryStateArray extends TrajectoryAbstract
         this.color = color;
 
         if (color) {
-            this.threeObj = new THREE.Line(
-                new THREE.Geometry(),
-                new THREE.LineBasicMaterial({ color: this.color, vertexColors: THREE.VertexColors })
-            );
-
-            scene.add(this.threeObj);
+            this.visualModel = new VisualTrajectoryModelStateArray(this, color);
         }
     }
 
@@ -342,26 +358,6 @@ class TrajectoryStateArray extends TrajectoryAbstract
                 newPosition.x, newPosition.y, newPosition.z,
                 newVelocity.x, newVelocity.y, newVelocity.z);
         }
-    }
-
-    render(epoch) {
-        if (!this.threeObj || this.states.length < 2) {
-            return;
-        }
-
-        this.threeObj.geometry.dispose();
-        const geometry = new THREE.Geometry();
-        for (let i = 0; i < this.states.length; ++i) {
-            const position = this.states[i].state.position;
-            geometry.vertices.push(new THREE.Vector3(
-                position.x,
-                position.y,
-                position.z
-            ));
-            geometry.colors.push(new THREE.Color(this.color));
-        }
-
-        this.threeObj.geometry = geometry;
     }
 }
 
