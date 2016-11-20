@@ -204,17 +204,17 @@ class VisualStarsModel
                 params[2] / 100
             )); 
         }
-    }
 
-    createStars() {
-        scene.add(new THREE.Points(
+        this.threeObj = new THREE.Points(
             this.threeGeometry,
             new THREE.PointsMaterial({
                 vertexColors: THREE.VertexColors,
                 size: 2,
                 sizeAttenuation: false
             })
-        ));
+        );
+
+        scene.add(this.threeObj); 
     }
 }
 

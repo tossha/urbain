@@ -373,8 +373,7 @@ function initBuiltIn() {
             );
         }
     }
-
-    (new VisualStarsModel(STARDATA)).createStars();
+    stars = new VisualStarsModel(STARDATA);
 }
 
 function firstRender(curTime) {
@@ -436,6 +435,7 @@ var camera, scene, renderer, controls;
 var settings, time, globalTime, trackingCoords;
 var textureLoader;
 var lastTrajectoryId = -1;
+var stars;
 
 window.onload = function () {
     init();
