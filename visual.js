@@ -191,7 +191,7 @@ class VisualStarsModel
 
         let threeGeometry = new THREE.Geometry();
         
-        for(let params of STARDATA) {
+        for(let params of data) {
 
             threeGeometry.vertices.push(new THREE.Vector3(
                 starDistance * Math.cos(deg2rad(params[0])) * Math.sin(deg2rad(params[1])), 
