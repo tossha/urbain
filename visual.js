@@ -86,6 +86,14 @@ class VisualTrajectoryModelAbstract
         }
     }
 
+    drop()
+    {
+        scene.remove(this.threeObj);
+        this.threeObj.geometry.dispose();
+        this.threeObj.material.dispose();
+        delete this.threeObj;
+    }
+
     render(epoch) {}
 }
 

@@ -64,7 +64,18 @@ class TrajectoryAbstract
         this.referenceFrame = referenceFrame || null; // class ReferenceFrame
     }
 
-    drop() {}
+    drop() {
+        if (this.visualModel) {
+            this.visualModel.drop();
+        }
+        
+        for (let trajIdx in TRAJECTORIES) {
+            if (this === TRAJECTORIES[trajIdx]) {
+                delete TRAJECTORIES[trajIdx];
+                break;
+            }
+        }
+    }
 
     getStateInOwnFrameByEpoch(epoch) {
         return ZERO_STATE_VECTOR;
@@ -124,11 +135,6 @@ class TrajectoryKeplerianOrbit extends TrajectoryAbstract
         if (color) {
             this.visualModel = new VisualTrajectoryModelKeplerianOrbit(this, color);
         }
-    }
-
-    drop() {
-        this.visualModel.drop();
-        super.drop();
     }
 
     getEccentricAnomalyByTrueAnomaly(ta) {
