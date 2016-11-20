@@ -1,4 +1,3 @@
-
 const RF_BASE = new ReferenceFrame(SOLAR_SYSTEM_BARYCENTER, RF_TYPE_INERTIAL);
 const RF_SUN = new ReferenceFrame(SUN, RF_TYPE_INERTIAL);
 const RF_MERCURY_B = new ReferenceFrame(MERCURY_BARYCENTER, RF_TYPE_INERTIAL);
@@ -22,6 +21,12 @@ const RF_PLUTO = new ReferenceFrame(PLUTO, RF_TYPE_INERTIAL);
 
 const TRAJECTORIES = {};
 const BODIES = {};
+
+STARDATA = [
+    [0, 0, 100],
+    [45, 80, 50],
+    [90, 90 , 100]
+];
 
 const SSDATA = {
     "0": {
