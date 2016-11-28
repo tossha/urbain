@@ -373,7 +373,22 @@ function initBuiltIn() {
             );
         }
     }
+
     stars = new VisualStarsModel(STARDATA);
+	
+	for (let id in TLEDATA){
+		const obj = new tle(TLEDATA[id]);
+		console.log(obj.name);
+		console.log(obj.lineOne);
+		console.log(obj.lineTwo);
+		console.log(obj.getInc());
+		console.log(obj.getRaan())
+		console.log(obj.getE());
+		console.log(obj.getAop());
+		console.log(obj.getMeanAnomaly())
+		console.log(obj.getMeanMotion());
+		console.log(obj.getSma());
+	}
 }
 
 function firstRender(curTime) {
@@ -441,4 +456,5 @@ window.onload = function () {
     init();
     initBuiltIn();
     requestAnimationFrame(firstRender);
+	
 };
