@@ -378,16 +378,49 @@ function initBuiltIn() {
 	
 	for (let id in TLEDATA){
 		const obj = new tle(TLEDATA[id]);
-		console.log(obj.name);
-		console.log(obj.lineOne);
-		console.log(obj.lineTwo);
-		console.log(obj.getInc());
-		console.log(obj.getRaan())
-		console.log(obj.getE());
-		console.log(obj.getAop());
-		console.log(obj.getMeanAnomaly())
-		console.log(obj.getMeanMotion());
-		console.log(obj.getSma());
+		const objId = parseInt(id);
+		const frame = new ReferenceFrame(EARTH, 0);
+		traj = new TrajectoryKeplerianOrbit(
+                frame,
+                398600.4415,//mu[earth]
+                obj.getSma(),
+                obj.getE(),
+                deg2rad(obj.getInc()),
+                deg2rad(obj.getRaan()),
+                deg2rad(obj.getAop()),
+                deg2rad(obj.getMeanAnomaly()),
+                obj.getEpoch(),
+                'azure',
+				false
+				)
+		TRAJECTORIES[objId] = traj;	
+		//let visualShape = new visualShapeModel
+		let visualShape = new VisualShapeSphere(
+                1,
+                12
+				)
+		let visualModel = new VisualBodyModel(
+                    visualShape,
+                    'azure',
+                    undefined
+                );
+		BODIES[objId] = new Body(
+                visualModel,
+                new PhysicalBodyModel(
+                    0,
+                    0
+                ),
+                traj,
+                new Orientation(
+                    0,
+                    getQuaternionByEuler(
+                        0,
+                        0,
+                        0
+                    ),
+                    0
+                )
+            );
 	}
 }
 
