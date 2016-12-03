@@ -209,3 +209,13 @@ function red2deg(radians) {
 function getQuaternionByEuler(x, y, z) {
     return (new THREE.Quaternion()).setFromEuler(new THREE.Euler(x, y, z));
 }
+
+const IDENTITY_QUATERNION = new THREE.Quaternion(0, 0, 0, 1);
+
+function threeVectorToVector(v) {
+    return new THREE.Vector3(v.x, v.y, v.z);
+}
+
+function vectorToThreeVector(v) {
+    return new Vector3(v.x, v.y, v.z);
+}

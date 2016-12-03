@@ -1,9 +1,10 @@
 
 class ReferenceFrame
 {
-    constructor(origin, type) {
+    constructor(origin, type, quaternion) {
         this.origin = origin;
         this.type = type || RF_TYPE_INERTIAL; // RF_TYPE_INERTIAL или RF_TYPE_ROTATING
+        this.quaternion = quaternion || IDENTITY_QUATERNION;
     }
 
     getMatrixByEpoch(epoch) {
@@ -24,18 +25,31 @@ class ReferenceFrame
         ) {
             return state;
         }
-
-        let state1 = TRAJECTORIES[this.origin].getStateByEpoch(epoch, RF_BASE);
-        let state2 = TRAJECTORIES[destinationFrame.origin].getStateByEpoch(epoch, RF_BASE);
-        let diffPos = state1.position.sub(state2.position);
-        let diffVel = state1.velocity.sub(state2.velocity);
+        
+        const rotation = new THREE.Quaternion().multiplyQuaternions(this.quaternion.inverse(), destinationFrame.quaternion);
+        
+        const state1 = TRAJECTORIES[this.origin].getStateByEpoch(epoch, RF_BASE);
+        const state2 = TRAJECTORIES[destinationFrame.origin].getStateByEpoch(epoch, RF_BASE);
+        
+        const pos1ThreeVec = vectorToThreeVector(state1.position);
+        const vel1ThreeVec = vectorToThreeVector(state1.velocity);
+        const stateThreeVec = vectorToThreeVector(state);
+        
+        rotation.multiplyVector3(posThreeVec);
+        rotation.multiplyVector3(velThreeVec);
+        rotation.multiplyVector3(stateThreeVec);
+        
+        const diffPos = threeVectorToVector(pos1ThreeVec).sub(state2.position);
+        const diffVel = threeVectorToVector(pos2ThreeVec).sub(state2.velocity);
+        const stateRotated = threeVectorToVector(stateThreeVec);
+        
         return new StateVector(
-            state.x + diffPos.x,
-            state.y + diffPos.y,
-            state.z + diffPos.z,
-            state.vx + diffVel.x,
-            state.vy + diffVel.y,
-            state.vz + diffVel.z
+            stateRotated. x + diffPos.x,
+            stateRotated. y + diffPos.y,
+            stateRotated. z + diffPos.z,
+            stateRotated.vx + diffVel.x,
+            stateRotated.vy + diffVel.y,
+            stateRotated.vz + diffVel.z
         );
     }
 
