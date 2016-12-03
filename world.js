@@ -26,30 +26,29 @@ class ReferenceFrame
             return state;
         }
         
-        const rotation = new THREE.Quaternion().multiplyQuaternions(this.quaternion.inverse(), destinationFrame.quaternion);
+        const rotation = new THREE.Quaternion().copy(destinationFrame.quaternion).inverse().multiply(new THREE.Quaternion().copy(this.quaternion));
+        // const rotation = destinationFrame.quaternion;
         
         const state1 = TRAJECTORIES[this.origin].getStateByEpoch(epoch, RF_BASE);
         const state2 = TRAJECTORIES[destinationFrame.origin].getStateByEpoch(epoch, RF_BASE);
         
-        const pos1ThreeVec = vectorToThreeVector(state1.position);
-        const vel1ThreeVec = vectorToThreeVector(state1.velocity);
-        const stateThreeVec = vectorToThreeVector(state);
-        
-        rotation.multiplyVector3(posThreeVec);
-        rotation.multiplyVector3(velThreeVec);
-        rotation.multiplyVector3(stateThreeVec);
+        const pos1ThreeVec = vectorToThreeVector(state1.position).applyQuaternion(rotation);
+        const vel1ThreeVec = vectorToThreeVector(state1.velocity).applyQuaternion(rotation);
+        const statePosThreeVec = vectorToThreeVector(state.position).applyQuaternion(rotation);
+        const stateVelThreeVec = vectorToThreeVector(state.velocity).applyQuaternion(rotation);
         
         const diffPos = threeVectorToVector(pos1ThreeVec).sub(state2.position);
-        const diffVel = threeVectorToVector(pos2ThreeVec).sub(state2.velocity);
-        const stateRotated = threeVectorToVector(stateThreeVec);
+        const diffVel = threeVectorToVector(vel1ThreeVec).sub(state2.velocity);
+        const statePosRotated = threeVectorToVector(statePosThreeVec);
+        const stateVelRotated = threeVectorToVector(stateVelThreeVec);
         
         return new StateVector(
-            stateRotated. x + diffPos.x,
-            stateRotated. y + diffPos.y,
-            stateRotated. z + diffPos.z,
-            stateRotated.vx + diffVel.x,
-            stateRotated.vy + diffVel.y,
-            stateRotated.vz + diffVel.z
+            statePosRotated.x + diffPos.x,
+            statePosRotated.y + diffPos.y,
+            statePosRotated.z + diffPos.z,
+            stateVelRotated.x + diffVel.x,
+            stateVelRotated.y + diffVel.y,
+            stateVelRotated.z + diffVel.z
         );
     }
 
