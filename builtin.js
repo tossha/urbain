@@ -3,7 +3,7 @@ const RF_BASE = ReferenceFrame.get(SOLAR_SYSTEM_BARYCENTER, RF_TYPE_ECLIPTIC);
 const TRAJECTORIES = {};
 const BODIES = {};
 
-const EQUATORIAL_QUATERNION = getQuaternionByEuler(deg2rad(27), 0, 0);
+const EQUATORIAL_QUATERNION = getQuaternionByEuler(0.4087561108170719, 0, 0);
 
 STARDATA = [
     [0, 0, 100],
