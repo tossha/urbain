@@ -29,10 +29,10 @@ class ReferenceFrame
             return state;
         }
         
-        if (destinationFrame === RF_BASE) {
-        }
-        
-        const rotation = new THREE.Quaternion().copy(destinationFrame.quaternion).inverse().multiply(new THREE.Quaternion().copy(this.quaternion));
+        const rotation = new THREE.Quaternion();
+        rotation.copy(destinationFrame.quaternion);
+        rotation.inverse();
+        rotation.multiply(this.quaternion);
         
         const state1 = TRAJECTORIES[this.origin].getStateByEpoch(epoch, RF_BASE);
         const state2 = TRAJECTORIES[destinationFrame.origin].getStateByEpoch(epoch, RF_BASE);
@@ -63,16 +63,6 @@ class ReferenceFrame
             new StateVector(pos.x, pos.y, pos.z, 0, 0, 0),
             destinationFrame
         ).position;
-    }
-
-    getTransformationQuaternionByEpoch(epoch, destinationFrame) {
-        if ((this.origin === destinationFrame.origin)
-            && (this.type === destinationFrame.type)
-        ) {
-            return IDENTITY_MATRIX6; // @todo think about optimization here
-        }
-
-        // @todo implement
     }
 }
 
