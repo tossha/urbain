@@ -373,7 +373,33 @@ function initBuiltIn() {
             );
         }
     }
+
     stars = new VisualStarsModel(STARDATA);
+	
+    for (let id in TLEDATA) {
+        const obj = new TLE(TLEDATA[id]);
+        const objId = parseInt(id);
+        const frame = new ReferenceFrame(EARTH, RF_TYPE_INERTIAL);
+        if (TLEDATA[id].color !== undefined){
+            var color = TLEDATA[id].color
+        } else {
+            var color = 'azure'
+        }
+        traj = new TrajectoryKeplerianOrbit(
+            frame,
+            BODIES[EARTH].physicalModel.mu,
+            obj.getSma(),
+            obj.getE(),
+            deg2rad(obj.getInc()),
+            deg2rad(obj.getRaan()),
+            deg2rad(obj.getAop()),
+            deg2rad(obj.getMeanAnomaly()),
+            obj.getEpoch(),
+            color,
+            false
+            );
+        TRAJECTORIES[objId] = traj;	
+    }
 }
 
 function firstRender(curTime) {

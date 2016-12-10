@@ -116,7 +116,7 @@ class TrajectoryStaticPosition extends TrajectoryAbstract
 
 class TrajectoryKeplerianOrbit extends TrajectoryAbstract
 {
-    constructor(referenceFrame, mu, sma, e, inc, raan, aop, ta, epoch, color) {
+    constructor(referenceFrame, mu, sma, e, inc, raan, aop, anomaly, epoch, color, isAnomalyTrue) {
         super(referenceFrame);
 
         this._mu    = mu;
@@ -127,8 +127,12 @@ class TrajectoryKeplerianOrbit extends TrajectoryAbstract
         this._aop   = aop;
         this._epoch = epoch;
 
-        this.ta = ta;
-
+        if ((isAnomalyTrue === undefined) || (isAnomalyTrue === true)) {
+            this.ta = anomaly;
+        } else {
+            this.m0 = anomaly;
+        }
+		
         this.updateMeanMotion();
 
         if (color) {
