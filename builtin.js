@@ -19,7 +19,7 @@ const SSDATA = {
             type: 'static',
             rf: {
                 origin: SOLAR_SYSTEM_BARYCENTER,
-                type: RF_ECLIPTIC
+                type: RF_TYPE_ECLIPTIC
             },
             data: [0, 0, 0]
         }
@@ -31,7 +31,7 @@ const SSDATA = {
             type: 'static',
             rf: {
                 origin: SOLAR_SYSTEM_BARYCENTER,
-                type: RF_ECLIPTIC
+                type: RF_TYPE_ECLIPTIC
             },
             data: [0, 0, 0]
         },
@@ -62,7 +62,7 @@ const SSDATA = {
             color: 'azure',
             rf: {
                 origin: SUN,
-                type: RF_ECLIPTIC
+                type: RF_TYPE_ECLIPTIC
             },
             data: {
                 mu:    132712440017.99,   // MU[sun]
@@ -100,7 +100,7 @@ const SSDATA = {
             color: 'orange',
             rf: {
                 origin: SUN,
-                type: RF_ECLIPTIC
+                type: RF_TYPE_ECLIPTIC
             },
             data: {
                 mu:    132712440017.99,   // MU[sun]
@@ -138,7 +138,7 @@ const SSDATA = {
             color: 'lightblue',
             rf: {
                 origin: SUN,
-                type: RF_ECLIPTIC
+                type: RF_TYPE_ECLIPTIC
             },
             data: {
                 mu:    132712440017.99,   // MU[sun]
@@ -160,7 +160,7 @@ const SSDATA = {
             color: 'blue',
             rf: {
                 origin: EARTH_BARYCENTER,
-                type: RF_ECLIPTIC
+                type: RF_TYPE_ECLIPTIC
             },
             data: {
                 mu:    0.7238334181449901,  // MU[moon]^3 / (MU[earth] + MU[moon])^2
@@ -198,7 +198,7 @@ const SSDATA = {
             color: 'white',
             rf: {
                 origin: EARTH_BARYCENTER,
-                type: RF_ECLIPTIC
+                type: RF_TYPE_ECLIPTIC
             },
             data: {
                 mu:    388972.8321930768,  // MU[earth]^3 / (MU[earth] + MU[moon])^2
@@ -236,7 +236,7 @@ const SSDATA = {
             color: 'red',
             rf: {
                 origin: SUN,
-                type: RF_ECLIPTIC
+                type: RF_TYPE_ECLIPTIC
             },
             data: {
                 mu:    132712440017.99,   // MU[sun]
@@ -274,7 +274,7 @@ const SSDATA = {
             color: 'burlywood',
             rf: {
                 origin: SUN,
-                type: RF_ECLIPTIC
+                type: RF_TYPE_ECLIPTIC
             },
             data: {
                 mu:    132712440017.99,   // MU[sun]
@@ -312,7 +312,7 @@ const SSDATA = {
             color: 'sandybrown',
             rf: {
                 origin: SUN,
-                type: RF_ECLIPTIC
+                type: RF_TYPE_ECLIPTIC
             },
             data: {
                 mu:    132712440017.99,   // MU[sun]
@@ -349,7 +349,7 @@ const SSDATA = {
             color: 'lightskyblue',
             rf: {
                 origin: SUN,
-                type: RF_ECLIPTIC
+                type: RF_TYPE_ECLIPTIC
             },
             data: {
                 mu:    132712440017.99,   // MU[sun]
@@ -386,7 +386,7 @@ const SSDATA = {
             color: 'steelblue',
             rf: {
                 origin: SUN,
-                type: RF_ECLIPTIC
+                type: RF_TYPE_ECLIPTIC
             },
             data: {
                 mu:    132712440017.99,   // MU[sun]
@@ -423,7 +423,7 @@ const SSDATA = {
             color: 'tan',
             rf: {
                 origin: SUN,
-                type: RF_ECLIPTIC
+                type: RF_TYPE_ECLIPTIC
             },
             data: {
                 mu:    132712440017.99,   // MU[sun]
@@ -445,7 +445,7 @@ const SSDATA = {
             color: 'tan',
             rf: {
                 origin: PLUTO_BARYCENTER,
-                type: RF_ECLIPTIC
+                type: RF_TYPE_ECLIPTIC
             },
             data: {
                 mu:    1.126007850945504,   // MU[charon]^3 / (MU[pluto] + MU[charon])^2
@@ -482,7 +482,7 @@ const SSDATA = {
             color: 'rosybrown',
             rf: {
                 origin: PLUTO_BARYCENTER,
-                type: RF_ECLIPTIC
+                type: RF_TYPE_ECLIPTIC
             },
             data: {
                 mu:    698.9254936721327,   // MU[pluto]^3 / (MU[pluto] + MU[charon])^2

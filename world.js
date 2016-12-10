@@ -9,6 +9,7 @@ class ReferenceFrame
             case RF_TYPE_EQUATORIAL:
                 this.quaternion = EQUATORIAL_QUATERNION;
                 break;
+                
             default:
                 this.quaternion = IDENTITY_QUATERNION;
                 break;

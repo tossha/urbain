@@ -55,7 +55,6 @@ class Settings
         for (let group of ['velocity', 'position']) {
             trajectoryMenu[group].folder = this.guiMain.addFolder(group);
             for (let id of ['x', 'y', 'z', 'mag']) {
-                console.log(group, id, trajectoryMenu[group], trajectoryMenu[group].values);
                 trajectoryMenu[group][id] = trajectoryMenu[group].folder.add(trajectoryMenu[group].values, id);
             }
         }
