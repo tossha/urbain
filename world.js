@@ -128,10 +128,10 @@ class TrajectoryKeplerianOrbit extends TrajectoryAbstract
         this._epoch = epoch;
 
         if ((isAnomalyTrue === undefined) || (isAnomalyTrue === true)) {
-			this.ta = anomaly;
-		} else {
-			this.m0 = anomaly;
-		}
+            this.ta = anomaly;
+        } else {
+            this.m0 = anomaly;
+        }
 		
         this.updateMeanMotion();
 

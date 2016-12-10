@@ -377,12 +377,12 @@ function initBuiltIn() {
     stars = new VisualStarsModel(STARDATA);
 	
 	for (let id in TLEDATA){
-		const obj = new tle(TLEDATA[id]);
+		const obj = new TLE(TLEDATA[id]);
 		const objId = parseInt(id);
-		const frame = new ReferenceFrame(EARTH, 0);
+		const frame = new ReferenceFrame(EARTH, RF_TYPE_INERTIAL);
 		traj = new TrajectoryKeplerianOrbit(
                 frame,
-                398600.4415,//mu[earth]
+                BODIES[EARTH].physicalModel.mu,
                 obj.getSma(),
                 obj.getE(),
                 deg2rad(obj.getInc()),
@@ -404,7 +404,7 @@ function initBuiltIn() {
                     'azure',
                     undefined
                 );
-		BODIES[objId] = new Body(
+		/*BODIES[objId] = new Body(
                 visualModel,
                 new PhysicalBodyModel(
                     0,
@@ -420,7 +420,7 @@ function initBuiltIn() {
                     ),
                     0
                 )
-            );
+            );*/
 	}
 }
 
@@ -489,5 +489,4 @@ window.onload = function () {
     init();
     initBuiltIn();
     requestAnimationFrame(firstRender);
-	
 };
