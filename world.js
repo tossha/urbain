@@ -67,10 +67,16 @@ class ReferenceFrame
     }
 }
 
-ReferenceFrame.get = function (origin, type) {
+ReferenceFrame.get = function(origin, type) {
     this.collection = this.collection || [];
     
+    for (let rf of this.collection) {
+        if (rf.origin === origin && rf.type === type) {
+            return rf;
+        }
+    }
     
+    return new ReferenceFrame(origin, type);
 };
 
 class TrajectoryAbstract
