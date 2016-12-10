@@ -37,13 +37,11 @@ class ReferenceFrame
         const state1 = TRAJECTORIES[this.origin].getStateByEpoch(epoch, RF_BASE);
         const state2 = TRAJECTORIES[destinationFrame.origin].getStateByEpoch(epoch, RF_BASE);
         
-        // const pos1ThreeVec = vectorToThreeVector(state1.position).applyQuaternion(rotation);
-        // const vel1ThreeVec = vectorToThreeVector(state1.velocity).applyQuaternion(rotation);
         const statePosThreeVec = vectorToThreeVector(state.position).applyQuaternion(rotation);
         const stateVelThreeVec = vectorToThreeVector(state.velocity).applyQuaternion(rotation);
         
-        const diffPos = state1.position.sub(state2.position); // threeVectorToVector(pos1ThreeVec).sub(state2.position);
-        const diffVel = state1.velocity.sub(state2.velocity); // threeVectorToVector(vel1ThreeVec).sub(state2.velocity);
+        const diffPos = state1.position.sub(state2.position);
+        const diffVel = state1.velocity.sub(state2.velocity);
         const statePosRotated = threeVectorToVector(statePosThreeVec);
         const stateVelRotated = threeVectorToVector(stateVelThreeVec);
         
