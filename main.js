@@ -376,52 +376,30 @@ function initBuiltIn() {
 
     stars = new VisualStarsModel(STARDATA);
 	
-	for (let id in TLEDATA){
-		const obj = new TLE(TLEDATA[id]);
-		const objId = parseInt(id);
-		const frame = new ReferenceFrame(EARTH, RF_TYPE_INERTIAL);
-		traj = new TrajectoryKeplerianOrbit(
-                frame,
-                BODIES[EARTH].physicalModel.mu,
-                obj.getSma(),
-                obj.getE(),
-                deg2rad(obj.getInc()),
-                deg2rad(obj.getRaan()),
-                deg2rad(obj.getAop()),
-                deg2rad(obj.getMeanAnomaly()),
-                obj.getEpoch(),
-                'azure',
-				false
-				)
-		TRAJECTORIES[objId] = traj;	
-		//let visualShape = new visualShapeModel
-		let visualShape = new VisualShapeSphere(
-                1,
-                12
-				)
-		let visualModel = new VisualBodyModel(
-                    visualShape,
-                    'azure',
-                    undefined
-                );
-		/*BODIES[objId] = new Body(
-                visualModel,
-                new PhysicalBodyModel(
-                    0,
-                    0
-                ),
-                traj,
-                new Orientation(
-                    0,
-                    getQuaternionByEuler(
-                        0,
-                        0,
-                        0
-                    ),
-                    0
-                )
-            );*/
-	}
+    for (let id in TLEDATA) {
+        const obj = new TLE(TLEDATA[id]);
+        const objId = parseInt(id);
+        const frame = new ReferenceFrame(EARTH, RF_TYPE_INERTIAL);
+        if (TLEDATA[id].color !== undefined){
+            var color = TLEDATA[id].color
+        } else {
+            var color = 'azure'
+        }
+        traj = new TrajectoryKeplerianOrbit(
+            frame,
+            BODIES[EARTH].physicalModel.mu,
+            obj.getSma(),
+            obj.getE(),
+            deg2rad(obj.getInc()),
+            deg2rad(obj.getRaan()),
+            deg2rad(obj.getAop()),
+            deg2rad(obj.getMeanAnomaly()),
+            obj.getEpoch(),
+            color,
+            false
+            );
+        TRAJECTORIES[objId] = traj;	
+    }
 }
 
 function firstRender(curTime) {
