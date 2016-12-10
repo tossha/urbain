@@ -3,39 +3,57 @@ class ReferenceFrame
 {
     constructor(origin, type) {
         this.origin = origin;
-        this.type = type || RF_TYPE_INERTIAL; // RF_TYPE_INERTIAL или RF_TYPE_ROTATING
-    }
-
-    getMatrixByEpoch(epoch) {
-        // @todo implement
+        this.type = type || RF_TYPE_ECLIPTIC; // RF_TYPE_EQUATORIAL, RF_TYPE_ECLIPTIC или RF_TYPE_ROTATING
+        
+        switch (type) {
+            case RF_TYPE_EQUATORIAL:
+                this.quaternion = EQUATORIAL_QUATERNION;
+                break;
+                
+            default:
+                this.quaternion = IDENTITY_QUATERNION;
+                break;
+        }
     }
 
     transformStateVectorByEpoch(epoch, state, destinationFrame) {
-        if ((this.type !== RF_TYPE_INERTIAL)
-            || (destinationFrame.type !== RF_TYPE_INERTIAL)
+        if ((this.type === RF_TYPE_ROTATING)
+            || (destinationFrame.type === RF_TYPE_ROTATING)
         ) {
-            // @tofo implement
+            // @todo implement
             console.log('Rotating frames are not supported yet');
             return;
         }
 
-        if ((this.origin === destinationFrame.origin)
-            && (this.type === destinationFrame.type)
-        ) {
+        if (this === destinationFrame) {
             return state;
         }
-
-        let state1 = TRAJECTORIES[this.origin].getStateByEpoch(epoch, RF_BASE);
-        let state2 = TRAJECTORIES[destinationFrame.origin].getStateByEpoch(epoch, RF_BASE);
-        let diffPos = state1.position.sub(state2.position);
-        let diffVel = state1.velocity.sub(state2.velocity);
+        
+        const rotation = new THREE.Quaternion();
+        rotation.copy(destinationFrame.quaternion);
+        rotation.inverse();
+        rotation.multiply(this.quaternion);
+        
+        const state1 = TRAJECTORIES[this.origin].getStateByEpoch(epoch, RF_BASE);
+        const state2 = TRAJECTORIES[destinationFrame.origin].getStateByEpoch(epoch, RF_BASE);
+        
+        const pos1ThreeVec = vectorToThreeVector(state1.position).applyQuaternion(rotation);
+        const vel1ThreeVec = vectorToThreeVector(state1.velocity).applyQuaternion(rotation);
+        const statePosThreeVec = vectorToThreeVector(state.position).applyQuaternion(rotation);
+        const stateVelThreeVec = vectorToThreeVector(state.velocity).applyQuaternion(rotation);
+        
+        const diffPos = threeVectorToVector(pos1ThreeVec).sub(state2.position);
+        const diffVel = threeVectorToVector(vel1ThreeVec).sub(state2.velocity);
+        const statePosRotated = threeVectorToVector(statePosThreeVec);
+        const stateVelRotated = threeVectorToVector(stateVelThreeVec);
+        
         return new StateVector(
-            state.x + diffPos.x,
-            state.y + diffPos.y,
-            state.z + diffPos.z,
-            state.vx + diffVel.x,
-            state.vy + diffVel.y,
-            state.vz + diffVel.z
+            statePosRotated.x + diffPos.x,
+            statePosRotated.y + diffPos.y,
+            statePosRotated.z + diffPos.z,
+            stateVelRotated.x + diffVel.x,
+            stateVelRotated.y + diffVel.y,
+            stateVelRotated.z + diffVel.z
         );
     }
 
@@ -46,17 +64,21 @@ class ReferenceFrame
             destinationFrame
         ).position;
     }
-
-    getTransformationMatrixByEpoch(epoch, destinationFrame) {
-        if ((this.origin === destinationFrame.origin)
-            && (this.type === destinationFrame.type)
-        ) {
-            return IDENTITY_MATRIX6; // @todo think about optimization here
-        }
-
-        // @todo implement
-    }
 }
+
+ReferenceFrame.get = function(origin, type) {
+    ReferenceFrame.collection = ReferenceFrame.collection || [];
+    
+    for (let rf of ReferenceFrame.collection) {
+        if (rf.origin === origin && rf.type === type) {
+            return rf;
+        }
+    }
+    
+    const rf = new ReferenceFrame(origin, type);
+    ReferenceFrame.collection.push(rf);
+    return rf;
+};
 
 class TrajectoryAbstract
 {

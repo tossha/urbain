@@ -55,7 +55,6 @@ class Settings
         for (let group of ['velocity', 'position']) {
             trajectoryMenu[group].folder = this.guiMain.addFolder(group);
             for (let id of ['x', 'y', 'z', 'mag']) {
-                console.log(group, id, trajectoryMenu[group], trajectoryMenu[group].values);
                 trajectoryMenu[group][id] = trajectoryMenu[group].folder.add(trajectoryMenu[group].values, id);
             }
         }
@@ -305,7 +304,7 @@ function initBuiltIn() {
         const body = SSDATA[id];
         const bodyId = parseInt(id);
         const trajConfig = body.traj;
-        const frame = new ReferenceFrame(trajConfig.rf.origin, trajConfig.rf.type);
+        const frame = ReferenceFrame.get(trajConfig.rf.origin, trajConfig.rf.type);
         let traj;
 
         if (trajConfig.type === 'static') {

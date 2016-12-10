@@ -21,8 +21,9 @@ const PLUTO   = 999;
 
 const MOON = 301;
 
-const RF_TYPE_INERTIAL = 0; // reference frame type: inertial
-const RF_TYPE_ROTATING = 1; // reference frame type: rotating with the body
+const RF_TYPE_ECLIPTIC = 1; // reference frame type: inertial
+const RF_TYPE_EQUATORIAL = 2;
+const RF_TYPE_ROTATING = 3; // reference frame type: rotating with the body
 
 const VM_SHAPE_SPHERE = 1; // visual model shape type: sphere
 const VM_SHAPE_MODEL  = 2; // visual model shape type: custom 3d model
