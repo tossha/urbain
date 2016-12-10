@@ -22,6 +22,8 @@ const RF_PLUTO     = ReferenceFrame.get(PLUTO, RF_TYPE_ECLIPTIC);
 const TRAJECTORIES = {};
 const BODIES = {};
 
+const EQUATORIAL_QUATERNION = getQuaternionByEuler(Math.PI / 4, 0, 0);
+
 STARDATA = [
     [0, 0, 100],
     [45, 80, 50],
@@ -155,7 +157,7 @@ const SSDATA = {
             color: 'lightblue',
             rf: {
                 origin: SUN,
-                type: 0
+                type: 2
             },
             data: {
                 mu:    132712440017.99,   // MU[sun]

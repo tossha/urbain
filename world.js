@@ -1,29 +1,33 @@
 
 class ReferenceFrame
 {
-    constructor(origin, type, quaternion) {
+    constructor(origin, type) {
         this.origin = origin;
         this.type = type || RF_TYPE_ECLIPTIC; // RF_TYPE_EQUATORIAL, RF_TYPE_ECLIPTIC или RF_TYPE_ROTATING
-        this.quaternion = quaternion || IDENTITY_QUATERNION;
+        
+        switch (type) {
+            case RF_TYPE_EQUATORIAL: this.quaternion = EQUATORIAL_QUATERNION; break;
+            default: this.quaternion = IDENTITY_QUATERNION; break;
+        }
     }
 
     transformStateVectorByEpoch(epoch, state, destinationFrame) {
-        if ((this.type !== RF_TYPE_ECLIPTIC)
-            || (destinationFrame.type !== RF_TYPE_ECLIPTIC)
+        if ((this.type === RF_TYPE_ROTATING)
+            || (destinationFrame.type === RF_TYPE_ROTATING)
         ) {
             // @tofo implement
             console.log('Rotating frames are not supported yet');
             return;
         }
 
-        if ((this.origin === destinationFrame.origin)
-            && (this.type === destinationFrame.type)
-        ) {
+        if (this === destinationFrame) {
             return state;
         }
         
+        if (destinationFrame === RF_BASE) {
+        }
+        
         const rotation = new THREE.Quaternion().copy(destinationFrame.quaternion).inverse().multiply(new THREE.Quaternion().copy(this.quaternion));
-        // const rotation = destinationFrame.quaternion;
         
         const state1 = TRAJECTORIES[this.origin].getStateByEpoch(epoch, RF_BASE);
         const state2 = TRAJECTORIES[destinationFrame.origin].getStateByEpoch(epoch, RF_BASE);
