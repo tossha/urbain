@@ -3,17 +3,13 @@ class ReferenceFrame
 {
     constructor(origin, type, quaternion) {
         this.origin = origin;
-        this.type = type || RF_TYPE_INERTIAL; // RF_TYPE_INERTIAL или RF_TYPE_ROTATING
+        this.type = type || RF_TYPE_ECLIPTIC; // RF_TYPE_EQUATORIAL, RF_TYPE_ECLIPTIC или RF_TYPE_ROTATING
         this.quaternion = quaternion || IDENTITY_QUATERNION;
     }
 
-    getMatrixByEpoch(epoch) {
-        // @todo implement
-    }
-
     transformStateVectorByEpoch(epoch, state, destinationFrame) {
-        if ((this.type !== RF_TYPE_INERTIAL)
-            || (destinationFrame.type !== RF_TYPE_INERTIAL)
+        if ((this.type !== RF_TYPE_ECLIPTIC)
+            || (destinationFrame.type !== RF_TYPE_ECLIPTIC)
         ) {
             // @tofo implement
             console.log('Rotating frames are not supported yet');
@@ -60,7 +56,7 @@ class ReferenceFrame
         ).position;
     }
 
-    getTransformationMatrixByEpoch(epoch, destinationFrame) {
+    getTransformationQuaternionByEpoch(epoch, destinationFrame) {
         if ((this.origin === destinationFrame.origin)
             && (this.type === destinationFrame.type)
         ) {
@@ -70,6 +66,12 @@ class ReferenceFrame
         // @todo implement
     }
 }
+
+ReferenceFrame.get = function (origin, type) {
+    this.collection = this.collection || [];
+    
+    
+};
 
 class TrajectoryAbstract
 {

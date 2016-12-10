@@ -305,7 +305,7 @@ function initBuiltIn() {
         const body = SSDATA[id];
         const bodyId = parseInt(id);
         const trajConfig = body.traj;
-        const frame = new ReferenceFrame(trajConfig.rf.origin, trajConfig.rf.type);
+        const frame = ReferenceFrame.get(trajConfig.rf.origin, trajConfig.rf.type);
         let traj;
 
         if (trajConfig.type === 'static') {
