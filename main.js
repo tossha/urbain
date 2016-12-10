@@ -378,7 +378,7 @@ function initBuiltIn() {
     for (let id in TLEDATA) {
         const obj = new TLE(TLEDATA[id]);
         const objId = parseInt(id);
-        const frame = new ReferenceFrame(EARTH, RF_TYPE_INERTIAL);
+        const frame = new ReferenceFrame(EARTH, RF_TYPE_EQUATORIAL);
         if (TLEDATA[id].color !== undefined){
             var color = TLEDATA[id].color
         } else {
