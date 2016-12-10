@@ -1,23 +1,4 @@
-const RF_BASE      = ReferenceFrame.get(SOLAR_SYSTEM_BARYCENTER, RF_TYPE_ECLIPTIC);
-const RF_SUN       = ReferenceFrame.get(SUN, RF_TYPE_ECLIPTIC);
-const RF_MERCURY_B = ReferenceFrame.get(MERCURY_BARYCENTER, RF_TYPE_ECLIPTIC);
-const RF_VENUS_B   = ReferenceFrame.get(VENUS_BARYCENTER, RF_TYPE_ECLIPTIC);
-const RF_EARTH_B   = ReferenceFrame.get(EARTH_BARYCENTER, RF_TYPE_ECLIPTIC);
-const RF_MARS_B    = ReferenceFrame.get(MARS_BARYCENTER, RF_TYPE_ECLIPTIC);
-const RF_JUPITER_B = ReferenceFrame.get(JUPITER_BARYCENTER, RF_TYPE_ECLIPTIC);
-const RF_SATURN_B  = ReferenceFrame.get(SATURN_BARYCENTER, RF_TYPE_ECLIPTIC);
-const RF_URANUS_B  = ReferenceFrame.get(URANUS_BARYCENTER, RF_TYPE_ECLIPTIC);
-const RF_NEPTUNE_B = ReferenceFrame.get(NEPTUNE_BARYCENTER, RF_TYPE_ECLIPTIC);
-const RF_PLUTO_B   = ReferenceFrame.get(PLUTO_BARYCENTER, RF_TYPE_ECLIPTIC);
-const RF_MERCURY   = ReferenceFrame.get(MERCURY, RF_TYPE_ECLIPTIC);
-const RF_VENUS     = ReferenceFrame.get(VENUS, RF_TYPE_ECLIPTIC);
-const RF_EARTH     = ReferenceFrame.get(EARTH, RF_TYPE_ECLIPTIC);
-const RF_MARS      = ReferenceFrame.get(MARS, RF_TYPE_ECLIPTIC);
-const RF_JUPITER   = ReferenceFrame.get(JUPITER, RF_TYPE_ECLIPTIC);
-const RF_SATURN    = ReferenceFrame.get(SATURN, RF_TYPE_ECLIPTIC);
-const RF_URANUS    = ReferenceFrame.get(URANUS, RF_TYPE_ECLIPTIC);
-const RF_NEPTUNE   = ReferenceFrame.get(NEPTUNE, RF_TYPE_ECLIPTIC);
-const RF_PLUTO     = ReferenceFrame.get(PLUTO, RF_TYPE_ECLIPTIC);
+const RF_BASE = ReferenceFrame.get(SOLAR_SYSTEM_BARYCENTER, RF_TYPE_ECLIPTIC);
 
 const TRAJECTORIES = {};
 const BODIES = {};
@@ -38,7 +19,7 @@ const SSDATA = {
             type: 'static',
             rf: {
                 origin: SOLAR_SYSTEM_BARYCENTER,
-                type: 0
+                type: RF_ECLIPTIC
             },
             data: [0, 0, 0]
         }
@@ -50,7 +31,7 @@ const SSDATA = {
             type: 'static',
             rf: {
                 origin: SOLAR_SYSTEM_BARYCENTER,
-                type: 0
+                type: RF_ECLIPTIC
             },
             data: [0, 0, 0]
         },
@@ -81,7 +62,7 @@ const SSDATA = {
             color: 'azure',
             rf: {
                 origin: SUN,
-                type: 0
+                type: RF_ECLIPTIC
             },
             data: {
                 mu:    132712440017.99,   // MU[sun]
@@ -119,7 +100,7 @@ const SSDATA = {
             color: 'orange',
             rf: {
                 origin: SUN,
-                type: 0
+                type: RF_ECLIPTIC
             },
             data: {
                 mu:    132712440017.99,   // MU[sun]
@@ -157,7 +138,7 @@ const SSDATA = {
             color: 'lightblue',
             rf: {
                 origin: SUN,
-                type: 2
+                type: RF_ECLIPTIC
             },
             data: {
                 mu:    132712440017.99,   // MU[sun]
@@ -179,7 +160,7 @@ const SSDATA = {
             color: 'blue',
             rf: {
                 origin: EARTH_BARYCENTER,
-                type: 0
+                type: RF_ECLIPTIC
             },
             data: {
                 mu:    0.7238334181449901,  // MU[moon]^3 / (MU[earth] + MU[moon])^2
@@ -217,7 +198,7 @@ const SSDATA = {
             color: 'white',
             rf: {
                 origin: EARTH_BARYCENTER,
-                type: 0
+                type: RF_ECLIPTIC
             },
             data: {
                 mu:    388972.8321930768,  // MU[earth]^3 / (MU[earth] + MU[moon])^2
@@ -255,7 +236,7 @@ const SSDATA = {
             color: 'red',
             rf: {
                 origin: SUN,
-                type: 0
+                type: RF_ECLIPTIC
             },
             data: {
                 mu:    132712440017.99,   // MU[sun]
@@ -293,7 +274,7 @@ const SSDATA = {
             color: 'burlywood',
             rf: {
                 origin: SUN,
-                type: 0
+                type: RF_ECLIPTIC
             },
             data: {
                 mu:    132712440017.99,   // MU[sun]
@@ -331,7 +312,7 @@ const SSDATA = {
             color: 'sandybrown',
             rf: {
                 origin: SUN,
-                type: 0
+                type: RF_ECLIPTIC
             },
             data: {
                 mu:    132712440017.99,   // MU[sun]
@@ -368,7 +349,7 @@ const SSDATA = {
             color: 'lightskyblue',
             rf: {
                 origin: SUN,
-                type: 0
+                type: RF_ECLIPTIC
             },
             data: {
                 mu:    132712440017.99,   // MU[sun]
@@ -405,7 +386,7 @@ const SSDATA = {
             color: 'steelblue',
             rf: {
                 origin: SUN,
-                type: 0
+                type: RF_ECLIPTIC
             },
             data: {
                 mu:    132712440017.99,   // MU[sun]
@@ -442,7 +423,7 @@ const SSDATA = {
             color: 'tan',
             rf: {
                 origin: SUN,
-                type: 0
+                type: RF_ECLIPTIC
             },
             data: {
                 mu:    132712440017.99,   // MU[sun]
@@ -464,7 +445,7 @@ const SSDATA = {
             color: 'tan',
             rf: {
                 origin: PLUTO_BARYCENTER,
-                type: 0
+                type: RF_ECLIPTIC
             },
             data: {
                 mu:    1.126007850945504,   // MU[charon]^3 / (MU[pluto] + MU[charon])^2
@@ -501,7 +482,7 @@ const SSDATA = {
             color: 'rosybrown',
             rf: {
                 origin: PLUTO_BARYCENTER,
-                type: 0
+                type: RF_ECLIPTIC
             },
             data: {
                 mu:    698.9254936721327,   // MU[pluto]^3 / (MU[pluto] + MU[charon])^2

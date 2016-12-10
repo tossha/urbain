@@ -6,8 +6,12 @@ class ReferenceFrame
         this.type = type || RF_TYPE_ECLIPTIC; // RF_TYPE_EQUATORIAL, RF_TYPE_ECLIPTIC или RF_TYPE_ROTATING
         
         switch (type) {
-            case RF_TYPE_EQUATORIAL: this.quaternion = EQUATORIAL_QUATERNION; break;
-            default: this.quaternion = IDENTITY_QUATERNION; break;
+            case RF_TYPE_EQUATORIAL:
+                this.quaternion = EQUATORIAL_QUATERNION;
+                break;
+            default:
+                this.quaternion = IDENTITY_QUATERNION;
+                break;
         }
     }
 
@@ -15,7 +19,7 @@ class ReferenceFrame
         if ((this.type === RF_TYPE_ROTATING)
             || (destinationFrame.type === RF_TYPE_ROTATING)
         ) {
-            // @tofo implement
+            // @todo implement
             console.log('Rotating frames are not supported yet');
             return;
         }
