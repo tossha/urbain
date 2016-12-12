@@ -376,28 +376,22 @@ function initBuiltIn() {
     stars = new VisualStarsModel(STARDATA);
 	
     for (let id in TLEDATA) {
-        const obj = new TLE(TLEDATA[id]);
+        const tle = new TLE(TLEDATA[id]);
         const objId = parseInt(id);
-        const frame = new ReferenceFrame(EARTH, RF_TYPE_EQUATORIAL);
-        if (TLEDATA[id].color !== undefined){
-            var color = TLEDATA[id].color
-        } else {
-            var color = 'azure'
-        }
-        traj = new TrajectoryKeplerianOrbit(
-            frame,
+
+        TRAJECTORIES[objId] = new TrajectoryKeplerianOrbit(
+            ReferenceFrame.get(EARTH, RF_TYPE_EQUATORIAL),
             BODIES[EARTH].physicalModel.mu,
-            obj.getSma(),
-            obj.getE(),
-            deg2rad(obj.getInc()),
-            deg2rad(obj.getRaan()),
-            deg2rad(obj.getAop()),
-            deg2rad(obj.getMeanAnomaly()),
-            obj.getEpoch(),
-            color,
+            tle.getSma(),
+            tle.getE(),
+            deg2rad(tle.getInc()),
+            deg2rad(tle.getRaan()),
+            deg2rad(tle.getAop()),
+            deg2rad(tle.getMeanAnomaly()),
+            tle.getEpoch(),
+            TLEDATA[id].color ? TLEDATA[id].color : 'azure',
             false
-            );
-        TRAJECTORIES[objId] = traj;	
+        );
     }
 }
 

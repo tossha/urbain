@@ -1,4 +1,5 @@
-class TLE {
+class TLE
+{
     constructor(tleObject) {
 	    this.name = tleObject.name;
 	    this.lineOne = tleObject.lineOne;
@@ -30,15 +31,14 @@ class TLE {
     }
 
     getSma() {
-	    return Math.cbrt(BODIES[EARTH].physicalModel.mu / Math.pow(2 * Math.PI * (this.getMeanMotion()), 2))
-	    //sma^3=mu[earth]/(2PI*Frequency)^2
+	    //sma^3 = mu[earth] / (2PI * Frequency)^2
+	    return Math.cbrt(BODIES[EARTH].physicalModel.mu / Math.pow(2 * Math.PI * (this.getMeanMotion()), 2));
     }
 
     getEpoch() {
-	    var result = 0;
-	    var years = parseInt(this.lineOne.substr(18, 2));
-	    var days = parseFloat(this.lineTwo.substr(20, 12));
-	    result = years * 365.259636 * 86400 + days * 86400;
-	    return result
+	    const years = parseInt(this.lineOne.substr(18, 2));
+	    const days = parseFloat(this.lineTwo.substr(20, 12));
+
+	    return years * 31558152.27185062 + days * 86400;
     }
 }
