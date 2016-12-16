@@ -393,6 +393,21 @@ function initBuiltIn() {
             false
         );
     }
+	
+	traj = new TrajectoryKeplerianOrbit(/////////////////////////////////////////////
+                ReferenceFrame.get(SUN, RF_TYPE_EQUATORIAL),
+                1212121212,
+                1313131313,
+                0.1414141414,
+                deg2rad(36),
+                deg2rad(72),
+                deg2rad(96),
+                deg2rad(30),
+                504921600,
+                'white',
+				false);
+	TRAJECTORIES[1234] = traj;//////////////////////////////////////////////
+	
 }
 
 function firstRender(curTime) {
@@ -442,6 +457,9 @@ function render(curTime) {
 
     renderer.render(scene, camera);
     requestAnimationFrame(render);
+	
+	var testState = TRAJECTORIES[1234].getStateByEpoch(time.epoch, SUN); /////////////////////
+	console.log(getElementsByPositionAndVelocity(testState.Position, testState.Velocity, 121212121212));
 }
 
 function onWindowResize() {
