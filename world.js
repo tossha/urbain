@@ -7,23 +7,30 @@ class ReferenceFrame
         
         switch (type) {
             case RF_TYPE_EQUATORIAL:
+                this.rotationVelocity = ZERO_VECTOR;
                 this.quaternion = EQUATORIAL_QUATERNION;
                 break;
-                
+
+            case RF_TYPE_ROTATING:
+                this.rotationVelocity = ZERO_VECTOR;
+                this.quaternion = EQUATORIAL_QUATERNION;
+                break;
+
             default:
+                this.rotationVelocity = ;
                 this.quaternion = IDENTITY_QUATERNION;
                 break;
         }
     }
 
     transformStateVectorByEpoch(epoch, state, destinationFrame) {
-        if ((this.type === RF_TYPE_ROTATING)
+        /* if ((this.type === RF_TYPE_ROTATING)
             || (destinationFrame.type === RF_TYPE_ROTATING)
         ) {
             // @todo implement
             console.log('Rotating frames are not supported yet');
             return;
-        }
+        } */
 
         if (this === destinationFrame) {
             return state;
@@ -36,6 +43,13 @@ class ReferenceFrame
         
         const state1 = TRAJECTORIES[this.origin].getStateByEpoch(epoch, RF_BASE);
         const state2 = TRAJECTORIES[destinationFrame.origin].getStateByEpoch(epoch, RF_BASE);
+
+        const rfVel1 = threeVectorToVector(
+            new THREE.Vector3().multiplyVectors(
+                vectorToThreeVector(state.position),
+                vectorToThreeVector(this.rotationVelocity)
+            )
+        );
         
         const pos1ThreeVec = vectorToThreeVector(state1.position).applyQuaternion(rotation);
         const vel1ThreeVec = vectorToThreeVector(state1.velocity).applyQuaternion(rotation);
@@ -46,14 +60,25 @@ class ReferenceFrame
         const diffVel = threeVectorToVector(vel1ThreeVec).sub(state2.velocity);
         const statePosRotated = threeVectorToVector(statePosThreeVec);
         const stateVelRotated = threeVectorToVector(stateVelThreeVec);
+
+        const destinationPos = statePosRotated.add(diffPos);
         
+        const rfVel2 = threeVectorToVector(
+            new THREE.Vector3().multiplyVectors(
+                vectorToThreeVector(destinationPos),
+                vectorToThreeVector(destinationFrame.rotationVelocity),
+            )
+        );
+
+        const destinationVel = stateVelRotated.add(diffVel).add(rfVel1).sub(rfVel2);
+
         return new StateVector(
-            statePosRotated.x + diffPos.x,
-            statePosRotated.y + diffPos.y,
-            statePosRotated.z + diffPos.z,
-            stateVelRotated.x + diffVel.x,
-            stateVelRotated.y + diffVel.y,
-            stateVelRotated.z + diffVel.z
+            destinationPos.x,
+            destinationPos.y,
+            destinationPos.z,
+            destinationVel.x,
+            destinationVel.y,
+            destinationVel.z
         );
     }
 
