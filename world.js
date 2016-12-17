@@ -12,12 +12,12 @@ class ReferenceFrame
                 break;
 
             case RF_TYPE_ROTATING:
-                this.rotationVelocity = ZERO_VECTOR;
-                this.quaternion = EQUATORIAL_QUATERNION;
+                this.rotationVelocity = SAMPLE_ROTATION_VELOCITY;
+                this.quaternion = IDENTITY_QUATERNION;
                 break;
 
             default:
-                this.rotationVelocity = ;
+                this.rotationVelocity = ZERO_VECTOR;
                 this.quaternion = IDENTITY_QUATERNION;
                 break;
         }
@@ -66,7 +66,7 @@ class ReferenceFrame
         const rfVel2 = threeVectorToVector(
             new THREE.Vector3().multiplyVectors(
                 vectorToThreeVector(destinationPos),
-                vectorToThreeVector(destinationFrame.rotationVelocity),
+                vectorToThreeVector(destinationFrame.rotationVelocity)
             )
         );
 

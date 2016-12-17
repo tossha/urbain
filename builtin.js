@@ -4,6 +4,7 @@ const TRAJECTORIES = {};
 const BODIES = {};
 
 const EQUATORIAL_QUATERNION = getQuaternionByEuler(0.4087561108170719, 0, 0);
+const SAMPLE_ROTATION_VELOCITY = new Vector3(0, 0, 0.0000727220521664304);
 
 STARDATA = [
     [0, 0, 100],
