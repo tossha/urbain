@@ -32,9 +32,9 @@ class VisualBodyModel
     }
 
     getMaterial(parameters) {
-    	parameters.metalness = 0;
-    	parameters.roughness = 1;
-    	return new THREE.MeshStandardMaterial(parameters);
+        parameters.metalness = 0;
+        parameters.roughness = 1;
+        return new THREE.MeshStandardMaterial(parameters);
     }
 
     render(epoch, pos) {
@@ -60,7 +60,7 @@ class VisualBodyModelLight extends VisualBodyModel
     }
 
     getMaterial(parameters) {
-    	return new THREE.MeshBasicMaterial(parameters);
+        return new THREE.MeshBasicMaterial(parameters);
     }
 }
 

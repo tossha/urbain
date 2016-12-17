@@ -152,7 +152,7 @@ class TrajectoryKeplerianOrbit extends TrajectoryAbstract
         } else {
             this.m0 = anomaly;
         }
-		
+    	
         this.updateMeanMotion();
 
         if (color) {
