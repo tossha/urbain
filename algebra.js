@@ -48,6 +48,14 @@ class Vector3
     div(k) {
         return new Vector3(this.vector[0] / k, this.vector[1] / k, this.vector[2] / k);
     }
+	
+	mulDotByVector(vec){
+        return (this.vector[0] * vec.x + this.vector[1] * vec.y + this.vector[2] * vec.z);
+	}
+	
+	mulCrossByVector(vec){
+        return new Vector3(this.vector[1] * vec.z - this.vector[2] * vec.y, this.vector[2] * vec.x - this.vector[0] * vec.z, this.vector[0] * vec.y - this.vector[1] * vec.x);
+	}
 
     mulMatrix(mat) {
         let result = new Vector3(0, 0, 0);
@@ -202,7 +210,7 @@ function deg2rad(degrees) {
     return degrees / 180 * Math.PI;
 }
 
-function red2deg(radians) {
+function rad2deg(radians) {
     return radians * 180 / Math.PI;
 }
 
