@@ -6,17 +6,17 @@ class VisualBodyModel
         this.shape = shape;   // class VisualShapeAbstract
         this.color = color;
         this.body = null; // class Body
-        
+
         this.threeObj = new THREE.Mesh(
             this.shape.getThreeGeometry(),
             this.getMaterial({color: this.color, wireframe: true})
         );
-        
+
         scene.add(this.threeObj);
 
         if (texturePath !== undefined) {
             var that = this;
-            
+
             textureLoader.load(
                 COMMON_TEXTURE_PATH + texturePath,
                 function(txt) {
@@ -24,9 +24,9 @@ class VisualBodyModel
                     that.threeObj.material = that.getMaterial({map: txt});
                 },
                 undefined,
-                function(err) { 
+                function(err) {
                     console.log(err);
-                }                    
+                }
             );
         }
     }
@@ -195,8 +195,8 @@ class VisualStarsModel
         for(let params of STARDATA) {
 
             threeGeometry.vertices.push(new THREE.Vector3(
-                starDist * Math.cos(deg2rad(params[0])) * Math.sin(deg2rad(params[1])), 
-                starDist * Math.sin(deg2rad(params[0])) * Math.sin(deg2rad(params[1])), 
+                starDist * Math.cos(deg2rad(params[0])) * Math.sin(deg2rad(params[1])),
+                starDist * Math.sin(deg2rad(params[0])) * Math.sin(deg2rad(params[1])),
                 starDist * Math.cos(deg2rad(params[1]))
             ));
 
@@ -204,7 +204,7 @@ class VisualStarsModel
                 params[2] / 100,
                 params[2] / 100,
                 params[2] / 100
-            )); 
+            ));
         }
 
         this.threeObj = new THREE.Points(
@@ -216,7 +216,7 @@ class VisualStarsModel
             })
         );
 
-        scene.add(this.threeObj); 
+        scene.add(this.threeObj);
     }
 }
 
@@ -224,7 +224,7 @@ class VisualShapeModel extends VisualShapeAbstract
 {
     constructor(modelFile) {
         super();
-        
+
         this.modelFile = modelFile;
     }
 

@@ -4,12 +4,12 @@ class ReferenceFrame
     constructor(origin, type) {
         this.origin = origin;
         this.type = type || RF_TYPE_ECLIPTIC; // RF_TYPE_EQUATORIAL, RF_TYPE_ECLIPTIC или RF_TYPE_ROTATING
-        
+
         switch (type) {
             case RF_TYPE_EQUATORIAL:
                 this.quaternion = EQUATORIAL_QUATERNION;
                 break;
-                
+
             default:
                 this.quaternion = IDENTITY_QUATERNION;
                 break;
@@ -28,23 +28,23 @@ class ReferenceFrame
         if (this === destinationFrame) {
             return state;
         }
-        
+
         const rotation = new THREE.Quaternion();
         rotation.copy(destinationFrame.quaternion);
         rotation.inverse();
         rotation.multiply(this.quaternion);
-        
+
         const state1 = TRAJECTORIES[this.origin].getStateByEpoch(epoch, RF_BASE);
         const state2 = TRAJECTORIES[destinationFrame.origin].getStateByEpoch(epoch, RF_BASE);
-        
+
         const statePosThreeVec = vectorToThreeVector(state.position).applyQuaternion(rotation);
         const stateVelThreeVec = vectorToThreeVector(state.velocity).applyQuaternion(rotation);
-        
+
         const diffPos = state1.position.sub(state2.position);
         const diffVel = state1.velocity.sub(state2.velocity);
         const statePosRotated = threeVectorToVector(statePosThreeVec);
         const stateVelRotated = threeVectorToVector(stateVelThreeVec);
-        
+
         return new StateVector(
             statePosRotated.x + diffPos.x,
             statePosRotated.y + diffPos.y,
@@ -66,13 +66,13 @@ class ReferenceFrame
 
 ReferenceFrame.get = function(origin, type) {
     ReferenceFrame.collection = ReferenceFrame.collection || [];
-    
+
     for (let rf of ReferenceFrame.collection) {
         if (rf.origin === origin && rf.type === type) {
             return rf;
         }
     }
-    
+
     const rf = new ReferenceFrame(origin, type);
     ReferenceFrame.collection.push(rf);
     return rf;
@@ -152,7 +152,7 @@ class TrajectoryKeplerianOrbit extends TrajectoryAbstract
         } else {
             this.m0 = anomaly;
         }
-    	
+
         this.updateMeanMotion();
 
         if (color) {

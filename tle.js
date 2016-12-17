@@ -3,7 +3,7 @@ class TLE
     constructor(tleObject) {
         this.name = tleObject.name;
         this.lineOne = tleObject.lineOne;
-        this.lineTwo = tleObject.lineTwo;	
+        this.lineTwo = tleObject.lineTwo;
     }
 
     getInc() {
