@@ -1,44 +1,44 @@
 class TLE
 {
     constructor(tleObject) {
-	    this.name = tleObject.name;
-	    this.lineOne = tleObject.lineOne;
-	    this.lineTwo = tleObject.lineTwo;	
+        this.name = tleObject.name;
+        this.lineOne = tleObject.lineOne;
+        this.lineTwo = tleObject.lineTwo;
     }
 
     getInc() {
-	    return parseFloat(this.lineTwo.substr(8, 8));
+        return parseFloat(this.lineTwo.substr(8, 8));
     }
 
     getRaan() {
-	    return parseFloat(this.lineTwo.substr(17, 8));
+        return parseFloat(this.lineTwo.substr(17, 8));
     }
 
     getE() {
-	    return parseFloat('0.' + this.lineTwo.substr(26, 8));
+        return parseFloat('0.' + this.lineTwo.substr(26, 8));
     }
 
     getAop() {
-	    return parseFloat(this.lineTwo.substr(34, 8));
+        return parseFloat(this.lineTwo.substr(34, 8));
     }
 
     getMeanAnomaly() {
-	    return parseFloat(this.lineTwo.substr(43, 8));
+        return parseFloat(this.lineTwo.substr(43, 8));
     }
 
     getMeanMotion() {
-	    return parseFloat(this.lineTwo.substr(52, 11)) / 86400; //day^(-1)/86400 (s/day)=s^(-1)
+        return parseFloat(this.lineTwo.substr(52, 11)) / 86400; //day^(-1)/86400 (s/day)=s^(-1)
     }
 
     getSma() {
-	    //sma^3 = mu[earth] / (2PI * Frequency)^2
-	    return Math.cbrt(BODIES[EARTH].physicalModel.mu / Math.pow(2 * Math.PI * (this.getMeanMotion()), 2));
+        //sma^3 = mu[earth] / (2PI * Frequency)^2
+        return Math.cbrt(BODIES[EARTH].physicalModel.mu / Math.pow(2 * Math.PI * (this.getMeanMotion()), 2));
     }
 
     getEpoch() {
-	    const years = parseInt(this.lineOne.substr(18, 2));
-	    const days = parseFloat(this.lineTwo.substr(20, 12));
+        const years = parseInt(this.lineOne.substr(18, 2));
+        const days = parseFloat(this.lineTwo.substr(20, 12));
 
-	    return years * 31558152.27185062 + days * 86400;
+        return years * 31558152.27185062 + days * 86400;
     }
 }

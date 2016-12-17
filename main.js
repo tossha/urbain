@@ -374,7 +374,7 @@ function initBuiltIn() {
     }
 
     stars = new VisualStarsModel(STARDATA);
-	
+
     for (let id in TLEDATA) {
         const tle = new TLE(TLEDATA[id]);
         const objId = parseInt(id);
