@@ -151,7 +151,7 @@ class TrajectoryKeplerianOrbit extends TrajectoryAbstract
         } else {
             this.m0 = anomaly;
         }
-        
+
         this.updateMeanMotion();
 
         if (color) {
@@ -312,31 +312,31 @@ class TrajectoryKeplerianOrbit extends TrajectoryAbstract
         );
     }
     
-    static createByState (referenceFrame, state, mu, epoch, color) {
-        var pos = state.position;
-        var vel = state.velocity;
+    static createByState(referenceFrame, state, mu, epoch, color) {
+        let pos = state.position;
+        let vel = state.velocity;
         
-        var angMomentum = pos.mulCrossByVector(vel);
+        let angMomentum = pos.mulCrossByVector(vel);
         
-        var raan = Math.atan2(angMomentum.x, -angMomentum.y); //raan
-        var inc = Math.atan2((Math.sqrt(Math.pow(angMomentum.x, 2) + Math.pow(angMomentum.y, 2))) , angMomentum.z); //inclination
+        let raan = Math.atan2(angMomentum.x, -angMomentum.y); //raan
+        let inc = Math.atan2((Math.sqrt(Math.pow(angMomentum.x, 2) + Math.pow(angMomentum.y, 2))) , angMomentum.z); //inclination
         
-        var sma = (mu * pos.mag) / (2.0 * mu - pos.mag * Math.pow(vel.mag, 2)); //semimajor axis
-        var e = Math.sqrt(1.0 - (Math.pow(angMomentum.mag, 2) / (mu * sma))); //eccentricity
+        let sma = (mu * pos.mag) / (2.0 * mu - pos.mag * Math.pow(vel.mag, 2)); //semimajor axis
+        let e = Math.sqrt(1.0 - (Math.pow(angMomentum.mag, 2) / (mu * sma))); //eccentricity
         
-        var p = pos.rotateZ(-raan).rotateX(-inc);
-        var u = Math.atan2(p.y , p.x);
+        let p = pos.rotateZ(-raan).rotateX(-inc);
+        let u = Math.atan2(p.y , p.x);
     
-        var radVel = pos.mulDotByVector(vel) / pos.mag;
-        var cosE = (sma - pos.mag) / (sma * e);
-        var sinE = (pos.mag * radVel) / (e * Math.sqrt(mu * sma));
-        var ta = Math.atan2((Math.sqrt(1.0 - e * e) * sinE) , (cosE - e));
+        let radVel = pos.mulDotByVector(vel) / pos.mag;
+        let cosE = (sma - pos.mag) / (sma * e);
+        let sinE = (pos.mag * radVel) / (e * Math.sqrt(mu * sma));
+        let ta = Math.atan2((Math.sqrt(1.0 - e * e) * sinE) , (cosE - e));
         ta = (ta > 0) ? ta : (ta + 2 * Math.PI);
     
-        var E = (sinE < 0) ? Math.acos (cosE) : (2 * Math.PI - Math.acos (cosE));
+        let E = (sinE < 0) ? Math.acos (cosE) : (2 * Math.PI - Math.acos (cosE));
     
-        var aop = ((u - ta) > 0) ? (u - ta) : 2 * Math.PI + (u - ta); //argument of periapsis
-        var m0 = 2 * Math.PI - (E - e * sinE); //mean anomaly
+        let aop = ((u - ta) > 0) ? (u - ta) : 2 * Math.PI + (u - ta); //argument of periapsis
+        let m0 = 2 * Math.PI - (E - e * sinE); //mean anomaly
         
         return new TrajectoryKeplerianOrbit(
             referenceFrame, 
@@ -349,7 +349,8 @@ class TrajectoryKeplerianOrbit extends TrajectoryAbstract
             m0, 
             epoch, 
             color, 
-            false)
+            false
+        );
     }
 }
 
