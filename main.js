@@ -442,9 +442,6 @@ function render(curTime) {
 
     renderer.render(scene, camera);
     requestAnimationFrame(render);
-	
-	var testState = TRAJECTORIES[MERCURY].getStateByEpoch(time.epoch, RF_BASE); /////////////////////////////////////////////////////////////////
-	console.log(getElementsByPositionAndVelocity(testState.position, testState.velocity, 132712440017.99));
 }
 
 function onWindowResize() {
