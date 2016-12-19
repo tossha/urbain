@@ -151,7 +151,7 @@ class TrajectoryKeplerianOrbit extends TrajectoryAbstract
         } else {
             this.m0 = anomaly;
         }
-		
+        
         this.updateMeanMotion();
 
         if (color) {
@@ -311,19 +311,19 @@ class TrajectoryKeplerianOrbit extends TrajectoryAbstract
             vel.x, vel.y, vel.z
         );
     }
-	
+    
     static createByState (referenceFrame, state, mu, epoch, color) {
         var pos = state.position;
-		var vel = state.velocity;
-		
-		var angMomentum = pos.mulCrossByVector(vel);
-    
+        var vel = state.velocity;
+        
+        var angMomentum = pos.mulCrossByVector(vel);
+        
         var raan = Math.atan2(angMomentum.x, -angMomentum.y); //raan
         var inc = Math.atan2((Math.sqrt(Math.pow(angMomentum.x, 2) + Math.pow(angMomentum.y, 2))) , angMomentum.z); //inclination
-    
+        
         var sma = (mu * pos.mag) / (2.0 * mu - pos.mag * Math.pow(vel.mag, 2)); //semimajor axis
         var e = Math.sqrt(1.0 - (Math.pow(angMomentum.mag, 2) / (mu * sma))); //eccentricity
-    
+        
         var p = pos.rotateZ(-raan).rotateX(-inc);
         var u = Math.atan2(p.y , p.x);
     
@@ -337,8 +337,8 @@ class TrajectoryKeplerianOrbit extends TrajectoryAbstract
     
         var aop = ((u - ta) > 0) ? (u - ta) : 2 * Math.PI + (u - ta); //argument of periapsis
         var m0 = 2 * Math.PI - (E - e * sinE); //mean anomaly
-		
-		return new TrajectoryKeplerianOrbit(
+        
+        return new TrajectoryKeplerianOrbit(
             referenceFrame, 
             mu, 
             sma, 
