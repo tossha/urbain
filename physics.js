@@ -13,7 +13,7 @@ class Propagator
         this.significantBodies = significantBodies;
         this.timeStep = timeStep;
     }
-    
+
     propagateTrajectory(trajectory, /* exitCondition */ exitEpoch) {
         const lastState = trajectory.states[trajectory.states.length - 1];
         let currentPosition = lastState.state.position;
