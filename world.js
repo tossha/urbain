@@ -1,4 +1,3 @@
-
 class ReferenceFrame
 {
     constructor(origin, type) {
@@ -310,6 +309,47 @@ class TrajectoryKeplerianOrbit extends TrajectoryAbstract
         return new StateVector(
             pos.x, pos.y, pos.z,
             vel.x, vel.y, vel.z
+        );
+    }
+    
+    static createByState(referenceFrame, state, mu, epoch, color) {
+        let pos = state.position;
+        let vel = state.velocity;
+        
+        let angMomentum = pos.mulCrossByVector(vel);
+        
+        let raan = Math.atan2(angMomentum.x, -angMomentum.y); //raan
+        let inc = Math.atan2((Math.sqrt(Math.pow(angMomentum.x, 2) + Math.pow(angMomentum.y, 2))) , angMomentum.z); //inclination
+        
+        let sma = (mu * pos.mag) / (2.0 * mu - pos.mag * Math.pow(vel.mag, 2)); //semimajor axis
+        let e = Math.sqrt(1.0 - (Math.pow(angMomentum.mag, 2) / (mu * sma))); //eccentricity
+        
+        let p = pos.rotateZ(-raan).rotateX(-inc);
+        let u = Math.atan2(p.y , p.x);
+    
+        let radVel = pos.mulDotByVector(vel) / pos.mag;
+        let cosE = (sma - pos.mag) / (sma * e);
+        let sinE = (pos.mag * radVel) / (e * Math.sqrt(mu * sma));
+        let ta = Math.atan2((Math.sqrt(1.0 - e * e) * sinE) , (cosE - e));
+        ta = (ta > 0) ? ta : (ta + 2 * Math.PI);
+    
+        let E = (sinE < 0) ? Math.acos (cosE) : (2 * Math.PI - Math.acos (cosE));
+    
+        let aop = ((u - ta) > 0) ? (u - ta) : 2 * Math.PI + (u - ta); //argument of periapsis
+        let m0 = 2 * Math.PI - (E - e * sinE); //mean anomaly
+        
+        return new TrajectoryKeplerianOrbit(
+            referenceFrame, 
+            mu, 
+            sma, 
+            e, 
+            inc, 
+            raan, 
+            aop, 
+            m0, 
+            epoch, 
+            color, 
+            false
         );
     }
 }
