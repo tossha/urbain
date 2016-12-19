@@ -392,7 +392,7 @@ function initBuiltIn() {
             TLEDATA[id].color ? TLEDATA[id].color : 'azure',
             false
         );
-    }	
+    }
 }
 
 function firstRender(curTime) {
