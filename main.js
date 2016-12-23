@@ -372,7 +372,27 @@ function initBuiltIn() {
             );
         }
     }
+
     stars = new VisualStarsModel(STARDATA);
+
+    for (let id in TLEDATA) {
+        const tle = new TLE(TLEDATA[id]);
+        const objId = parseInt(id);
+
+        TRAJECTORIES[objId] = new TrajectoryKeplerianOrbit(
+            ReferenceFrame.get(EARTH, RF_TYPE_EQUATORIAL),
+            BODIES[EARTH].physicalModel.mu,
+            tle.getSma(),
+            tle.getE(),
+            deg2rad(tle.getInc()),
+            deg2rad(tle.getRaan()),
+            deg2rad(tle.getAop()),
+            deg2rad(tle.getMeanAnomaly()),
+            tle.getEpoch(),
+            TLEDATA[id].color ? TLEDATA[id].color : 'azure',
+            false
+        );
+    }
 }
 
 function firstRender(curTime) {
