@@ -55,7 +55,7 @@ class ReferenceFrame
         const vel1ThreeVec = vectorToThreeVector(state1.velocity).applyQuaternion(rotation);
         const statePosThreeVec = vectorToThreeVector(state.position).applyQuaternion(rotation);
         const stateVelThreeVec = vectorToThreeVector(state.velocity).applyQuaternion(rotation);
-        
+  
         const diffPos = threeVectorToVector(pos1ThreeVec).sub(state2.position);
         const diffVel = threeVectorToVector(vel1ThreeVec).sub(state2.velocity);
         const statePosRotated = threeVectorToVector(statePosThreeVec);
@@ -126,61 +126,14 @@ class ReferenceFrameEcliptic extends ReferenceFrameAbstract
         super(origin);
     }
 
-}
-
-class ReferenceFrameEquatorial extends ReferenceFrameAbstract
-{
-    constructor(origin) {
-        super(origin);
-    }
-}
-
-class ReferenceFrameRotating extends ReferenceFrameAbstract
-{
-    constructor(origin) {
-        super(origin);
-    }
-
     stateVectorFromBaseReferenceFrameByEpoch(epoch, state) {
-        if (this === destinationFrame) {
-            return state;
-        }
-        
-        const rotation = new THREE.Quaternion();
-        rotation.copy(destinationFrame.quaternion);
-        rotation.inverse();
-        rotation.multiply(this.quaternion);
-        
-        const state1 = TRAJECTORIES[this.origin].getStateByEpoch(epoch, RF_BASE);
         const state2 = TRAJECTORIES[destinationFrame.origin].getStateByEpoch(epoch, RF_BASE);
 
-        const rfVel1 = threeVectorToVector(
-            new THREE.Vector3().multiplyVectors(
-                vectorToThreeVector(state.position),
-                vectorToThreeVector(this.rotationVelocity)
-            )
-        );
-        
-        const pos1ThreeVec = vectorToThreeVector(state1.position).applyQuaternion(rotation);
-        const vel1ThreeVec = vectorToThreeVector(state1.velocity).applyQuaternion(rotation);
-        const statePosThreeVec = vectorToThreeVector(state.position).applyQuaternion(rotation);
-        const stateVelThreeVec = vectorToThreeVector(state.velocity).applyQuaternion(rotation);
-        
-        const diffPos = threeVectorToVector(pos1ThreeVec).sub(state2.position);
-        const diffVel = threeVectorToVector(vel1ThreeVec).sub(state2.velocity);
-        const statePosRotated = threeVectorToVector(statePosThreeVec);
-        const stateVelRotated = threeVectorToVector(stateVelThreeVec);
+        const statePosRotated = state.position;
+        const stateVelRotated = state.velocity;
 
-        const destinationPos = statePosRotated.add(diffPos);
-        
-        const rfVel2 = threeVectorToVector(
-            new THREE.Vector3().multiplyVectors(
-                vectorToThreeVector(destinationPos),
-                vectorToThreeVector(destinationFrame.rotationVelocity)
-            )
-        );
-
-        const destinationVel = stateVelRotated.add(diffVel).add(rfVel1).sub(rfVel2);
+        const destinationPos = statePosRotated.sub(state2.position);
+        const destinationVel = stateVelRotated.sub(state2.velocity);
 
         return new StateVector(
             destinationPos.x,
@@ -193,18 +146,134 @@ class ReferenceFrameRotating extends ReferenceFrameAbstract
     }
 
     stateVectorToBaseReferenceFrameByEpoch(epoch, state) {
-        if (this === destinationFrame) {
-            return state;
-        }
-        
-        const rotation = new THREE.Quaternion();
-        rotation.copy(destinationFrame.quaternion);
-        rotation.inverse();
-        rotation.multiply(this.quaternion);
-        
         const state1 = TRAJECTORIES[this.origin].getStateByEpoch(epoch, RF_BASE);
+        
+        const pos1ThreeVec = vectorToThreeVector(state1.position);
+        const vel1ThreeVec = vectorToThreeVector(state1.velocity);
+        const statePosThreeVec = vectorToThreeVector(state.position);
+        const stateVelThreeVec = vectorToThreeVector(state.velocity);
+        
+        const diffPos = state1.position;
+        const diffVel = state1.velocity;
+        const statePosRotated = state.position;
+        const stateVelRotated = state.velocity;
+
+        const destinationPos = state.position.add(state1.position);
+        const destinationVel = state.velocity.add(state1.velocity);
+
+        return new StateVector(
+            destinationPos.x,
+            destinationPos.y,
+            destinationPos.z,
+            destinationVel.x,
+            destinationVel.y,
+            destinationVel.z
+        );
+    }
+}
+
+class ReferenceFrameEquatorial extends ReferenceFrameAbstract
+{
+    constructor(origin) {
+        super(origin);
+    }
+
+    stateVectorFromBaseReferenceFrameByEpoch(epoch, state) {
+        const rotation = new THREE.Quaternion().copy(this.quaternion).inverse();
+ 
         const state2 = TRAJECTORIES[destinationFrame.origin].getStateByEpoch(epoch, RF_BASE);
 
+        const statePosThreeVec = vectorToThreeVector(state.position).applyQuaternion(rotation);
+        const stateVelThreeVec = vectorToThreeVector(state.velocity).applyQuaternion(rotation);
+        
+        const statePosRotated = threeVectorToVector(statePosThreeVec);
+        const stateVelRotated = threeVectorToVector(stateVelThreeVec);
+
+        const destinationPos = statePosRotated.sub(state2.position);
+        
+        const destinationVel = stateVelRotated.sub(state2.velocity);
+
+        return new StateVector(
+            destinationPos.x,
+            destinationPos.y,
+            destinationPos.z,
+            destinationVel.x,
+            destinationVel.y,
+            destinationVel.z
+        );
+    }
+
+    stateVectorToBaseReferenceFrameByEpoch(epoch, state) {
+        const rotation = this.quaternion;
+        const state1 = TRAJECTORIES[this.origin].getStateByEpoch(epoch, RF_BASE);
+        
+        const pos1ThreeVec = vectorToThreeVector(state1.position).applyQuaternion(rotation);
+        const vel1ThreeVec = vectorToThreeVector(state1.velocity).applyQuaternion(rotation);
+        const statePosThreeVec = vectorToThreeVector(state.position).applyQuaternion(rotation);
+        const stateVelThreeVec = vectorToThreeVector(state.velocity).applyQuaternion(rotation);
+        
+        const diffPos = threeVectorToVector(pos1ThreeVec);
+        const diffVel = threeVectorToVector(vel1ThreeVec);
+        const statePosRotated = threeVectorToVector(statePosThreeVec);
+        const stateVelRotated = threeVectorToVector(stateVelThreeVec);
+
+        const destinationPos = statePosRotated.add(diffPos);
+        
+        const destinationVel = stateVelRotated.add(diffVel);
+
+        return new StateVector(
+            destinationPos.x,
+            destinationPos.y,
+            destinationPos.z,
+            destinationVel.x,
+            destinationVel.y,
+            destinationVel.z
+        );
+    }
+}
+
+class ReferenceFrameRotating extends ReferenceFrameAbstract
+{
+    constructor(origin) {
+        super(origin);
+    }
+
+    stateVectorFromBaseReferenceFrameByEpoch(epoch, state) {
+        const rotation = new THREE.Quaternion().copy(this.quaternion).inverse();
+ 
+        const state2 = TRAJECTORIES[destinationFrame.origin].getStateByEpoch(epoch, RF_BASE);
+
+        const statePosThreeVec = vectorToThreeVector(state.position).applyQuaternion(rotation);
+        const stateVelThreeVec = vectorToThreeVector(state.velocity).applyQuaternion(rotation);
+        
+        const statePosRotated = threeVectorToVector(statePosThreeVec);
+        const stateVelRotated = threeVectorToVector(stateVelThreeVec);
+
+        const destinationPos = statePosRotated.sub(state2.position);
+        
+        const rfVel2 = threeVectorToVector(
+            new THREE.Vector3().multiplyVectors(
+                vectorToThreeVector(destinationPos),
+                vectorToThreeVector(destinationFrame.rotationVelocity)
+            )
+        );
+
+        const destinationVel = stateVelRotated.sub(state2.velocity).sub(rfVel2);
+
+        return new StateVector(
+            destinationPos.x,
+            destinationPos.y,
+            destinationPos.z,
+            destinationVel.x,
+            destinationVel.y,
+            destinationVel.z
+        );
+    }
+
+    stateVectorToBaseReferenceFrameByEpoch(epoch, state) {
+        const rotation = this.quaternion;
+        const state1 = TRAJECTORIES[this.origin].getStateByEpoch(epoch, RF_BASE);
+        
         const rfVel1 = threeVectorToVector(
             new THREE.Vector3().multiplyVectors(
                 vectorToThreeVector(state.position),
@@ -217,21 +286,14 @@ class ReferenceFrameRotating extends ReferenceFrameAbstract
         const statePosThreeVec = vectorToThreeVector(state.position).applyQuaternion(rotation);
         const stateVelThreeVec = vectorToThreeVector(state.velocity).applyQuaternion(rotation);
         
-        const diffPos = threeVectorToVector(pos1ThreeVec).sub(state2.position);
-        const diffVel = threeVectorToVector(vel1ThreeVec).sub(state2.velocity);
+        const diffPos = threeVectorToVector(pos1ThreeVec);
+        const diffVel = threeVectorToVector(vel1ThreeVec);
         const statePosRotated = threeVectorToVector(statePosThreeVec);
         const stateVelRotated = threeVectorToVector(stateVelThreeVec);
 
         const destinationPos = statePosRotated.add(diffPos);
         
-        const rfVel2 = threeVectorToVector(
-            new THREE.Vector3().multiplyVectors(
-                vectorToThreeVector(destinationPos),
-                vectorToThreeVector(destinationFrame.rotationVelocity)
-            )
-        );
-
-        const destinationVel = stateVelRotated.add(diffVel).add(rfVel1).sub(rfVel2);
+        const destinationVel = stateVelRotated.add(diffVel).add(rfVel1);
 
         return new StateVector(
             destinationPos.x,
