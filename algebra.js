@@ -219,7 +219,6 @@ function getQuaternionByEuler(x, y, z) {
 }
 
 const IDENTITY_QUATERNION = new THREE.Quaternion(0, 0, 0, 1);
-//const IDENTITY_QUATERNION = getQuaternionByEuler(Math.PI / 2, 0, 0);
 
 function vectorToThreeVector(v) {
     return new THREE.Vector3(v.x, v.y, v.z);

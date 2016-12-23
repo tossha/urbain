@@ -1,4 +1,4 @@
-const RF_BASE = ReferenceFrameEcliptic.getInstance(SOLAR_SYSTEM_BARYCENTER); // ReferenceFrame.get(SOLAR_SYSTEM_BARYCENTER, RF_TYPE_ECLIPTIC);
+const RF_BASE = ReferenceFrameEcliptic.getInstance(SOLAR_SYSTEM_BARYCENTER);
 
 const TRAJECTORIES = {};
 const BODIES = {};
