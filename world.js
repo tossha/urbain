@@ -114,11 +114,11 @@ class ReferenceFrameAbstract
     static getInstance(origin, type) {
         switch(type) {
             case RF_TYPE_ECLIPTIC:
-                return ReferenceFrameEcliptic.get(origin);
+                return ReferenceFrameEcliptic.getInstance(origin);
             case RF_TYPE_EQUATORIAL:
-                return ReferenceFrameEquatorial.get(origin);
+                return ReferenceFrameEquatorial.getInstance(origin);
             case RF_TYPE_ROTATING:
-                return ReferenceFrameRotating.get(origin);
+                return ReferenceFrameRotating.getInstance(origin);
         }
     }
 
