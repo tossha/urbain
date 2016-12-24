@@ -78,7 +78,7 @@ class ReferenceFrameEcliptic extends ReferenceFrameAbstract
 
     stateVectorToBaseReferenceFrameByEpoch(epoch, state) {
         const originState = TRAJECTORIES[this.origin].getStateByEpoch(epoch, RF_BASE);
-        
+
         const destinationPos = state.position.add(originState.position);
         const destinationVel = state.velocity.add(originState.velocity);
 
@@ -108,22 +108,22 @@ class ReferenceFrameEquatorial extends ReferenceFrameAbstract
             }
         }
 
-        const rf = new ReferenceFrameEcliptic(origin);
+        const rf = new ReferenceFrameEquatorial(origin);
         this.saved.push(rf);
         return rf;
     }
 
     get quaternion() {
-        return IDENTITY_QUATERNION;
+        return EQUATORIAL_QUATERNION;
     }
 
     stateVectorFromBaseReferenceFrameByEpoch(epoch, state) {
-        const rotation = new THREE.Quaternion().copy(EQUATORIAL_QUATERNION).inverse();
+        const rotation = this.quaternion; // new THREE.Quaternion().copy(EQUATORIAL_QUATERNION).inverse();
         const originState = TRAJECTORIES[destinationFrame.origin].getStateByEpoch(epoch, RF_BASE);
 
         const statePosThreeVec = vectorToThreeVector(state.position).applyQuaternion(rotation);
         const stateVelThreeVec = vectorToThreeVector(state.velocity).applyQuaternion(rotation);
-        
+
         const destinationPos = threeVectorToVector(statePosThreeVec).sub(originState.position);
         const destinationVel = threeVectorToVector(stateVelThreeVec).sub(originState.velocity);
 
@@ -138,14 +138,14 @@ class ReferenceFrameEquatorial extends ReferenceFrameAbstract
     }
 
     stateVectorToBaseReferenceFrameByEpoch(epoch, state) {
-        const rotation = EQUATORIAL_QUATERNION;
+        const rotation = new THREE.Quaternion().copy(this.quaternion).inverse(); // EQUATORIAL_QUATERNION;
         const originState = TRAJECTORIES[this.origin].getStateByEpoch(epoch, RF_BASE);
-        
+
         const originPosThreeVec = vectorToThreeVector(originState.position).applyQuaternion(rotation);
         const originVelThreeVec = vectorToThreeVector(originState.velocity).applyQuaternion(rotation);
         const statePosThreeVec = vectorToThreeVector(state.position).applyQuaternion(rotation);
         const stateVelThreeVec = vectorToThreeVector(state.velocity).applyQuaternion(rotation);
-        
+
         const destinationPos = threeVectorToVector(statePosThreeVec).add(threeVectorToVector(originPosThreeVec));
         const destinationVel = threeVectorToVector(stateVelThreeVec).add(threeVectorToVector(originVelThreeVec));
 
@@ -190,12 +190,12 @@ class ReferenceFrameRotating extends ReferenceFrameAbstract
 
         const statePosThreeVec = vectorToThreeVector(state.position).applyQuaternion(rotation);
         const stateVelThreeVec = vectorToThreeVector(state.velocity).applyQuaternion(rotation);
-        
+
         const statePosRotated = threeVectorToVector(statePosThreeVec);
         const stateVelRotated = threeVectorToVector(stateVelThreeVec);
 
         const destinationPos = statePosRotated.sub(originState.position);
-        
+
         const rfVel = threeVectorToVector(
             new THREE.Vector3().multiplyVectors(
                 vectorToThreeVector(destinationPos),
@@ -218,26 +218,26 @@ class ReferenceFrameRotating extends ReferenceFrameAbstract
     stateVectorToBaseReferenceFrameByEpoch(epoch, state) {
         const rotation = IDENTITY_QUATERNION;
         const originState = TRAJECTORIES[this.origin].getStateByEpoch(epoch, RF_BASE);
-        
+
         const rfVel = threeVectorToVector(
             new THREE.Vector3().multiplyVectors(
                 vectorToThreeVector(state.position),
                 vectorToThreeVector(SAMPLE_ROTATION_VELOCITY)
             )
         );
-        
+
         const originPosThreeVec = vectorToThreeVector(originState.position).applyQuaternion(rotation);
         const originVelThreeVec = vectorToThreeVector(originState.velocity).applyQuaternion(rotation);
         const statePosThreeVec = vectorToThreeVector(state.position).applyQuaternion(rotation);
         const stateVelThreeVec = vectorToThreeVector(state.velocity).applyQuaternion(rotation);
-        
+
         const diffPos = threeVectorToVector(originPosThreeVec);
         const diffVel = threeVectorToVector(originVelThreeVec);
         const statePosRotated = threeVectorToVector(statePosThreeVec);
         const stateVelRotated = threeVectorToVector(stateVelThreeVec);
 
         const destinationPos = statePosRotated.add(diffPos);
-        
+
         const destinationVel = stateVelRotated.add(diffVel).add(rfVel);
 
         return new StateVector(
@@ -485,44 +485,44 @@ class TrajectoryKeplerianOrbit extends TrajectoryAbstract
             vel.x, vel.y, vel.z
         );
     }
-    
+
     static createByState(referenceFrame, state, mu, epoch, color) {
         let pos = state.position;
         let vel = state.velocity;
-        
+
         let angMomentum = pos.mulCrossByVector(vel);
-        
+
         let raan = Math.atan2(angMomentum.x, -angMomentum.y); //raan
         let inc = Math.atan2((Math.sqrt(Math.pow(angMomentum.x, 2) + Math.pow(angMomentum.y, 2))) , angMomentum.z); //inclination
-        
+
         let sma = (mu * pos.mag) / (2.0 * mu - pos.mag * Math.pow(vel.mag, 2)); //semimajor axis
         let e = Math.sqrt(1.0 - (Math.pow(angMomentum.mag, 2) / (mu * sma))); //eccentricity
-        
+
         let p = pos.rotateZ(-raan).rotateX(-inc);
         let u = Math.atan2(p.y , p.x);
-    
+
         let radVel = pos.mulDotByVector(vel) / pos.mag;
         let cosE = (sma - pos.mag) / (sma * e);
         let sinE = (pos.mag * radVel) / (e * Math.sqrt(mu * sma));
         let ta = Math.atan2((Math.sqrt(1.0 - e * e) * sinE) , (cosE - e));
         ta = (ta > 0) ? ta : (ta + 2 * Math.PI);
-    
+
         let E = (sinE < 0) ? Math.acos (cosE) : (2 * Math.PI - Math.acos (cosE));
-    
+
         let aop = ((u - ta) > 0) ? (u - ta) : 2 * Math.PI + (u - ta); //argument of periapsis
         let m0 = 2 * Math.PI - (E - e * sinE); //mean anomaly
-        
+
         return new TrajectoryKeplerianOrbit(
-            referenceFrame, 
-            mu, 
-            sma, 
-            e, 
-            inc, 
-            raan, 
-            aop, 
-            m0, 
-            epoch, 
-            color, 
+            referenceFrame,
+            mu,
+            sma,
+            e,
+            inc,
+            raan,
+            aop,
+            m0,
+            epoch,
+            color,
             false
         );
     }
