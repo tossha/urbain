@@ -380,7 +380,7 @@ function initBuiltIn() {
         const objId = parseInt(id);
 
         TRAJECTORIES[objId] = new TrajectoryKeplerianOrbit(
-            ReferenceFrame.get(EARTH, RF_TYPE_EQUATORIAL),
+            ReferenceFrameAbstract.getInstance(EARTH, RF_TYPE_EQUATORIAL),
             BODIES[EARTH].physicalModel.mu,
             tle.getSma(),
             tle.getE(),

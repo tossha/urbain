@@ -249,11 +249,7 @@ class ReferenceFrameRotating extends ReferenceFrameAbstract
             destinationVel.z
         );
     }
-
-    const rf = new ReferenceFrame(origin, type);
-    ReferenceFrame.collection.push(rf);
-    return rf;
-};
+}
 
 class TrajectoryAbstract
 {
