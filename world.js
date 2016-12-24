@@ -5,14 +5,27 @@ class ReferenceFrameAbstract
     }
 
     static getInstance(origin, type) {
-        switch(type) {
-            case RF_TYPE_ECLIPTIC:
-                return ReferenceFrameEcliptic.getInstance(origin);
-            case RF_TYPE_EQUATORIAL:
-                return ReferenceFrameEquatorial.getInstance(origin);
-            case RF_TYPE_ROTATING:
-                return ReferenceFrameRotating.getInstance(origin);
+        if (!REFERENCE_FRAMES[`${origin} ${type}`]) {
+            let rf = null;
+
+            switch(type) {
+                case RF_TYPE_ECLIPTIC:
+                    rf = new ReferenceFrameEcliptic(origin);
+                    break;
+
+                case RF_TYPE_EQUATORIAL:
+                    rf = new ReferenceFrameEquatorial(origin);
+                    break;
+
+                case RF_TYPE_ROTATING:
+                    rf = new ReferenceFrameRotating(origin);
+                    break;
+            }
+
+            REFERENCE_FRAMES[`${origin} ${type}`] = rf;
         }
+
+        return REFERENCE_FRAMES[`${origin} ${type}`];
     }
 
     get quaternion() { return IDENTITY_QUATERNION; }
@@ -71,20 +84,6 @@ class ReferenceFrameEcliptic extends ReferenceFrameAbstract
         super(origin);
     }
 
-    static getInstance(origin) {
-        this.saved = this.saved || [];
-
-        for (let rf of this.saved) {
-            if (rf.origin === origin) {
-                return rf;
-            }
-        }
-
-        const rf = new ReferenceFrameEcliptic(origin);
-        this.saved.push(rf);
-        return rf;
-    }
-
     stateVectorFromBaseReferenceFrameByEpoch(epoch, state) {
         const originState = TRAJECTORIES[this.origin].getStateByEpoch(epoch, RF_BASE);
 
@@ -122,20 +121,6 @@ class ReferenceFrameEquatorial extends ReferenceFrameAbstract
 {
     constructor(origin) {
         super(origin);
-    }
-
-    static getInstance(origin) {
-        this.saved = this.saved || [];
-
-        for (let rf of this.saved) {
-            if (rf.origin === origin) {
-                return rf;
-            }
-        }
-
-        const rf = new ReferenceFrameEquatorial(origin);
-        this.saved.push(rf);
-        return rf;
     }
 
     get quaternion() {
@@ -193,20 +178,6 @@ class ReferenceFrameRotating extends ReferenceFrameAbstract
 {
     constructor(origin) {
         super(origin);
-    }
-
-    static getInstance(origin) {
-        this.saved = this.saved || [];
-
-        for (let rf of this.saved) {
-            if (rf.origin === origin) {
-                return rf;
-            }
-        }
-
-        const rf = new ReferenceFrameEcliptic(origin);
-        this.saved.push(rf);
-        return rf;
     }
 
     get rotationVelocity() {
@@ -646,3 +617,5 @@ class Orientation
             ));
     }
 }
+
+REFERENCE_FRAMES = {};
