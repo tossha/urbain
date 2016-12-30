@@ -4,30 +4,6 @@ class ReferenceFrameAbstract
         this.origin = origin;
     }
 
-    static getInstance(origin, type) {
-        if (!REFERENCE_FRAMES[`${origin} ${type}`]) {
-            let rf = null;
-
-            switch(type) {
-                case RF_TYPE_ECLIPTIC:
-                    rf = new ReferenceFrameEcliptic(origin);
-                    break;
-
-                case RF_TYPE_EQUATORIAL:
-                    rf = new ReferenceFrameEquatorial(origin);
-                    break;
-
-                case RF_TYPE_ROTATING:
-                    rf = new ReferenceFrameRotating(origin);
-                    break;
-            }
-
-            REFERENCE_FRAMES[`${origin} ${type}`] = rf;
-        }
-
-        return REFERENCE_FRAMES[`${origin} ${type}`];
-    }
-
     get quaternion() { return IDENTITY_QUATERNION; }
     get rotationVelocity() { return ZERO_VECTOR; }
 
