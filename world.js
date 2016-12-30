@@ -83,14 +83,14 @@ class ReferenceFrameEquatorial extends ReferenceFrameAbstract
 
         const originState = TRAJECTORIES[this.origin].getStateByEpoch(epoch, RF_BASE);
 
-        const statePosThreeVec = vectorToThreeVector(state.position);
-        const stateVelThreeVec = vectorToThreeVector(state.velocity);
+        const statePosThreeVec = vectorToThreeVector(state.position.sub(originState.position));
+        const stateVelThreeVec = vectorToThreeVector(state.velocity.sub(originState.position));
 
-        const statePosRotated = threeVectorToVector(statePosThreeVec.applyQuaternion(rotation));
-        const stateVelRotated = threeVectorToVector(stateVelThreeVec.applyQuaternion(rotation));
+        const statePosRotated = statePosThreeVec.applyQuaternion(rotation);
+        const stateVelRotated = stateVelThreeVec.applyQuaternion(rotation);
 
-        const destPos = statePosRotated.sub(originState.position);
-        const destVel = stateVelRotated.sub(originState.velocity);
+        const destPos = threeVectorToVector(statePosRotated);
+        const destVel = threeVectorToVector(stateVelRotated);
 
         return new StateVector(
             destPos.x,
