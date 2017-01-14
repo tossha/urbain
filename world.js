@@ -188,7 +188,7 @@ class ReferenceFrameRotating extends ReferenceFrameAbstract
         const stateVelRotated = threeVectorToVector(stateVelThreeVec.applyQuaternion(rotation));
 
         const destPos = statePosRotated.add(originState.position);
-        const destVel = stateVelRotated.add(originState.velocity).add(rfVel);
+        const destVel = stateVelRotated.add(originState.velocity).sub(rfVel);
 
         return new StateVector(
             destPos.x,
