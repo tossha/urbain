@@ -1,41 +1,56 @@
-
 class ReferenceFrame
 {
     constructor(origin, type) {
         this.origin = origin;
-        this.type = type || RF_TYPE_INERTIAL; // RF_TYPE_INERTIAL или RF_TYPE_ROTATING
-    }
+        this.type = type || RF_TYPE_ECLIPTIC; // RF_TYPE_EQUATORIAL, RF_TYPE_ECLIPTIC или RF_TYPE_ROTATING
 
-    getMatrixByEpoch(epoch) {
-        // @todo implement
+        switch (type) {
+            case RF_TYPE_EQUATORIAL:
+                this.quaternion = EQUATORIAL_QUATERNION;
+                break;
+
+            default:
+                this.quaternion = IDENTITY_QUATERNION;
+                break;
+        }
     }
 
     transformStateVectorByEpoch(epoch, state, destinationFrame) {
-        if ((this.type !== RF_TYPE_INERTIAL)
-            || (destinationFrame.type !== RF_TYPE_INERTIAL)
+        if ((this.type === RF_TYPE_ROTATING)
+            || (destinationFrame.type === RF_TYPE_ROTATING)
         ) {
-            // @tofo implement
+            // @todo implement
             console.log('Rotating frames are not supported yet');
             return;
         }
 
-        if ((this.origin === destinationFrame.origin)
-            && (this.type === destinationFrame.type)
-        ) {
+        if (this === destinationFrame) {
             return state;
         }
 
-        let state1 = TRAJECTORIES[this.origin].getStateByEpoch(epoch, RF_BASE);
-        let state2 = TRAJECTORIES[destinationFrame.origin].getStateByEpoch(epoch, RF_BASE);
-        let diffPos = state1.position.sub(state2.position);
-        let diffVel = state1.velocity.sub(state2.velocity);
+        const rotation = new THREE.Quaternion();
+        rotation.copy(destinationFrame.quaternion);
+        rotation.inverse();
+        rotation.multiply(this.quaternion);
+
+        const state1 = TRAJECTORIES[this.origin].getStateByEpoch(epoch, RF_BASE);
+        const state2 = TRAJECTORIES[destinationFrame.origin].getStateByEpoch(epoch, RF_BASE);
+
+        const statePosThreeVec = vectorToThreeVector(state.position).applyQuaternion(rotation);
+        const stateVelThreeVec = vectorToThreeVector(state.velocity).applyQuaternion(rotation);
+
+        const diffPos = state1.position.sub(state2.position);
+        const diffVel = state1.velocity.sub(state2.velocity);
+        const statePosRotated = threeVectorToVector(statePosThreeVec);
+        const stateVelRotated = threeVectorToVector(stateVelThreeVec);
+
         return new StateVector(
-            state.x + diffPos.x,
-            state.y + diffPos.y,
-            state.z + diffPos.z,
-            state.vx + diffVel.x,
-            state.vy + diffVel.y,
-            state.vz + diffVel.z
+            statePosRotated.x + diffPos.x,
+            statePosRotated.y + diffPos.y,
+            statePosRotated.z + diffPos.z,
+            stateVelRotated.x + diffVel.x,
+            stateVelRotated.y + diffVel.y,
+            stateVelRotated.z + diffVel.z
         );
     }
 
@@ -46,17 +61,21 @@ class ReferenceFrame
             destinationFrame
         ).position;
     }
-
-    getTransformationMatrixByEpoch(epoch, destinationFrame) {
-        if ((this.origin === destinationFrame.origin)
-            && (this.type === destinationFrame.type)
-        ) {
-            return IDENTITY_MATRIX6; // @todo think about optimization here
-        }
-
-        // @todo implement
-    }
 }
+
+ReferenceFrame.get = function(origin, type) {
+    ReferenceFrame.collection = ReferenceFrame.collection || [];
+
+    for (let rf of ReferenceFrame.collection) {
+        if (rf.origin === origin && rf.type === type) {
+            return rf;
+        }
+    }
+
+    const rf = new ReferenceFrame(origin, type);
+    ReferenceFrame.collection.push(rf);
+    return rf;
+};
 
 class TrajectoryAbstract
 {
@@ -116,7 +135,7 @@ class TrajectoryStaticPosition extends TrajectoryAbstract
 
 class TrajectoryKeplerianOrbit extends TrajectoryAbstract
 {
-    constructor(referenceFrame, mu, sma, e, inc, raan, aop, ta, epoch, color) {
+    constructor(referenceFrame, mu, sma, e, inc, raan, aop, anomaly, epoch, color, isAnomalyTrue) {
         super(referenceFrame);
 
         this._mu    = mu;
@@ -127,7 +146,11 @@ class TrajectoryKeplerianOrbit extends TrajectoryAbstract
         this._aop   = aop;
         this._epoch = epoch;
 
-        this.ta = ta;
+        if ((isAnomalyTrue === undefined) || (isAnomalyTrue === true)) {
+            this.ta = anomaly;
+        } else {
+            this.m0 = anomaly;
+        }
 
         this.updateMeanMotion();
 
@@ -286,6 +309,47 @@ class TrajectoryKeplerianOrbit extends TrajectoryAbstract
         return new StateVector(
             pos.x, pos.y, pos.z,
             vel.x, vel.y, vel.z
+        );
+    }
+    
+    static createByState(referenceFrame, state, mu, epoch, color) {
+        let pos = state.position;
+        let vel = state.velocity;
+        
+        let angMomentum = pos.mulCrossByVector(vel);
+        
+        let raan = Math.atan2(angMomentum.x, -angMomentum.y); //raan
+        let inc = Math.atan2((Math.sqrt(Math.pow(angMomentum.x, 2) + Math.pow(angMomentum.y, 2))) , angMomentum.z); //inclination
+        
+        let sma = (mu * pos.mag) / (2.0 * mu - pos.mag * Math.pow(vel.mag, 2)); //semimajor axis
+        let e = Math.sqrt(1.0 - (Math.pow(angMomentum.mag, 2) / (mu * sma))); //eccentricity
+        
+        let p = pos.rotateZ(-raan).rotateX(-inc);
+        let u = Math.atan2(p.y , p.x);
+    
+        let radVel = pos.mulDotByVector(vel) / pos.mag;
+        let cosE = (sma - pos.mag) / (sma * e);
+        let sinE = (pos.mag * radVel) / (e * Math.sqrt(mu * sma));
+        let ta = Math.atan2((Math.sqrt(1.0 - e * e) * sinE) , (cosE - e));
+        ta = (ta > 0) ? ta : (ta + 2 * Math.PI);
+    
+        let E = (sinE < 0) ? Math.acos (cosE) : (2 * Math.PI - Math.acos (cosE));
+    
+        let aop = ((u - ta) > 0) ? (u - ta) : 2 * Math.PI + (u - ta); //argument of periapsis
+        let m0 = 2 * Math.PI - (E - e * sinE); //mean anomaly
+        
+        return new TrajectoryKeplerianOrbit(
+            referenceFrame, 
+            mu, 
+            sma, 
+            e, 
+            inc, 
+            raan, 
+            aop, 
+            m0, 
+            epoch, 
+            color, 
+            false
         );
     }
 }

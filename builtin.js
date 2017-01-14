@@ -1,27 +1,15 @@
-
-const RF_BASE = new ReferenceFrame(SOLAR_SYSTEM_BARYCENTER, RF_TYPE_INERTIAL);
-const RF_SUN = new ReferenceFrame(SUN, RF_TYPE_INERTIAL);
-const RF_MERCURY_B = new ReferenceFrame(MERCURY_BARYCENTER, RF_TYPE_INERTIAL);
-const RF_VENUS_B = new ReferenceFrame(VENUS_BARYCENTER, RF_TYPE_INERTIAL);
-const RF_EARTH_B = new ReferenceFrame(EARTH_BARYCENTER, RF_TYPE_INERTIAL);
-const RF_MARS_B = new ReferenceFrame(MARS_BARYCENTER, RF_TYPE_INERTIAL);
-const RF_JUPITER_B = new ReferenceFrame(JUPITER_BARYCENTER, RF_TYPE_INERTIAL);
-const RF_SATURN_B = new ReferenceFrame(SATURN_BARYCENTER, RF_TYPE_INERTIAL);
-const RF_URANUS_B = new ReferenceFrame(URANUS_BARYCENTER, RF_TYPE_INERTIAL);
-const RF_NEPTUNE_B = new ReferenceFrame(NEPTUNE_BARYCENTER, RF_TYPE_INERTIAL);
-const RF_PLUTO_B = new ReferenceFrame(PLUTO_BARYCENTER, RF_TYPE_INERTIAL);
-const RF_MERCURY = new ReferenceFrame(MERCURY, RF_TYPE_INERTIAL);
-const RF_VENUS = new ReferenceFrame(VENUS, RF_TYPE_INERTIAL);
-const RF_EARTH = new ReferenceFrame(EARTH, RF_TYPE_INERTIAL);
-const RF_MARS = new ReferenceFrame(MARS, RF_TYPE_INERTIAL);
-const RF_JUPITER = new ReferenceFrame(JUPITER, RF_TYPE_INERTIAL);
-const RF_SATURN = new ReferenceFrame(SATURN, RF_TYPE_INERTIAL);
-const RF_URANUS = new ReferenceFrame(URANUS, RF_TYPE_INERTIAL);
-const RF_NEPTUNE = new ReferenceFrame(NEPTUNE, RF_TYPE_INERTIAL);
-const RF_PLUTO = new ReferenceFrame(PLUTO, RF_TYPE_INERTIAL);
+const RF_BASE = ReferenceFrame.get(SOLAR_SYSTEM_BARYCENTER, RF_TYPE_ECLIPTIC);
 
 const TRAJECTORIES = {};
 const BODIES = {};
+
+const EQUATORIAL_QUATERNION = getQuaternionByEuler(0.4087561108170719, 0, 0);
+
+STARDATA = [
+    [0, 0, 100],
+    [45, 80, 50],
+    [90, 90 , 100]
+];
 
 const SSDATA = {
     "0": {
@@ -31,7 +19,7 @@ const SSDATA = {
             type: 'static',
             rf: {
                 origin: SOLAR_SYSTEM_BARYCENTER,
-                type: 0
+                type: RF_TYPE_ECLIPTIC
             },
             data: [0, 0, 0]
         }
@@ -43,7 +31,7 @@ const SSDATA = {
             type: 'static',
             rf: {
                 origin: SOLAR_SYSTEM_BARYCENTER,
-                type: 0
+                type: RF_TYPE_ECLIPTIC
             },
             data: [0, 0, 0]
         },
@@ -74,7 +62,7 @@ const SSDATA = {
             color: 'azure',
             rf: {
                 origin: SUN,
-                type: 0
+                type: RF_TYPE_ECLIPTIC
             },
             data: {
                 mu:    132712440017.99,   // MU[sun]
@@ -112,7 +100,7 @@ const SSDATA = {
             color: 'orange',
             rf: {
                 origin: SUN,
-                type: 0
+                type: RF_TYPE_ECLIPTIC
             },
             data: {
                 mu:    132712440017.99,   // MU[sun]
@@ -150,7 +138,7 @@ const SSDATA = {
             color: 'lightblue',
             rf: {
                 origin: SUN,
-                type: 0
+                type: RF_TYPE_ECLIPTIC
             },
             data: {
                 mu:    132712440017.99,   // MU[sun]
@@ -172,7 +160,7 @@ const SSDATA = {
             color: 'blue',
             rf: {
                 origin: EARTH_BARYCENTER,
-                type: 0
+                type: RF_TYPE_ECLIPTIC
             },
             data: {
                 mu:    0.7238334181449901,  // MU[moon]^3 / (MU[earth] + MU[moon])^2
@@ -210,7 +198,7 @@ const SSDATA = {
             color: 'white',
             rf: {
                 origin: EARTH_BARYCENTER,
-                type: 0
+                type: RF_TYPE_ECLIPTIC
             },
             data: {
                 mu:    388972.8321930768,  // MU[earth]^3 / (MU[earth] + MU[moon])^2
@@ -248,7 +236,7 @@ const SSDATA = {
             color: 'red',
             rf: {
                 origin: SUN,
-                type: 0
+                type: RF_TYPE_ECLIPTIC
             },
             data: {
                 mu:    132712440017.99,   // MU[sun]
@@ -286,7 +274,7 @@ const SSDATA = {
             color: 'burlywood',
             rf: {
                 origin: SUN,
-                type: 0
+                type: RF_TYPE_ECLIPTIC
             },
             data: {
                 mu:    132712440017.99,   // MU[sun]
@@ -324,7 +312,7 @@ const SSDATA = {
             color: 'sandybrown',
             rf: {
                 origin: SUN,
-                type: 0
+                type: RF_TYPE_ECLIPTIC
             },
             data: {
                 mu:    132712440017.99,   // MU[sun]
@@ -361,7 +349,7 @@ const SSDATA = {
             color: 'lightskyblue',
             rf: {
                 origin: SUN,
-                type: 0
+                type: RF_TYPE_ECLIPTIC
             },
             data: {
                 mu:    132712440017.99,   // MU[sun]
@@ -398,7 +386,7 @@ const SSDATA = {
             color: 'steelblue',
             rf: {
                 origin: SUN,
-                type: 0
+                type: RF_TYPE_ECLIPTIC
             },
             data: {
                 mu:    132712440017.99,   // MU[sun]
@@ -435,7 +423,7 @@ const SSDATA = {
             color: 'tan',
             rf: {
                 origin: SUN,
-                type: 0
+                type: RF_TYPE_ECLIPTIC
             },
             data: {
                 mu:    132712440017.99,   // MU[sun]
@@ -457,7 +445,7 @@ const SSDATA = {
             color: 'tan',
             rf: {
                 origin: PLUTO_BARYCENTER,
-                type: 0
+                type: RF_TYPE_ECLIPTIC
             },
             data: {
                 mu:    1.126007850945504,   // MU[charon]^3 / (MU[pluto] + MU[charon])^2
@@ -494,7 +482,7 @@ const SSDATA = {
             color: 'rosybrown',
             rf: {
                 origin: PLUTO_BARYCENTER,
-                type: 0
+                type: RF_TYPE_ECLIPTIC
             },
             data: {
                 mu:    698.9254936721327,   // MU[pluto]^3 / (MU[pluto] + MU[charon])^2
@@ -522,5 +510,20 @@ const SSDATA = {
             axisZ: 0,
             angVel: 0.00000
         }
+    }
+};
+
+const TLEDATA = {
+    "10001":{
+    	name: 'ISS',
+    	lineOne: '1 25544U 98067A   16345.25971633  .00005580  00000-0  92357-4 0  9993',
+    	lineTwo: '2 25544  51.6439 260.0841 0005883 314.4887 146.0880 15.53854424 32373',
+    	color: 'springgreen'
+    },
+    "10002":{
+    	name: 'Hubble Space Telescope',
+    	lineOne: '1 20580U 90037B   16345.19836807  .00000608  00000-0  26678-4 0  9992',
+    	lineTwo: '2 20580  28.4685 176.1733 0002613 302.2358  16.6063 15.08617271261710',
+    	color: 'gold'
     }
 };
