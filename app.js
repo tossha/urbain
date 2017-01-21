@@ -3,23 +3,17 @@ class App {
         this.frames = this.frames || {};
         this.frames[origin] = this.frames[origin] || {};
 
-        let neededType;
+        const typeClasses = {
+            [RF_TYPE_ECLIPTIC]: ReferenceFrameEcliptic,
+            [RF_TYPE_EQUATORIAL]: ReferenceFrameEquatorial,
+            [RF_TYPE_ROTATING]: ReferenceFrameRotating
+        };
 
-        switch(type) {
-            case RF_TYPE_ECLIPTIC:
-                neededType = ReferenceFrameEcliptic;
-                break;
-
-            case RF_TYPE_EQUATORIAL:
-                neededType = ReferenceFrameEquatorial;
-                break;
-
-            case RF_TYPE_ROTATING:
-                neededType = ReferenceFrameRotating;
-                break;
+        if (!typeClasses[type]){
+            return null;
         }
 
-        this.frames[origin][type] = this.frames[origin][type] || new neededType(origin);
+        this.frames[origin][type] = this.frames[origin][type] || new (typeClasses[type])(origin);
         return this.frames[origin][type];
     }
 }
