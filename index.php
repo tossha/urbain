@@ -1,16 +1,37 @@
+<?php
+function getDirScripts($dir) {
+    $scripts = glob($dir . '/*.js');
+
+    foreach(scandir($dir) as $subDir) {
+        if (($subDir{0} === '.')
+            || !is_dir($dir . '/' . $subDir)
+        ) {
+            continue;
+        }
+
+        $scripts = array_merge($scripts, getDirScripts($dir . '/' . $subDir));
+    }
+
+    return $scripts;
+}
+$scripts = array_merge(
+    getDirScripts('core'),
+    getDirScripts('visual')
+);
+?>
 <!DOCTYPE html>
 <html manifest="manifest.appcache">
 <head>
 <script src="https://threejs.org/build/three.min.js"></script>
 <script src="https://threejs.org/examples/js/controls/OrbitControls.js"></script>
 <script src="vendor/dat.gui.js"></script>
-<script src="const.js"></script>
-<script src="core/tle.js"></script>
+
+<?php foreach ($scripts as $script) { ?>
+<script src="<?= $script ?>"></script>
+<?php } ?>
+
 <script src="algebra.js"></script>
-<script src="physics.js"></script>
-<script src="visual.js"></script>
-<script src="world.js"></script>
-<script src="app.js"></script>
+<script src="const.js"></script>
 <style type="text/css">
 
     body {

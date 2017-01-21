@@ -1,17 +1,16 @@
 class TLE
 {
-    constructor(tleObject) {
-        this.name = tleObject.name;
-        this.lineOne = tleObject.lineOne;
-        this.lineTwo = tleObject.lineTwo;
+    constructor(lines) {
+        this.lineOne = lines[0];
+        this.lineTwo = lines[1];
     }
 
     getInc() {
-        return parseFloat(this.lineTwo.substr(8, 8));
+        return deg2rad(parseFloat(this.lineTwo.substr(8, 8)));
     }
 
     getRaan() {
-        return parseFloat(this.lineTwo.substr(17, 8));
+        return deg2rad(parseFloat(this.lineTwo.substr(17, 8)));
     }
 
     getE() {
@@ -19,11 +18,11 @@ class TLE
     }
 
     getAop() {
-        return parseFloat(this.lineTwo.substr(34, 8));
+        return deg2rad(parseFloat(this.lineTwo.substr(34, 8)));
     }
 
     getMeanAnomaly() {
-        return parseFloat(this.lineTwo.substr(43, 8));
+        return deg2rad(parseFloat(this.lineTwo.substr(43, 8)));
     }
 
     getMeanMotion() {
