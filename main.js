@@ -304,7 +304,7 @@ function initBuiltIn() {
         const body = SSDATA[id];
         const bodyId = parseInt(id);
         const trajConfig = body.traj;
-        const frame = ReferenceFrame.get(trajConfig.rf.origin, trajConfig.rf.type);
+        const frame = App.getReferenceFrame(trajConfig.rf.origin, trajConfig.rf.type);
         let traj;
 
         if (trajConfig.type === 'static') {
@@ -380,7 +380,7 @@ function initBuiltIn() {
         const objId = parseInt(id);
 
         TRAJECTORIES[objId] = new TrajectoryKeplerianOrbit(
-            ReferenceFrame.get(EARTH, RF_TYPE_EQUATORIAL),
+            App.getReferenceFrame(EARTH, RF_TYPE_EQUATORIAL),
             BODIES[EARTH].physicalModel.mu,
             tle.getSma(),
             tle.getE(),

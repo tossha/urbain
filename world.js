@@ -1,56 +1,32 @@
-class ReferenceFrame
+class ReferenceFrameAbstract
 {
-    constructor(origin, type) {
+    constructor(origin) {
         this.origin = origin;
-        this.type = type || RF_TYPE_ECLIPTIC; // RF_TYPE_EQUATORIAL, RF_TYPE_ECLIPTIC или RF_TYPE_ROTATING
+    }
 
-        switch (type) {
-            case RF_TYPE_EQUATORIAL:
-                this.quaternion = EQUATORIAL_QUATERNION;
-                break;
-
-            default:
-                this.quaternion = IDENTITY_QUATERNION;
-                break;
-        }
+    getQuaternionByEpoch(epoch) {
+        return IDENTITY_QUATERNION;
     }
 
     transformStateVectorByEpoch(epoch, state, destinationFrame) {
-        if ((this.type === RF_TYPE_ROTATING)
-            || (destinationFrame.type === RF_TYPE_ROTATING)
-        ) {
-            // @todo implement
-            console.log('Rotating frames are not supported yet');
-            return;
-        }
-
         if (this === destinationFrame) {
             return state;
         }
 
-        const rotation = new THREE.Quaternion();
-        rotation.copy(destinationFrame.quaternion);
-        rotation.inverse();
-        rotation.multiply(this.quaternion);
+        if (this === RF_BASE) {
+            return destinationFrame.stateVectorFromBaseReferenceFrameByEpoch(
+                epoch,
+                state
+            );
+        }
 
-        const state1 = TRAJECTORIES[this.origin].getStateByEpoch(epoch, RF_BASE);
-        const state2 = TRAJECTORIES[destinationFrame.origin].getStateByEpoch(epoch, RF_BASE);
+        if (destinationFrame === RF_BASE) {
+            return this.stateVectorToBaseReferenceFrameByEpoch(epoch, state);
+        }
 
-        const statePosThreeVec = vectorToThreeVector(state.position).applyQuaternion(rotation);
-        const stateVelThreeVec = vectorToThreeVector(state.velocity).applyQuaternion(rotation);
-
-        const diffPos = state1.position.sub(state2.position);
-        const diffVel = state1.velocity.sub(state2.velocity);
-        const statePosRotated = threeVectorToVector(statePosThreeVec);
-        const stateVelRotated = threeVectorToVector(stateVelThreeVec);
-
-        return new StateVector(
-            statePosRotated.x + diffPos.x,
-            statePosRotated.y + diffPos.y,
-            statePosRotated.z + diffPos.z,
-            stateVelRotated.x + diffVel.x,
-            stateVelRotated.y + diffVel.y,
-            stateVelRotated.z + diffVel.z
+        return destinationFrame.stateVectorFromBaseReferenceFrameByEpoch(
+            epoch,
+            this.stateVectorToBaseReferenceFrameByEpoch(epoch, state)
         );
     }
 
@@ -61,21 +37,183 @@ class ReferenceFrame
             destinationFrame
         ).position;
     }
+
+    stateVectorFromBaseReferenceFrameByEpoch(epoch, state) {}
+    stateVectorToBaseReferenceFrameByEpoch(epoch, state) {}
 }
 
-ReferenceFrame.get = function(origin, type) {
-    ReferenceFrame.collection = ReferenceFrame.collection || [];
-
-    for (let rf of ReferenceFrame.collection) {
-        if (rf.origin === origin && rf.type === type) {
-            return rf;
-        }
+class ReferenceFrameEcliptic extends ReferenceFrameAbstract
+{
+    constructor(origin) {
+        super(origin);
     }
 
-    const rf = new ReferenceFrame(origin, type);
-    ReferenceFrame.collection.push(rf);
-    return rf;
-};
+    stateVectorFromBaseReferenceFrameByEpoch(epoch, state) {
+        const originState = TRAJECTORIES[this.origin].getStateByEpoch(epoch, RF_BASE);
+
+        const destinationPos = state.position.sub(originState.position);
+        const destinationVel = state.velocity.sub(originState.velocity);
+
+        return new StateVector(
+            destinationPos.x,
+            destinationPos.y,
+            destinationPos.z,
+            destinationVel.x,
+            destinationVel.y,
+            destinationVel.z
+        );
+    }
+
+    stateVectorToBaseReferenceFrameByEpoch(epoch, state) {
+        const originState = TRAJECTORIES[this.origin].getStateByEpoch(epoch, RF_BASE);
+
+        const destinationPos = state.position.add(originState.position);
+        const destinationVel = state.velocity.add(originState.velocity);
+
+        return new StateVector(
+            destinationPos.x,
+            destinationPos.y,
+            destinationPos.z,
+            destinationVel.x,
+            destinationVel.y,
+            destinationVel.z
+        );
+    }
+}
+
+class ReferenceFrameEquatorial extends ReferenceFrameAbstract
+{
+    constructor(origin) {
+        super(origin);
+    }
+
+    getQuaternionByEpoch(epoch) {
+        return BODIES[this.origin].orientation.getOrientationByEpoch(epoch);
+    }
+
+    stateVectorFromBaseReferenceFrameByEpoch(epoch, state) {
+        const rotation = new THREE.Quaternion().copy(this.getQuaternionByEpoch(epoch)).inverse();
+
+        const originState = TRAJECTORIES[this.origin].getStateByEpoch(epoch, RF_BASE);
+
+        const statePosThreeVec = vectorToThreeVector(state.position.sub(originState.position));
+        const stateVelThreeVec = vectorToThreeVector(state.velocity.sub(originState.velocity));
+
+        const statePosRotated = statePosThreeVec.applyQuaternion(rotation);
+        const stateVelRotated = stateVelThreeVec.applyQuaternion(rotation);
+
+        const destPos = threeVectorToVector(statePosRotated);
+        const destVel = threeVectorToVector(stateVelRotated);
+
+        return new StateVector(
+            destPos.x,
+            destPos.y,
+            destPos.z,
+            destVel.x,
+            destVel.y,
+            destVel.z
+        );
+    }
+
+    stateVectorToBaseReferenceFrameByEpoch(epoch, state) {
+        const originState = TRAJECTORIES[this.origin].getStateByEpoch(epoch, RF_BASE);
+
+        const statePosThreeVec = vectorToThreeVector(state.position);
+        const stateVelThreeVec = vectorToThreeVector(state.velocity);
+
+        const rotation = this.getQuaternionByEpoch(epoch);
+        const statePosRotated = threeVectorToVector(statePosThreeVec.applyQuaternion(rotation));
+        const stateVelRotated = threeVectorToVector(stateVelThreeVec.applyQuaternion(rotation));
+
+        const destPos = statePosRotated.add(originState.position);
+        const destVel = stateVelRotated.add(originState.velocity);
+
+        return new StateVector(
+            destPos.x,
+            destPos.y,
+            destPos.z,
+            destVel.x,
+            destVel.y,
+            destVel.z
+        );
+    }
+}
+
+class ReferenceFrameRotating extends ReferenceFrameAbstract
+{
+    constructor(origin) {
+        super(origin);
+    }
+
+    getQuaternionByEpoch(epoch) {
+        return BODIES[this.origin].orientation.getOrientationByEpoch(epoch);
+    }
+
+    getRotationVelocityByEpoch(epoch) {
+        return new Vector3(0, 0, BODIES[this.origin].orientation.angularVel);
+    }
+
+    stateVectorFromBaseReferenceFrameByEpoch(epoch, state) {
+        const rotation = new THREE.Quaternion().copy(this.getQuaternionByEpoch(epoch)).inverse();
+
+        const originState = TRAJECTORIES[this.origin].getStateByEpoch(epoch, RF_BASE);
+
+        const statePosThreeVec = vectorToThreeVector(state.position.sub(originState.position));
+        const stateVelThreeVec = vectorToThreeVector(state.velocity.sub(originState.velocity));
+
+        const statePosRotated = threeVectorToVector(statePosThreeVec.applyQuaternion(rotation));
+        const stateVelRotated = threeVectorToVector(stateVelThreeVec.applyQuaternion(rotation));
+
+        const destPos = statePosRotated;
+        const rfVel = threeVectorToVector(
+            new THREE.Vector3().crossVectors(
+                vectorToThreeVector(destPos),
+                vectorToThreeVector(this.getRotationVelocityByEpoch(epoch))
+            )
+        );
+        const destVel = stateVelRotated.add(rfVel);
+
+        return new StateVector(
+            destPos.x,
+            destPos.y,
+            destPos.z,
+            destVel.x,
+            destVel.y,
+            destVel.z
+        );
+    }
+
+    stateVectorToBaseReferenceFrameByEpoch(epoch, state) {
+        const originState = TRAJECTORIES[this.origin].getStateByEpoch(epoch, RF_BASE);
+
+        const statePosThreeVec = vectorToThreeVector(state.position);
+
+        const rfVel = threeVectorToVector(
+            new THREE.Vector3().crossVectors(
+                statePosThreeVec,
+                vectorToThreeVector(this.getRotationVelocityByEpoch(epoch))
+            )
+        );
+
+        const stateVelThreeVec = vectorToThreeVector(state.velocity.sub(rfVel));
+
+        const rotation = this.getQuaternionByEpoch(epoch);
+        const statePosRotated = threeVectorToVector(statePosThreeVec.applyQuaternion(rotation));
+        const stateVelRotated = threeVectorToVector(stateVelThreeVec.applyQuaternion(rotation));
+
+        const destPos = statePosRotated.add(originState.position);
+        const destVel = stateVelRotated.add(originState.velocity);
+
+        return new StateVector(
+            destPos.x,
+            destPos.y,
+            destPos.z,
+            destVel.x,
+            destVel.y,
+            destVel.z
+        );
+    }
+}
 
 class TrajectoryAbstract
 {
@@ -311,44 +449,44 @@ class TrajectoryKeplerianOrbit extends TrajectoryAbstract
             vel.x, vel.y, vel.z
         );
     }
-    
+
     static createByState(referenceFrame, state, mu, epoch, color) {
         let pos = state.position;
         let vel = state.velocity;
-        
+
         let angMomentum = pos.mulCrossByVector(vel);
-        
+
         let raan = Math.atan2(angMomentum.x, -angMomentum.y); //raan
         let inc = Math.atan2((Math.sqrt(Math.pow(angMomentum.x, 2) + Math.pow(angMomentum.y, 2))) , angMomentum.z); //inclination
-        
+
         let sma = (mu * pos.mag) / (2.0 * mu - pos.mag * Math.pow(vel.mag, 2)); //semimajor axis
         let e = Math.sqrt(1.0 - (Math.pow(angMomentum.mag, 2) / (mu * sma))); //eccentricity
-        
+
         let p = pos.rotateZ(-raan).rotateX(-inc);
         let u = Math.atan2(p.y , p.x);
-    
+
         let radVel = pos.mulDotByVector(vel) / pos.mag;
         let cosE = (sma - pos.mag) / (sma * e);
         let sinE = (pos.mag * radVel) / (e * Math.sqrt(mu * sma));
         let ta = Math.atan2((Math.sqrt(1.0 - e * e) * sinE) , (cosE - e));
         ta = (ta > 0) ? ta : (ta + 2 * Math.PI);
-    
+
         let E = (sinE < 0) ? Math.acos (cosE) : (2 * Math.PI - Math.acos (cosE));
-    
+
         let aop = ((u - ta) > 0) ? (u - ta) : 2 * Math.PI + (u - ta); //argument of periapsis
         let m0 = 2 * Math.PI - (E - e * sinE); //mean anomaly
-        
+
         return new TrajectoryKeplerianOrbit(
-            referenceFrame, 
-            mu, 
-            sma, 
-            e, 
-            inc, 
-            raan, 
-            aop, 
-            m0, 
-            epoch, 
-            color, 
+            referenceFrame,
+            mu,
+            sma,
+            e,
+            inc,
+            raan,
+            aop,
+            m0,
+            epoch,
+            color,
             false
         );
     }
