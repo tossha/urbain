@@ -7,6 +7,6 @@ class TrajectoryStaticPosition extends TrajectoryAbstract
     }
 
     getStateInOwnFrameByEpoch(epoch) {
-        return new StateVector(this.pos.x, this.pos.y, this.pos.z, 0, 0, 0);
+        return new StateVector(this.pos);
     }
 }

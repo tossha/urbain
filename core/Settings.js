@@ -104,7 +104,7 @@ class Settings
 
                 if (!TRAJECTORIES[lastTrajectoryId]) {
                     TRAJECTORIES[lastTrajectoryId] = new TrajectoryKeplerianOrbit(
-                        new ReferenceFrame(that.trackingObject),
+                        App.getReferenceFrame(that.trackingObject, RF_TYPE_ECLIPTIC),
                         BODIES[that.trackingObject]
                             ? BODIES[that.trackingObject].physicalModel.mu
                             : 0,

@@ -33,7 +33,7 @@ class ReferenceFrameAbstract
     transformPositionByEpoch(epoch, pos, destinationFrame) {
         return this.transformStateVectorByEpoch(
             epoch,
-            new StateVector(pos.x, pos.y, pos.z, 0, 0, 0),
+            new StateVector(pos),
             destinationFrame
         ).position;
     }

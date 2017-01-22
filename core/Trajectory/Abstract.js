@@ -1,7 +1,7 @@
 class TrajectoryAbstract
 {
     constructor(referenceFrame) {
-        this.referenceFrame = referenceFrame || null; // class ReferenceFrame
+        this.referenceFrame = referenceFrame || null; // class ReferenceFrameAbstract
     }
 
     drop() {

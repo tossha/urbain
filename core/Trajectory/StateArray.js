@@ -63,8 +63,9 @@ class TrajectoryStateArray extends TrajectoryAbstract
             const newPosition = newVelocity.add(prev.state.velocity).
             mul(timeDiff / 2).add(prev.state.position);
             return new StateVector(
-                newPosition.x, newPosition.y, newPosition.z,
-                newVelocity.x, newVelocity.y, newVelocity.z);
+                newPosition,
+                newVelocity
+            );
         }
     }
 }

@@ -36,9 +36,9 @@ class VisualBodyModelBasic
     }
 
     render(epoch, pos) {
-        this.threeObj.position.set(pos.x, pos.y, pos.z);
+        this.threeObj.position.set(pos[0], pos[1], pos[2]);
         this.threeObj.quaternion.copy(
-            this.body.orientation.getOrientationByEpoch(epoch)
+            this.body.orientation.getOrientationByEpoch(epoch).toThreejs()
         );
     }
 }

@@ -37,8 +37,8 @@ class Propagator
             currentEpoch += this.timeStep;
 
             trajectory.addState(currentEpoch, new StateVector(
-                currentPosition.x, currentPosition.y, currentPosition.z,
-                currentVelocity.x, currentVelocity.y, currentVelocity.z
+                currentPosition,
+                currentVelocity
             ));
         }
     }

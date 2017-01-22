@@ -155,25 +155,22 @@ class TrajectoryKeplerianOrbit extends TrajectoryAbstract
         let cos = Math.cos(E);
         let sin = Math.sin(E);
 
-        let pos = new Vector3(
+        let pos = new Vector([
             this._sma * (cos - this._e),
             this._sma * Math.sqrt(1 - this._e * this._e) * sin,
             0
-        );
+        ]);
 
         let koeff = this.meanMotion * this._sma / (1 - this._e * cos);
-        let vel = new Vector3(
+        let vel = new Vector([
             -koeff * sin,
             koeff * Math.sqrt(1 - this._e * this._e) * cos,
             0
-        );
-
-        pos = pos.rotateZ(this._aop).rotateX(this._inc).rotateZ(this._raan);
-        vel = vel.rotateZ(this._aop).rotateX(this._inc).rotateZ(this._raan);
+        ]);
 
         return new StateVector(
-            pos.x, pos.y, pos.z,
-            vel.x, vel.y, vel.z
+            pos.rotateZ(this._aop).rotateX(this._inc).rotateZ(this._raan),
+            vel.rotateZ(this._aop).rotateX(this._inc).rotateZ(this._raan)
         );
     }
 
@@ -181,7 +178,7 @@ class TrajectoryKeplerianOrbit extends TrajectoryAbstract
         let pos = state.position;
         let vel = state.velocity;
 
-        let angMomentum = pos.mulCrossByVector(vel);
+        let angMomentum = pos.cross(vel);
 
         let raan = Math.atan2(angMomentum.x, -angMomentum.y); //raan
         let inc = Math.atan2((Math.sqrt(Math.pow(angMomentum.x, 2) + Math.pow(angMomentum.y, 2))) , angMomentum.z); //inclination
@@ -192,7 +189,7 @@ class TrajectoryKeplerianOrbit extends TrajectoryAbstract
         let p = pos.rotateZ(-raan).rotateX(-inc);
         let u = Math.atan2(p.y , p.x);
 
-        let radVel = pos.mulDotByVector(vel) / pos.mag;
+        let radVel = pos.dot(vel) / pos.mag;
         let cosE = (sma - pos.mag) / (sma * e);
         let sinE = (pos.mag * radVel) / (e * Math.sqrt(mu * sma));
         let ta = Math.atan2((Math.sqrt(1.0 - e * e) * sinE) , (cosE - e));

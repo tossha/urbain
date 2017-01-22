@@ -49,7 +49,7 @@ function initBuiltIn() {
         let traj;
 
         if (trajConfig.type === 'static') {
-            traj = new TrajectoryStaticPosition(frame, new Vector3(trajConfig.data[0], trajConfig.data[1], trajConfig.data[2]));
+            traj = new TrajectoryStaticPosition(frame, new Vector([trajConfig.data[0], trajConfig.data[1], trajConfig.data[2]]));
         } else if (trajConfig.type === 'keplerian') {
             let color = null;
 
@@ -103,7 +103,7 @@ function initBuiltIn() {
                 traj,
                 new Orientation(
                     body.orientation.epoch,
-                    getQuaternionByEuler(
+                    (new Quaternion()).setFromEuler(
                         body.orientation.axisX,
                         body.orientation.axisY,
                         body.orientation.axisZ

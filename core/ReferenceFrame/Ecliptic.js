@@ -7,32 +7,18 @@ class ReferenceFrameEcliptic extends ReferenceFrameAbstract
     stateVectorFromBaseReferenceFrameByEpoch(epoch, state) {
         const originState = TRAJECTORIES[this.origin].getStateByEpoch(epoch, RF_BASE);
 
-        const destinationPos = state.position.sub(originState.position);
-        const destinationVel = state.velocity.sub(originState.velocity);
-
         return new StateVector(
-            destinationPos.x,
-            destinationPos.y,
-            destinationPos.z,
-            destinationVel.x,
-            destinationVel.y,
-            destinationVel.z
+            state.position.sub(originState.position),
+            state.velocity.sub(originState.velocity)
         );
     }
 
     stateVectorToBaseReferenceFrameByEpoch(epoch, state) {
         const originState = TRAJECTORIES[this.origin].getStateByEpoch(epoch, RF_BASE);
 
-        const destinationPos = state.position.add(originState.position);
-        const destinationVel = state.velocity.add(originState.velocity);
-
         return new StateVector(
-            destinationPos.x,
-            destinationPos.y,
-            destinationPos.z,
-            destinationVel.x,
-            destinationVel.y,
-            destinationVel.z
+            state.position.add(originState.position),
+            state.velocity.add(originState.velocity)
         );
     }
 }

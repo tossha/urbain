@@ -15,6 +15,7 @@ function getDirScripts($dir) {
     return $scripts;
 }
 $scripts = array_merge(
+    getDirScripts('vendor'),
     getDirScripts('core'),
     getDirScripts('visual')
 );
@@ -24,7 +25,6 @@ $scripts = array_merge(
 <head>
 <script src="https://threejs.org/build/three.min.js"></script>
 <script src="https://threejs.org/examples/js/controls/OrbitControls.js"></script>
-<script src="vendor/dat.gui.js"></script>
 
 <?php foreach ($scripts as $script) { ?>
 <script src="<?= $script ?>"></script>
