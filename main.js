@@ -2,10 +2,6 @@ function init() {
     let objectsForTracking = {};
 
     camera = new THREE.PerspectiveCamera(60, window.innerWidth / window.innerHeight, 1, 1000000000);
-    camera.position.x = 300000000;
-    camera.position.y = 300000000;
-    camera.position.z = 300000000;
-    camera.up = new THREE.Vector3(0, 0, 1);
 
     scene = new THREE.Scene();
     scene.add(new THREE.AxisHelper(100000000));
@@ -14,8 +10,7 @@ function init() {
     renderer = new THREE.WebGLRenderer();
     renderer.setSize(window.innerWidth, window.innerHeight);
 
-    controls = new THREE.OrbitControls(camera, renderer.domElement);
-    controls.zoomSpeed = 3;
+    controls = new Camera(camera, renderer.domElement);
 
     document.getElementById('viewport').appendChild(renderer.domElement);
 
@@ -148,14 +143,6 @@ function render(curTime) {
     globalTime = curTime;
 
     newTrackingCoords = TRAJECTORIES[settings.trackingObject].getPositionByEpoch(time.epoch, RF_BASE);
-
-    controls.object.position.x += newTrackingCoords.x - trackingCoords.x;
-    controls.object.position.y += newTrackingCoords.y - trackingCoords.y;
-    controls.object.position.z += newTrackingCoords.z - trackingCoords.z;
-
-    controls.target.x = newTrackingCoords.x;
-    controls.target.y = newTrackingCoords.y;
-    controls.target.z = newTrackingCoords.z;
 
     trackingCoords = newTrackingCoords;
     controls.update();
