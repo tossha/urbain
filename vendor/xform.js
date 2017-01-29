@@ -1745,7 +1745,7 @@ var xform = {};
      * @param {Vector} vector - The Vector to rotate by this Quaternion.
      * @returns {Vector} The rotated Vector.
      */
-    Quaternion.prototype.rotate = function(vector) {
+    Quaternion.prototype.rotate_ = function(vector) {
         var v = this.v;
         var t = this.t;
         var cx = Vector.cross(v, [vector[0], vector[1], vector[2]]).scale(2);
@@ -1754,6 +1754,10 @@ var xform = {};
         vector[1] += t * cx[1] + cx2[1];
         vector[2] += t * cx[2] + cx2[2];
         return vector;
+    };
+
+    Quaternion.prototype.rotate = function(vector) {
+        return this.rotate_(Vector.copy(vector));
     };
 
     /**

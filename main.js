@@ -1,16 +1,16 @@
 function init() {
     let objectsForTracking = {};
 
-    camera = new THREE.PerspectiveCamera(60, window.innerWidth / window.innerHeight, 1, 1000000000);
-
     scene = new THREE.Scene();
-    scene.add(new THREE.AxisHelper(100000000));
     scene.add(new THREE.AmbientLight(0xFFEFD5, 0.15));
+
+    axisHelper = new THREE.AxisHelper(100000000);
+    scene.add(axisHelper);
 
     renderer = new THREE.WebGLRenderer();
     renderer.setSize(window.innerWidth, window.innerHeight);
 
-    controls = new Camera(camera, renderer.domElement);
+    camera = new Camera(renderer.domElement, SUN, new Vector([300000000, 300000000, 300000000]));
 
     document.getElementById('viewport').appendChild(renderer.domElement);
 
@@ -133,19 +133,14 @@ function initBuiltIn() {
 
 function firstRender(curTime) {
     globalTime = curTime;
-    trackingCoords = TRAJECTORIES[settings.trackingObject].getPositionByEpoch(time.epoch, RF_BASE);
     requestAnimationFrame(render);
 }
 
 function render(curTime) {
-    let newTrackingCoords;
     time.tick(curTime - globalTime);
     globalTime = curTime;
 
-    newTrackingCoords = TRAJECTORIES[settings.trackingObject].getPositionByEpoch(time.epoch, RF_BASE);
-
-    trackingCoords = newTrackingCoords;
-    controls.update();
+    camera.update(time.epoch);
 
     for (let bodyIdx in BODIES) {
         BODIES[bodyIdx].render(time.epoch);
@@ -168,18 +163,19 @@ function render(curTime) {
         }
     }
 
-    renderer.render(scene, camera);
+    axisHelper.position.fromArray(camera.lastPosition.mul(-1));
+
+    renderer.render(scene, camera.threeCamera);
     requestAnimationFrame(render);
 }
 
 function onWindowResize() {
-    camera.aspect = window.innerWidth / window.innerHeight;
-    camera.updateProjectionMatrix();
+    camera.onResize();
     renderer.setSize(window.innerWidth, window.innerHeight);
 }
 
-var camera, scene, renderer, controls;
-var settings, time, globalTime, trackingCoords;
+var camera, scene, renderer, axisHelper;
+var settings, time, globalTime;
 var textureLoader;
 var lastTrajectoryId = -1;
 var stars;

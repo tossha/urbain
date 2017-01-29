@@ -17,7 +17,7 @@ class Settings
         this.guiMain.add(this, 'timeScale', -2000, 2000);
         this.guiMain.add(this, 'isTimeRunning');
         this.guiMain.add(this, 'trackingObject', initial.objectsForTracking).onChange(function(value) {
-            trackingCoords = TRAJECTORIES[value].getPositionByEpoch(time.epoch, RF_BASE);
+            camera.setOrbitingPoint(value);
         });
 
         const trajectoryMenu = {
