@@ -1,36 +1,34 @@
+<?php
+function getDirScripts($dir) {
+    $scripts = glob($dir . '/*.js');
+
+    foreach(scandir($dir) as $subDir) {
+        if (($subDir{0} === '.')
+            || !is_dir($dir . '/' . $subDir)
+        ) {
+            continue;
+        }
+
+        $scripts = array_merge($scripts, getDirScripts($dir . '/' . $subDir));
+    }
+
+    return $scripts;
+}
+$scripts = array_merge(
+    getDirScripts('vendor'),
+    getDirScripts('core'),
+    getDirScripts('visual')
+);
+?>
 <!DOCTYPE html>
 <html manifest="manifest.appcache">
 <head>
 <script src="https://threejs.org/build/three.min.js"></script>
 <script src="https://threejs.org/examples/js/controls/OrbitControls.js"></script>
 
-<script src="vendor/dat.gui.js"></script>
-<script src="vendor/xform.js"></script>
-<script src="core/App.js"></script>
-<script src="core/Body.js"></script>
-<script src="core/Orientation.js"></script>
-<script src="core/PhysicalBodyModel.js"></script>
-<script src="core/Propagator.js"></script>
-<script src="core/Settings.js"></script>
-<script src="core/StateVector.js"></script>
-<script src="core/TLE.js"></script>
-<script src="core/Time.js"></script>
-<script src="core/ReferenceFrame/Abstract.js"></script>
-<script src="core/ReferenceFrame/Ecliptic.js"></script>
-<script src="core/ReferenceFrame/Equatorial.js"></script>
-<script src="core/ReferenceFrame/Rotating.js"></script>
-<script src="core/Trajectory/Abstract.js"></script>
-<script src="core/Trajectory/KeplerianOrbit.js"></script>
-<script src="core/Trajectory/StateArray.js"></script>
-<script src="core/Trajectory/StaticPosition.js"></script>
-<script src="visual/StarsModel.js"></script>
-<script src="visual/BodyModel/Basic.js"></script>
-<script src="visual/BodyModel/Light.js"></script>
-<script src="visual/Shape/Abstract.js"></script>
-<script src="visual/Shape/Sphere.js"></script>
-<script src="visual/TrajectoryModel/Abstract.js"></script>
-<script src="visual/TrajectoryModel/KeplerianOrbit.js"></script>
-<script src="visual/TrajectoryModel/StateArray.js"></script>
+<?php foreach ($scripts as $script) { ?>
+<script src="<?= $script ?>"></script>
+<?php } ?>
 
 <script src="algebra.js"></script>
 <script src="const.js"></script>

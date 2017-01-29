@@ -1,12 +1,3 @@
-
-class PhysicalBodyModel
-{
-    constructor(mu, radius) {
-        this.mu     = mu;     // gravitational parameter
-        this.radius = radius;
-    }
-}
-
 class Propagator
 {
     constructor(significantBodies, timeStep) {
@@ -46,8 +37,8 @@ class Propagator
             currentEpoch += this.timeStep;
 
             trajectory.addState(currentEpoch, new StateVector(
-                currentPosition.x, currentPosition.y, currentPosition.z,
-                currentVelocity.x, currentVelocity.y, currentVelocity.z
+                currentPosition,
+                currentVelocity
             ));
         }
     }
