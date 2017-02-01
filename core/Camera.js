@@ -100,8 +100,9 @@ class Camera
         let mouseShift = this.currentMousePos.sub(this.accountedMousePos);
 
         if (mouseShift[0] || mouseShift[1]) {
+            let poleAngle = this.position.angle(this.pole);
             let verticalRotationAxis = this.position.cross(this.pole);
-            let verticalQuaternion = (new Quaternion()).setAxisAngle(verticalRotationAxis, mouseShift[1] * 0.01);
+            let verticalQuaternion = new Quaternion(verticalRotationAxis, Math.max(Math.min(mouseShift[1] * 0.01, poleAngle), poleAngle - Math.PI));
             let mainQuaternion = (new Quaternion()).setAxisAngle(this.pole, -mouseShift[0] * 0.01).mul(verticalQuaternion);
 
             mainQuaternion.rotate_(this.position);

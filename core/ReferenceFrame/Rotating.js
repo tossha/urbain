@@ -5,7 +5,7 @@ class ReferenceFrameRotating extends ReferenceFrameAbstract
     }
 
     getQuaternionByEpoch(epoch) {
-        return BODIES[this.origin].orientation.getOrientationByEpoch(epoch);
+        return BODIES[this.origin].orientation.getQuaternionByEpoch(epoch);
     }
 
     getRotationVelocityByEpoch(epoch) {
