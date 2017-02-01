@@ -1,12 +1,16 @@
 class VisualTrajectoryModelKeplerianOrbit extends VisualTrajectoryModelAbstract
 {
+    getKeplerianObject(epoch) {
+        return this.trajectory.keplerianObject;
+    }
+
     render(epoch) {
         const endingBrightness = 0.35;
 
-        const traj = this.trajectory;
-        const centerPos = traj.referenceFrame.transformPositionByEpoch(epoch, ZERO_VECTOR, RF_BASE);
+        const traj = this.getKeplerianObject(epoch);
+        const centerPos = this.trajectory.referenceFrame.transformPositionByEpoch(epoch, ZERO_VECTOR, RF_BASE);
         const dr = -traj.sma * traj.e;
-        const ta = traj.getTrueAnomaly(epoch);
+        const ta = traj.getTrueAnomalyByEpoch(epoch);
         const mainColor = new THREE.Color(this.color);
         let lastVertexIdx;
         let ang = Math.acos(
@@ -42,7 +46,7 @@ class VisualTrajectoryModelKeplerianOrbit extends VisualTrajectoryModelAbstract
             );
         }
 
-        this.threeObj.quaternion.copy(traj.referenceFrame.getQuaternionByEpoch(time.epoch).toThreejs());
+        this.threeObj.quaternion.copy(this.trajectory.referenceFrame.getQuaternionByEpoch(time.epoch).toThreejs());
         this.threeObj.rotation.z = traj.raan;
         this.threeObj.position.fromArray(centerPos.sub(camera.lastPosition));
     }

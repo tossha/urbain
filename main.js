@@ -54,14 +54,17 @@ function initBuiltIn() {
 
             traj = new TrajectoryKeplerianOrbit(
                 frame,
-                trajConfig.data.mu,
-                trajConfig.data.sma,
-                trajConfig.data.e,
-                deg2rad(trajConfig.data.inc),
-                deg2rad(trajConfig.data.raan),
-                deg2rad(trajConfig.data.aop),
-                deg2rad(trajConfig.data.ta),
-                trajConfig.data.epoch,
+                new KeplerianObject(
+                    trajConfig.data.e,
+                    trajConfig.data.sma,
+                    deg2rad(trajConfig.data.aop),
+                    deg2rad(trajConfig.data.inc),
+                    deg2rad(trajConfig.data.raan),
+                    deg2rad(trajConfig.data.ta),
+                    trajConfig.data.epoch,
+                    trajConfig.data.mu,
+                    true
+                ),
                 color
             );
         }
@@ -116,14 +119,17 @@ function initBuiltIn() {
 
         TRAJECTORIES[objId] = new TrajectoryKeplerianOrbit(
             App.getReferenceFrame(EARTH, RF_TYPE_EQUATORIAL),
-            BODIES[EARTH].physicalModel.mu,
-            tle.getSma(),
-            tle.getE(),
-            tle.getInc(),
-            tle.getRaan(),
-            tle.getAop(),
-            tle.getMeanAnomaly(),
-            tle.getEpoch(),
+            new KeplerianObject(
+                tle.getE(),
+                tle.getSma(),
+                tle.getAop(),
+                tle.getInc(),
+                tle.getRaan(),
+                tle.getMeanAnomaly(),
+                tle.getEpoch(),
+                BODIES[EARTH].physicalModel.mu,
+                false
+            ),
             TLEDATA[id].color ? TLEDATA[id].color : 'azure',
             false
         );
