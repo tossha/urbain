@@ -107,16 +107,19 @@ class Settings
                 if (!TRAJECTORIES[lastTrajectoryId]) {
                     TRAJECTORIES[lastTrajectoryId] = new TrajectoryKeplerianOrbit(
                         App.getReferenceFrame(that.trackingObject, RF_TYPE_ECLIPTIC),
-                        BODIES[that.trackingObject]
-                            ? BODIES[that.trackingObject].physicalModel.mu
-                            : 0,
-                        that.trajectorySettings.sma,
-                        that.trajectorySettings.e,
-                        deg2rad(that.trajectorySettings.inc ),
-                        deg2rad(that.trajectorySettings.raan),
-                        deg2rad(that.trajectorySettings.aop ),
-                        deg2rad(that.trajectorySettings.ta  ),
-                        time.epoch,
+                        new KeplerianObject(
+                            that.trajectorySettings.e,
+                            that.trajectorySettings.sma,
+                            deg2rad(that.trajectorySettings.aop ),
+                            deg2rad(that.trajectorySettings.inc ),
+                            deg2rad(that.trajectorySettings.raan),
+                            deg2rad(that.trajectorySettings.ta  ),
+                            time.epoch,
+                            BODIES[that.trackingObject]
+                                ? BODIES[that.trackingObject].physicalModel.mu
+                                : 0,
+                            true
+                        ),
                         '#00ff00'
                     );
                 }

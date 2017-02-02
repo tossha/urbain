@@ -15,7 +15,7 @@ class VisualBodyModelBasic
         scene.add(this.threeObj);
         scene.add(this.axisHelper);
 
-        if (texturePath !== undefined) {
+        if (texturePath) {
             var that = this;
 
             textureLoader.load(
