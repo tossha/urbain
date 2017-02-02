@@ -10,7 +10,7 @@ function init() {
     renderer = new THREE.WebGLRenderer();
     renderer.setSize(window.innerWidth, window.innerHeight);
 
-    camera = new Camera(renderer.domElement, SUN, new Vector([300000000, 300000000, 300000000]));
+    camera = new Camera(renderer.domElement, EARTH, new Vector([300000, 300000, 300000]));
 
     document.getElementById('viewport').appendChild(renderer.domElement);
 
@@ -28,7 +28,7 @@ function init() {
         timeLinePos:        504921600,
         timeScale:          100,
         isTimeRunning:      true,
-        trackingObject:     SUN,
+        trackingObject:     EARTH,
         objectsForTracking: objectsForTracking,
     });
 
@@ -88,6 +88,13 @@ function initBuiltIn() {
                     body.visual.color,
                     body.visual.texture
                 );
+            let orientation = body.iauOrientation
+                ? new OrientationIAUModel(
+                    body.iauOrientation.ra,
+                    body.iauOrientation.dec,
+                    body.iauOrientation.pm
+                )
+                : new OrientationConstantAxis([0, 0, 1e-10]);
 
             BODIES[bodyId] = new Body(
                 visualModel,
@@ -96,15 +103,7 @@ function initBuiltIn() {
                     body.phys.r
                 ),
                 traj,
-                new Orientation(
-                    body.orientation.epoch,
-                    (new Quaternion()).setFromEuler(
-                        body.orientation.axisX,
-                        body.orientation.axisY,
-                        body.orientation.axisZ
-                    ),
-                    body.orientation.angVel
-                )
+                orientation
             );
         }
     }

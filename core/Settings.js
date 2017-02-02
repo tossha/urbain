@@ -12,9 +12,11 @@ class Settings
         this.timeScale = initial.timeScale;
         this.isTimeRunning = initial.isTimeRunning;
         this.trackingObject = initial.trackingObject;
+        this.currentDate = '';
 
         this.timeLineController = this.guiTimeLine.add(this, 'timeLine', initial.timeLineStart, initial.timeLineEnd);
         this.guiMain.add(this, 'timeScale', -2000, 2000);
+        this.guiMain.add(this, 'currentDate').listen();
         this.guiMain.add(this, 'isTimeRunning');
         this.guiMain.add(this, 'trackingObject', initial.objectsForTracking).onChange(function(value) {
             camera.setOrbitingPoint(value);

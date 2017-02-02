@@ -5,7 +5,7 @@ class ReferenceFrameEquatorial extends ReferenceFrameAbstract
     }
 
     getQuaternionByEpoch(epoch) {
-        return BODIES[this.origin].orientation.getOrientationByEpoch(epoch);
+        return BODIES[this.origin].orientation.getQuaternionByEpoch(0);
     }
 
     stateVectorFromBaseReferenceFrameByEpoch(epoch, state) {

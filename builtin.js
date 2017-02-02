@@ -44,12 +44,10 @@ const SSDATA = {
             r: 695990,
             texture: 'SunTexture.jpg'
         },
-        orientation: {
-            epoch: 0,
-            axisX: 0,
-            axisY: 0,
-            axisZ: 0,
-            angVel: 0.00000
+        iauOrientation: {
+            ra: [286.13, 0, 0],
+            dec: [63.87, 0, 0],
+            pm: [84.176, 14.1844, 0]
         }
     },
     "199": {
@@ -82,12 +80,10 @@ const SSDATA = {
             r: 2440,
             texture: 'MercuryTexture.jpg'
         },
-        orientation: {
-            epoch: 0,
-            axisX: 0,
-            axisY: 0,
-            axisZ: 0,
-            angVel: 0.00000
+        iauOrientation: {
+            ra: [281.0097, -0.0328, 0],
+            dec: [61.4143, -0.0049, 0],
+            pm: [329.5469, 6.1385025, 0]
         }
     },
     "299": {
@@ -120,12 +116,10 @@ const SSDATA = {
             r: 6051.9,
             texture: 'VenusTexture.jpg'
         },
-        orientation: {
-            epoch: 0,
-            axisX: 0,
-            axisY: 0,
-            axisZ: 0,
-            angVel: 0.00000
+        iauOrientation: {
+            ra: [272.76, 0, 0],
+            dec: [67.16, 0, 0],
+            pm: [160.20, -1.4813688, 0]
         }
     },
     "3": {
@@ -180,12 +174,10 @@ const SSDATA = {
             r: 6378.1363,
             texture: 'EarthTexture.jpg'
         },
-        orientation: {
-            epoch: 0,
-            axisX: 0.4087561108170719,
-            axisY: 0,
-            axisZ: 0,
-            angVel: 0.00007292123516990375
+        iauOrientation: {
+            ra: [0, -0.641, 0],
+            dec: [90, -0.557, 0],
+            pm: [190.147, 360.9856235, 0]
         }
     },
     "301": {
@@ -218,12 +210,10 @@ const SSDATA = {
             r: 1738.2,
             texture: 'MoonTexture.jpg'
         },
-        orientation: {
-            epoch: 0,
-            axisX: 0,
-            axisY: 0,
-            axisZ: 0,
-            angVel: 0.00000
+        iauOrientation: {
+            ra: [269.9949, 0.0031, 0],
+            dec: [66.5392, 0.0130, 0],
+            pm: [38.3213, 13.17635815, 0]
         }
     },
     "499": {
@@ -256,12 +246,10 @@ const SSDATA = {
             r: 3389.5,
             texture: 'MarsTexture.jpg'
         },
-        orientation: {
-            epoch: 0,
-            axisX: 0,
-            axisY: 0,
-            axisZ: 0,
-            angVel: 0.00000
+        iauOrientation: {
+            ra: [317.68143, -0.1061, 0],
+            dec: [52.88650, -0.0609, 0],
+            pm: [176.630, 350.89198226, 0]
         }
     },
     "599": {
@@ -294,12 +282,10 @@ const SSDATA = {
             r: 69911,
             texture: 'JupiterTexture.jpg'
         },
-        orientation: {
-            epoch: 0,
-            axisX: 0,
-            axisY: 0,
-            axisZ: 0,
-            angVel: 0.00000
+        iauOrientation: {
+            ra: [268.056595, -0.006499, 0],
+            dec: [64.495303, 0.002413, 0],
+            pm: [284.95, 870.536, 0]
         }
     },
     "699": {
@@ -331,12 +317,10 @@ const SSDATA = {
             color: 'sandybrown',
             r: 58232
         },
-        orientation: {
-            epoch: 0,
-            axisX: 0,
-            axisY: 0,
-            axisZ: 0,
-            angVel: 0.00000
+        iauOrientation: {
+            ra: [40.589, -0.036, 0],
+            dec: [83.537, -0.004, 0],
+            pm: [38.90, 810.7939024, 0]
         }
     },
     "799": {
@@ -368,12 +352,10 @@ const SSDATA = {
             color: 'lightskyblue',
             r: 25362
         },
-        orientation: {
-            epoch: 0,
-            axisX: 0,
-            axisY: 0,
-            axisZ: 0,
-            angVel: 0.00000
+        iauOrientation: {
+            ra: [257.311, 0, 0],
+            dec: [-15.175, 0, 0],
+            pm: [203.81, -501.1600928, 0]
         }
     },
     "899": {
@@ -405,12 +387,10 @@ const SSDATA = {
             color: 'steelblue',
             r: 24624
         },
-        orientation: {
-            epoch: 0,
-            axisX: 0,
-            axisY: 0,
-            axisZ: 0,
-            angVel: 0.00000
+        iauOrientation: {
+            ra: [299.36, 0, 0],
+            dec: [43.46, 0, 0],
+            pm: [253.18, 536.3128492, 0]
         }
     },
     "9": {
@@ -464,12 +444,10 @@ const SSDATA = {
             color: 'tan',
             r: 1195
         },
-        orientation: {
-            epoch: 0,
-            axisX: 0,
-            axisY: 0,
-            axisZ: 0,
-            angVel: 0.00000
+        iauOrientation: {
+            ra: [312.993, 0, 0],
+            dec: [6.163, 0, 0],
+            pm: [237.305, -56.3625225, 0]
         }
     },
     "901": {
@@ -501,12 +479,10 @@ const SSDATA = {
             color: 'rosybrown',
             r: 605
         },
-        orientation: {
-            epoch: 0,
-            axisX: 0,
-            axisY: 0,
-            axisZ: 0,
-            angVel: 0.00000
+        iauOrientation: {
+            ra: [312.993,0, 0],
+            dec: [6.163, 0, 0],
+            pm: [57.305, -56.3625225, 0]
         }
     }
 };
