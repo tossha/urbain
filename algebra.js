@@ -12,8 +12,8 @@ function rad2deg(radians) {
 }
 
 function approximateAngle(ang1, ang2, proportion) {
-    ang1 = (ang1 + TWO_PI) % TWO_PI;
-    ang2 = (ang2 + TWO_PI) % TWO_PI;
+    ang1 = ((ang1 % TWO_PI) + TWO_PI) % TWO_PI;
+    ang2 = ((ang2 % TWO_PI) + TWO_PI) % TWO_PI;
 
     let diff = ang2 - ang1;
 

@@ -47,10 +47,10 @@ class TrajectoryKeplerianArray extends TrajectoryAbstract
             return this.keplerianObjects[this.keplerianObjects.length - 1].getStateByEpoch(epoch);
         }
 
-        let nextIdx = Math.ceil((epoch - this.minEpoch) / (this.maxEpoch - this.minEpoch));
+        let nextIdx = Math.ceil((epoch - this.minEpoch) / (this.maxEpoch - this.minEpoch) * (this.keplerianObjects.length - 1));
         let searchDirection = this.keplerianObjects[nextIdx].epoch > epoch ? -1 : 1;
 
-        while ((nextIdx < this.states.length) && (nextIdx > 0)) {
+        while ((nextIdx < this.keplerianObjects.length) && (nextIdx > 0)) {
             if ((this.keplerianObjects[nextIdx].epoch > epoch)
                 && (this.keplerianObjects[nextIdx - 1].epoch < epoch)
             ) {
@@ -59,20 +59,20 @@ class TrajectoryKeplerianArray extends TrajectoryAbstract
             nextIdx += searchDirection;
         }
 
-        if ((nextIdx === this.states.length) || (nextIdx === 0)) {
+        if ((nextIdx === this.keplerianObjects.length) || (nextIdx === 0)) {
             nextIdx -= searchDirection;
         }
 
         return this.approximateKeplerianObject(
-            this.keplerianObjects[nextIdx],
             this.keplerianObjects[nextIdx - 1],
+            this.keplerianObjects[nextIdx],
             epoch
         );
     }
 
     approximateKeplerianObject(object1, object2, epoch) {
         const proportion = (epoch - object1.epoch) / (object2.epoch - object1.epoch);
-        return KeplerianObject(
+        return new KeplerianObject(
             approximateNumber(object1.e, object2.e, proportion),
             approximateNumber(object1.sma, object2.sma, proportion),
             approximateAngle(object1.aop, object2.aop, proportion),
