@@ -36,7 +36,7 @@ class VisualBodyModelBasic
     }
 
     render(epoch, pos) {
-        this.threeObj.position.set(pos[0], pos[1], pos[2]);
+        this.threeObj.position.fromArray(pos.sub(camera.lastPosition));
         this.threeObj.quaternion.copy(
             this.body.orientation.getOrientationByEpoch(epoch).toThreejs()
         );

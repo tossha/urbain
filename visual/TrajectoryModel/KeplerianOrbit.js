@@ -44,6 +44,6 @@ class VisualTrajectoryModelKeplerianOrbit extends VisualTrajectoryModelAbstract
 
         this.threeObj.quaternion.copy(traj.referenceFrame.getQuaternionByEpoch(time.epoch).toThreejs());
         this.threeObj.rotation.z = traj.raan;
-        this.threeObj.position.set(centerPos.x, centerPos.y, centerPos.z);
+        this.threeObj.position.fromArray(centerPos.sub(camera.lastPosition));
     }
 }
