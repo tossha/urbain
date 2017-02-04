@@ -145,7 +145,29 @@ class Settings
 
                 that.guiAddTrajectoryElements.addTrajectoryFolder.open();
                 that.guiAddTrajectoryElements.settingsFolder.close();
-            }
+            },
+
+            testFunction: function() {//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+                if (BODIES[that.trackingObject] !== undefined) {
+                    helperPlane = new HelperPlane(that.trackingObject);
+                };
+
+                let myVector = new THREE.Vector3(0, 0, 1);
+                let myQuat = (new THREE.Quaternion).setFromAxisAngle(new THREE.Vector3(1, 0, 0), Math.PI / 4);
+                let planePos = getPlanePosition(myVector, myQuat);
+                var plane = new THREEHelperPlane(planePos.normal, planePos.distance);
+
+                var isCreatingActive = true; 
+                that.guiAddTrajectoryElements.addTrajectoryFolder.open();
+                that.guiAddTrajectoryElements.settingsFolder.close();
+            },
+
+            cancelFunction: function() {
+
+                var isCreatingActive = false;
+                that.guiAddTrajectoryElements.addTrajectoryFolder.open();
+                that.guiAddTrajectoryElements.settingsFolder.close();
+            }//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
         };
 
         this.guiAddTrajectoryElements.settingsFolder = this.guiAddTrajectory.addFolder("trajectory settings");
@@ -211,6 +233,9 @@ class Settings
         this.guiAddTrajectoryElements.addTrajectoryFolder.open();
 
         this.guiAddTrajectory.add(this.trajectorySettings, 'dropLastTrajectory');
+
+        this.guiAddTrajectory.add(this.trajectorySettings, 'testFunction');//////////////////////////////////////////////////////////////////////////////////////
+        this.guiAddTrajectory.add(this.trajectorySettings, 'cancelFunction');
         document.getElementById('leftPanel').appendChild(this.guiAddTrajectory.domElement);
     }
 }

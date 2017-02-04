@@ -80,6 +80,10 @@ class Camera
         } else if (event.deltaY > 0) {
             this.position.scale(koeff);
         }
+
+        if (helperPlane) {
+            helperPlane.onZoom(this.position.mag);
+        }
     }
 
     onMouseDown(event) {

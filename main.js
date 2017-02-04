@@ -113,6 +113,10 @@ function render(curTime) {
 
     axisHelper.position.fromArray(camera.lastPosition.mul(-1));
 
+    if (helperPlane) {
+        helperPlane.update(time.epoch);
+    }
+
     renderer.render(scene, camera.threeCamera);
     statistics.update();
     requestAnimationFrame(render);
@@ -132,6 +136,7 @@ var trajArray = [];
 var selection;
 var statistics;
 var rendererEvents;
+var helperPlane;
 
 window.onload = function () {
     init();
