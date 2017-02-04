@@ -10,9 +10,12 @@ class VisualBodyModelBasic
             this.getMaterial({color: this.color, wireframe: true})
         );
 
-        scene.add(this.threeObj);
+        this.axisHelper = new THREE.AxisHelper(shape.radius * 2);
 
-        if (texturePath !== undefined) {
+        scene.add(this.threeObj);
+        scene.add(this.axisHelper);
+
+        if (texturePath) {
             var that = this;
 
             textureLoader.load(
@@ -36,9 +39,11 @@ class VisualBodyModelBasic
     }
 
     render(epoch, pos) {
-        this.threeObj.position.set(pos[0], pos[1], pos[2]);
+        this.threeObj.position.fromArray(pos.sub(camera.lastPosition));
         this.threeObj.quaternion.copy(
-            this.body.orientation.getOrientationByEpoch(epoch).toThreejs()
+            this.body.orientation.getQuaternionByEpoch(epoch).toThreejs()
         );
+        this.axisHelper.position.copy(this.threeObj.position);
+        this.axisHelper.quaternion.copy(this.threeObj.quaternion);
     }
 }

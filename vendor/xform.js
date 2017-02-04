@@ -511,6 +511,10 @@ var xform = {};
         return temp.sub_(vec);
     };
 
+    Vector.prototype.angle = function(vec) {
+        return Math.acos(this.dot(vec) / this.mag / vec.mag);
+    };
+
     /**
      * Scales each entry of this Vector by scalar.
      *
@@ -1566,10 +1570,14 @@ var xform = {};
      * @class
      * @extends Dimensional
      */
-    function Quaternion() {
+    function Quaternion(vector, angle) {
         this.t = 1;
         this.v = new Vector(3);
         this.dim = new Dimensions(4);
+
+        if (vector instanceof Array) {
+            this.setAxisAngle(vector || [1, 0, 0], angle || 0);
+        }
     }
     Quaternion.prototype = Object.create(Dimensional.prototype);
     Quaternion.prototype.constructor = Quaternion;
@@ -1588,6 +1596,22 @@ var xform = {};
         out.v = Vector.copy(q.v);
         out.dim = Dimensions.copy(q.dim);
         return out;
+    };
+
+    Quaternion.transfer = function(fromVector, toVector) {
+        const angle = Math.acos(fromVector.dot(toVector) / fromVector.mag / toVector.mag);
+
+        if (angle) {
+            return new Quaternion(
+                fromVector.cross(toVector),
+                Math.acos(fromVector.dot(toVector) / fromVector.mag / toVector.mag)
+            );
+        } else {
+            let result  = new Quaternion();
+            result.t = 1;
+            result.v.set([0, 0, 0]);
+            return result;
+        }
     };
 
     /**
@@ -1745,7 +1769,7 @@ var xform = {};
      * @param {Vector} vector - The Vector to rotate by this Quaternion.
      * @returns {Vector} The rotated Vector.
      */
-    Quaternion.prototype.rotate = function(vector) {
+    Quaternion.prototype.rotate_ = function(vector) {
         var v = this.v;
         var t = this.t;
         var cx = Vector.cross(v, [vector[0], vector[1], vector[2]]).scale(2);
@@ -1754,6 +1778,10 @@ var xform = {};
         vector[1] += t * cx[1] + cx2[1];
         vector[2] += t * cx[2] + cx2[2];
         return vector;
+    };
+
+    Quaternion.prototype.rotate = function(vector) {
+        return this.rotate_(Vector.copy(vector));
     };
 
     /**
@@ -1812,19 +1840,66 @@ var xform = {};
         return this;
     };
 
-    Quaternion.prototype.setFromEuler = function(x, y, z) {
-        const cosX = Math.cos(x / 2);
-        const cosY = Math.cos(y / 2);
-        const cosZ = Math.cos(z / 2);
-        const sinX = Math.sin(x / 2);
-        const sinY = Math.sin(y / 2);
-        const sinZ = Math.sin(z / 2);
-        this.t = cosX * cosY * cosZ + sinX * sinY * sinZ;
-        this.v.set([
-            sinX * cosY * cosZ - cosX * sinY * sinZ,
-            cosX * sinY * cosZ + sinX * cosY * sinZ,
-            cosX * cosY * sinZ - sinX * sinY * cosZ
-        ]);
+    Quaternion.prototype.setFromEuler = function(x, y, z, order) {
+        const c1 = Math.cos(x / 2);
+        const c2 = Math.cos(y / 2);
+        const c3 = Math.cos(z / 2);
+        const s1 = Math.sin(x / 2);
+        const s2 = Math.sin(y / 2);
+        const s3 = Math.sin(z / 2);
+
+        order = order || 'ZYX';
+
+        if (order === 'XYZ') {
+            this.v.set([
+                s1 * c2 * c3 + c1 * s2 * s3,
+                c1 * s2 * c3 - s1 * c2 * s3,
+                c1 * c2 * s3 + s1 * s2 * c3
+            ]);
+            this.t = c1 * c2 * c3 - s1 * s2 * s3;
+        } else if (order === 'YXZ') {
+            this.v.set([
+                s1 * c2 * c3 + c1 * s2 * s3,
+                c1 * s2 * c3 - s1 * c2 * s3,
+                c1 * c2 * s3 - s1 * s2 * c3
+            ]);
+            this.t = c1 * c2 * c3 + s1 * s2 * s3;
+        } else if (order === 'ZXY') {
+            this.v.set([
+                s1 * c2 * c3 - c1 * s2 * s3,
+                c1 * s2 * c3 + s1 * c2 * s3,
+                c1 * c2 * s3 + s1 * s2 * c3
+            ]);
+            this.t = c1 * c2 * c3 - s1 * s2 * s3;
+        } else if (order === 'ZYX') {
+            this.v.set([
+                s1 * c2 * c3 - c1 * s2 * s3,
+                c1 * s2 * c3 + s1 * c2 * s3,
+                c1 * c2 * s3 - s1 * s2 * c3
+            ]);
+            this.t = c1 * c2 * c3 + s1 * s2 * s3;
+        } else if (order === 'YZX') {
+            this.v.set([
+                s1 * c2 * c3 + c1 * s2 * s3,
+                c1 * s2 * c3 + s1 * c2 * s3,
+                c1 * c2 * s3 - s1 * s2 * c3
+            ]);
+            this.t = c1 * c2 * c3 - s1 * s2 * s3;
+        } else if (order === 'XZY') {
+            this.v.set([
+                s1 * c2 * c3 - c1 * s2 * s3,
+                c1 * s2 * c3 - s1 * c2 * s3,
+                c1 * c2 * s3 + s1 * s2 * c3
+            ]);
+            this.t = c1 * c2 * c3 + s1 * s2 * s3;
+        } else if (order === 'ZXZ') {
+            this.v.set([
+                Math.cos((x - z) / 2) * s2,
+                Math.sin((x - z) / 2) * s2,
+                Math.sin((x + z) / 2) * c2
+            ]);
+            this.t = Math.cos((x + z) / 2) * c2
+        }
         return this;
     };
 

@@ -4,7 +4,7 @@ class Body
         this.visualModel   = visualModel;    // class VisualBodyModelBasic
         this.physicalModel = physicalModel;  // class PhysicalBodyModel
         this.trajectory    = trajectory;     // class TrajectoryAbstract
-        this.orientation   = orientation;
+        this.orientation   = orientation;    // class OrientationAbstract
         this.visualModel.body = this;
     }
 

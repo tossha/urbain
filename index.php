@@ -17,7 +17,8 @@ function getDirScripts($dir) {
 $scripts = array_merge(
     getDirScripts('vendor'),
     getDirScripts('core'),
-    getDirScripts('visual')
+    getDirScripts('visual'),
+    getDirScripts('interface')
 );
 ?>
 <!DOCTYPE html>
@@ -32,6 +33,7 @@ $scripts = array_merge(
 
 <script src="algebra.js"></script>
 <script src="const.js"></script>
+<script src="ssdata.js"></script>
 <style type="text/css">
 
     body {

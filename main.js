@@ -1,21 +1,16 @@
 function init() {
     let objectsForTracking = {};
 
-    camera = new THREE.PerspectiveCamera(60, window.innerWidth / window.innerHeight, 1, 1000000000);
-    camera.position.x = 300000000;
-    camera.position.y = 300000000;
-    camera.position.z = 300000000;
-    camera.up = new THREE.Vector3(0, 0, 1);
-
     scene = new THREE.Scene();
-    scene.add(new THREE.AxisHelper(100000000));
     scene.add(new THREE.AmbientLight(0xFFEFD5, 0.15));
+
+    axisHelper = new THREE.AxisHelper(100000000);
+    scene.add(axisHelper);
 
     renderer = new THREE.WebGLRenderer();
     renderer.setSize(window.innerWidth, window.innerHeight);
 
-    controls = new THREE.OrbitControls(camera, renderer.domElement);
-    controls.zoomSpeed = 3;
+    camera = new Camera(renderer.domElement, EARTH, new Vector([300000, 300000, 300000]));
 
     document.getElementById('viewport').appendChild(renderer.domElement);
 
@@ -33,7 +28,7 @@ function init() {
         timeLinePos:        504921600,
         timeScale:          100,
         isTimeRunning:      true,
-        trackingObject:     SUN,
+        trackingObject:     EARTH,
         objectsForTracking: objectsForTracking,
     });
 
@@ -41,78 +36,7 @@ function init() {
 }
 
 function initBuiltIn() {
-    for (let id in SSDATA) {
-        const body = SSDATA[id];
-        const bodyId = parseInt(id);
-        const trajConfig = body.traj;
-        const frame = App.getReferenceFrame(trajConfig.rf.origin, trajConfig.rf.type);
-        let traj;
-
-        if (trajConfig.type === 'static') {
-            traj = new TrajectoryStaticPosition(frame, new Vector([trajConfig.data[0], trajConfig.data[1], trajConfig.data[2]]));
-        } else if (trajConfig.type === 'keplerian') {
-            let color = null;
-
-            if (trajConfig.color !== undefined) {
-                color = trajConfig.color;
-            }
-
-            traj = new TrajectoryKeplerianOrbit(
-                frame,
-                trajConfig.data.mu,
-                trajConfig.data.sma,
-                trajConfig.data.e,
-                deg2rad(trajConfig.data.inc),
-                deg2rad(trajConfig.data.raan),
-                deg2rad(trajConfig.data.aop),
-                deg2rad(trajConfig.data.ta),
-                trajConfig.data.epoch,
-                color
-            );
-        }
-
-        TRAJECTORIES[bodyId] = traj;
-
-        if (body.type === 'body') {
-            let visualShape = new VisualShapeSphere(
-                body.visual.r,
-                body.visual.texture ? 32 : 12
-            );
-            let visualModel = (bodyId == SUN)
-                ? new VisualBodyModelLight(
-                    visualShape,
-                    body.visual.color,
-                    body.visual.texture,
-                    body.visual.lightColor,
-                    body.visual.lightIntensity,
-                    body.visual.lightDistance,
-                    body.visual.lightDecay
-                )
-                : new VisualBodyModelBasic(
-                    visualShape,
-                    body.visual.color,
-                    body.visual.texture
-                );
-
-            BODIES[bodyId] = new Body(
-                visualModel,
-                new PhysicalBodyModel(
-                    body.phys.mu,
-                    body.phys.r
-                ),
-                traj,
-                new Orientation(
-                    body.orientation.epoch,
-                    (new Quaternion()).setFromEuler(
-                        body.orientation.axisX,
-                        body.orientation.axisY,
-                        body.orientation.axisZ
-                    ),
-                    body.orientation.angVel
-                )
-            );
-        }
-    }
+    ObjectLoader.loadFromCnfig(SSDATA);
 
     stars = new VisualStarsModel(STARDATA);
 
@@ -122,14 +46,17 @@ function initBuiltIn() {
 
         TRAJECTORIES[objId] = new TrajectoryKeplerianOrbit(
             App.getReferenceFrame(EARTH, RF_TYPE_EQUATORIAL),
-            BODIES[EARTH].physicalModel.mu,
-            tle.getSma(),
-            tle.getE(),
-            tle.getInc(),
-            tle.getRaan(),
-            tle.getAop(),
-            tle.getMeanAnomaly(),
-            tle.getEpoch(),
+            new KeplerianObject(
+                tle.getE(),
+                tle.getSma(),
+                tle.getAop(),
+                tle.getInc(),
+                tle.getRaan(),
+                tle.getMeanAnomaly(),
+                tle.getEpoch(),
+                BODIES[EARTH].physicalModel.mu,
+                false
+            ),
             TLEDATA[id].color ? TLEDATA[id].color : 'azure',
             false
         );
@@ -138,27 +65,14 @@ function initBuiltIn() {
 
 function firstRender(curTime) {
     globalTime = curTime;
-    trackingCoords = TRAJECTORIES[settings.trackingObject].getPositionByEpoch(time.epoch, RF_BASE);
     requestAnimationFrame(render);
 }
 
 function render(curTime) {
-    let newTrackingCoords;
     time.tick(curTime - globalTime);
     globalTime = curTime;
 
-    newTrackingCoords = TRAJECTORIES[settings.trackingObject].getPositionByEpoch(time.epoch, RF_BASE);
-
-    controls.object.position.x += newTrackingCoords.x - trackingCoords.x;
-    controls.object.position.y += newTrackingCoords.y - trackingCoords.y;
-    controls.object.position.z += newTrackingCoords.z - trackingCoords.z;
-
-    controls.target.x = newTrackingCoords.x;
-    controls.target.y = newTrackingCoords.y;
-    controls.target.z = newTrackingCoords.z;
-
-    trackingCoords = newTrackingCoords;
-    controls.update();
+    camera.update(time.epoch);
 
     for (let bodyIdx in BODIES) {
         BODIES[bodyIdx].render(time.epoch);
@@ -181,18 +95,19 @@ function render(curTime) {
         }
     }
 
-    renderer.render(scene, camera);
+    axisHelper.position.fromArray(camera.lastPosition.mul(-1));
+
+    renderer.render(scene, camera.threeCamera);
     requestAnimationFrame(render);
 }
 
 function onWindowResize() {
-    camera.aspect = window.innerWidth / window.innerHeight;
-    camera.updateProjectionMatrix();
+    camera.onResize();
     renderer.setSize(window.innerWidth, window.innerHeight);
 }
 
-var camera, scene, renderer, controls;
-var settings, time, globalTime, trackingCoords;
+var camera, scene, renderer, axisHelper;
+var settings, time, globalTime;
 var textureLoader;
 var lastTrajectoryId = -1;
 var stars;

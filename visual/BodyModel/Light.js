@@ -9,7 +9,7 @@ class VisualBodyModelLight extends VisualBodyModelBasic
 
     render(epoch, pos) {
         super.render(epoch, pos);
-        this.light.position.set(pos.x, pos.y, pos.z);
+        this.light.position.fromArray(pos.sub(camera.lastPosition));
     }
 
     getMaterial(parameters) {
