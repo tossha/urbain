@@ -148,23 +148,29 @@ class Settings
             },
 
             testFunction: function() {//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-                if (BODIES[that.trackingObject] !== undefined) {
-                    helperPlane = new HelperPlane(that.trackingObject);
+                if (isCreatingActive !== true) {
+
+                    if (BODIES[that.trackingObject] !== undefined) {
+                                        helperPlane = new HelperPlane(that.trackingObject);
+                    };
+
+                    let myVector = new THREE.Vector3(0, 0, 1);
+                    let myQuat = (new THREE.Quaternion).setFromAxisAngle(new THREE.Vector3(1, 0, 0), Math.PI / 4);
+                    let planePos = getPlanePosition(myVector, myQuat);
+                    var plane = new THREEHelperPlane(planePos.normal, planePos.distance);
                 };
 
-                let myVector = new THREE.Vector3(0, 0, 1);
-                let myQuat = (new THREE.Quaternion).setFromAxisAngle(new THREE.Vector3(1, 0, 0), Math.PI / 4);
-                let planePos = getPlanePosition(myVector, myQuat);
-                var plane = new THREEHelperPlane(planePos.normal, planePos.distance);
-
-                var isCreatingActive = true; 
+                isCreatingActive = true; 
                 that.guiAddTrajectoryElements.addTrajectoryFolder.open();
                 that.guiAddTrajectoryElements.settingsFolder.close();
             },
 
             cancelFunction: function() {
+                if (isCreatingActive) {
+                    helperPlane.remove();
 
-                var isCreatingActive = false;
+                    isCreatingActive = false;
+                };
                 that.guiAddTrajectoryElements.addTrajectoryFolder.open();
                 that.guiAddTrajectoryElements.settingsFolder.close();
             }//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////

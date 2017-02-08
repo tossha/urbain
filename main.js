@@ -125,7 +125,7 @@ function onWindowResize() {
     camera.onResize();
 }
 
-var camera, scene, renderer, axisHelper, raycaster;
+var camera, scene, renderer, axisHelper, raycaster, isCreatingActive;
 var settings, time, globalTime;
 var textureLoader;
 var lastTrajectoryId = -1;
