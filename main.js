@@ -18,6 +18,8 @@ function init() {
 
     textureLoader = new THREE.TextureLoader();
 
+    raycaster = new VisualRaycaster(camera.threeCamera);
+
     for (let objId in SSDATA) {
         objectsForTracking[SSDATA[objId].name] = objId;
     }
@@ -85,6 +87,11 @@ function render(curTime) {
         TRAJECTORIES[trajIdx].render(time.epoch);
     }
 
+    document.dispatchEvent(new CustomEvent(
+        'vr_render',
+        {detail: {epoch: time.epoch}}
+    ));
+
     const trajectoryMenu = settings.currentTrajectoryMenu;
     const state = TRAJECTORIES[settings.trackingObject].getStateByEpoch(time.epoch, RF_BASE);
     for (let group of ['velocity', 'position']) {
@@ -106,7 +113,7 @@ function onWindowResize() {
     renderer.setSize(window.innerWidth, window.innerHeight);
 }
 
-var camera, scene, renderer, axisHelper;
+var camera, scene, renderer, axisHelper, raycaster;
 var settings, time, globalTime;
 var textureLoader;
 var lastTrajectoryId = -1;
