@@ -1,4 +1,5 @@
-class THREEHelperPlane extends THREE.Plane {
+class THREEHelperPlane extends THREE.Plane 
+{
     raycast(raycaster, intersects) {
         debugger;
     }
@@ -7,18 +8,23 @@ class THREEHelperPlane extends THREE.Plane {
 class HelperPlane
 {
     constructor(centerObject) {
-        let pos = TRAJECTORIES[centerObject].getPositionByEpoch(time.epoch, RF_BASE);
+        this.centerObject = centerObject;
+
         let pow = Math.round(Math.log2(camera.position.mag)); // not supported in some browsers
         //let pow = Math.round(Math.log(camera.position.mag) / Math.log(2));
 
-        this.centerObject = centerObject;
+        this.render(pow);
+    }
+
+    render(pow) {
+        let pos = TRAJECTORIES[this.centerObject].getPositionByEpoch(time.epoch, RF_BASE);
         this.gridParam = pow;
         this.threeGrid = new THREE.PolarGridHelper(Math.pow(2, pow),
                                                    32,
-                                                   Math.pow(2, pow) / BODIES[this.centerObject].physicalModel.radius,
+                                                   32,
                                                    200);
         this.threeGrid.position.fromArray(pos.sub(camera.lastPosition));
-        this.threeGrid.quaternion.copy(BODIES[centerObject].orientation.getQuaternionByEpoch(time.epoch).toThreejs());
+        this.threeGrid.quaternion.copy(BODIES[this.centerObject].orientation.getQuaternionByEpoch(time.epoch).toThreejs());
         this.threeGrid.rotateX(Math.PI / 2);
 
         scene.add(this.threeGrid);
@@ -31,22 +37,13 @@ class HelperPlane
 
     onZoom(newDistance) {
         if (isCreatingActive) {
-            let pos = TRAJECTORIES[this.centerObject].getPositionByEpoch(time.epoch, RF_BASE);
             let pow = Math.round(Math.log2(newDistance)); // not supported in some browsers
             //let pow = Math.round(Math.log(newDistance) / Math.log(2));
+
             if (pow != this.gridParam) {
                 scene.remove(this.threeGrid);
 
-                this.gridParam = pow;
-                this.threeGrid = new THREE.PolarGridHelper(Math.pow(2, pow),
-                                                           32,
-                                                           Math.pow(2, pow) / BODIES[this.centerObject].physicalModel.radius,
-                                                           200);
-                this.threeGrid.position.fromArray(pos.sub(camera.lastPosition));
-                this.threeGrid.quaternion.copy(BODIES[this.centerObject].orientation.getQuaternionByEpoch(time.epoch).toThreejs());
-                this.threeGrid.rotateX(Math.PI / 2);
-
-                scene.add(this.threeGrid);
+                this.render(pow);
             }
         }
     }
