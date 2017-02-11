@@ -16,8 +16,8 @@ class VisualRaycaster
     }
 
     intersectObjects(threeObjects) {
-        return (new THREE.Raycaster())
-            .setFromCamera(this.mouse, this.camera)
-            .intersectObjects(threeObjects);
+        let raycaster = new THREE.Raycaster();
+        raycaster.setFromCamera(this.mouse, this.camera);
+        return raycaster.intersectObjects(threeObjects);
     }
 }
