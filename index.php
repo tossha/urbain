@@ -1,24 +1,13 @@
 <?php
-function getDirScripts($dir) {
-    $scripts = glob($dir . '/*.js');
+require 'functions.php';
 
-    foreach(scandir($dir) as $subDir) {
-        if (($subDir{0} === '.')
-            || !is_dir($dir . '/' . $subDir)
-        ) {
-            continue;
-        }
-
-        $scripts = array_merge($scripts, getDirScripts($dir . '/' . $subDir));
-    }
-
-    return $scripts;
-}
 $scripts = array_merge(
     getDirScripts('vendor'),
-    getDirScripts('core'),
-    getDirScripts('visual'),
-    getDirScripts('interface')
+    reorderScripts(array_merge(
+        getDirScripts('core'),
+        getDirScripts('visual'),
+        getDirScripts('interface')
+    ))
 );
 ?>
 <!DOCTYPE html>
