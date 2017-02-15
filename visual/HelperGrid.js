@@ -5,7 +5,7 @@ class THREEHelperPlane extends THREE.Plane
     }
 }
 
-class HelperPlane
+class HelperGrid
 {
     constructor(centerObject) {
         this.centerObject = centerObject;

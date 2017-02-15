@@ -147,11 +147,11 @@ class Settings
                 that.guiAddTrajectoryElements.settingsFolder.close();
             },
 
-            testFunction: function() {//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+            createNewTrajectory: function() {//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
                 if (isCreatingActive !== true) {
 
                     if (BODIES[that.trackingObject] !== undefined) {
-                                        helperPlane = new HelperPlane(that.trackingObject);
+                                        helperGrid = new HelperGrid(that.trackingObject);
                     };
 
                     let myVector = new THREE.Vector3(0, 0, 1);
@@ -165,14 +165,22 @@ class Settings
                 that.guiAddTrajectoryElements.settingsFolder.close();
             },
 
-            cancelFunction: function() {
+            cancelCreating: function() {
                 if (isCreatingActive) {
-                    helperPlane.remove();
+                    helperGrid.remove();
 
                     isCreatingActive = false;
                 };
                 that.guiAddTrajectoryElements.addTrajectoryFolder.open();
                 that.guiAddTrajectoryElements.settingsFolder.close();
+            },
+            
+            editExistingTrajectory: function() {
+                KeplerianEditor.editExisting();
+            },
+
+            cancelEditing: function() {
+                //
             }//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
         };
 
@@ -240,8 +248,10 @@ class Settings
 
         this.guiAddTrajectory.add(this.trajectorySettings, 'dropLastTrajectory');
 
-        this.guiAddTrajectory.add(this.trajectorySettings, 'testFunction');//////////////////////////////////////////////////////////////////////////////////////
-        this.guiAddTrajectory.add(this.trajectorySettings, 'cancelFunction');
+        this.guiAddTrajectory.add(this.trajectorySettings, 'createNewTrajectory');//////////////////////////////////////////////////////////////////////////////////////
+        this.guiAddTrajectory.add(this.trajectorySettings, 'cancelCreating');
+        this.guiAddTrajectory.add(this.trajectorySettings, 'editExistingTrajectory');
+        this.guiAddTrajectory.add(this.trajectorySettings, 'cancelEditing');
         document.getElementById('leftPanel').appendChild(this.guiAddTrajectory.domElement);
     }
 }

@@ -81,8 +81,8 @@ class Camera
             this.position.scale(koeff);
         }
 
-        if (helperPlane) {
-            helperPlane.onZoom(this.position.mag);
+        if (helperGrid) {
+            helperGrid.onZoom(this.position.mag);
         }
     }
 
