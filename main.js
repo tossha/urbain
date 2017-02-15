@@ -72,6 +72,13 @@ function initBuiltIn() {
             TLEDATA[id].color ? TLEDATA[id].color : 'azure'
         ));
     }
+
+    let testMainAxis = new Vector([1, 0, 0]);
+    let testCenter = new Vector([10000, 0, 10000]);
+    let testPoint = new Vector([20000, 30000, 10000]);
+    let testNormal = new Vector([0, 0, 1]);
+
+    let testAngle = new HelperAngle(testMainAxis, testCenter, testPoint, testNormal);
 }
 
 function firstRender(curTime) {
@@ -113,8 +120,8 @@ function render(curTime) {
 
     axisHelper.position.fromArray(camera.lastPosition.mul(-1));
 
-    if (helperPlane) {
-        helperPlane.update(time.epoch);
+    if (helperGrid) {
+        helperGrid.update(time.epoch);
     }
 
     renderer.render(scene, camera.threeCamera);
