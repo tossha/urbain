@@ -109,8 +109,15 @@ function render(curTime) {
 }
 
 function onWindowResize() {
-    camera.onResize();
-    renderer.setSize(window.innerWidth, window.innerHeight);
+    /* Из-за невозможности узнать новые размеры объекта во время изменения,
+     * сделаем это и обработаем изменение через 1 миллисекунду.
+     * Ужасный костыль, но функция onWindowResize, а также requestAnimationFrame,
+     * вызванный из неё, отрабатывают до непосредственного изменения размеров,
+     * из-за чего такое решение -- самое простое и надежное */
+    setInterval(function() {
+        camera.onResize();
+        renderer.setSize(window.innerWidth, window.innerHeight);
+    }, 1);
 }
 
 var camera, scene, renderer, axisHelper, raycaster;
