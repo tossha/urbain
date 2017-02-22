@@ -109,8 +109,8 @@ function render(curTime) {
 }
 
 function onWindowResize() {
-    camera.onResize();
     renderer.setSize(window.innerWidth, window.innerHeight);
+    camera.onResize();
 }
 
 var camera, scene, renderer, axisHelper, raycaster;
