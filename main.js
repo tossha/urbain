@@ -76,7 +76,6 @@ function initBuiltIn() {
     let testPoint = new Vector([20000, 30000, 10000]);
     let testNormal = new Vector([0, 0, 1]);
 
-    let testAngle = new HelperAngle(testMainAxis, testCenter, testPoint, testNormal);
 }
 
 function firstRender(curTime) {
@@ -118,8 +117,8 @@ function render(curTime) {
 
     axisHelper.position.fromArray(camera.lastPosition.mul(-1));
 
-    if (helperGrid) {
-        helperGrid.update(time.epoch);
+    if (KeplerianEditor.helperGrid) {
+        KeplerianEditor.helperGrid.update(time.epoch);
     }
 
     renderer.render(scene, camera.threeCamera);
@@ -132,7 +131,7 @@ function onWindowResize() {
     camera.onResize();
 }
 
-var camera, scene, renderer, axisHelper, raycaster, isCreatingActive;
+var camera, scene, renderer, axisHelper, raycaster;
 var settings, time, globalTime;
 var textureLoader;
 var lastTrajectoryId = -1;
@@ -141,7 +140,7 @@ var trajArray = [];
 var selection;
 var statistics;
 var rendererEvents;
-var helperPlane;
+var helperGrid, isEditMode;
 
 window.onload = function () {
     init();
