@@ -148,29 +148,17 @@ class Settings
             },
 
             createNewTrajectory: function() {//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-                if (isCreatingActive !== true) {
+                
+                KeplerianEditor.createNew();
 
-                    if (BODIES[that.trackingObject] !== undefined) {
-                                        helperGrid = new HelperGrid(that.trackingObject);
-                    };
-
-                    let myVector = new THREE.Vector3(0, 0, 1);
-                    let myQuat = (new THREE.Quaternion).setFromAxisAngle(new THREE.Vector3(1, 0, 0), Math.PI / 4);
-                    let planePos = getPlanePosition(myVector, myQuat);
-                    var plane = new THREEHelperPlane(planePos.normal, planePos.distance);
-                };
-
-                isCreatingActive = true; 
                 that.guiAddTrajectoryElements.addTrajectoryFolder.open();
                 that.guiAddTrajectoryElements.settingsFolder.close();
             },
 
             cancelCreating: function() {
-                if (isCreatingActive) {
-                    helperGrid.remove();
+                
+                KeplerianEditor.abortCreating();
 
-                    isCreatingActive = false;
-                };
                 that.guiAddTrajectoryElements.addTrajectoryFolder.open();
                 that.guiAddTrajectoryElements.settingsFolder.close();
             },
@@ -181,6 +169,22 @@ class Settings
 
             cancelEditing: function() {
                 //
+            },
+
+            testFunction: function() {
+                let testMainAxis = new Vector([1, 0, 0]);
+                let testNormal = new Vector([0, 0, 1]);
+
+                let testAngle = new HelperAngle(TRAJECTORIES[EARTH].getPositionByEpoch(time.epoch, RF_BASE),
+                                                testMainAxis,
+                                                testNormal,
+                                                Math.PI / 2,
+                                                0xdd8eff);
+
+                document.addEventListener('vr_render', function (event) {
+                    testAngle.update(TRAJECTORIES[EARTH].getPositionByEpoch(time.epoch, RF_BASE));
+                    console.log(event.detail.epoch);
+                });
             }//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
         };
 
@@ -252,6 +256,7 @@ class Settings
         this.guiAddTrajectory.add(this.trajectorySettings, 'cancelCreating');
         this.guiAddTrajectory.add(this.trajectorySettings, 'editExistingTrajectory');
         this.guiAddTrajectory.add(this.trajectorySettings, 'cancelEditing');
+        this.guiAddTrajectory.add(this.trajectorySettings, 'testFunction');
         document.getElementById('leftPanel').appendChild(this.guiAddTrajectory.domElement);
     }
 }

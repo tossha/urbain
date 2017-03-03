@@ -81,8 +81,8 @@ class Camera
             this.position.scale(koeff);
         }
 
-        if (helperGrid) {
-            helperGrid.onZoom(this.position.mag);
+        if (KeplerianEditor.helperGrid) {
+            KeplerianEditor.helperGrid.onZoom(this.position.mag);
         }
     }
 

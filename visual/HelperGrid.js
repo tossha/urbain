@@ -1,10 +1,3 @@
-class THREEHelperPlane extends THREE.Plane 
-{
-    raycast(raycaster, intersects) {
-        debugger;
-    }
-}
-
 class HelperGrid
 {
     constructor(centerObject) {
@@ -36,7 +29,7 @@ class HelperGrid
     }
 
     onZoom(newDistance) {
-        if (isCreatingActive) {
+        if (KeplerianEditor.isEditMode) {
             let pow = Math.round(Math.log2(newDistance)); // not supported in some browsers
             //let pow = Math.round(Math.log(newDistance) / Math.log(2));
 
@@ -49,19 +42,6 @@ class HelperGrid
     }
 
     remove() {
-        scene.remove(this.threeGrid);
+        scene.remove(this.threeGrid)
     }
 }
-
-function getPlanePosition(pos, quat) {
-    let normal = (new THREE.Vector3(0, 0, 1)).applyQuaternion(quat);
-    let mrVector = (new THREE.Vector3).crossVectors(normal, pos);
-    let mrCathetus = (new THREE.Vector3).crossVectors(normal, mrVector);
-    let cos = pos.dot(mrCathetus) / (pos.length() * mrCathetus.length());
-    let angle = (cos >= 0) ? Math.acos(cos) : Math.PI - Math.acos(cos);
-    let distance = pos.length() * Math.sin(angle);
-    return {
-        normal: normal,
-        distance: - distance
-    }
-};
