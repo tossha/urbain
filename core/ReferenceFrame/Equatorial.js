@@ -9,7 +9,7 @@ class ReferenceFrameEquatorial extends ReferenceFrameAbstract
     }
 
     stateVectorFromBaseReferenceFrameByEpoch(epoch, state) {
-        const originState = TRAJECTORIES[this.origin].getStateByEpoch(epoch, RF_BASE);
+        const originState = App.getTrajectory(this.origin).getStateByEpoch(epoch, RF_BASE);
         const rotation = this.getQuaternionByEpoch(epoch).invert();
 
         return new StateVector(
@@ -19,7 +19,7 @@ class ReferenceFrameEquatorial extends ReferenceFrameAbstract
     }
 
     stateVectorToBaseReferenceFrameByEpoch(epoch, state) {
-        const originState = TRAJECTORIES[this.origin].getStateByEpoch(epoch, RF_BASE);
+        const originState = App.getTrajectory(this.origin).getStateByEpoch(epoch, RF_BASE);
         const rotation = this.getQuaternionByEpoch(epoch);
 
         return new StateVector(

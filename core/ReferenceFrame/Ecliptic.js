@@ -5,7 +5,7 @@ class ReferenceFrameEcliptic extends ReferenceFrameAbstract
     }
 
     stateVectorFromBaseReferenceFrameByEpoch(epoch, state) {
-        const originState = TRAJECTORIES[this.origin].getStateByEpoch(epoch, RF_BASE);
+        const originState = App.getTrajectory(this.origin).getStateByEpoch(epoch, RF_BASE);
 
         return new StateVector(
             state.position.sub(originState.position),
@@ -14,7 +14,7 @@ class ReferenceFrameEcliptic extends ReferenceFrameAbstract
     }
 
     stateVectorToBaseReferenceFrameByEpoch(epoch, state) {
-        const originState = TRAJECTORIES[this.origin].getStateByEpoch(epoch, RF_BASE);
+        const originState = App.getTrajectory(this.origin).getStateByEpoch(epoch, RF_BASE);
 
         return new StateVector(
             state.position.add(originState.position),

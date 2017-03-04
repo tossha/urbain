@@ -7,6 +7,6 @@ class FunctionOfEpochObjectPosition extends FunctionOfEpochAbstract
     }
 
     evaluate(epoch) {
-        return TRAJECTORIES[this.objectId].getPositionByEpoch(epoch, this.referenceFrame);
+        return App.getTrajectory(this.objectId).getPositionByEpoch(epoch, this.referenceFrame);
     }
 }
