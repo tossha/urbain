@@ -46,7 +46,7 @@ function initBuiltIn() {
         const tle = new TLE(TLEDATA[id].lines);
         const objId = parseInt(id);
 
-        TRAJECTORIES[objId] = new TrajectoryKeplerianOrbit(
+        App.setTrajectory(objId, new TrajectoryKeplerianOrbit(
             App.getReferenceFrame(EARTH, RF_TYPE_EQUATORIAL),
             new KeplerianObject(
                 tle.getE(),
@@ -61,7 +61,7 @@ function initBuiltIn() {
             ),
             TLEDATA[id].color ? TLEDATA[id].color : 'azure',
             false
-        );
+        ));
     }
 }
 
@@ -71,6 +71,8 @@ function firstRender(curTime) {
 }
 
 function render(curTime) {
+    let lastTrajectory;
+
     time.tick(curTime - globalTime);
     globalTime = curTime;
 
@@ -80,11 +82,8 @@ function render(curTime) {
         BODIES[bodyIdx].render(time.epoch);
     }
 
-    for (let trajIdx in TRAJECTORIES) {
-        if (trajIdx == lastTrajectoryId) {
-            TRAJECTORIES[trajIdx].epoch = time.epoch;
-        }
-        TRAJECTORIES[trajIdx].render(time.epoch);
+    if (lastTrajectory = App.getTrajectory(lastTrajectoryId)) {
+        lastTrajectory.epoch = time.epoch;
     }
 
     document.dispatchEvent(new CustomEvent(
@@ -93,7 +92,7 @@ function render(curTime) {
     ));
 
     const trajectoryMenu = settings.currentTrajectoryMenu;
-    const state = TRAJECTORIES[settings.trackingObject].getStateByEpoch(time.epoch, RF_BASE);
+    const state = App.getTrajectory(settings.trackingObject).getStateByEpoch(time.epoch, RF_BASE);
     for (let group of ['velocity', 'position']) {
         const trajectoryGroup = trajectoryMenu[group];
         const stateGroup = state[group];

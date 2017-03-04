@@ -13,7 +13,7 @@ class ReferenceFrameRotating extends ReferenceFrameAbstract
     }
 
     stateVectorFromBaseReferenceFrameByEpoch(epoch, state) {
-        const originState = TRAJECTORIES[this.origin].getStateByEpoch(epoch, RF_BASE);
+        const originState = App.getTrajectory(this.origin).getStateByEpoch(epoch, RF_BASE);
         const rotation = this.getQuaternionByEpoch(epoch).invert();
 
         const destPos = rotation.rotate(state.position.sub_(originState.position));
@@ -28,7 +28,7 @@ class ReferenceFrameRotating extends ReferenceFrameAbstract
     }
 
     stateVectorToBaseReferenceFrameByEpoch(epoch, state) {
-        const originState = TRAJECTORIES[this.origin].getStateByEpoch(epoch, RF_BASE);
+        const originState = App.getTrajectory(this.origin).getStateByEpoch(epoch, RF_BASE);
         const rotation = this.getQuaternionByEpoch(epoch);
 
         const rfVel = state.position.cross(this.getRotationVelocityByEpoch(epoch));

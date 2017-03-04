@@ -56,14 +56,14 @@ class Camera
 
     setOrbitingPoint(pointId) {
         this.position
-            .add_(TRAJECTORIES[this.orbitingPoint].getPositionByEpoch(this.lastEpoch, RF_BASE))
-            .sub_(TRAJECTORIES[pointId].getPositionByEpoch(this.lastEpoch, RF_BASE));
+            .add_(App.getTrajectory(this.orbitingPoint).getPositionByEpoch(this.lastEpoch, RF_BASE))
+            .sub_(App.getTrajectory(pointId).getPositionByEpoch(this.lastEpoch, RF_BASE));
         this.quaternion = this._getQuaternionByPosition(this.position);
         this.orbitingPoint = pointId;
     }
 
     getOrbitingPointPosition(epoch) {
-        return TRAJECTORIES[this.orbitingPoint].getPositionByEpoch(epoch, RF_BASE);
+        return App.getTrajectory(this.orbitingPoint).getPositionByEpoch(epoch, RF_BASE);
     }
 
     onMouseWheel(event) {

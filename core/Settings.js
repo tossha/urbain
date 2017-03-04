@@ -104,8 +104,8 @@ class Settings
                 that.guiAddTrajectoryElements.aop  .setValue(deg2rad(that.baseTrajectorySettings.aop ));
                 that.guiAddTrajectoryElements.ta   .setValue(deg2rad(that.baseTrajectorySettings.ta  ));
 
-                if (!TRAJECTORIES[lastTrajectoryId]) {
-                    TRAJECTORIES[lastTrajectoryId] = new TrajectoryKeplerianOrbit(
+                if (!App.getTrajectory(lastTrajectoryId)) {
+                    App.setTrajectory(lastTrajectoryId, new TrajectoryKeplerianOrbit(
                         App.getReferenceFrame(that.trackingObject, RF_TYPE_ECLIPTIC),
                         new KeplerianObject(
                             that.trajectorySettings.e,
@@ -121,7 +121,7 @@ class Settings
                             true
                         ),
                         '#00ff00'
-                    );
+                    ));
                 }
 
                 that.guiAddTrajectoryElements.addTrajectoryFolder.close();
@@ -129,7 +129,7 @@ class Settings
             },
 
             saveTrajectory: function() {
-                while (TRAJECTORIES[lastTrajectoryId]) {
+                while (App.getTrajectory(lastTrajectoryId)) {
                     --lastTrajectoryId;
                 }
 
@@ -138,15 +138,15 @@ class Settings
             },
 
             dropLastTrajectory: function() {
-                while (!TRAJECTORIES[lastTrajectoryId]
-                && (lastTrajectoryId !== -1)
-                    ) {
+                while (!App.getTrajectory(lastTrajectoryId)
+                    && (lastTrajectoryId !== -1)
+                ) {
                     ++lastTrajectoryId;
                 }
 
-                if (TRAJECTORIES[lastTrajectoryId]) {
-                    TRAJECTORIES[lastTrajectoryId].drop();
-                    delete TRAJECTORIES[lastTrajectoryId];
+                if (App.getTrajectory(lastTrajectoryId)) {
+                    App.getTrajectory(lastTrajectoryId).drop();
+                    App.deleteTrajectory(lastTrajectoryId);
                 }
 
                 that.guiAddTrajectoryElements.addTrajectoryFolder.open();
@@ -159,7 +159,7 @@ class Settings
         this.guiAddTrajectoryElements.sma = this.guiAddTrajectoryElements.settingsFolder.add(
             this.trajectorySettings, 'sma', 1500000, 8000000000
         ).onChange(function(value) {
-            const trajectory = TRAJECTORIES[lastTrajectoryId];
+            const trajectory = App.getTrajectory(lastTrajectoryId);
             if (trajectory) {
                 trajectory.sma = value;
             }
@@ -168,7 +168,7 @@ class Settings
         this.guiAddTrajectoryElements.e = this.guiAddTrajectoryElements.settingsFolder.add(
             this.trajectorySettings, 'e', 0, 1
         ).onChange(function(value) {
-            const trajectory = TRAJECTORIES[lastTrajectoryId];
+            const trajectory = App.getTrajectory(lastTrajectoryId);
             if (trajectory) {
                 trajectory.e = value;
             }
@@ -177,7 +177,7 @@ class Settings
         this.guiAddTrajectoryElements.inc = this.guiAddTrajectoryElements.settingsFolder.add(
             this.trajectorySettings, 'inc', 0, 180
         ).onChange(function(value) {
-            const trajectory = TRAJECTORIES[lastTrajectoryId];
+            const trajectory = App.getTrajectory(lastTrajectoryId);
             if (trajectory) {
                 trajectory.inc = deg2rad(value);
             }
@@ -186,7 +186,7 @@ class Settings
         this.guiAddTrajectoryElements.raan = this.guiAddTrajectoryElements.settingsFolder.add(
             this.trajectorySettings, 'raan', 0, 360
         ).onChange(function(value) {
-            const trajectory = TRAJECTORIES[lastTrajectoryId];
+            const trajectory = App.getTrajectory(lastTrajectoryId);
             if (trajectory) {
                 trajectory.raan = deg2rad(value);
             }
@@ -195,7 +195,7 @@ class Settings
         this.guiAddTrajectoryElements.aop = this.guiAddTrajectoryElements.settingsFolder.add(
             this.trajectorySettings, 'aop', 0, 360
         ).onChange(function(value) {
-            const trajectory = TRAJECTORIES[lastTrajectoryId];
+            const trajectory = App.getTrajectory(lastTrajectoryId);
             if (trajectory) {
                 trajectory.aop = deg2rad(value);
             }
@@ -204,7 +204,7 @@ class Settings
         this.guiAddTrajectoryElements.ta = this.guiAddTrajectoryElements.settingsFolder.add(
             this.trajectorySettings, 'ta', 0, 360
         ).onChange(function(value) {
-            const trajectory = TRAJECTORIES[lastTrajectoryId];
+            const trajectory = App.getTrajectory(lastTrajectoryId);
             if (trajectory) {
                 trajectory.ta = deg2rad(value);
             }
