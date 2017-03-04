@@ -30,6 +30,7 @@ class App {
     }
 
     static deleteTrajectory(objectId) {
+        this.trajectories[objectId].drop();
         delete this.trajectories[objectId];
     }
 }
