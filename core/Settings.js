@@ -175,14 +175,14 @@ class Settings
                 let testMainAxis = new Vector([1, 0, 0]);
                 let testNormal = new Vector([0, 0, 1]);
 
-                let testAngle = new HelperAngle(TRAJECTORIES[EARTH].getPositionByEpoch(time.epoch, RF_BASE),
+                let testAngle = new HelperAngle(App.getTrajectory(EARTH).getPositionByEpoch(time.epoch, RF_BASE),
                                                 testMainAxis,
                                                 testNormal,
                                                 Math.PI / 2,
                                                 0xdd8eff);
 
                 document.addEventListener('vr_render', function (event) {
-                    testAngle.update(TRAJECTORIES[EARTH].getPositionByEpoch(time.epoch, RF_BASE));
+                    testAngle.update(App.getTrajectory(EARTH).getPositionByEpoch(time.epoch, RF_BASE));
                 });
             }//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
         };

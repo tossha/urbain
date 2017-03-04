@@ -45,9 +45,9 @@ class HelperAngle
         scene.remove(this.visual);
     }
 
-    onMouseDown() {
+    /* onMouseDown() {
         //raycast
-        if (/* raycast ok */) {
+        if ( raycast ok ) {
             document.addEventListener('mouseup', this.onMouseUp);
             document.addEventListener('mousemove', this.resize);  
         }
@@ -56,7 +56,7 @@ class HelperAngle
     onMouseUp() {
         document.removeEventListener('mouseup', this.onMouseUp);
         document.removeEventListener('mousemove', this.resize);
-    }
+    } */
 }
 
 function onMouseDown() {
