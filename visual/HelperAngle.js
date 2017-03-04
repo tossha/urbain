@@ -14,18 +14,19 @@ class HelperAngle
         scene.add(this.visual);
     }*/
 
-    constructor(pos, mainAxis, normal, angleValue, color, foo) {
-        if (foo !== undefined) {//do smth
-            };
+    constructor(pos, mainAxis, normal, angleValue, color, resize) {
+        if (resize !== undefined) {//do smth
+            document.addEventListener('mousedown', onMouseDown);
+        };
 
         this.value = angleValue;
-
+        this.color = color;
 
         let geometry = new THREE.CircleGeometry(Math.pow(2, 14),
                                               200,
                                               0,
                                               angleValue);
-        let material = new THREE.MeshBasicMaterial({color: color, opacity: 0.25, transparent: true});
+        let material = new THREE.MeshBasicMaterial({color: this.color, opacity: 0.25, transparent: true});
         this.visual = new THREE.Mesh(geometry, material);
 
         this.render(pos);
@@ -39,4 +40,28 @@ class HelperAngle
     update(newPos) {
         this.visual.position.fromArray(newPos.sub(camera.lastPosition));
     }
+
+    resize(newValue){
+        scene.remove(this.visual);
+    }
+
+    onMouseDown() {
+        //raycast
+        if (/* raycast ok */) {
+            document.addEventListener('mouseup', this.onMouseUp);
+            document.addEventListener('mousemove', this.resize);  
+        }
+    }
+
+    onMouseUp() {
+        document.removeEventListener('mouseup', this.onMouseUp);
+        document.removeEventListener('mousemove', this.resize);
+    }
 }
+
+function onMouseDown() {
+      
+}
+
+function onMouseUp() {
+} 
