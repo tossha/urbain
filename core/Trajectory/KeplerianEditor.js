@@ -16,7 +16,7 @@ class KeplerianEditor
                 KeplerianEditor.isEditMode = true; 
 
                 document.addEventListener('vr_render', function (event) {
-                    KeplerianEditor.helperGrid.update(TRAJECTORIES[EARTH].getPositionByEpoch(time.epoch, RF_BASE));
+                    KeplerianEditor.helperGrid.update(App.getTrajectory(KeplerianEditor.helperGrid.centerObject).getPositionByEpoch(time.epoch, RF_BASE));
                 });
             };
 

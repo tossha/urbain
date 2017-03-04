@@ -10,7 +10,7 @@ class HelperGrid
     }
 
     render(pow) {
-        let pos = TRAJECTORIES[this.centerObject].getPositionByEpoch(time.epoch, RF_BASE);
+        let pos = App.getTrajectory(this.centerObject).getPositionByEpoch(time.epoch, RF_BASE);
         this.gridParam = pow;
         this.threeGrid = new THREE.PolarGridHelper(Math.pow(2, pow),
                                                    32,
@@ -24,7 +24,7 @@ class HelperGrid
     }
 
     update(epoch) {
-        let pos = TRAJECTORIES[this.centerObject].getPositionByEpoch(epoch, RF_BASE);
+        let pos = App.getTrajectory(this.centerObject).getPositionByEpoch(epoch, RF_BASE);
         this.threeGrid.position.fromArray(pos.sub(camera.lastPosition));
     }
 

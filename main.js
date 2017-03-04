@@ -67,14 +67,10 @@ function initBuiltIn() {
                 BODIES[EARTH].physicalModel.mu,
                 false
             ),
-            TLEDATA[id].color ? TLEDATA[id].color : 'azure'
+            TLEDATA[id].color ? TLEDATA[id].color : 'azure',
+            false
         ));
-    }
-
-    let testMainAxis = new Vector([1, 0, 0]);
-    let testCenter = new Vector([10000, 0, 10000]);
-    let testPoint = new Vector([20000, 30000, 10000]);
-    let testNormal = new Vector([0, 0, 1]);
+    };
 
 }
 
