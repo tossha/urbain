@@ -9,7 +9,7 @@ class ObjectLoader
     static loadObject(bodyId, data) {
         let trajectory = TrajectoryLoader.create(data);
 
-        TRAJECTORIES[bodyId] = trajectory;
+        App.setTrajectory(bodyId, trajectory);
 
         if (data.radius) {
             let visualShape = new VisualShapeSphere(

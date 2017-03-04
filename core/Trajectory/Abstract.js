@@ -1,19 +1,16 @@
 class TrajectoryAbstract
 {
     constructor(referenceFrame) {
+        let that = this;
         this.referenceFrame = referenceFrame || null; // class ReferenceFrameAbstract
+        document.addEventListener('vr_render', function (event) {
+            that.render(event.detail.epoch);
+        });
     }
 
     drop() {
         if (this.visualModel) {
             this.visualModel.drop();
-        }
-
-        for (let trajIdx in TRAJECTORIES) {
-            if (this === TRAJECTORIES[trajIdx]) {
-                delete TRAJECTORIES[trajIdx];
-                break;
-            }
         }
     }
 

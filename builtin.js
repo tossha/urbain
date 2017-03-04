@@ -1,6 +1,5 @@
 const RF_BASE = App.getReferenceFrame(SOLAR_SYSTEM_BARYCENTER, RF_TYPE_ECLIPTIC);
 
-const TRAJECTORIES = {};
 const BODIES = {};
 
 const STARDATA = [
