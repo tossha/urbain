@@ -183,7 +183,6 @@ class Settings
 
                 document.addEventListener('vr_render', function (event) {
                     testAngle.update(TRAJECTORIES[EARTH].getPositionByEpoch(time.epoch, RF_BASE));
-                    console.log(event.detail.epoch);
                 });
             }//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
         };
