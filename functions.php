@@ -37,6 +37,10 @@ function reorderScripts($files) {
                 $delayed[] = $file;
             }
         }
+        if (count($files) === count($delayed)) {
+            $reordered = array_merge($reordered, $delayed);
+            break;
+        }
         $files = $delayed;
     }
 

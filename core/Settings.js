@@ -145,7 +145,6 @@ class Settings
                 }
 
                 if (App.getTrajectory(lastTrajectoryId)) {
-                    App.getTrajectory(lastTrajectoryId).drop();
                     App.deleteTrajectory(lastTrajectoryId);
                 }
 
