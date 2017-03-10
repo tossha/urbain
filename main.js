@@ -114,10 +114,6 @@ function render(curTime) {
 
     axisHelper.position.fromArray(camera.lastPosition.mul(-1));
 
-    if (KeplerianEditor.helperGrid) {
-        KeplerianEditor.helperGrid.update(time.epoch);
-    }
-
     renderer.render(scene, camera.threeCamera);
     statistics.update();
     requestAnimationFrame(render);
@@ -137,7 +133,6 @@ var trajArray = [];
 var selection;
 var statistics;
 var rendererEvents;
-var helperGrid, isEditMode;
 
 window.onload = function () {
     init();
