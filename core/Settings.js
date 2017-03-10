@@ -147,7 +147,7 @@ class Settings
                 that.guiAddTrajectoryElements.settingsFolder.close();
             },
 
-            createNewTrajectory: function() {//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+            createNewTrajectory: function() {
                 
                 KeplerianEditor.createNew();
 
@@ -172,19 +172,22 @@ class Settings
             },
 
             testFunction: function() {
-                let testMainAxis = new Vector([1, 0, 0]);
-                let testNormal = new Vector([0, 0, 1]);
+                let testMainAxis = App.getReferenceFrame(EARTH, RF_TYPE_EQUATORIAL).getQuaternionByEpoch(time.epoch).rotate(new Vector([1, 0, 0]));
+                let testNormal = App.getReferenceFrame(EARTH, RF_TYPE_EQUATORIAL).getQuaternionByEpoch(time.epoch).rotate(new Vector([0, 0, 1]));
+                let testCallback = 'smth';
 
                 let testAngle = new HelperAngle(App.getTrajectory(EARTH).getPositionByEpoch(time.epoch, RF_BASE),
                                                 testMainAxis,
                                                 testNormal,
                                                 Math.PI / 2,
-                                                0xdd8eff);
+                                                0xB00000,
+                                                testCallback);
+                testAngle.visual.quaternion.copy(App.getReferenceFrame(EARTH, RF_TYPE_EQUATORIAL).getQuaternionByEpoch(time.epoch).toThreejs());
 
                 document.addEventListener('vr_render', function (event) {
                     testAngle.update(App.getTrajectory(EARTH).getPositionByEpoch(time.epoch, RF_BASE));
                 });
-            }//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+            }
         };
 
         this.guiAddTrajectoryElements.settingsFolder = this.guiAddTrajectory.addFolder("trajectory settings");
@@ -251,7 +254,7 @@ class Settings
 
         this.guiAddTrajectory.add(this.trajectorySettings, 'dropLastTrajectory');
 
-        this.guiAddTrajectory.add(this.trajectorySettings, 'createNewTrajectory');//////////////////////////////////////////////////////////////////////////////////////
+        this.guiAddTrajectory.add(this.trajectorySettings, 'createNewTrajectory');
         this.guiAddTrajectory.add(this.trajectorySettings, 'cancelCreating');
         this.guiAddTrajectory.add(this.trajectorySettings, 'editExistingTrajectory');
         this.guiAddTrajectory.add(this.trajectorySettings, 'cancelEditing');
