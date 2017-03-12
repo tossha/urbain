@@ -20,7 +20,7 @@ class VisualRaycaster
 
     	var pointDirection = (new THREE.Vector3).subVectors(
     		point,
-    		this.raycaster.ray.origin
+    		camera.lastPosition
     	);
 
     	var angle = Math.acos(
