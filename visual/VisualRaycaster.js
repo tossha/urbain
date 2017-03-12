@@ -15,6 +15,22 @@ class VisualRaycaster
         window.addEventListener('resize', this.updatePixelAngleSize);
     }
 
+    getPixelDistance(point) {
+    	this.raycaster.setFromCamera(this.mouse, this.camera);
+
+    	var pointDirection = (new THREE.Vector3).subVectors(
+    		point,
+    		this.raycaster.ray.origin
+    	);
+
+    	var angle = Math.acos(
+    		this.raycaster.ray.direction.normalize().dot(
+    		pointDirection.normalize())
+    	);
+
+    	return angle / this.raycaster.pixelAngleSize;
+    }
+
     onMouseMove(event) {
         this.mouse.x = (event.clientX / window.innerWidth) * 2 - 1;
         this.mouse.y = -(event.clientY / window.innerHeight) * 2 + 1;
