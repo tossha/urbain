@@ -7,7 +7,7 @@ class Settings
             width: window.innerWidth * 0.9
         });
 
-        document.getElementById('bottomPanel').appendChild(this.guiTimeLine.domElement);
+        // document.getElementById('bottomPanel').appendChild(this.guiTimeLine.domElement);
         this.timeLine = initial.timeLinePos;
         this.timeScale = initial.timeScale;
         this.isTimeRunning = initial.isTimeRunning;
