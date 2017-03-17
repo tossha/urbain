@@ -172,20 +172,20 @@ class Settings
             },
 
             testFunction: function() {
-                let testMainAxis = App.getReferenceFrame(EARTH, RF_TYPE_EQUATORIAL).getQuaternionByEpoch(time.epoch).rotate(new Vector([1, 0, 0]));
-                let testNormal = App.getReferenceFrame(EARTH, RF_TYPE_EQUATORIAL).getQuaternionByEpoch(time.epoch).rotate(new Vector([0, 0, 1]));
+                let testMainAxis = App.getReferenceFrame(that.trackingObject, RF_TYPE_EQUATORIAL).getQuaternionByEpoch(time.epoch).rotate(new Vector([1, 0, 0]));
+                let testNormal = App.getReferenceFrame(that.trackingObject, RF_TYPE_EQUATORIAL).getQuaternionByEpoch(time.epoch).rotate(new Vector([0, 0, 1]));
                 let testCallback = 'smth';
 
-                let testAngle = new HelperAngle(App.getTrajectory(EARTH).getPositionByEpoch(time.epoch, RF_BASE),
+                let testAngle = new HelperAngle(App.getTrajectory(that.trackingObject).getPositionByEpoch(time.epoch, RF_BASE),
                                                 testMainAxis,
                                                 testNormal,
-                                                Math.PI / 2,
+                                                Math.PI / 4,
                                                 0xB00000,
                                                 testCallback);
-                testAngle.visual.quaternion.copy(App.getReferenceFrame(EARTH, RF_TYPE_EQUATORIAL).getQuaternionByEpoch(time.epoch).toThreejs());
+                testAngle.visual.quaternion.copy(App.getReferenceFrame(that.trackingObject, RF_TYPE_EQUATORIAL).getQuaternionByEpoch(time.epoch).toThreejs());
 
                 document.addEventListener('vr_render', function (event) {
-                    testAngle.update(App.getTrajectory(EARTH).getPositionByEpoch(time.epoch, RF_BASE));
+                    testAngle.update(App.getTrajectory(that.trackingObject).getPositionByEpoch(time.epoch, RF_BASE));
                 });
             }
         };
