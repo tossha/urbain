@@ -1,18 +1,15 @@
 class VisualRaycaster
 {
-    constructor(threeCamera, pixelPrecistion) {
-        let that = this;
-        window.addEventListener('mousemove', function (event) {
-            that.onMouseMove(event);
-        });
-
+    constructor(threeCamera, pixelPrecision) {
         this.raycaster = new THREE.Raycaster();
         this.mouse = new THREE.Vector2();
         this.camera = threeCamera;
 
-        this.setPixelPrecistion(pixelPrecistion);
+        this.setPixelPrecision(pixelPrecision);
         this.updatePixelAngleSize();
-        window.addEventListener('resize', this.updatePixelAngleSize);
+
+        window.addEventListener('mousemove', this.onMouseMove.bind(this));
+        window.addEventListener('resize', this.updatePixelAngleSize.bind(this));
     }
 
     onMouseMove(event) {
@@ -20,8 +17,8 @@ class VisualRaycaster
         this.mouse.y = -(event.clientY / window.innerHeight) * 2 + 1;
     }
 
-    setPixelPrecistion(value) {
-        this.raycaster.pixelPrecistion = value;
+    setPixelPrecision(value) {
+        this.raycaster.pixelPrecision = value;
     }
 
     updatePixelAngleSize() {

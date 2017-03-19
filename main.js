@@ -18,7 +18,7 @@ function init() {
 
     textureLoader = new THREE.TextureLoader();
 
-    raycaster = new VisualRaycaster(camera.threeCamera);
+    raycaster = new VisualRaycaster(camera.threeCamera, 10);
 
     for (let objId in SSDATA) {
         objectsForTracking[SSDATA[objId].name] = objId;

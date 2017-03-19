@@ -4,7 +4,7 @@ class VisualTrajectoryModelAbstract
         this.trajectory = trajectory;
         this.color = color;
 
-        this.threeObj = new THREE.Line(
+        this.threeObj = new LineObject(
             new THREE.Geometry(),
             new THREE.LineBasicMaterial({color: this.color, vertexColors: THREE.VertexColors})
         );
