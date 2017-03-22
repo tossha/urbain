@@ -131,6 +131,3 @@ class TimeLine
         this.msPerPxWanted = Math.max(1000, Math.min(1000 * 60 * 60 * 24, this.msPerPxWanted * (1 + 0.05 * e.deltaY)));
     }
 }
-
-var alreadyPrinted = false;
-
