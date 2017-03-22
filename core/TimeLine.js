@@ -1,4 +1,4 @@
-const MAGICAL_TIME_CONST = 946728000;
+const J2000_TIMESTAMP = 946728000;
 
 class TimeLine
 {
@@ -7,8 +7,9 @@ class TimeLine
         this.isMousePressed = false;
         this.settings = settings;
         this.msPerPx = 100 * 60 * 60 * 24;
+        this.msPerPxWanted = this.msPerPx;
         
-        const canvas = document.getElementById("timeLineCanvas");
+        const canvas = this.domElement = document.getElementById("timeLineCanvas");
         canvas.addEventListener("mousedown", (e) => this.onMouseDown  (e));
         window.addEventListener("mouseup"  , (e) => this.onMouseUp    (e));
         window.addEventListener("mousemove", (e) => this.onMouseMove  (e));
@@ -19,7 +20,21 @@ class TimeLine
         if (this.settings.isTimeRunning && !this.isMousePressed) {
             this.epoch += this.settings.timeScale * timePassed;
             this.settings.timeLine = this.epoch;
-            this.settings.currentDate = "" + new Date((MAGICAL_TIME_CONST + this.epoch) * 1000);
+            this.settings.currentDate = "" + new Date((J2000_TIMESTAMP + this.epoch) * 1000);
+        }
+        
+        // Плавное изменение масштаба
+        if (this.msPerPx !== this.msPerPxWanted) {
+            const panelStyle = getComputedStyle(document.getElementById("bottomPanel"));
+            const fixedMouseShift = this.mouseX - parseFloat(panelStyle.left) - parseFloat(panelStyle.width) / 2;
+            const fixedDate = this.epoch + fixedMouseShift * this.msPerPx / 1000;
+            const scaleShift = this.msPerPxWanted / this.msPerPx - 1;
+            if (Math.abs(scaleShift) < 0.05) {
+                this.msPerPx = this.msPerPxWanted;
+            } else {
+                this.msPerPx *= 1 + scaleShift / Math.abs(scaleShift) * 0.05;
+            }
+            this.epoch = fixedDate - fixedMouseShift * this.msPerPx / 1000;
         }
 
         this.redraw();
@@ -31,7 +46,7 @@ class TimeLine
     }
 
     redraw() {
-        const canvas = document.getElementById("timeLineCanvas");
+        const canvas = this.domElement;
         const computedStyle = getComputedStyle(canvas);
         canvas.width = parseFloat(computedStyle.width);
         canvas.height = parseFloat(computedStyle.height);
@@ -49,7 +64,7 @@ class TimeLine
         context.lineTo(canvas.width / 2, canvas.height);
         context.stroke();
 
-        const centerEpoch = 1000 * (this.epoch + MAGICAL_TIME_CONST);
+        const centerEpoch = 1000 * (this.epoch + J2000_TIMESTAMP);
         let displayEpoch = centerEpoch;
         while (centerEpoch - displayEpoch < this.msPerPx * canvas.width / 2) {
             displayEpoch = this.previousRenderingDate(displayEpoch - 1);
@@ -113,7 +128,7 @@ class TimeLine
     }
 
     onMouseWheel(e) {
-        this.msPerPx = Math.max(1000, Math.min(1000 * 60 * 60 * 24, this.msPerPx * (1 + 0.05 * e.deltaY)));
+        this.msPerPxWanted = Math.max(1000, Math.min(1000 * 60 * 60 * 24, this.msPerPxWanted * (1 + 0.05 * e.deltaY)));
     }
 }
 
