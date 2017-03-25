@@ -18,7 +18,14 @@ function init() {
 
     textureLoader = new THREE.TextureLoader();
 
-    raycaster = new VisualRaycaster(camera.threeCamera, 10);
+    raycaster = new VisualRaycaster(camera.threeCamera, 30);
+
+    testSphere = new THREE.Mesh(
+        new THREE.SphereGeometry(1, 10, 10),
+        new THREE.MeshBasicMaterial({color: 0xffff00})
+    );
+
+    scene.add(testSphere);
 
     for (let objId in SSDATA) {
         objectsForTracking[SSDATA[objId].name] = objId;
@@ -101,6 +108,27 @@ function render(curTime) {
         }
     }
 
+    const intersections = raycaster.intersectObjects(trajArray);
+
+    if(intersections.length > 0) {
+        var minDistacne = intersections[0].distance;
+        var point = intersections[0].point;
+
+        for(var i = 1; i < intersections.length; i++) 
+            if(intersections[i].distance < minDistacne) {
+                point = intersections[i].point;
+                minDistacne = intersections[i].distance;
+            }
+
+        testSphere.position.copy(point);
+
+        const scaleKoeff = point.length() / 200;
+
+        testSphere.scale.x = scaleKoeff;
+        testSphere.scale.y = scaleKoeff;
+        testSphere.scale.z = scaleKoeff;
+    }
+
     axisHelper.position.fromArray(camera.lastPosition.mul(-1));
 
     renderer.render(scene, camera.threeCamera);
@@ -117,6 +145,7 @@ var settings, time, globalTime;
 var textureLoader;
 var lastTrajectoryId = -1;
 var stars;
+var testSphere, trajArray = [];
 
 window.onload = function () {
     init();

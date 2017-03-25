@@ -10,6 +10,8 @@ class VisualTrajectoryModelAbstract
         );
 
         scene.add(this.threeObj);
+
+        trajArray.push(this.threeObj);
     }
 
     drop()

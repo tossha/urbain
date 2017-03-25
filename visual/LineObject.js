@@ -1,10 +1,21 @@
 class LineObject extends THREE.Line {
     raycast(raycaster, intersects) {
         const verticesCount = this.geometry.vertices.length;
+        let bestIntersection;
+
+        const ray = (new THREE.Ray())
+            .copy(raycaster.ray)
+            .applyMatrix4(
+                (new THREE.Matrix4())
+                .getInverse(this.matrixWorld)
+            );
 
         for (let i = 0; i < verticesCount; i++) {
-            const vertex1 = this.geometry.vertices[i];
-            const vertex2 = this.geometry.vertices[(i + 1) % verticesCount];
+            const vertex1 = (new THREE.Vector3)
+                .copy(this.geometry.vertices[i]);
+
+            const vertex2 = (new THREE.Vector3)
+                .copy(this.geometry.vertices[(i + 1) % verticesCount]);
 
             const currentLineDirection = (new THREE.Vector3).subVectors(
                 vertex1,
@@ -13,16 +24,16 @@ class LineObject extends THREE.Line {
 
             const commonPerpendicularDirection = (new THREE.Vector3).crossVectors(
                 currentLineDirection,
-                raycaster.ray.direction
+                ray.direction
             );
 
             const planeNormalVector = (new THREE.Vector3).crossVectors(
-                raycaster.ray.direction,
+                ray.direction,
                 commonPerpendicularDirection
             );
 
             let distanceCoeff = (new THREE.Vector3).subVectors(
-                raycaster.ray.origin,
+                ray.origin,
                 vertex1
             ).dot(planeNormalVector);
 
@@ -41,7 +52,7 @@ class LineObject extends THREE.Line {
                     )
                 ) < 0
             ) {
-                //вне отркзка
+                // вне отркзка
                 intersectionPoint =
                     (intersectionPoint.distanceTo(vertex1) < intersectionPoint.distanceTo(vertex2))
                         ? vertex1
@@ -51,23 +62,30 @@ class LineObject extends THREE.Line {
             const currentDistance = (new THREE.Vector3).crossVectors(
                 (new THREE.Vector3).subVectors(
                     intersectionPoint,
-                    raycaster.ray.origin
+                    ray.origin
                 ),
-                raycaster.ray.direction
-            ).length() / raycaster.ray.direction.length();
+                ray.direction
+            ).length();
 
-            if (currentDistance / raycaster.ray.origin.distanceTo(intersectionPoint)
-                < raycaster.pixelPrecision * raycaster.pixelAngleSize
-            ) {
-                intersects.push({
+            if (!bestIntersection || (bestIntersection.distance > currentDistance)) {
+                bestIntersection = {
                     distance: currentDistance,
                     point: intersectionPoint,
                     index: i,
                     face: null,
                     faceIndex: null,
                     object: this
-                });
+                }
             }
+        }
+
+        if (bestIntersection
+            && (bestIntersection.distance / ray.origin.distanceTo(bestIntersection.point)
+                < raycaster.pixelPrecision * raycaster.pixelAngleSize
+            )
+        ) {
+            bestIntersection.point.applyMatrix4(this.matrixWorld);
+            intersects.push(bestIntersection);
         }
     }
 }
