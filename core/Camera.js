@@ -97,7 +97,7 @@ class Camera
             break;
         case 2: this.rightButtonDown = true;
             break;
-}
+        }
     }
 
     onMouseMove(event) {

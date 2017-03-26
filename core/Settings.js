@@ -182,8 +182,7 @@ class Settings
                                                 Math.PI / 4,
                                                 0xB00000,
                                                 testCallback);
-                testAngle.visual.quaternion.copy(App.getReferenceFrame(that.trackingObject, RF_TYPE_EQUATORIAL).getQuaternionByEpoch(time.epoch).toThreejs());
-
+                
                 document.addEventListener('vr_render', function (event) {
                     testAngle.update(App.getTrajectory(that.trackingObject).getPositionByEpoch(time.epoch, RF_BASE));
                 });
