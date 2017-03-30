@@ -80,14 +80,10 @@ class Camera
         } else if (event.deltaY > 0) {
             this.position.scale(koeff);
         }
-
-        if (KeplerianEditor.helperGrid) {
-            KeplerianEditor.helperGrid.onZoom(this.position.mag);
-        }
     }
 
     onMouseDown(event) {
-        this.accountedMousePos = new Vector([event.clientX, event.clientY]);
+        /*this.accountedMousePos = new Vector([event.clientX, event.clientY]);
         this.currentMousePos = Vector.copy(this.accountedMousePos);
         this.isMouseDown = true;
         switch ( event.button ) {
@@ -98,6 +94,7 @@ class Camera
         case 2: this.rightButtonDown = true;
             break;
         }
+        this.isMouseDown = true;*/ 
     }
 
     onMouseMove(event) {
