@@ -26,16 +26,18 @@ class HelperAngle
     }
 
     render() {
+        this.remove();
+
         let geometry = new THREE.CircleGeometry(Math.pow(2, 14),
                                                 200,
                                                 0,
                                                 this.value);
         let material = new THREE.MeshBasicMaterial({color: this.color, opacity: 0.175, transparent: true, side: THREE.DoubleSide});
-        this.visual = new THREE.Mesh(geometry, material);
+        this.angleVisual = new THREE.Mesh(geometry, material);
 
-        scene.add(this.visual);
-        this.visual.position.copy(this.pos);
-        this.visual.quaternion.copy(this.quaternion);
+        scene.add(this.angleVisual);
+        this.angleVisual.position.copy(this.pos);
+        this.angleVisual.quaternion.copy(this.quaternion);
 
         
         this.mainAxisVisual = new THREE.ArrowHelper(this.mainAxis,
@@ -57,21 +59,50 @@ class HelperAngle
     }
 
     update(newPos) {
-        this.visual.position.fromArray(newPos.sub(camera.lastPosition));
-        this.mainAxisVisual.position.fromArray(newPos.sub(camera.lastPosition));
+        this.pos = (new THREE.Vector3).fromArray(newPos.sub(camera.lastPosition));
+
+        this.angleVisual.position.copy(this.pos);
+        this.mainAxisVisual.position.copy(this.pos);
         if (this.callback !== undefined){
-            this.drctVisual.position.fromArray(newPos.sub(camera.lastPosition));
+            this.drctVisual.position.copy(this.pos);
         }
         
-        if (this.test !== undefined) { this.test.position.fromArray(newPos.sub(camera.lastPosition)) };
+        if (this.test !== undefined) { this.test.position.copy(this.pos) };
+
+        this.createHelperPlane();
     }
 
     resize(newValue){
-        this.remove();
-
         this.value = newValue;
 
-        this.render();
+        scene.remove(this.angleVisual);
+
+        let geometry = new THREE.CircleGeometry(Math.pow(2, 14),
+                                                200,
+                                                0,
+                                                this.value);
+        let material = new THREE.MeshBasicMaterial({color: this.color, opacity: 0.175, transparent: true, side: THREE.DoubleSide});
+        this.angleVisual = new THREE.Mesh(geometry, material);
+
+        scene.add(this.angleVisual);
+        this.angleVisual.position.copy(this.pos);
+        this.angleVisual.quaternion.copy(this.quaternion);
+
+        if (this.callback !== undefined){
+            let tempVector = this.mainAxis.clone();
+            this.drct = tempVector.applyAxisAngle(this.normal, this.value);
+            this.drctVisual.setDirection(this.drct);
+        }
+    }
+
+    createHelperPlane() {
+        let mrVector = (new THREE.Vector3).crossVectors(this.normal, this.pos);
+        let mrCathetus = (new THREE.Vector3).crossVectors(this.normal, mrVector);
+        let cos = this.pos.dot(mrCathetus) / (this.pos.length() * mrCathetus.length());
+        let angle = (cos >= 0) ? Math.acos(cos) : Math.PI - Math.acos(cos);
+        let distance = this.pos.length() * Math.sin(angle);
+
+        this.plane = new HelperPlane(this.normal, - distance);
     }
 
      onMouseDown(event) {
@@ -81,11 +112,7 @@ class HelperAngle
             this.mouseUpListener = this.onMouseUp.bind(this);
             document.addEventListener('mouseup', this.mouseUpListener);
             this.mouseMoveListener = this.onMouseMove.bind(this);
-            document.addEventListener('mouseup', this.mouseMoveListener);  
-        }
-        if (event.button == 2) {
-            let val = this.value + Math.PI / 4;
-            this.resize(val);
+            document.addEventListener('mousemove', this.mouseMoveListener);
         }
     }
 
@@ -97,17 +124,10 @@ class HelperAngle
     } 
 
     onMouseMove() {
-        let obj = [this.drctVisual.line, this.drctVisual.cone];
+        let obj = [this.plane];
         let intersection = (raycaster.intersectObjects(obj))[0];
         if (intersection !== undefined) { 
-            let drct = (intersection.point).sub(this.visual.position);
-
-            this.test = new THREE.ArrowHelper(drct,
-                                              this.pos,
-                                              Math.pow(2, 14),
-                                              0xc2f442); 
-            scene.add(this.test);
-                                                         
+            let drct = (intersection.clone()).sub(this.angleVisual.position).normalize();                       
 
             let val = Math.acos((this.mainAxis).dot(drct) / (drct.length() * this.mainAxis.length()));
             let tempVector = this.mainAxis.clone();
@@ -119,7 +139,7 @@ class HelperAngle
     }
 
     remove() {
-        scene.remove(this.visual);
+        scene.remove(this.angleVisual);
         scene.remove(this.mainAxisVisual);
         if (this.callback !== undefined){
             scene.remove(this.drctVisual);
