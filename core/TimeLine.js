@@ -75,7 +75,7 @@ class TimeLine
         this.canvasContext.fillStyle   = "#00ee00";
         this.canvasContext.font        = "14pt sans-serif";
 
-        let markDate = this.roundDateUp(this.getDateByEpoch(this.leftEpoch));
+        let markDate = this.roundDateDown(this.getDateByEpoch(this.leftEpoch));
         let markEpoch = this.getEpochByDate(markDate);
 
         while (markEpoch < this.leftEpoch + this.span) {
