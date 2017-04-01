@@ -2,19 +2,13 @@ class Settings
 {
     constructor(initial) {
         this.guiMain = new dat.GUI({width: 350});
-        this.guiTimeLine = new dat.GUI({
-            autoPlace: false,
-            width: window.innerWidth * 0.9
-        });
 
-        document.getElementById('bottomPanel').appendChild(this.guiTimeLine.domElement);
         this.timeLine = initial.timeLinePos;
         this.timeScale = initial.timeScale;
         this.isTimeRunning = initial.isTimeRunning;
         this.trackingObject = initial.trackingObject;
         this.currentDate = '';
 
-        this.timeLineController = this.guiTimeLine.add(this, 'timeLine', initial.timeLineStart, initial.timeLineEnd);
         this.guiMain.add(this, 'timeScale', -2000, 2000);
         this.guiMain.add(this, 'currentDate').listen();
         this.guiMain.add(this, 'isTimeRunning');
@@ -62,10 +56,6 @@ class Settings
         }
 
         this.currentTrajectoryMenu = trajectoryMenu;
-
-        this.timeLineController.onChange(function(value) {
-            time.forceEpoch(value);
-        });
 
         this.guiAddTrajectory = new dat.GUI({
             autoPlace: false,

@@ -41,7 +41,7 @@ function init() {
         objectsForTracking: objectsForTracking,
     });
 
-    time = new Time(settings);
+    time = new TimeLine(settings);
 }
 
 function initBuiltIn() {
