@@ -114,8 +114,7 @@ class HelperAngle
                 .applyAxisAngle(this.normal, this.value);
             this.threeDirection.setDirection(this.direction);
 
-            //this.callback(newValue);
-            //is not a function yet
+            this.callback(newValue);
         }
     }
 

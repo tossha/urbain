@@ -174,7 +174,7 @@ class Settings
             testFunction: function() {
                 let testMainAxis = App.getReferenceFrame(that.trackingObject, RF_TYPE_EQUATORIAL).getQuaternionByEpoch(time.epoch).rotate(new Vector([1, 0, 0]));
                 let testNormal = App.getReferenceFrame(that.trackingObject, RF_TYPE_EQUATORIAL).getQuaternionByEpoch(time.epoch).rotate(new Vector([0, 0, 1]));
-                let testCallback = 'smth';
+                let testCallback = function(val) {} ;
 
                 let testAngle = new HelperAngle(App.getTrajectory(that.trackingObject).getPositionByEpoch(time.epoch, RF_BASE),
                                                 testMainAxis,
