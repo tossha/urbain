@@ -53,7 +53,7 @@ $scripts = array_merge(
                 margin-left: auto;
                 margin-right: auto;
                 width:  90%;
-                height: 45px;
+                height: 35px;
                 background-color: black;
                 opacity: 1;
                 font: 13px/1.231 "Lucida Grande", Lucida, Verdana, sans-serif;

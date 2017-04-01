@@ -12,13 +12,11 @@ class TimeLine
             rightButton: false
         };
 
-        this.span = 2592000; // 300 * 8640
+        this.span = 4 * 2592000; // 4 * 30 * 86400
 
         this.settings = settings;
         this.markDistance = 300;
         this.scaleType = "month";
-
-        this.passed = [];
 
         this.domElement = document.getElementById("timeLineCanvas");
         this.canvasContext = this.domElement.getContext("2d");
@@ -26,6 +24,8 @@ class TimeLine
         this.updateCanvasStyle();
 
         this.leftEpoch = this.epoch - this.span / 2;
+
+        this.updateScaleType();
 
         this.domElement.addEventListener("mousedown",  (e) => this.onMouseDown  (e));
         window         .addEventListener("mouseup",    (e) => this.onMouseUp    (e));
@@ -49,10 +49,9 @@ class TimeLine
 
             this.epoch += this.settings.timeScale * timePassed;
             this.settings.timeLine = this.epoch;
-            this.settings.currentDate = "" + new Date((J2000_TIMESTAMP + this.epoch) * 1000);
         }
 
-        this.updateScaleType();
+        this.settings.currentDate = "" + new Date((J2000_TIMESTAMP + this.epoch) * 1000);
         this.redraw();
     }
 
@@ -63,17 +62,17 @@ class TimeLine
 
     redraw() {
         // TODO: заменить
-        this.canvasContext.fillStyle = "#222222";
+        this.canvasContext.fillStyle = "#222";
         this.canvasContext.fillRect(0, 0, this.domElement.width, this.domElement.height);
 
         // TODO: заменить
-        this.canvasContext.fillStyle = "#0000EE";
+        this.canvasContext.fillStyle = "#2FA1D6";
         this.drawCurrentTimeMark();
 
         // TODO: заменить
-        this.canvasContext.strokeStyle = "#bbbbbb";
-        this.canvasContext.fillStyle   = "#00ee00";
-        this.canvasContext.font        = "14pt sans-serif";
+        this.canvasContext.strokeStyle = "#fff";
+        this.canvasContext.fillStyle   = "#fff";
+        this.canvasContext.font        = "11pt sans-serif";
 
         let markDate = this.roundDateUp(this.getDateByEpoch(this.leftEpoch));
         let markEpoch = this.getEpochByDate(markDate);
@@ -99,9 +98,7 @@ class TimeLine
 
     updateCanvasStyle() {
         this.canvasRect = this.domElement.getBoundingClientRect();
-        const newWidth = this.canvasRect.right - this.canvasRect.left;
-        this.span *= newWidth / this.domElement.width;
-        this.domElement.width = newWidth;
+        this.domElement.width  = this.canvasRect.right  - this.canvasRect.left;
         this.domElement.height = this.canvasRect.bottom - this.canvasRect.top;
     }
 
@@ -116,7 +113,8 @@ class TimeLine
             }
 
             if (Math.abs(TimeLine.scales[bestScale] / secondsPerPeriod - 1)
-                > Math.abs(TimeLine.scales[scale] / secondsPerPeriod - 1)) {
+                > Math.abs(TimeLine.scales[scale] / secondsPerPeriod - 1)
+            ) {
                 bestScale = scale;
             }
         }
@@ -129,7 +127,11 @@ class TimeLine
         this.canvasContext.moveTo(x, 0);
         this.canvasContext.lineTo(x, this.domElement.height / 2);
         this.canvasContext.stroke();
-        this.canvasContext.fillText(text, x - this.canvasContext.measureText(text).width / 2, this.domElement.height - 2);
+        this.canvasContext.fillText(
+            text,
+            x - this.canvasContext.measureText(text).width / 2,
+            this.domElement.height - 2
+        );
     }
 
     drawCurrentTimeMark() {
@@ -140,10 +142,16 @@ class TimeLine
         var d = new Date(date);
         if (this.scaleType === "minute") {
             d.setSeconds(60, 0);
+        } else if (this.scaleType === "fiveMinutes") {
+            d.setMinutes(5 + d.getMinutes() - d.getMinutes() % 5, 0, 0);
         } else if (this.scaleType === "tenMinutes") {
             d.setMinutes(10 + d.getMinutes() - d.getMinutes() % 10, 0, 0);
+        } else if (this.scaleType === "thirtyMinutes") {
+            d.setMinutes(30 + d.getMinutes() - d.getMinutes() % 30, 0, 0);
         } else if (this.scaleType === "hour") {
             d.setMinutes(60, 0, 0);
+        } else if (this.scaleType === "threeHours") {
+            d.setHours(3 + d.getHours() - d.getHours() % 3, 0, 0, 0);
         } else if (this.scaleType === "sixHours") {
             d.setHours(6 + d.getHours() - d.getHours() % 6, 0, 0, 0);
         } else if (this.scaleType === "day") {
@@ -175,10 +183,16 @@ class TimeLine
         var d = new Date(date);
         if (this.scaleType === "minute") {
             d.setMinutes(d.getMinutes() + 1);
+        } else if (this.scaleType === "fiveMinutes") {
+            d.setMinutes(d.getMinutes() + 5);
         } else if (this.scaleType === "tenMinutes") {
             d.setMinutes(d.getMinutes() + 10);
+        } else if (this.scaleType === "thirtyMinutes") {
+            d.setMinutes(d.getMinutes() + 30);
         } else if (this.scaleType === "hour") {
             d.setHours(d.getHours() + 1);
+        } else if (this.scaleType === "threeHours") {
+            d.setHours(d.getHours() + 3);
         } else if (this.scaleType === "sixHours") {
             d.setHours(d.getHours() + 6);
         } else if (this.scaleType === "day") {
@@ -202,7 +216,9 @@ class TimeLine
     formatDate(d) {
         let formatOptions;
         if ((this.scaleType === "minute")
+            || (this.scaleType === "fiveMinutes")
             || (this.scaleType === "tenMinutes")
+            || (this.scaleType === "thirtyMinutes")
         ) {
             formatOptions = {
                 minute: "2-digit",
@@ -212,6 +228,7 @@ class TimeLine
                 year: "numeric"
             };
         } else if ((this.scaleType === "hour")
+            || (this.scaleType === "threeHours")
             || (this.scaleType === "sixHours")
         ) {
             formatOptions = {
@@ -226,7 +243,7 @@ class TimeLine
          ) {
             formatOptions = {
                 day: "2-digit",
-                month: "short",
+                month: "2-digit",
                 year: "numeric"
             };
         } else if ((this.scaleType === "month")
@@ -272,7 +289,7 @@ class TimeLine
     }
 
     onMouseWheel(e) {
-        const stepMult = 1.5;
+        const stepMult = 1.3;
         const mult = (e.deltaY > 0) ? stepMult : (1 / stepMult);
         const newSpan = Math.min(Math.max(this.span * mult,
             (this.canvasRect.right - this.canvasRect.left) / this.markDistance * TimeLine.scales.minute),
@@ -280,13 +297,18 @@ class TimeLine
         this.leftEpoch += (this.mouseState.x - this.canvasRect.left)
             * (this.span - newSpan) / (this.canvasRect.right - this.canvasRect.left);
         this.span = newSpan;
+
+        this.updateScaleType();
     }
 }
 
 TimeLine.scales = {
     minute: 60,
+    fiveMinutes: 300,
     tenMinutes: 600,
+    thirtyMinutes: 1800,
     hour: 3600,
+    threeHours: 10800,
     sixHours: 21600,
     day: 86400,
     week: 604800,
