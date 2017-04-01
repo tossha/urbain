@@ -20,7 +20,7 @@ class VisualRaycaster
     setPixelPrecision(value) {
         this.raycaster.pixelPrecision = value;
     }
-
+    
     updatePixelAngleSize() {
         this.raycaster.pixelAngleSize = deg2rad(this.camera.fov) / window.innerHeight;
     }
@@ -28,5 +28,20 @@ class VisualRaycaster
     intersectObjects(threeObjects) {
         this.raycaster.setFromCamera(this.mouse, this.camera);
         return this.raycaster.intersectObjects(threeObjects);
+    }
+
+    getPixelDistance(point) {
+        this.raycaster.setFromCamera(this.mouse, this.camera);
+
+        const pointDirection = (new THREE.Vector3).subVectors(
+            point,
+            camera.lastPosition
+        );
+
+        const angle = Math.acos(
+            this.raycaster.ray.direction.dot(pointDirection) / pointDirection.length()
+        );
+
+        return angle / this.raycaster.pixelAngleSize;
     }
 }
