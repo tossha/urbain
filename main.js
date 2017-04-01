@@ -42,6 +42,9 @@ function init() {
     });
 
     time = new TimeLine(settings);
+
+    statistics = new Stats();
+    document.body.appendChild(statistics.dom);
 }
 
 function initBuiltIn() {
@@ -114,7 +117,7 @@ function render(curTime) {
         var minDistacne = intersections[0].distance;
         var point = intersections[0].point;
 
-        for(var i = 1; i < intersections.length; i++) 
+        for(var i = 1; i < intersections.length; i++)
             if(intersections[i].distance < minDistacne) {
                 point = intersections[i].point;
                 minDistacne = intersections[i].distance;
@@ -132,6 +135,7 @@ function render(curTime) {
     axisHelper.position.fromArray(camera.lastPosition.mul(-1));
 
     renderer.render(scene, camera.threeCamera);
+    statistics.update();
     requestAnimationFrame(render);
 }
 
@@ -146,6 +150,7 @@ var textureLoader;
 var lastTrajectoryId = -1;
 var stars;
 var testSphere, trajArray = [];
+var statistics;
 
 window.onload = function () {
     init();
