@@ -5,7 +5,6 @@ class TimeLine
     constructor(settings) {
         this.epoch = settings.timeLine; // time in seconds
         this.leftEpoch = this.epoch;
-        this.span = 1;
 
         this.mouseState = {
             x: 0,
@@ -14,9 +13,10 @@ class TimeLine
             rightButton: false
         };
 
+        this.span = 2592000; // 300 * 8640
+
         this.settings = settings;
-        this.msPerPx = 8640000;
-        this.markDistance = 200;
+        this.markDistance = 300;
         this.scaleType = "month";
 
         this.passed = [];
@@ -36,25 +36,20 @@ class TimeLine
     }
 
     tick(timePassed) {
-        this.passed.push(timePassed);
-        if (this.passed.length > 10000) {
-            this.passed = this.passed.splice(1);
-        }
-        this.settings.fps = "" + (1000 * this.passed.length / this.passed.reduce((a, b) => a + b, 0));
-
-        // TODO: убрать
-        this.span = this.domElement.width * this.msPerPx / 1000;
-
-        if (this.settings.isTimeRunning && !this.isMousePressed) {
-            this.epoch += this.settings.timeScale * timePassed;
-            this.settings.timeLine = this.epoch;
-            this.settings.currentDate = "" + new Date((J2000_TIMESTAMP + this.epoch) * 1000);
-        }
-
         if (this.mouseState.leftButton) {
             console.log(this.mouseState, this.canvasRect);
             this.epoch = this.leftEpoch + (this.mouseState.x
                 - this.canvasRect.left) * this.span / this.domElement.width;
+        } else if (this.settings.isTimeRunning && !this.isMousePressed) {
+            if ((this.leftEpoch < this.epoch)
+                && (this.epoch < this.leftEpoch + this.span)
+            ) {
+                this.leftEpoch += this.settings.timeScale * timePassed;
+            }
+
+            this.epoch += this.settings.timeScale * timePassed;
+            this.settings.timeLine = this.epoch;
+            this.settings.currentDate = "" + new Date((J2000_TIMESTAMP + this.epoch) * 1000);
         }
 
         this.updateScaleType();
@@ -104,7 +99,9 @@ class TimeLine
 
     updateCanvasStyle() {
         this.canvasRect = this.domElement.getBoundingClientRect();
-        this.domElement.width = this.canvasRect.right - this.canvasRect.left;
+        const newWidth = this.canvasRect.right - this.canvasRect.left;
+        this.span *= newWidth / this.domElement.width;
+        this.domElement.width = newWidth;
         this.domElement.height = this.canvasRect.bottom - this.canvasRect.top;
     }
 
@@ -128,6 +125,7 @@ class TimeLine
     }
 
     drawMark(x, text) {
+        this.canvasContext.beginPath();
         this.canvasContext.moveTo(x, 0);
         this.canvasContext.lineTo(x, this.domElement.height / 2);
         this.canvasContext.stroke();
@@ -240,6 +238,12 @@ class TimeLine
     }
 
     onMouseWheel(e) {
+        const newSpan = Math.min(Math.max(this.span * (1 + e.deltaY * 0.0005),
+            (this.canvasRect.right - this.canvasRect.left) * TimeLine.scales.minute),
+            (this.canvasRect.right - this.canvasRect.left) * TimeLine.scales.year);
+        this.leftEpoch += (this.mouseState.x - this.canvasRect.left)
+            * (this.span - newSpan) / (this.canvasRect.right - this.canvasRect.left);
+        this.span = newSpan;
     }
 }
 
