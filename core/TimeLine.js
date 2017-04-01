@@ -234,7 +234,7 @@ class TimeLine
         }
 
         this.mouseState.x = e.x;
-        this.mouseState.y = e.x;
+        this.mouseState.y = e.y;
     }
 
     onMouseWheel(e) {
