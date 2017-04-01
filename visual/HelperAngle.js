@@ -25,7 +25,7 @@ class HelperAngle
 
         this.quaternion = quaternionX.multiply(quaternionZ);
 
-        if (this.callback !== undefined) {//do smth
+        if (this.callback) {
             this.initEditMode();
         };
 
@@ -65,13 +65,13 @@ class HelperAngle
 
         scene.add(this.threeMainAxis);
 
-        if (this.callback !== undefined){
-            this.drct = this.mainAxis
+        if (this.isEditMode) {
+            this.direction = this.mainAxis
                 .clone()
                 .applyAxisAngle(this.normal, this.value);
 
             this.threeDirection = new THREE.ArrowHelper(
-                this.drct,
+                this.direction,
                 this.pos,
                 INITIAL_LENGTH,
                 this.isEditMode ? 0xc2f442 : this.color
@@ -86,38 +86,36 @@ class HelperAngle
 
         this.threeAngle.position.copy(this.pos);
         this.threeMainAxis.position.copy(this.pos);
-        if (this.callback !== undefined){
-            this.threeDirection.position.copy(this.pos);
-        }
-        
-        if (this.test !== undefined) { this.test.position.copy(this.pos) };
+        this.threeDirection.position.copy(this.pos);
 
         this.createHelperPlane();
     }
 
-    resize(newValue){
+    resize(newValue) {
         this.value = newValue;
 
         scene.remove(this.threeAngle);
 
-        let geometry = new THREE.CircleGeometry(
+        this.threeAngle.geometry.dispose();
+        this.threeAngle.geometry = new THREE.CircleGeometry(
             INITIAL_LENGTH,
             INITIAL_SEGMENTS_NUMBER,
             0,
             this.value
         );
-        let material = new THREE.MeshBasicMaterial({color: this.color, opacity: 0.175, transparent: true, side: THREE.DoubleSide});
-        this.threeAngle = new THREE.Mesh(geometry, material);
 
         scene.add(this.threeAngle);
         this.threeAngle.position.copy(this.pos);
         this.threeAngle.quaternion.copy(this.quaternion);
 
-        if (this.isEditMode){
-            this.drct = this.mainAxis
+        if (this.isEditMode) {
+            this.direction = this.mainAxis
                 .clone()
                 .applyAxisAngle(this.normal, this.value);
-            this.threeDirection.setDirection(this.drct);
+            this.threeDirection.setDirection(this.direction);
+
+            //this.callback(newValue);
+            //is not a function yet
         }
     }
 
@@ -153,14 +151,14 @@ class HelperAngle
         let obj = [this.plane];
         let intersection = (raycaster.intersectObjects(obj))[0];
         if (intersection !== undefined) { 
-            const DIRECTION = intersection.point
+            const direction = intersection.point
                 .clone()
                 .sub(this.threeAngle.position)
                 .normalize();
 
-            let val = Math.acos((this.mainAxis).dot(DIRECTION)); // no division by lengths because direction and mainAxis are normalized (length = 1)
+            let val = Math.acos((this.mainAxis).dot(direction)); // no division by lengths because direction and mainAxis are normalized (length = 1)
             let tempVector = this.mainAxis.clone();
-            tempVector.cross(DIRECTION);
+            tempVector.cross(direction);
 
             val = (tempVector.dot(this.normal) > 0) ? val : TWO_PI - val;
             this.resize(val);
@@ -170,8 +168,6 @@ class HelperAngle
     remove() {
         scene.remove(this.threeAngle);
         scene.remove(this.threeMainAxis);
-        if (this.isEditMode){
-            scene.remove(this.threeDirection);
-        };
+        scene.remove(this.threeDirection);
     }
 }
