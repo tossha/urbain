@@ -11,15 +11,15 @@ class HelperGrid
     render() {
         let pos = App.getTrajectory(this.centerObject).getPositionByEpoch(time.epoch, RF_BASE);
         
-        this.gridVisual = new THREE.PolarGridHelper(Math.pow(2, this.gridSizeParam),
+        this.threeGrid = new THREE.PolarGridHelper(Math.pow(2, this.gridSizeParam),
                                                    32,
                                                    32,
                                                    200);
-        this.gridVisual.position.fromArray(pos.sub(camera.lastPosition));
-        this.gridVisual.quaternion.copy(BODIES[this.centerObject].orientation.getQuaternionByEpoch(time.epoch).toThreejs());
-        this.gridVisual.rotateX(Math.PI / 2);
+        this.threeGrid.position.fromArray(pos.sub(camera.lastPosition));
+        this.threeGrid.quaternion.copy(BODIES[this.centerObject].orientation.getQuaternionByEpoch(time.epoch).toThreejs());
+        this.threeGrid.rotateX(Math.PI / 2);
 
-        scene.add(this.gridVisual);
+        scene.add(this.threeGrid);
 
         this.zoomListener = this.onZoom.bind(this);
         document.addEventListener('wheel', this.zoomListener);
@@ -27,7 +27,7 @@ class HelperGrid
 
     update(epoch) {
         let pos = App.getTrajectory(this.centerObject).getPositionByEpoch(epoch, RF_BASE);
-        this.gridVisual.position.fromArray(pos.sub(camera.lastPosition));
+        this.threeGrid.position.fromArray(pos.sub(camera.lastPosition));
     }
 
     onZoom() {
@@ -35,7 +35,7 @@ class HelperGrid
         //let pow = Math.round(Math.log(newDistance) / Math.log(2));
 
         if (pow != this.gridSizeParam) {
-            scene.remove(this.gridVisual);
+            scene.remove(this.threeGrid);
 
             this.gridSizeParam = pow;
 
@@ -44,7 +44,7 @@ class HelperGrid
     }
 
     remove() {
-        scene.remove(this.gridVisual);
+        scene.remove(this.threeGrid);
         document.removeEventListener('wheel', this.zoomListener);
     }
 }

@@ -1,4 +1,4 @@
-class HelperPlane extends THREE.Plane 
+class VirtualPlane extends THREE.Plane 
 {
     raycast(raycaster, intersects) {
 
@@ -14,6 +14,15 @@ class HelperPlane extends THREE.Plane
 
         let d = point.dot(this.normal) / raycaster.ray.direction.dot(this.normal);
 
-        intersects.push(raycaster.ray.direction.clone().multiplyScalar(d));
+        let intersectionPoint = raycaster.ray.direction.clone().multiplyScalar(d);
+
+        intersects.push({
+            distance  : intersectionPoint.length(),
+            point     : intersectionPoint,
+            index     : 0,
+            face      : null,
+            faceIndex : null,
+            object    : this
+        });
     }
 }
