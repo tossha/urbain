@@ -75,7 +75,7 @@ class TimeLine
         this.canvasContext.fillStyle   = "#00ee00";
         this.canvasContext.font        = "14pt sans-serif";
 
-        let markDate = this.roundDateDown(this.getDateByEpoch(this.leftEpoch));
+        let markDate = this.roundDateUp(this.getDateByEpoch(this.leftEpoch));
         let markEpoch = this.getEpochByDate(markDate);
 
         while (markEpoch < this.leftEpoch + this.span) {
@@ -136,42 +136,39 @@ class TimeLine
         this.canvasContext.fillRect(0, 0, this.getCanvasPositionByEpoch(this.epoch), this.domElement.height);
     }
 
-    roundDateDown(date) {
+    roundDateUp(date) {
         var d = new Date(date);
         if (this.scaleType === "minute") {
-            d.setSeconds(0, 0);
+            d.setSeconds(60, 0);
         } else if (this.scaleType === "tenMinutes") {
-            d.setMinutes(d.getMinutes() - d.getMinutes() % 10, 0, 0);
+            d.setMinutes(10 + d.getMinutes() - d.getMinutes() % 10, 0, 0);
         } else if (this.scaleType === "hour") {
             d.setMinutes(60, 0, 0);
         } else if (this.scaleType === "sixHours") {
-            d.setHours(d.getHours() - d.getHours() % 6, 0, 0, 0);
+            d.setHours(6 + d.getHours() - d.getHours() % 6, 0, 0, 0);
         } else if (this.scaleType === "day") {
             d.setHours(24, 0, 0, 0);
         } else if (this.scaleType === "week") {
             d.setHours(0, 0, 0, 0);
-            d.setDate(d.getDate() - d.getDay());
+            d.setDate(7 + d.getDate() - d.getDay());
         } else if (this.scaleType === "month") {
             d.setHours(0, 0, 0, 0);
             d.setDate(1);
+            d.setMonth(d.getMonth() + 1);
         } else if (this.scaleType === "threeMonths") {
             d.setHours(0, 0, 0, 0);
             d.setDate(1);
-            d.setMonth(d.getMonth() - d.getMonth() % 3);
+            d.setMonth(3 + d.getMonth() - d.getMonth() % 3);
         } else if (this.scaleType === "year") {
             d.setHours(0, 0, 0, 0);
             d.setMonth(0, 1);
         } else if (this.scaleType === "fiveYears") {
             d.setHours(0, 0, 0, 0);
-            d.setFullYear(d.getFullYear() - d.getFullYear() % 5, 0, 1);
+            d.setFullYear(5 + d.getFullYear() - d.getFullYear() % 5, 0, 1);
         } else {
             return;
         }
         return d;
-    }
-
-    roundDateUp(date) {
-        return this.nextRenderingDate(this.roundDateDown(date));
     }
 
     nextRenderingDate(date) {
