@@ -4,7 +4,6 @@ class TimeLine
 {
     constructor(settings) {
         this.epoch = settings.timeLine; // time in seconds
-        this.leftEpoch = this.epoch;
 
         this.mouseState = {
             x: 0,
@@ -26,6 +25,8 @@ class TimeLine
         this.canvasRect = {};
         this.updateCanvasStyle();
 
+        this.leftEpoch = this.epoch - this.span / 2;
+
         this.domElement.addEventListener("mousedown",  (e) => this.onMouseDown  (e));
         window         .addEventListener("mouseup",    (e) => this.onMouseUp    (e));
         window         .addEventListener("mousemove",  (e) => this.onMouseMove  (e));
@@ -37,7 +38,6 @@ class TimeLine
 
     tick(timePassed) {
         if (this.mouseState.leftButton) {
-            console.log(this.mouseState, this.canvasRect);
             this.epoch = this.leftEpoch + (this.mouseState.x
                 - this.canvasRect.left) * this.span / this.domElement.width;
         } else if (this.settings.isTimeRunning && !this.isMousePressed) {
@@ -136,39 +136,66 @@ class TimeLine
         this.canvasContext.fillRect(0, 0, this.getCanvasPositionByEpoch(this.epoch), this.domElement.height);
     }
 
-    roundDateUp(date) {
+    roundDateDown(date) {
         var d = new Date(date);
         if (this.scaleType === "minute") {
-            d.setSeconds(60, 0);
+            d.setSeconds(0, 0);
+        } else if (this.scaleType === "tenMinutes") {
+            d.setMinutes(d.getMinutes() - d.getMinutes() % 10, 0, 0);
         } else if (this.scaleType === "hour") {
             d.setMinutes(60, 0, 0);
+        } else if (this.scaleType === "sixHours") {
+            d.setHours(d.getHours() - d.getHours() % 6, 0, 0, 0);
         } else if (this.scaleType === "day") {
             d.setHours(24, 0, 0, 0);
+        } else if (this.scaleType === "week") {
+            d.setHours(0, 0, 0, 0);
+            d.setDate(d.getDate() - d.getDay());
         } else if (this.scaleType === "month") {
             d.setHours(0, 0, 0, 0);
             d.setDate(1);
-            d.setMonth(d.getMonth() + 1);
+        } else if (this.scaleType === "threeMonths") {
+            d.setHours(0, 0, 0, 0);
+            d.setDate(1);
+            d.setMonth(d.getMonth() - d.getMonth() % 3);
         } else if (this.scaleType === "year") {
             d.setHours(0, 0, 0, 0);
-            d.setMonth(12, 1);
+            d.setMonth(0, 1);
+        } else if (this.scaleType === "fiveYears") {
+            d.setHours(0, 0, 0, 0);
+            d.setFullYear(d.getFullYear() - d.getFullYear() % 5, 0, 1);
         } else {
             return;
         }
         return d;
     }
 
+    roundDateUp(date) {
+        return this.nextRenderingDate(this.roundDateDown(date));
+    }
+
     nextRenderingDate(date) {
         var d = new Date(date);
         if (this.scaleType === "minute") {
             d.setMinutes(d.getMinutes() + 1);
+        } else if (this.scaleType === "tenMinutes") {
+            d.setMinutes(d.getMinutes() + 10);
         } else if (this.scaleType === "hour") {
             d.setHours(d.getHours() + 1);
+        } else if (this.scaleType === "sixHours") {
+            d.setHours(d.getHours() + 6);
         } else if (this.scaleType === "day") {
             d.setDate(d.getDate() + 1);
+        } else if (this.scaleType === "week") {
+            d.setDate(d.getDate() + 7);
         } else if (this.scaleType === "month") {
             d.setMonth(d.getMonth() + 1);
+        } else if (this.scaleType === "threeMonths") {
+            d.setMonth(d.getMonth() + 3);
         } else if (this.scaleType === "year") {
             d.setFullYear(d.getFullYear() + 1, d.getMonth(), d.getDate());
+        } else if (this.scaleType === "fiveYears") {
+            d.setFullYear(d.getFullYear() + 5, d.getMonth(), d.getDate());
         } else {
             return;
         }
@@ -177,7 +204,9 @@ class TimeLine
 
     formatDate(d) {
         let formatOptions;
-        if (this.scaleType === "minute") {
+        if ((this.scaleType === "minute")
+            || (this.scaleType === "tenMinutes")
+        ) {
             formatOptions = {
                 minute: "2-digit",
                 hour: "2-digit",
@@ -185,7 +214,9 @@ class TimeLine
                 month: "2-digit",
                 year: "numeric"
             };
-        } else if (this.scaleType === "hour") {
+        } else if ((this.scaleType === "hour")
+            || (this.scaleType === "sixHours")
+        ) {
             formatOptions = {
                 minute: "2-digit",
                 hour: "2-digit",
@@ -193,18 +224,24 @@ class TimeLine
                 month: "2-digit",
                 year: "numeric"
             };
-        } else if (this.scaleType === "day") {
+        } else if ((this.scaleType === "day")
+            || (this.scaleType === "week")
+         ) {
             formatOptions = {
                 day: "2-digit",
                 month: "short",
                 year: "numeric"
             };
-        } else if (this.scaleType === "month") {
+        } else if ((this.scaleType === "month")
+            || (this.scaleType === "threeMonths")
+         ) {
             formatOptions = {
                 month: "long",
                 year: "numeric"
             };
-        } else if (this.scaleType === "year") {
+        } else if ((this.scaleType === "year")
+            || (this.scaleType === "fiveYears")
+        ) {
             formatOptions = {
                 year: "numeric"
             };
@@ -238,9 +275,11 @@ class TimeLine
     }
 
     onMouseWheel(e) {
-        const newSpan = Math.min(Math.max(this.span * (1 + e.deltaY * 0.0005),
-            (this.canvasRect.right - this.canvasRect.left) * TimeLine.scales.minute),
-            (this.canvasRect.right - this.canvasRect.left) * TimeLine.scales.year);
+        const stepMult = 1.5;
+        const mult = (e.deltaY > 0) ? stepMult : (1 / stepMult);
+        const newSpan = Math.min(Math.max(this.span * mult,
+            (this.canvasRect.right - this.canvasRect.left) / this.markDistance * TimeLine.scales.minute),
+            (this.canvasRect.right - this.canvasRect.left) / this.markDistance * TimeLine.scales.fiveYears);
         this.leftEpoch += (this.mouseState.x - this.canvasRect.left)
             * (this.span - newSpan) / (this.canvasRect.right - this.canvasRect.left);
         this.span = newSpan;
@@ -249,8 +288,13 @@ class TimeLine
 
 TimeLine.scales = {
     minute: 60,
+    tenMinutes: 600,
     hour: 3600,
+    sixHours: 21600,
     day: 86400,
+    week: 604800,
     month: 2592000,
-    year: 31557600
+    threeMonths: 7776000,
+    year: 31557600,
+    fiveYears: 157788000,
 }
