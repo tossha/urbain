@@ -71,8 +71,7 @@ function initBuiltIn() {
             0.00108263,
             TLEDATA[id].color ? TLEDATA[id].color : 'azure'
         ));
-    };
-
+    }
 }
 
 function firstRender(curTime) {
