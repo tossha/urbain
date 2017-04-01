@@ -11,17 +11,11 @@ class KeplerianEditor
     static createNew() {
         if (KeplerianEditor.isEditMode !== true) {
 
-            if (BODIES[settings.trackingObject] !== undefined) {
-                KeplerianEditor.helperGrid = new HelperGrid(settings.trackingObject);
-                KeplerianEditor.isEditMode = true; 
-
-                document.addEventListener('vr_render', function (event) {
-                    KeplerianEditor.helperGrid.update(time.epoch);
-                });
-            };
+            KeplerianEditor.helperGrid = new HelperGrid(App.getReferenceFrame(settings.trackingObject, RF_TYPE_EQUATORIAL));
+            KeplerianEditor.isEditMode = true;
 
             //plane
-        };
+        }
 
         
     }
@@ -31,6 +25,6 @@ class KeplerianEditor
             KeplerianEditor.helperGrid.remove();
 
             KeplerianEditor.isEditMode = false;
-        };
+        }
     }
 }
