@@ -176,16 +176,14 @@ class Settings
                 let testNormal = App.getReferenceFrame(that.trackingObject, RF_TYPE_EQUATORIAL).getQuaternionByEpoch(time.epoch).rotate(new Vector([0, 0, 1]));
                 let testCallback = function(val) {} ;
 
-                let testAngle = new HelperAngle(App.getTrajectory(that.trackingObject).getPositionByEpoch(time.epoch, RF_BASE),
-                                                testMainAxis,
-                                                testNormal,
-                                                Math.PI / 4,
-                                                0xB00000,
-                                                testCallback);
-                
-                document.addEventListener('vr_render', function (event) {
-                    testAngle.update(App.getTrajectory(that.trackingObject).getPositionByEpoch(time.epoch, RF_BASE));
-                });
+                let testAngle = new HelperAngle(
+                    new FunctionOfEpochObjectPosition(that.trackingObject, RF_BASE),
+                    testMainAxis,
+                    testNormal,
+                    Math.PI / 4,
+                    0xB00000,
+                    testCallback
+                );
             }
         };
 
