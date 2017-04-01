@@ -4,39 +4,60 @@ class TimeLine
 {
     constructor(settings) {
         this.epoch = settings.timeLine; // time in seconds
-        this.isMousePressed = false;
+        this.leftEpoch = this.epoch;
+        this.span = 1;
+
+        this.mouseState = {
+            x: 0,
+            y: 0,
+            leftButton: false,
+            rightButton: false
+        };
+
         this.settings = settings;
-        this.msPerPx = 100 * 60 * 60 * 24;
-        this.msPerPxWanted = this.msPerPx;
-        
-        const canvas = this.domElement = document.getElementById("timeLineCanvas");
-        canvas.addEventListener("mousedown", (e) => this.onMouseDown  (e));
-        window.addEventListener("mouseup"  , (e) => this.onMouseUp    (e));
-        window.addEventListener("mousemove", (e) => this.onMouseMove  (e));
-        canvas.addEventListener("wheel"    , (e) => this.onMouseWheel (e));
+        this.msPerPx = 8640000;
+        this.markDistance = 200;
+        this.scaleType = "month";
+
+        this.passed = [];
+
+        this.domElement = document.getElementById("timeLineCanvas");
+        this.canvasContext = this.domElement.getContext("2d");
+        this.canvasRect = {};
+        this.updateCanvasStyle();
+
+        this.domElement.addEventListener("mousedown",  (e) => this.onMouseDown  (e));
+        window         .addEventListener("mouseup",    (e) => this.onMouseUp    (e));
+        window         .addEventListener("mousemove",  (e) => this.onMouseMove  (e));
+        this.domElement.addEventListener("mousewheel", (e) => this.onMouseWheel (e));
+
+        window.addEventListener("resize", () => this.updateCanvasStyle());
+        window.oncontextmenu = () => false;
     }
 
     tick(timePassed) {
+        this.passed.push(timePassed);
+        if (this.passed.length > 10000) {
+            this.passed = this.passed.splice(1);
+        }
+        this.settings.fps = "" + (1000 * this.passed.length / this.passed.reduce((a, b) => a + b, 0));
+
+        // TODO: убрать
+        this.span = this.domElement.width * this.msPerPx / 1000;
+
         if (this.settings.isTimeRunning && !this.isMousePressed) {
             this.epoch += this.settings.timeScale * timePassed;
             this.settings.timeLine = this.epoch;
             this.settings.currentDate = "" + new Date((J2000_TIMESTAMP + this.epoch) * 1000);
         }
-        
-        // Плавное изменение масштаба
-        if (this.msPerPx !== this.msPerPxWanted) {
-            const panelStyle = getComputedStyle(document.getElementById("bottomPanel"));
-            const fixedMouseShift = this.mouseX - parseFloat(panelStyle.left) - parseFloat(panelStyle.width) / 2;
-            const fixedDate = this.epoch + fixedMouseShift * this.msPerPx / 1000;
-            const scaleShift = this.msPerPxWanted / this.msPerPx - 1;
-            if (Math.abs(scaleShift) < 0.05) {
-                this.msPerPx = this.msPerPxWanted;
-            } else {
-                this.msPerPx *= 1 + scaleShift / Math.abs(scaleShift) * 0.05;
-            }
-            this.epoch = fixedDate - fixedMouseShift * this.msPerPx / 1000;
+
+        if (this.mouseState.leftButton) {
+            console.log(this.mouseState, this.canvasRect);
+            this.epoch = this.leftEpoch + (this.mouseState.x
+                - this.canvasRect.left) * this.span / this.domElement.width;
         }
 
+        this.updateScaleType();
         this.redraw();
     }
 
@@ -46,88 +67,186 @@ class TimeLine
     }
 
     redraw() {
-        const canvas = this.domElement;
-        const computedStyle = getComputedStyle(canvas);
-        canvas.width = parseFloat(computedStyle.width);
-        canvas.height = parseFloat(computedStyle.height);
-        
-        const context = canvas.getContext("2d");
+        // TODO: заменить
+        this.canvasContext.fillStyle = "#222222";
+        this.canvasContext.fillRect(0, 0, this.domElement.width, this.domElement.height);
 
-        context.fillStyle = "#222222";
-        context.fillRect(0, 0, canvas.width, canvas.height);
+        // TODO: заменить
+        this.canvasContext.fillStyle = "#0000EE";
+        this.drawCurrentTimeMark();
 
-        context.strokeStyle = "#bbbbbb";
-        context.fillStyle   = "#00ee00";
-        context.font        = "#14px Courier New";
+        // TODO: заменить
+        this.canvasContext.strokeStyle = "#bbbbbb";
+        this.canvasContext.fillStyle   = "#00ee00";
+        this.canvasContext.font        = "14pt sans-serif";
 
-        context.moveTo(canvas.width / 2, 0);
-        context.lineTo(canvas.width / 2, canvas.height);
-        context.stroke();
+        let markDate = this.roundDateUp(this.getDateByEpoch(this.leftEpoch));
+        let markEpoch = this.getEpochByDate(markDate);
 
-        const centerEpoch = 1000 * (this.epoch + J2000_TIMESTAMP);
-        let displayEpoch = centerEpoch;
-        while (centerEpoch - displayEpoch < this.msPerPx * canvas.width / 2) {
-            displayEpoch = this.previousRenderingDate(displayEpoch - 1);
-        }
-
-        while (displayEpoch - centerEpoch < this.msPerPx * canvas.width / 2) {
-            const position = canvas.width / 2 + (displayEpoch - centerEpoch) / this.msPerPx;
-            context.moveTo(position, 0);
-            context.lineTo(position, canvas.height / 2);
-            context.stroke();
-            context.fillText(this.formatDate(displayEpoch), position, canvas.height / 2);
-            displayEpoch = this.nextRenderingDate(displayEpoch + 1);
+        while (markEpoch < this.leftEpoch + this.span) {
+            this.drawMark(this.getCanvasPositionByEpoch(markEpoch), this.formatDate(markDate));
+            markDate = this.nextRenderingDate(markDate);
+            markEpoch = this.getEpochByDate(markDate);
         }
     }
 
-    previousRenderingDate(date) {
+    getDateByEpoch(epoch) {
+        return new Date((J2000_TIMESTAMP + epoch) * 1000);
+    }
+
+    getEpochByDate(date) {
+        return date / 1000 - J2000_TIMESTAMP;
+    }
+
+    getCanvasPositionByEpoch(epoch) {
+        return (epoch - this.leftEpoch) * this.domElement.width / this.span;
+    }
+
+    updateCanvasStyle() {
+        this.canvasRect = this.domElement.getBoundingClientRect();
+        this.domElement.width = this.canvasRect.right - this.canvasRect.left;
+        this.domElement.height = this.canvasRect.bottom - this.canvasRect.top;
+    }
+
+    updateScaleType() {
+        const secondsPerPeriod = this.markDistance * this.span / this.domElement.width;
+        let bestScale = false;
+
+        for (let scale in TimeLine.scales) {
+            if (!bestScale) {
+                bestScale = scale;
+                continue;
+            }
+
+            if (Math.abs(TimeLine.scales[bestScale] / secondsPerPeriod - 1)
+                > Math.abs(TimeLine.scales[scale] / secondsPerPeriod - 1)) {
+                bestScale = scale;
+            }
+        }
+
+        this.scaleType = bestScale;
+    }
+
+    drawMark(x, text) {
+        this.canvasContext.moveTo(x, 0);
+        this.canvasContext.lineTo(x, this.domElement.height / 2);
+        this.canvasContext.stroke();
+        this.canvasContext.fillText(text, x - this.canvasContext.measureText(text).width / 2, this.domElement.height - 2);
+    }
+
+    drawCurrentTimeMark() {
+        this.canvasContext.fillRect(0, 0, this.getCanvasPositionByEpoch(this.epoch), this.domElement.height);
+    }
+
+    roundDateUp(date) {
         var d = new Date(date);
-        d.setDate(1);
-        d.setHours(0);
-        d.setMinutes(0);
-        d.setSeconds(0);
-        d.setMilliseconds(0);
-        return +d;
+        if (this.scaleType === "minute") {
+            d.setSeconds(60, 0);
+        } else if (this.scaleType === "hour") {
+            d.setMinutes(60, 0, 0);
+        } else if (this.scaleType === "day") {
+            d.setHours(24, 0, 0, 0);
+        } else if (this.scaleType === "month") {
+            d.setHours(0, 0, 0, 0);
+            d.setDate(1);
+            d.setMonth(d.getMonth() + 1);
+        } else if (this.scaleType === "year") {
+            d.setHours(0, 0, 0, 0);
+            d.setMonth(12, 1);
+        } else {
+            return;
+        }
+        return d;
     }
 
     nextRenderingDate(date) {
         var d = new Date(date);
-        d.setMonth(d.getMonth() + 1);
-        d.setDate(1);
-        d.setHours(0);
-        d.setMinutes(0);
-        d.setSeconds(0);
-        d.setMilliseconds(0);
-        return +d;
+        if (this.scaleType === "minute") {
+            d.setMinutes(d.getMinutes() + 1);
+        } else if (this.scaleType === "hour") {
+            d.setHours(d.getHours() + 1);
+        } else if (this.scaleType === "day") {
+            d.setDate(d.getDate() + 1);
+        } else if (this.scaleType === "month") {
+            d.setMonth(d.getMonth() + 1);
+        } else if (this.scaleType === "year") {
+            d.setFullYear(d.getFullYear() + 1, d.getMonth(), d.getDate());
+        } else {
+            return;
+        }
+        return d;
     }
 
-    formatDate(date) {
-        const d = new Date(date);
-        return `${[
-            "Январь", "Февраль", "Март",
-            "Апрель", "Май", "Июнь",
-            "Июль", "Август", "Сентябрь",
-            "Октябрь", "Ноябрь", "Декабрь"
-        ][d.getMonth()]} ${d.getFullYear()}`;
+    formatDate(d) {
+        let formatOptions;
+        if (this.scaleType === "minute") {
+            formatOptions = {
+                minute: "2-digit",
+                hour: "2-digit",
+                day: "2-digit",
+                month: "2-digit",
+                year: "numeric"
+            };
+        } else if (this.scaleType === "hour") {
+            formatOptions = {
+                minute: "2-digit",
+                hour: "2-digit",
+                day: "2-digit",
+                month: "2-digit",
+                year: "numeric"
+            };
+        } else if (this.scaleType === "day") {
+            formatOptions = {
+                day: "2-digit",
+                month: "short",
+                year: "numeric"
+            };
+        } else if (this.scaleType === "month") {
+            formatOptions = {
+                month: "long",
+                year: "numeric"
+            };
+        } else if (this.scaleType === "year") {
+            formatOptions = {
+                year: "numeric"
+            };
+        }
+        return d.toLocaleString('ru', formatOptions);
     }
 
     onMouseDown(e) {
-        this.isMousePressed = true;
+        if (e.button === 0) {
+            this.mouseState.leftButton = true;
+        } else if (e.button === 2) {
+            this.mouseState.rightButton = true;
+        }
     }
 
     onMouseUp(e) {
-        this.isMousePressed = false;
+        if (e.button === 0) {
+            this.mouseState.leftButton = false;
+        } else if (e.button === 2) {
+            this.mouseState.rightButton = false;
+        }
     }
 
     onMouseMove(e) {
-        if (this.isMousePressed) {
-            this.epoch += (this.mouseX - e.clientX) * this.msPerPx / 1000;
+        if (this.mouseState.rightButton) {
+            this.leftEpoch += (this.mouseState.x - e.x) * this.span / this.domElement.width;
         }
 
-        this.mouseX = e.clientX;
+        this.mouseState.x = e.x;
+        this.mouseState.y = e.x;
     }
 
     onMouseWheel(e) {
-        this.msPerPxWanted = Math.max(1000, Math.min(1000 * 60 * 60 * 24, this.msPerPxWanted * (1 + 0.05 * e.deltaY)));
     }
+}
+
+TimeLine.scales = {
+    minute: 60,
+    hour: 3600,
+    day: 86400,
+    month: 2592000,
+    year: 31557600
 }
