@@ -122,7 +122,7 @@ var settings, time, globalTime;
 var textureLoader;
 var lastTrajectoryId = -1;
 var stars;
-var testSphere, trajArray = [];
+var trajArray = [];
 var selection;
 var statistics;
 

@@ -60,8 +60,6 @@ class SelectionHandler
                 currentTraj.isSelected = true;
             }
         }
-
-        console.log(this.selectedObject);
     }
 
     getSelectedObjects() {
