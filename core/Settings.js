@@ -16,7 +16,7 @@ class Settings
 
         this.guiMain.add(this, 'timeScale', -2000, 2000);
         this.guiMain.add(this, 'currentDate').listen();
-        this.guiMain.add(this, 'isTimeRunning');
+        this.guiIsTimeRunning = this.guiMain.add(this, 'isTimeRunning');
         this.guiMain.add(this, 'trackingObject', initial.objectsForTracking).onChange(function(value) {
             camera.setOrbitingPoint(value);
         });
