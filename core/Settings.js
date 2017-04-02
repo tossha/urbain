@@ -9,6 +9,11 @@ class Settings
         this.trackingObject = initial.trackingObject;
         this.currentDate = '';
 
+        this.showStatistics = false;
+        this.guiMain.add(this, 'showStatistics').onChange((value) => {
+            statistics.dom.style.display = value ? "" : "none";
+        });
+
         this.guiMain.add(this, 'timeScale', -2000, 2000);
         this.guiMain.add(this, 'currentDate').listen();
         this.guiMain.add(this, 'isTimeRunning');
