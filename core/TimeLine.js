@@ -32,6 +32,12 @@ class TimeLine
         window         .addEventListener("mousemove",  (e) => this.onMouseMove  (e));
         this.domElement.addEventListener("mousewheel", (e) => this.onMouseWheel (e));
 
+        window.addEventListener("keypress", (e) => {
+            if (e.key === " ") {
+                this.settings.guiIsTimeRunning.setValue(!this.settings.isTimeRunning);
+            }
+        });
+
         window.addEventListener("resize", () => this.updateCanvasStyle());
         window.oncontextmenu = () => false;
     }
