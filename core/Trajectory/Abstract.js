@@ -2,6 +2,7 @@ class TrajectoryAbstract
 {
     constructor(referenceFrame) {
         let that = this;
+
         this.referenceFrame = referenceFrame || null; // class ReferenceFrameAbstract
         document.addEventListener('vr_render', function (event) {
             that.render(event.detail.epoch);
@@ -11,6 +12,12 @@ class TrajectoryAbstract
     drop() {
         if (this.visualModel) {
             this.visualModel.drop();
+        }
+    }
+
+    set isSelected(newValue) {
+        if (this.visualModel) {
+            this.visualModel.isSelected = newValue;
         }
     }
 
