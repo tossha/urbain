@@ -45,6 +45,7 @@ function init() {
 
     statistics = new Stats();
     document.body.appendChild(statistics.dom);
+    statistics.dom.style.display = "none";
 }
 
 function initBuiltIn() {
