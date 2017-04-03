@@ -7,7 +7,7 @@ class SelectionHandler
 
         this.pointerSphere = new THREE.Mesh(
             new THREE.SphereGeometry(1, 10, 10),
-            new THREE.MeshBasicMaterial({color: 0xffff00})
+            new THREE.MeshBasicMaterial({color: 0xFFFF00})
         );
 
         scene.add(this.pointerSphere);
@@ -49,15 +49,31 @@ class SelectionHandler
 
             if (currentTraj === this.selectedObject) {
                 currentTraj.isSelected = false;
+
+                document.dispatchEvent(new CustomEvent(
+                    'vr_deselect',
+                    {detail: {trajectory: this.selectedObject}}
+                ));
+
                 this.selectedObject = null;
             }
             else {
                 if (this.selectedObject) {
                     this.selectedObject.isSelected = false;
+
+                    document.dispatchEvent(new CustomEvent(
+                        'vr_deselect',
+                        {detail: {trajectory: this.selectedObject}}
+                    ));
                 }
 
                 this.selectedObject = currentTraj;
                 currentTraj.isSelected = true;
+
+                document.dispatchEvent(new CustomEvent(
+                    'vr_select',
+                    {detail: {trajectory: this.selectedObject}}
+                ));
             }
         }
     }
