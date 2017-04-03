@@ -7,22 +7,20 @@ $scripts = array_merge(
         getDirScripts('core'),
         getDirScripts('visual'),
         getDirScripts('interface')
-    ))
+    )),
+    ['algebra.js', 'const.js', 'ssdata.js']
 );
+$scripts = array_map('addTime', $scripts);
 ?>
 <!DOCTYPE html>
-<html manifest="manifest.appcache">
+<html>
     <head>
         <script src="https://threejs.org/build/three.min.js"></script>
-        <script src="https://threejs.org/examples/js/controls/OrbitControls.js"></script>
 
         <?php foreach ($scripts as $script) { ?>
             <script src="<?= $script ?>"></script>
         <?php } ?>
 
-        <script src="algebra.js"></script>
-        <script src="const.js"></script>
-        <script src="ssdata.js"></script>
         <style type="text/css">
 
             body {
@@ -78,8 +76,8 @@ $scripts = array_merge(
     </head>
 
     <body>
-        <script type="text/javascript" src="builtin.js"></script>
-        <script type="text/javascript" src="main.js"></script>
+        <script type="text/javascript" src="<?= addTime('builtin.js') ?>"></script>
+        <script type="text/javascript" src="<?= addTime('main.js') ?>"></script>
 
         <div id="leftPanel"></div>
         <div id="viewport"></div>
