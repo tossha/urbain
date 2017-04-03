@@ -16,6 +16,10 @@ function getDirScripts($dir) {
     return $scripts;
 }
 
+function addTime($file) {
+    return $file . '?t=' . filemtime($file);
+}
+
 function reorderScripts($files) {
     $reordered = [];
     $includedClasses = [];
