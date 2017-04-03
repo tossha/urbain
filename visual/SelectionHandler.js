@@ -5,12 +5,12 @@ class SelectionHandler
         this.selectedObject = null;
         this.bestIntersection = null;
 
-        this.testSphere = new THREE.Mesh(
+        this.pointerSphere = new THREE.Mesh(
             new THREE.SphereGeometry(1, 10, 10),
             new THREE.MeshBasicMaterial({color: 0xffff00})
         );
 
-        scene.add(this.testSphere);
+        scene.add(this.pointerSphere);
 
         document.addEventListener('vr_render', this.onRender.bind(this));
         window.addEventListener('click', this.onMouseClick.bind(this));
@@ -28,17 +28,17 @@ class SelectionHandler
                 }
             }
 
-            this.testSphere.visible = true;
-            this.testSphere.position.copy(this.bestIntersection.point);
+            this.pointerSphere.visible = true;
+            this.pointerSphere.position.copy(this.bestIntersection.point);
 
             const scaleKoeff = this.bestIntersection.point.length() / 200;
 
-            this.testSphere.scale.x = scaleKoeff;
-            this.testSphere.scale.y = scaleKoeff;
-            this.testSphere.scale.z = scaleKoeff;
+            this.pointerSphere.scale.x = scaleKoeff;
+            this.pointerSphere.scale.y = scaleKoeff;
+            this.pointerSphere.scale.z = scaleKoeff;
         }
         else {
-            this.testSphere.visible = false;
+            this.pointerSphere.visible = false;
             this.bestIntersection = null;
         }
     }
@@ -62,7 +62,7 @@ class SelectionHandler
         }
     }
 
-    getSelectedObjects() {
+    getSelectedObject() {
         return this.selectedObject;
     }
 }

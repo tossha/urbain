@@ -18,7 +18,7 @@ function init() {
 
     textureLoader = new THREE.TextureLoader();
 
-    raycaster = new VisualRaycaster(camera.threeCamera, 30);
+    raycaster = new VisualRaycaster(camera.threeCamera, 7);
 
     selection = new SelectionHandler(raycaster);
 

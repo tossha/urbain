@@ -7,7 +7,7 @@ class VisualTrajectoryModelAbstract
 
         this.threeObj = new LineObject(
             new THREE.Geometry(),
-            new THREE.LineBasicMaterial({color: 0xFFFFFF, vertexColors: THREE.VertexColors})
+            new THREE.LineBasicMaterial({vertexColors: THREE.VertexColors})
         );
 
         this.threeObj.userData = {trajectory: trajectory};
