@@ -19,7 +19,7 @@ class VisualTrajectoryModelAbstract
 
     set isSelected(newValue) {
         if(newValue) {
-            this.color = 0xffffff;
+            this.color = 0xFFFFFF;
         }
         else {
             this.color = this.standardColor;
