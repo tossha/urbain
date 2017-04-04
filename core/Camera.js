@@ -1,5 +1,6 @@
 class Camera
 {
+    
     constructor (domElement, initialOrbitingPoint, initialPosition) {
         let that = this;
 
@@ -8,27 +9,32 @@ class Camera
         this.isMouseDown = false;
         this.orbitingPoint = initialOrbitingPoint;
 
-        this.pole = new Vector([0, 0, 1]);
         this.position = initialPosition;
-        this.quaternion = this._getQuaternionByPosition(this.position);
 
         this.currentMousePos = new Vector([0, 0]);
         this.accountedMousePos = new Vector([0, 0]);
 
         this.threeCamera.position.fromArray([0, 0, 0]);
+        
+        this.rightButtonDown = false;
+            
+        domElement.addEventListener('mousedown', this.onMouseDown.bind(this));
+        domElement.addEventListener('mousemove', this.onMouseMove.bind(this));
+        domElement.addEventListener('mouseup',   this.onMouseUp.bind(this));
+        domElement.addEventListener('wheel',     this.onMouseWheel.bind(this));
+    }
 
-        domElement.addEventListener('mousedown', function (event) {
-            that.onMouseDown(event);
-        });
-        domElement.addEventListener('mousemove', function (event) {
-            that.onMouseMove(event);
-        });
-        domElement.addEventListener('mouseup', function (event) {
-            that.onMouseUp(event);
-        });
-        domElement.addEventListener('wheel', function (event) {
-            that.onMouseWheel(event);
-        });
+    init(epoch) {
+        this.lastEpoch = epoch;
+        this.setOrbitingPoint(this.orbitingPoint);
+    }
+    
+    updatePole(epoch) {
+        if (BODIES[this.orbitingPoint] === undefined) {
+            this.pole = new Vector([0, 0, 1]);
+        } else {
+            this.pole = BODIES[this.orbitingPoint].orientation.getQuaternionByEpoch(epoch).rotate_(new Vector([0, 0, 1]));
+        }
     }
 
     _getQuaternionByPosition(position) {
@@ -58,8 +64,9 @@ class Camera
         this.position
             .add_(App.getTrajectory(this.orbitingPoint).getPositionByEpoch(this.lastEpoch, RF_BASE))
             .sub_(App.getTrajectory(pointId).getPositionByEpoch(this.lastEpoch, RF_BASE));
-        this.quaternion = this._getQuaternionByPosition(this.position);
         this.orbitingPoint = pointId;
+        this.updatePole(this.lastEpoch);
+        this.quaternion = this._getQuaternionByPosition(this.position);
     }
 
     getOrbitingPointPosition(epoch) {
@@ -79,6 +86,14 @@ class Camera
         this.accountedMousePos = new Vector([event.clientX, event.clientY]);
         this.currentMousePos = Vector.copy(this.accountedMousePos);
         this.isMouseDown = true;
+        switch ( event.button ) {
+        case 0: //left
+            break;
+        case 1: // middle
+            break;
+        case 2: this.rightButtonDown = true;
+            break;
+}
     }
 
     onMouseMove(event) {
@@ -89,6 +104,7 @@ class Camera
 
     onMouseUp(event) {
         this.isMouseDown = false;
+        this.rightButtonDown = false;
     }
 
     onResize() {
@@ -98,19 +114,26 @@ class Camera
 
     update(epoch) {
         let mouseShift = this.currentMousePos.sub(this.accountedMousePos);
-
+        
+        this.updatePole(epoch);
+        
         if (mouseShift[0] || mouseShift[1]) {
+            const polarConstraint = 0.00001;
             let poleAngle = this.position.angle(this.pole);
-            let verticalRotationAxis = this.position.cross(this.pole);
-            let verticalQuaternion = new Quaternion(verticalRotationAxis, Math.max(Math.min(mouseShift[1] * 0.01, poleAngle), poleAngle - Math.PI));
+            let verticalRotationAxis = this.rightButtonDown
+                ? this.quaternion.rotate(new Vector([0, 0, 1])).cross(this.pole)
+                : this.position.cross(this.pole);
+                
+            let verticalQuaternion = new Quaternion(verticalRotationAxis, Math.min(Math.max(mouseShift[1] * 0.01, poleAngle - Math.PI + polarConstraint), poleAngle - polarConstraint));
             let mainQuaternion = (new Quaternion()).setAxisAngle(this.pole, -mouseShift[0] * 0.01).mul(verticalQuaternion);
-
-            mainQuaternion.rotate_(this.position);
+    
+            if (!this.rightButtonDown) {
+                mainQuaternion.rotate_(this.position);
+            }
             this.quaternion = mainQuaternion.mul(this.quaternion);
 
             this.accountedMousePos = Vector.copy(this.currentMousePos);
         }
-
         this.threeCamera.quaternion.copy(this.quaternion.toThreejs());
         this.lastPosition = this.getOrbitingPointPosition(epoch).add_(this.position);
         this.lastEpoch = epoch;

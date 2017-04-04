@@ -4,6 +4,11 @@ class ObjectLoader
         for (let bodyId in config) {
             this.loadObject(bodyId, config[bodyId]);
         }
+
+        App.setTrajectory(
+            SOLAR_SYSTEM_BARYCENTER,
+            new TrajectoryStaticPosition(RF_BASE, new Vector([0, 0, 0]))
+        );
     }
 
     static loadObject(bodyId, data) {
