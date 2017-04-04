@@ -9,10 +9,7 @@ class Camera
         this.isMouseDown = false;
         this.orbitingPoint = initialOrbitingPoint;
 
-        this.updatePole(0);
-        
         this.position = initialPosition;
-        this.quaternion = this._getQuaternionByPosition(this.position);
 
         this.currentMousePos = new Vector([0, 0]);
         this.accountedMousePos = new Vector([0, 0]);
@@ -21,18 +18,15 @@ class Camera
         
         this.rightButtonDown = false;
             
-        domElement.addEventListener('mousedown', function (event) {
-            that.onMouseDown(event);
-        });
-        domElement.addEventListener('mousemove', function (event) {
-            that.onMouseMove(event);
-        });
-        domElement.addEventListener('mouseup', function (event) {
-            that.onMouseUp(event);
-        });
-        domElement.addEventListener('wheel', function (event) {
-            that.onMouseWheel(event);
-        });
+        domElement.addEventListener('mousedown', this.onMouseDown.bind(this));
+        domElement.addEventListener('mousemove', this.onMouseMove.bind(this));
+        domElement.addEventListener('mouseup',   this.onMouseUp.bind(this));
+        domElement.addEventListener('wheel',     this.onMouseWheel.bind(this));
+    }
+
+    init(epoch) {
+        this.lastEpoch = epoch;
+        this.setOrbitingPoint(this.orbitingPoint);
     }
     
     updatePole(epoch) {
@@ -68,15 +62,15 @@ class Camera
 
     setOrbitingPoint(pointId) {
         this.position
-            .add_(TRAJECTORIES[this.orbitingPoint].getPositionByEpoch(this.lastEpoch, RF_BASE))
-            .sub_(TRAJECTORIES[pointId].getPositionByEpoch(this.lastEpoch, RF_BASE));
+            .add_(App.getTrajectory(this.orbitingPoint).getPositionByEpoch(this.lastEpoch, RF_BASE))
+            .sub_(App.getTrajectory(pointId).getPositionByEpoch(this.lastEpoch, RF_BASE));
         this.orbitingPoint = pointId;
         this.updatePole(this.lastEpoch);
         this.quaternion = this._getQuaternionByPosition(this.position);
     }
 
     getOrbitingPointPosition(epoch) {
-        return TRAJECTORIES[this.orbitingPoint].getPositionByEpoch(epoch, RF_BASE);
+        return App.getTrajectory(this.orbitingPoint).getPositionByEpoch(epoch, RF_BASE);
     }
 
     onMouseWheel(event) {

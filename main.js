@@ -1,5 +1,7 @@
 function init() {
-    let objectsForTracking = {};
+    let objectsForTracking = {
+        'Solar System barycenter': SOLAR_SYSTEM_BARYCENTER
+    };
 
     scene = new THREE.Scene();
     scene.add(new THREE.AmbientLight(0xFFEFD5, 0.15));
@@ -74,6 +76,7 @@ function initBuiltIn() {
 
 function firstRender(curTime) {
     globalTime = curTime;
+    camera.init(time.epoch);
     requestAnimationFrame(render);
 }
 
