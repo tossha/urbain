@@ -85,9 +85,9 @@ class HelperAngle
         scene.add(this.threeDirection);
     }
 
-    onRender(epoch) {
+    onRender(event) {
         this.pos = (new THREE.Vector3).fromArray(
-            this.positionAtEpoch.evaluate(epoch)
+            this.positionAtEpoch.evaluate(event.detail.epoch)
                 .sub(camera.lastPosition)
         );
 
