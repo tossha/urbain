@@ -172,7 +172,7 @@ class Settings
             },
 
             testFunction: function() {
-                let testMainAxis = App.getReferenceFrame(that.trackingObject, RF_TYPE_EQUATORIAL).getQuaternionByEpoch(time.epoch).rotate(new Vector([1, 0, 0]));
+                /*let testMainAxis = App.getReferenceFrame(that.trackingObject, RF_TYPE_EQUATORIAL).getQuaternionByEpoch(time.epoch).rotate(new Vector([1, 0, 0]));
                 let testNormal = App.getReferenceFrame(that.trackingObject, RF_TYPE_EQUATORIAL).getQuaternionByEpoch(time.epoch).rotate(new Vector([0, 0, 1]));
                 let testCallback = function(val) {} ;
 
@@ -181,9 +181,13 @@ class Settings
                     testMainAxis,
                     testNormal,
                     Math.PI / 4,
-                    0xB00000,
+                    0xFC0FC0,
                     testCallback
-                );
+                );*/
+
+                document.addEventListener('vr_select', function() {
+                    event.detail.trajectory.keplerianEditor = new KeplerianEditor(event.detail.trajectory, false)
+                })
             }
         };
 
