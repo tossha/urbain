@@ -83,7 +83,7 @@ class Camera
     }
 
     onMouseDown(event) {
-        /*this.accountedMousePos = new Vector([event.clientX, event.clientY]);
+        this.accountedMousePos = new Vector([event.clientX, event.clientY]);
         this.currentMousePos = Vector.copy(this.accountedMousePos);
         this.isMouseDown = true;
         switch ( event.button ) {
@@ -94,7 +94,7 @@ class Camera
         case 2: this.rightButtonDown = true;
             break;
         }
-        this.isMouseDown = true;*/ 
+        this.isMouseDown = true;
     }
 
     onMouseMove(event) {
