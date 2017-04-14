@@ -32,44 +32,76 @@ class KeplerianEditor
     }*/
 
     initAngles(event) {
-        if (this.trajectory.keplerianObject !== undefined) {
-            const keplerianObject = this.trajectory.keplerianObject;
-        } else {
-            const keplerianObject = this.trajectory.getKeplerianObjectByEpoch(event.detail.epoch)
-        }
+        const keplerianObject = this.trajectory.keplerianObject || this.trajectory.getKeplerianObjectByEpoch(event.detail.epoch);
+        
 
         /*this.incAngle = new HelperAngle(
-            new FunctionOfEpochTrajectoryPosition(this.trajectory, RF_BASE),
+            new FunctionOfEpochObjectPosition(this.trajectory.referenceFrame.origin, RF_BASE),
             ,
             ,
             keplerianObject.inc,
-            0xB00000
+            0xB00000 //red
         );
 
         this.raanAngle = new HelperAngle(
-            new FunctionOfEpochTrajectoryPosition(this.trajectory, RF_BASE),
+            new FunctionOfEpochObjectPosition(this.trajectory.referenceFrame.origin, RF_BASE),
             ,
             ,
             keplerianObject.raan,
-            0x7FFFD4
+            0x7FFFD4 //lightblue
         );*/
 
-        let orbitNormal = this.trajectory.referenceFrame.getQuaternionByEpoch(time.epoch).rotate(new Vector([0, 0, 1]));
-        let orbitX = this.trajectory.referenceFrame.getQuaternionByEpoch(time.epoch).rotate(new Vector([1, 0, 0]));
+        let parentX = (new THREE.Vector3).fromArray(
+            this.trajectory.referenceFrame
+            .getQuaternionByEpoch(event.detail.epoch)
+            .rotate(new Vector([1, 0, 0])))
+            .normalize();
+        let parentZ = (new THREE.Vector3).fromArray(
+            this.trajectory.referenceFrame
+            .getQuaternionByEpoch(event.detail.epoch)
+            .rotate(new Vector([0, 0, 1])))
+            .normalize();
+
+        let orbitQuaternion = (new THREE.Quaternion).setFromAxisAngle(parentX, keplerianObject.inc)
+            .multiply((new THREE.Quaternion).setFromAxisAngle(parentZ, keplerianObject.raan))
+            .multiply((new THREE.Quaternion)
+                .fromArray(this.trajectory.referenceFrame
+                    .getQuaternionByEpoch(event.detail.epoch).toVTArray()));
+
+        let orbitNormalThree = new THREE.Vector3(0, 0, 1).applyQuaternion(orbitQuaternion);
+        let orbitNormal = new Vector([
+            orbitNormalThree.x,
+            orbitNormalThree.y,
+            orbitNormalThree.z
+        ]);
+
+        let orbitXThree = new THREE.Vector3(0, 0, 1).applyQuaternion(orbitQuaternion);
+        let orbitX = new Vector([
+            orbitXThree.x,
+            orbitXThree.y,
+            orbitXThree.z
+        ]);
 
         this.aopAngle = new HelperAngle(
-            new FunctionOfEpochTrajectoryPosition(this.trajectory, RF_BASE),
+            new FunctionOfEpochObjectPosition(this.trajectory.referenceFrame.origin, RF_BASE),
             orbitX,
             orbitNormal,
             keplerianObject.aop,
-            0x9966CC
+            0x9966CC //violet
         );
 
-        this.taAngle = new HelperAngle(
-            new FunctionOfEpochTrajectoryPosition(this.trajectory, RF_BASE),
+        /*this.taAngle = new HelperAngle(
+            new FunctionOfEpochObjectPosition(this.trajectory.referenceFrame.origin, RF_BASE),
             orbitX,
             orbitNormal,
             keplerianObject.ta,
+            0xFC0FC0 //pink
+        );*/
+
+        this.test = new THREE.ArrowHelper(
+            parentZ,
+            this.aopAngle.position.clone().sub(camera.lastPosition),
+            Math.pow(2, 14),
             0xFC0FC0
         );
 
@@ -79,8 +111,10 @@ class KeplerianEditor
     }
 
     updateAngles() {
-        const keplerianObject = this.trajectory.getKeplerianObjectByEpoch(event.detail.epoch) || this.trajectory.keplerianObject;
+        const keplerianObject = this.trajectory.keplerianObject || this.trajectory.getKeplerianObjectByEpoch(event.detail.epoch);
         this.aopAngle.resize(keplerianObject.aop);
-        this.taAngle.resize(keplerianObject.ta);
+        //this.taAngle.resize(keplerianObject.ta);
+
+        this.aopAngle.position.clone().sub(camera.lastPosition);
     }
 }

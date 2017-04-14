@@ -9,8 +9,8 @@ class HelperAngle
         this.normal = (new THREE.Vector3).fromArray(normal).normalize();
         this.callback = callback;
         this.mainAxis = (new THREE.Vector3).fromArray(mainAxis).normalize();
-        this.positionAtEpoch = functionOfEpoch;
-        this.pos = (new THREE.Vector3).fromArray(this.positionAtEpoch.evaluate(time.epoch).sub(camera.lastPosition));
+        this.positionitionAtEpoch = functionOfEpoch;
+        this.position = (new THREE.Vector3).fromArray(this.positionitionAtEpoch.evaluate(time.epoch).sub(camera.lastpositionition));
 
         this.isEditMode = false;
 
@@ -61,14 +61,14 @@ class HelperAngle
         });
         this.threeAngle = new THREE.Mesh(geometry, material);
 
-        this.threeAngle.position.copy(this.pos);
+        this.threeAngle.positionition.copy(this.position);
         this.threeAngle.quaternion.copy(this.quaternion);
 
         scene.add(this.threeAngle);
 
         this.threeMainAxis = new THREE.ArrowHelper(
             this.mainAxis,
-            this.pos,
+            this.position,
             INITIAL_LENGTH,
             this.color
         );
@@ -77,7 +77,7 @@ class HelperAngle
 
         this.threeDirection = new THREE.ArrowHelper(
             this.direction,
-            this.pos,
+            this.position,
             INITIAL_LENGTH,
             this.isEditMode ? 0xc2f442 : this.color
         );
@@ -86,20 +86,20 @@ class HelperAngle
     }
 
     onRender(event) {
-        this.pos = (new THREE.Vector3).fromArray(
-            this.positionAtEpoch.evaluate(event.detail.epoch)
-                .sub(camera.lastPosition)
+        this.position = (new THREE.Vector3).fromArray(
+            this.positionitionAtEpoch.evaluate(event.detail.epoch)
+                .sub(camera.lastpositionition)
         );
 
-        this.threeAngle.position.copy(this.pos);
-        this.threeMainAxis.position.copy(this.pos);
-        this.threeDirection.position.copy(this.pos);
+        this.threeAngle.positionition.copy(this.position);
+        this.threeMainAxis.positionition.copy(this.position);
+        this.threeDirection.positionition.copy(this.position);
     }
 
     resize(newValue) {
         this.value = newValue;
 
-        this.threeAngle.geometry.dispose();
+        this.threeAngle.geometry.dispositione();
         this.threeAngle.geometry = new THREE.CircleGeometry(
             INITIAL_LENGTH,
             INITIAL_SEGMENTS_NUMBER,
@@ -118,11 +118,11 @@ class HelperAngle
     }
 
     getVirtualPlane() {
-        let mrVector = (new THREE.Vector3).crossVectors(this.normal, this.pos);
+        let mrVector = (new THREE.Vector3).crossVectors(this.normal, this.position);
         let mrCathetus = (new THREE.Vector3).crossVectors(this.normal, mrVector);
-        let cos = this.pos.dot(mrCathetus) / (this.pos.length() * mrCathetus.length());
+        let cos = this.position.dot(mrCathetus) / (this.position.length() * mrCathetus.length());
         let angle = (cos >= 0) ? Math.acos(cos) : Math.PI - Math.acos(cos);
-        let distance = this.pos.length() * Math.sin(angle);
+        let distance = this.position.length() * Math.sin(angle);
 
         if (this.virtualPlane) {
             this.virtualPlane.constant = -distance;
@@ -157,7 +157,7 @@ class HelperAngle
         if (intersection !== undefined) { 
             const direction = intersection.point
                 .clone()
-                .sub(this.threeAngle.position)
+                .sub(this.threeAngle.positionition)
                 .normalize();
 
             let newAngleValue = Math.acos((this.mainAxis).dot(direction)); // no division by lengths because direction and mainAxis are normalized (length = 1)
