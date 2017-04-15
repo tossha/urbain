@@ -1,4 +1,4 @@
-const INITIAL_LENGTH = Math.pow(2, 14);
+const INITIAL_LENGTH = Math.pow(2, 25);
 const INITIAL_SEGMENTS_NUMBER = 200;
 
 class HelperAngle
@@ -10,18 +10,18 @@ class HelperAngle
         this.callback = callback;
         this.mainAxis = (new THREE.Vector3).fromArray(mainAxis).normalize();
         this.positionitionAtEpoch = functionOfEpoch;
-        this.position = (new THREE.Vector3).fromArray(this.positionitionAtEpoch.evaluate(time.epoch).sub(camera.lastpositionition));
+        this.position = (new THREE.Vector3).fromArray(this.positionitionAtEpoch.evaluate(time.epoch).sub(camera.lastPosition));
 
         this.isEditMode = false;
-
-        let quaternionX = (new THREE.Quaternion).setFromUnitVectors(
-            new THREE.Vector3(1, 0, 0),
-            this.mainAxis
-        );
 
         let quaternionZ = (new THREE.Quaternion).setFromUnitVectors(
             new THREE.Vector3(0, 0, 1),
             this.normal
+        );
+
+        let quaternionX = (new THREE.Quaternion).setFromUnitVectors(
+            (new THREE.Vector3(1, 0, 0)).applyQuaternion(quaternionZ),
+            this.mainAxis
         );
 
         this.quaternion = quaternionX.multiply(quaternionZ);
@@ -61,7 +61,7 @@ class HelperAngle
         });
         this.threeAngle = new THREE.Mesh(geometry, material);
 
-        this.threeAngle.positionition.copy(this.position);
+        this.threeAngle.position.copy(this.position);
         this.threeAngle.quaternion.copy(this.quaternion);
 
         scene.add(this.threeAngle);
@@ -88,18 +88,18 @@ class HelperAngle
     onRender(event) {
         this.position = (new THREE.Vector3).fromArray(
             this.positionitionAtEpoch.evaluate(event.detail.epoch)
-                .sub(camera.lastpositionition)
+                .sub(camera.lastPosition)
         );
 
-        this.threeAngle.positionition.copy(this.position);
-        this.threeMainAxis.positionition.copy(this.position);
-        this.threeDirection.positionition.copy(this.position);
+        this.threeAngle.position.copy(this.position);
+        this.threeMainAxis.position.copy(this.position);
+        this.threeDirection.position.copy(this.position);
     }
 
     resize(newValue) {
         this.value = newValue;
 
-        this.threeAngle.geometry.dispositione();
+        this.threeAngle.geometry.dispose();
         this.threeAngle.geometry = new THREE.CircleGeometry(
             INITIAL_LENGTH,
             INITIAL_SEGMENTS_NUMBER,
@@ -157,7 +157,7 @@ class HelperAngle
         if (intersection !== undefined) { 
             const direction = intersection.point
                 .clone()
-                .sub(this.threeAngle.positionition)
+                .sub(this.threeAngle.position)
                 .normalize();
 
             let newAngleValue = Math.acos((this.mainAxis).dot(direction)); // no division by lengths because direction and mainAxis are normalized (length = 1)
