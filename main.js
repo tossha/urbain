@@ -34,14 +34,9 @@ function init() {
         timeLinePos:        TimeLine.getEpochByDate(new Date()),
         timeScale:          0.001,
         isTimeRunning:      true,
-        trackingObject:     SOLAR_SYSTEM_BARYCENTER,
+        trackingObject:     EARTH,
         objectsForTracking: objectsForTracking,
     });
-
-    document.addEventListener('vr_select', function() {
-        event.detail.trajectory.keplerianEditor = new KeplerianEditor(event.detail.trajectory, false)
-    })
-
 
     time = new TimeLine(settings);
 

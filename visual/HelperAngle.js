@@ -1,9 +1,9 @@
-const INITIAL_LENGTH = Math.pow(2, 25);
+const INITIAL_LENGTH = Math.pow(2, 14);
 const INITIAL_SEGMENTS_NUMBER = 200;
 
 class HelperAngle
 {
-    constructor(functionOfEpoch, mainAxis, normal, angleValue, color, callback) {
+    constructor(functionOfEpoch, mainAxis, normal, angleValue, color, isArcMode, callback) {
         this.value = angleValue;
         this.color = color;
         this.normal = (new THREE.Vector3).fromArray(normal).normalize();
@@ -11,6 +11,7 @@ class HelperAngle
         this.mainAxis = (new THREE.Vector3).fromArray(mainAxis).normalize();
         this.positionitionAtEpoch = functionOfEpoch;
         this.position = (new THREE.Vector3).fromArray(this.positionitionAtEpoch.evaluate(time.epoch).sub(camera.lastPosition));
+        this.isArcMode = isArcMode;
 
         this.isEditMode = false;
 
@@ -47,20 +48,36 @@ class HelperAngle
     }
 
     init() {
-        let geometry = new THREE.CircleGeometry(
-            INITIAL_LENGTH,
-            INITIAL_SEGMENTS_NUMBER,
-            0,
-            this.value
-        );
-        let material = new THREE.MeshBasicMaterial({
-            color: this.color,
-            opacity: 0.175,
-            transparent: true,
-            side: THREE.DoubleSide
-        });
-        this.threeAngle = new THREE.Mesh(geometry, material);
+        if (this.isArcMode === true) {
+            let geometry = (new THREE.Path(
+                (new THREE.EllipseCurve(
+                    0, 0,
+                    INITIAL_LENGTH, INITIAL_LENGTH,
+                    0, this.value,
+                    false,
+                    0
+                )).getPoints(100)
+            )).createPointsGeometry(100);
 
+            let material = new THREE.LineBasicMaterial({color: this.color});
+
+            this.threeAngle = new LineObject(geometry, material);
+        } else {
+            let geometry = new THREE.CircleGeometry(
+                INITIAL_LENGTH,
+                INITIAL_SEGMENTS_NUMBER,
+                0,
+                this.value
+            );
+            let material = new THREE.MeshBasicMaterial({
+                color: this.color,
+                opacity: 0.175,
+                transparent: true,
+                side: THREE.DoubleSide
+            });
+
+            this.threeAngle = new THREE.Mesh(geometry, material);
+        };
         this.threeAngle.position.copy(this.position);
         this.threeAngle.quaternion.copy(this.quaternion);
 
@@ -115,6 +132,31 @@ class HelperAngle
         if (this.callback) {
             this.callback(newValue);
         }
+    }
+
+    rearrange(newMainAxis, newNormal) {
+        this.mainAxis = (new THREE.Vector3).fromArray(newMainAxis).normalize();
+        this.normal = (new THREE.Vector3).fromArray(newNormal).normalize();
+
+        this.threeMainAxis.setDirection(this.mainAxis);
+
+        this.direction = this.mainAxis
+            .clone()
+            .applyAxisAngle(this.normal, this.value);
+        this.threeDirection.setDirection(this.direction);
+
+        let quaternionZ = (new THREE.Quaternion).setFromUnitVectors(
+            new THREE.Vector3(0, 0, 1),
+            this.normal
+        );
+
+        let quaternionX = (new THREE.Quaternion).setFromUnitVectors(
+            (new THREE.Vector3(1, 0, 0)).applyQuaternion(quaternionZ),
+            this.mainAxis
+        );
+
+        this.quaternion = quaternionX.multiply(quaternionZ);
+        this.threeAngle.quaternion.copy(this.quaternion);
     }
 
     getVirtualPlane() {
