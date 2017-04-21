@@ -36,13 +36,18 @@ class KeplerianEditor
 
         this.raanAngle = new HelperAngle(
             new FunctionOfEpochObjectPosition(this.trajectory.referenceFrame.origin, RF_BASE),
-            new Vector([1, 0, 0]),
-            new Vector([0, 0, 1]),
+            this.trajectory.referenceFrame
+                .getQuaternionByEpoch(0)
+                .rotate(new Vector([1, 0, 0])),
+            this.trajectory.referenceFrame
+                .getQuaternionByEpoch(0)
+                .rotate(new Vector([0, 0, 1])),
             keplerianObject.raan,
-            0x7FFFD4 //lightblue
+            0x7FFFD4, //lightblue
+            true
         );
 
-        let normal = this.trajectory.referenceFrame
+        /*let normal = this.trajectory.referenceFrame
             .getQuaternionByEpoch(event.detail.epoch)
             .rotate(
                 (new Vector([0, 0, 1]))
@@ -62,7 +67,8 @@ class KeplerianEditor
             node,
             normal,
             keplerianObject.aop,
-            0x9966CC //violet
+            0x9966CC, //violet
+            true
         );
 
        this.incAngle = new HelperAngle(
@@ -70,7 +76,8 @@ class KeplerianEditor
             Vector.copy(node).rotateZ(- Math.PI / 2),
             node,
             keplerianObject.inc,
-            0xB00000 //red
+            0xB00000, //red
+            true
         );
 
         let periapsis = new Vector([
@@ -84,8 +91,9 @@ class KeplerianEditor
             periapsis,
             normal,
             keplerianObject.ta,
-            0xFC0FC0 //pink
-        );
+            0xFC0FC0, //pink
+            true
+        );*/
 
         document.removeEventListener('vr_render', this.initAnglesImproved);
         this.updateAnglesImproved = this.updateAngles.bind(this);
@@ -94,18 +102,32 @@ class KeplerianEditor
 
     updateAngles() {
         const keplerianObject = this.trajectory.keplerianObject || this.trajectory.getKeplerianObjectByEpoch(event.detail.epoch);
-        
+        this.raanAngle.position.clone().sub(camera.lastPosition);
+        this.raanAngle.resize(keplerianObject.raan);
+
+        /*let normal = this.trajectory.referenceFrame
+            .getQuaternionByEpoch(event.detail.epoch)
+            .rotate(
+                (new Vector([0, 0, 1]))
+                    .rotateX(keplerianObject.inc)
+                    .rotateZ(keplerianObject.raan)
+            );
+
+        let node = this.trajectory.referenceFrame
+            .getQuaternionByEpoch(event.detail.epoch)
+            .rotate(
+                (new Vector([1, 0, 0]))
+                    .rotateZ(keplerianObject.raan)
+            );
 
         this.aopAngle.position.clone().sub(camera.lastPosition);
         this.aopAngle.resize(keplerianObject.aop);
-
-        this.raanAngle.position.clone().sub(camera.lastPosition);
-        this.raanAngle.resize(keplerianObject.raan);
+        //this.aopAngle.rearrange();
 
         this.incAngle.position.clone().sub(camera.lastPosition);
         this.incAngle.resize(keplerianObject.inc);
 
         this.taAngle.position.clone().sub(camera.lastPosition);
-        this.taAngle.resize(keplerianObject.ta);
+        this.taAngle.resize(keplerianObject.ta);*/
     }
 }
