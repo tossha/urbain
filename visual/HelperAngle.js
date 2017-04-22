@@ -1,4 +1,4 @@
-const INITIAL_LENGTH = Math.pow(2, 14);
+const INITIAL_LENGTH = Math.pow(2, 15);
 const INITIAL_SEGMENTS_NUMBER = 200;
 
 class HelperAngle
@@ -52,7 +52,7 @@ class HelperAngle
             let geometry = (new THREE.Path(
                 (new THREE.EllipseCurve(
                     0, 0,
-                    INITIAL_LENGTH, INITIAL_LENGTH,
+                    INITIAL_LENGTH / 2, INITIAL_LENGTH / 2,
                     0, this.value,
                     false,
                     0
@@ -77,29 +77,36 @@ class HelperAngle
             });
 
             this.threeAngle = new THREE.Mesh(geometry, material);
-        };
+
+        }; // TEMP! NEEDS REWORK
+            this.threeMainAxis = new THREE.ArrowHelper(
+                this.mainAxis,
+                this.position,
+                INITIAL_LENGTH,
+                'white'
+            );
+
+            this.threeDirection = new THREE.ArrowHelper(
+                this.direction,
+                this.position,
+                INITIAL_LENGTH,
+                this.isEditMode ? 0xc2f442 : this.color
+            );
+        //};
+
+        this.threeNormal = new THREE.ArrowHelper(
+                this.normal,
+                this.position,
+                INITIAL_LENGTH,
+                0xc2f442
+            );
+        
         this.threeAngle.position.copy(this.position);
         this.threeAngle.quaternion.copy(this.quaternion);
-
         scene.add(this.threeAngle);
-
-        this.threeMainAxis = new THREE.ArrowHelper(
-            this.mainAxis,
-            this.position,
-            INITIAL_LENGTH,
-            this.color
-        );
-
         scene.add(this.threeMainAxis);
-
-        this.threeDirection = new THREE.ArrowHelper(
-            this.direction,
-            this.position,
-            INITIAL_LENGTH,
-            this.isEditMode ? 0xc2f442 : this.color
-        );
-
         scene.add(this.threeDirection);
+        scene.add(this.threeNormal);
     }
 
     onRender(event) {
@@ -111,18 +118,30 @@ class HelperAngle
         this.threeAngle.position.copy(this.position);
         this.threeMainAxis.position.copy(this.position);
         this.threeDirection.position.copy(this.position);
+        this.threeNormal.position.copy(this.position);
     }
 
     resize(newValue) {
         this.value = newValue;
 
         this.threeAngle.geometry.dispose();
-        this.threeAngle.geometry = new THREE.CircleGeometry(
-            INITIAL_LENGTH,
-            INITIAL_SEGMENTS_NUMBER,
-            0,
-            this.value
-        );
+        this.threeAngle.geometry = (this.isArcMode) ? 
+            (new THREE.Path(
+                (new THREE.EllipseCurve(
+                    0, 0,
+                    INITIAL_LENGTH / 3, INITIAL_LENGTH / 3,
+                    0, this.value,
+                    false,
+                    0
+                )).getPoints(100)
+            )).createPointsGeometry(100)
+            :
+            (new THREE.CircleGeometry(
+                INITIAL_LENGTH,
+                INITIAL_SEGMENTS_NUMBER,
+                0,
+                this.value
+            ));
 
         this.direction = this.mainAxis
             .clone()

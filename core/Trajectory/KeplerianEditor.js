@@ -37,30 +37,35 @@ class KeplerianEditor
         this.raanAngle = new HelperAngle(
             new FunctionOfEpochObjectPosition(this.trajectory.referenceFrame.origin, RF_BASE),
             this.trajectory.referenceFrame
-                .getQuaternionByEpoch(0)
+                .getQuaternionByEpoch(event.detail.epoch)
                 .rotate(new Vector([1, 0, 0])),
             this.trajectory.referenceFrame
-                .getQuaternionByEpoch(0)
+                .getQuaternionByEpoch(event.detail.epoch)
                 .rotate(new Vector([0, 0, 1])),
             keplerianObject.raan,
             0x7FFFD4, //lightblue
             true
         );
 
-        /*let normal = this.trajectory.referenceFrame
-            .getQuaternionByEpoch(event.detail.epoch)
-            .rotate(
-                (new Vector([0, 0, 1]))
-                    .rotateX(keplerianObject.inc)
-                    .rotateZ(keplerianObject.raan)
-            );
+        let nodeQuaternion = new Quaternion(new Vector([0, 0, 1]), keplerianObject.raan);
+        let node = nodeQuaternion.rotate(new Vector([1, 0, 0]));
+        let normal = (new Quaternion(node, keplerianObject.inc)).rotate(new Vector([0, 0, 1]));
+        let aopQuaternion = new Quaternion(normal, keplerianObject.aop);
 
-        let node = this.trajectory.referenceFrame
+        let periapsisQuaternion = Quaternion.mul(aopQuaternion, nodeQuaternion);
+        let periapsis = Quaternion.mul(aopQuaternion, nodeQuaternion).rotate(new Vector([1, 0, 0]));
+
+        normal = this.trajectory.referenceFrame
             .getQuaternionByEpoch(event.detail.epoch)
-            .rotate(
-                (new Vector([1, 0, 0]))
-                    .rotateZ(keplerianObject.raan)
-            );
+            .rotate(normal);
+
+        periapsis = this.trajectory.referenceFrame
+            .getQuaternionByEpoch(event.detail.epoch)
+            .rotate(periapsis);
+
+        node = this.trajectory.referenceFrame
+            .getQuaternionByEpoch(event.detail.epoch)
+            .rotate(node);
 
         this.aopAngle = new HelperAngle(
             new FunctionOfEpochObjectPosition(this.trajectory.referenceFrame.origin, RF_BASE),
@@ -71,20 +76,23 @@ class KeplerianEditor
             true
         );
 
-       this.incAngle = new HelperAngle(
+        let nodePerp = nodeQuaternion
+            .rotate(
+                (new Vector([1, 0, 0]))
+                .rotateZ(Math.PI / 2));
+
+        nodePerp = this.trajectory.referenceFrame
+            .getQuaternionByEpoch(event.detail.epoch)
+            .rotate(nodePerp);
+
+        this.incAngle = new HelperAngle(
             new FunctionOfEpochObjectPosition(this.trajectory.referenceFrame.origin, RF_BASE),
-            Vector.copy(node).rotateZ(- Math.PI / 2),
+            nodePerp,
             node,
             keplerianObject.inc,
             0xB00000, //red
             true
         );
-
-        let periapsis = new Vector([
-            this.aopAngle.direction.x,
-            this.aopAngle.direction.y,
-            this.aopAngle.direction.z
-        ]);
 
         this.taAngle = new HelperAngle(
             new FunctionOfEpochObjectPosition(this.trajectory.referenceFrame.origin, RF_BASE),
@@ -93,7 +101,7 @@ class KeplerianEditor
             keplerianObject.ta,
             0xFC0FC0, //pink
             true
-        );*/
+        );
 
         document.removeEventListener('vr_render', this.initAnglesImproved);
         this.updateAnglesImproved = this.updateAngles.bind(this);
@@ -102,10 +110,9 @@ class KeplerianEditor
 
     updateAngles() {
         const keplerianObject = this.trajectory.keplerianObject || this.trajectory.getKeplerianObjectByEpoch(event.detail.epoch);
-        this.raanAngle.position.clone().sub(camera.lastPosition);
         this.raanAngle.resize(keplerianObject.raan);
 
-        /*let normal = this.trajectory.referenceFrame
+        let normal = this.trajectory.referenceFrame
             .getQuaternionByEpoch(event.detail.epoch)
             .rotate(
                 (new Vector([0, 0, 1]))
@@ -120,14 +127,11 @@ class KeplerianEditor
                     .rotateZ(keplerianObject.raan)
             );
 
-        this.aopAngle.position.clone().sub(camera.lastPosition);
         this.aopAngle.resize(keplerianObject.aop);
         //this.aopAngle.rearrange();
 
-        this.incAngle.position.clone().sub(camera.lastPosition);
         this.incAngle.resize(keplerianObject.inc);
 
-        this.taAngle.position.clone().sub(camera.lastPosition);
-        this.taAngle.resize(keplerianObject.ta);*/
+        this.taAngle.resize(keplerianObject.ta);
     }
 }
