@@ -25,16 +25,22 @@ class EventHandler
         const list = this.listeners[eventName];
         for (let idx = 0; idx < list.length; idx++) {
             if (list[idx].handler === listener) {
-                list[idx] = list[list.length - 1];
-                list.pop();
+                list.splice(idx, 1);
+                break;
             }
+        }
+
+        if (list.length === 0) {
+            this.domElement.removeEventListener(eventName, this.handlers[eventName]);
+            delete this.handlers[eventName];
+            delete this.listeners[eventName];
         }
     }
 
     handleEvent(eventName, eventObject) {
         const list = this.listeners[eventName];
 
-        if (list.length === 0) {
+        if (!list) {
             return;
         }
 
