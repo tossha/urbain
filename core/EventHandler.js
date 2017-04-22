@@ -23,9 +23,10 @@ class EventHandler
 
     removeListener(eventName, listener) {
         const list = this.listeners[eventName];
-        for (let listenerIdx in list) {
-            if (list[listenerIdx] === listener) {
-                delete list[listenerIdx];
+        for (let idx = 0; idx < list.length; idx++) {
+            if (list[idx].handler === listener) {
+                list[idx] = list[list.length - 1];
+                list.pop();
             }
         }
     }
