@@ -12,7 +12,9 @@ function init() {
     renderer = new THREE.WebGLRenderer();
     renderer.setSize(window.innerWidth, window.innerHeight);
 
-    camera = new Camera(renderer.domElement, EARTH, new Vector([300000, 300000, 300000]));
+    rendererEvents = new EventHandler(renderer.domElement);
+
+    camera = new Camera(renderer.domElement, rendererEvents, EARTH, new Vector([300000, 300000, 300000]));
 
     document.getElementById('viewport').appendChild(renderer.domElement);
 
@@ -130,6 +132,7 @@ var stars;
 var trajArray = [];
 var selection;
 var statistics;
+var rendererEvents;
 
 window.onload = function () {
     init();
