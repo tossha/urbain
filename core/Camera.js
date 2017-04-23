@@ -1,7 +1,7 @@
 class Camera
 {
 
-    constructor (domElement, initialOrbitingPoint, initialPosition) {
+    constructor (domElement, eventHandler, initialOrbitingPoint, initialPosition) {
         let that = this;
 
         this.threeCamera = new THREE.PerspectiveCamera(60, domElement.width / domElement.height, 1, 1e15);
@@ -18,10 +18,10 @@ class Camera
 
         this.rightButtonDown = false;
 
-        domElement.addEventListener('mousedown', this.onMouseDown.bind(this));
-        domElement.addEventListener('mousemove', this.onMouseMove.bind(this));
-        domElement.addEventListener('mouseup',   this.onMouseUp.bind(this));
-        domElement.addEventListener('wheel',     this.onMouseWheel.bind(this));
+        eventHandler.addListener('mousedown', this.onMouseDown.bind(this) , 1);
+        eventHandler.addListener('mousemove', this.onMouseMove.bind(this) , 1);
+        eventHandler.addListener('mouseup',   this.onMouseUp.bind(this)   , 1);
+        eventHandler.addListener('wheel',     this.onMouseWheel.bind(this), 1);
     }
 
     init(epoch) {
