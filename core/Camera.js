@@ -1,10 +1,10 @@
 class Camera
 {
-    
+
     constructor (domElement, initialOrbitingPoint, initialPosition) {
         let that = this;
 
-        this.threeCamera = new THREE.PerspectiveCamera(60, domElement.width / domElement.height, 1, 1000000000);
+        this.threeCamera = new THREE.PerspectiveCamera(60, domElement.width / domElement.height, 1, 1e15);
         this.domElement = domElement;
         this.isMouseDown = false;
         this.orbitingPoint = initialOrbitingPoint;
@@ -15,9 +15,9 @@ class Camera
         this.accountedMousePos = new Vector([0, 0]);
 
         this.threeCamera.position.fromArray([0, 0, 0]);
-        
+
         this.rightButtonDown = false;
-            
+
         domElement.addEventListener('mousedown', this.onMouseDown.bind(this));
         domElement.addEventListener('mousemove', this.onMouseMove.bind(this));
         domElement.addEventListener('mouseup',   this.onMouseUp.bind(this));
@@ -28,7 +28,7 @@ class Camera
         this.lastEpoch = epoch;
         this.setOrbitingPoint(this.orbitingPoint);
     }
-    
+
     updatePole(epoch) {
         if (BODIES[this.orbitingPoint] === undefined) {
             this.pole = new Vector([0, 0, 1]);
@@ -114,19 +114,19 @@ class Camera
 
     update(epoch) {
         let mouseShift = this.currentMousePos.sub(this.accountedMousePos);
-        
+
         this.updatePole(epoch);
-        
+
         if (mouseShift[0] || mouseShift[1]) {
             const polarConstraint = 0.00001;
             let poleAngle = this.position.angle(this.pole);
             let verticalRotationAxis = this.rightButtonDown
                 ? this.quaternion.rotate(new Vector([0, 0, 1])).cross(this.pole)
                 : this.position.cross(this.pole);
-                
+
             let verticalQuaternion = new Quaternion(verticalRotationAxis, Math.min(Math.max(mouseShift[1] * 0.01, poleAngle - Math.PI + polarConstraint), poleAngle - polarConstraint));
             let mainQuaternion = (new Quaternion()).setAxisAngle(this.pole, -mouseShift[0] * 0.01).mul(verticalQuaternion);
-    
+
             if (!this.rightButtonDown) {
                 mainQuaternion.rotate_(this.position);
             }
