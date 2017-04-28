@@ -183,7 +183,9 @@ class Settings
                     Math.PI / 4,
                     0xFC0FC0,
                     testCallback
-                );*/
+                );
+
+                testAngle.rearrange(testMainAxis.scale(-1), testNormal.scale(-1)); */
 
                 document.addEventListener('vr_select', function() {
                     event.detail.trajectory.keplerianEditor = new KeplerianEditor(event.detail.trajectory, false)
