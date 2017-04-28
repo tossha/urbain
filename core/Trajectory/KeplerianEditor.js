@@ -108,30 +108,55 @@ class KeplerianEditor
         document.addEventListener('vr_render', this.updateAnglesImproved);
     }
 
-    updateAngles() {
+    updateAngles(event) {
         const keplerianObject = this.trajectory.keplerianObject || this.trajectory.getKeplerianObjectByEpoch(event.detail.epoch);
         this.raanAngle.resize(keplerianObject.raan);
+        this.raanAngle.rearrange(
+            this.trajectory.referenceFrame
+                .getQuaternionByEpoch(event.detail.epoch)
+                .rotate(new Vector([1, 0, 0])),
 
-        let normal = this.trajectory.referenceFrame
-            .getQuaternionByEpoch(event.detail.epoch)
-            .rotate(
-                (new Vector([0, 0, 1]))
-                    .rotateX(keplerianObject.inc)
-                    .rotateZ(keplerianObject.raan)
-            );
+            this.trajectory.referenceFrame
+                .getQuaternionByEpoch(event.detail.epoch)
+                .rotate(new Vector([0, 0, 1]))
+        );
 
-        let node = this.trajectory.referenceFrame
+        let nodeQuaternion = new Quaternion(new Vector([0, 0, 1]), keplerianObject.raan);
+        let node = nodeQuaternion.rotate(new Vector([1, 0, 0]));
+        let normal = (new Quaternion(node, keplerianObject.inc)).rotate(new Vector([0, 0, 1]));
+        let aopQuaternion = new Quaternion(normal, keplerianObject.aop);
+
+        let periapsisQuaternion = Quaternion.mul(aopQuaternion, nodeQuaternion);
+        let periapsis = Quaternion.mul(aopQuaternion, nodeQuaternion).rotate(new Vector([1, 0, 0]));
+
+        normal = this.trajectory.referenceFrame
             .getQuaternionByEpoch(event.detail.epoch)
-            .rotate(
-                (new Vector([1, 0, 0]))
-                    .rotateZ(keplerianObject.raan)
-            );
+            .rotate(normal);
+
+        periapsis = this.trajectory.referenceFrame
+            .getQuaternionByEpoch(event.detail.epoch)
+            .rotate(periapsis);
+
+        node = this.trajectory.referenceFrame
+            .getQuaternionByEpoch(event.detail.epoch)
+            .rotate(node);
 
         this.aopAngle.resize(keplerianObject.aop);
-        //this.aopAngle.rearrange();
+        this.aopAngle.rearrange(node, normal);
+
+        let nodePerp = nodeQuaternion
+            .rotate(
+                (new Vector([1, 0, 0]))
+                .rotateZ(Math.PI / 2));
+
+        nodePerp = this.trajectory.referenceFrame
+            .getQuaternionByEpoch(event.detail.epoch)
+            .rotate(nodePerp);
 
         this.incAngle.resize(keplerianObject.inc);
+        this.incAngle.rearrange(nodePerp, node);
 
         this.taAngle.resize(keplerianObject.ta);
+        this.taAngle.rearrange(periapsis, normal);
     }
 }

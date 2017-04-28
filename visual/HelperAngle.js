@@ -13,6 +13,8 @@ class HelperAngle
         this.position = (new THREE.Vector3).fromArray(this.positionitionAtEpoch.evaluate(time.epoch).sub(camera.lastPosition));
         this.isArcMode = isArcMode;
 
+        this.sizeParam = Math.round(Math.log2(camera.position.mag)) - 1;
+
         this.isEditMode = false;
 
         let quaternionZ = (new THREE.Quaternion).setFromUnitVectors(
@@ -38,13 +40,16 @@ class HelperAngle
         this.onRenderListener = this.onRender.bind(this);
         document.addEventListener('vr_render', this.onRenderListener);
 
+        this.onWheelListener = this.onMouseWheel.bind(this);
+        document.addEventListener('vr_render', this.onWheelListener);
+
         this.init();
     }
 
     initEditMode() {
         this.isEditMode = true;
         this.mouseDownListener = this.onMouseDown.bind(this);
-        document.addEventListener('mousedown', this.mouseDownListener);
+        document.addEventListener('mousedown', this.mouseDownListener, 2);
     }
 
     init() {
@@ -52,7 +57,7 @@ class HelperAngle
             let geometry = (new THREE.Path(
                 (new THREE.EllipseCurve(
                     0, 0,
-                    INITIAL_LENGTH / 2, INITIAL_LENGTH / 2,
+                    Math.pow(2, this.sizeParam) / 3, Math.pow(2, this.sizeParam) / 3,
                     0, this.value,
                     false,
                     0
@@ -64,7 +69,7 @@ class HelperAngle
             this.threeAngle = new LineObject(geometry, material);
         } else {
             let geometry = new THREE.CircleGeometry(
-                INITIAL_LENGTH,
+                Math.pow(2, this.sizeParam),
                 INITIAL_SEGMENTS_NUMBER,
                 0,
                 this.value
@@ -77,36 +82,27 @@ class HelperAngle
             });
 
             this.threeAngle = new THREE.Mesh(geometry, material);
-
         }; // TEMP! NEEDS REWORK
-            this.threeMainAxis = new THREE.ArrowHelper(
-                this.mainAxis,
-                this.position,
-                INITIAL_LENGTH,
-                'white'
-            );
 
-            this.threeDirection = new THREE.ArrowHelper(
-                this.direction,
-                this.position,
-                INITIAL_LENGTH,
-                this.isEditMode ? 0xc2f442 : this.color
-            );
-        //};
+        this.threeMainAxis = new THREE.ArrowHelper(
+            this.mainAxis,
+            this.position,
+            Math.pow(2, this.sizeParam),
+            this.color
+        );
 
-        this.threeNormal = new THREE.ArrowHelper(
-                this.normal,
-                this.position,
-                INITIAL_LENGTH,
-                0xc2f442
-            );
+        this.threeDirection = new THREE.ArrowHelper(
+            this.direction,
+            this.position,
+            Math.pow(2, this.sizeParam),
+            this.isEditMode ? 0xc2f442 : this.color
+        );
         
         this.threeAngle.position.copy(this.position);
         this.threeAngle.quaternion.copy(this.quaternion);
         scene.add(this.threeAngle);
         scene.add(this.threeMainAxis);
         scene.add(this.threeDirection);
-        scene.add(this.threeNormal);
     }
 
     onRender(event) {
@@ -118,7 +114,6 @@ class HelperAngle
         this.threeAngle.position.copy(this.position);
         this.threeMainAxis.position.copy(this.position);
         this.threeDirection.position.copy(this.position);
-        this.threeNormal.position.copy(this.position);
     }
 
     resize(newValue) {
@@ -129,7 +124,7 @@ class HelperAngle
             (new THREE.Path(
                 (new THREE.EllipseCurve(
                     0, 0,
-                    INITIAL_LENGTH / 3, INITIAL_LENGTH / 3,
+                    Math.pow(2, this.sizeParam) / 3, Math.pow(2, this.sizeParam) / 3,
                     0, this.value,
                     false,
                     0
@@ -137,7 +132,7 @@ class HelperAngle
             )).createPointsGeometry(100)
             :
             (new THREE.CircleGeometry(
-                INITIAL_LENGTH,
+                Math.pow(2, this.sizeParam),
                 INITIAL_SEGMENTS_NUMBER,
                 0,
                 this.value
@@ -200,16 +195,16 @@ class HelperAngle
         )[0];
         if ((intersection !== undefined) && (event.button == 0)) { //check if the mouse button pressed is left
             this.mouseUpListener = this.onMouseUp.bind(this);
-            document.addEventListener('mouseup', this.mouseUpListener);
+            document.addEventListener('mouseup', this.mouseUpListener, 2);
             this.mouseMoveListener = this.onMouseMove.bind(this);
-            document.addEventListener('mousemove', this.mouseMoveListener);
+            document.addEventListener('mousemove', this.mouseMoveListener, 2);
         }
     }
 
     onMouseUp(event) { //check if the mouse button pressed is left
         if (event.button == 0) {
-            document.removeEventListener('mouseup', this.mouseUpListener);
-            document.removeEventListener('mousemove', this.mouseMoveListener);
+            document.removeEventListener('mouseup', this.mouseUpListener, 2);
+            document.removeEventListener('mousemove', this.mouseMoveListener, 2);
         }
     } 
 
@@ -228,6 +223,34 @@ class HelperAngle
             newAngleValue = (tempVector.dot(this.normal) > 0) ? newAngleValue : TWO_PI - newAngleValue;
             this.resize(newAngleValue);
         }   
+    }
+
+    onMouseWheel() {
+        if (Math.round(Math.log2(camera.position.mag)) - 1 != this.sizeParam) {
+            this.sizeParam = Math.round(Math.log2(camera.position.mag)) - 1;
+
+            this.threeAngle.geometry.dispose();
+            this.threeAngle.geometry = (this.isArcMode) ?
+                (new THREE.Path(
+                    (new THREE.EllipseCurve(
+                        0, 0,
+                        Math.pow(2, this.sizeParam) / 3, Math.pow(2, this.sizeParam) / 3,
+                        0, this.value,
+                        false,
+                        0
+                    )).getPoints(100)
+                )).createPointsGeometry(100)
+                :
+                (new THREE.CircleGeometry(
+                    Math.pow(2, this.sizeParam),
+                    INITIAL_SEGMENTS_NUMBER,
+                    0,
+                    this.value
+                ));
+
+            this.threeMainAxis.setLength(Math.pow(2, this.sizeParam), this.threeMainAxis.headLength, this.threeMainAxis.headWidth);
+            this.threeDirection.setLength(Math.pow(2, this.sizeParam), this.threeDirection.headLength, this.threeDirection.headWidth);
+        };
     }
 
     remove() {
