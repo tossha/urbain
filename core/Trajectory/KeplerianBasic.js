@@ -6,7 +6,7 @@ class TrajectoryKeplerianBasic extends TrajectoryKeplerianAbstract
     }
 
     isEditable() {
-		return true;
+        return true;
     }
 
     get mu() {
@@ -74,7 +74,7 @@ class TrajectoryKeplerianBasic extends TrajectoryKeplerianAbstract
     }
 
     getKeplerianObjectByEpoch(epoch) {
-		return this.keplerianObject;
+        return this.keplerianObject;
     }
 
     static createFromState(referenceFrame, state, mu, epoch, color) {

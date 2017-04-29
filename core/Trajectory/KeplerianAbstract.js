@@ -11,7 +11,7 @@ class TrajectoryKeplerianAbstract extends TrajectoryAbstract
     }
 
     isEditable() {
-		return false;
+        return false;
     }
 
     getStateInOwnFrameByEpoch(epoch) {

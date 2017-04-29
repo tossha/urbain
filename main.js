@@ -67,8 +67,8 @@ function initBuiltIn() {
                 BODIES[EARTH].physicalModel.mu,
                 false
             ),
-			BODIES[EARTH].physicalModel.radius,
-			0.00108263,
+            BODIES[EARTH].physicalModel.radius,
+            0.00108263,
             TLEDATA[id].color ? TLEDATA[id].color : 'azure'
         ));
     }

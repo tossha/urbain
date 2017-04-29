@@ -89,11 +89,11 @@ class KeplerianObject
     }
 
     addPrecession(r, j2, epoch) {
-		const rate = -3/2 * r * r * j2 * Math.cos(this.inc) * this.meanMotion / Math.pow(this.sma * (1 - this.e * this.e), 2);
-		this.m0 = this.getMeanAnomalyByEpoch(epoch);
-		this.raan += rate * (epoch - this._epoch);
-		this._epoch = epoch;
-		return this;
+        const rate = -3/2 * r * r * j2 * Math.cos(this.inc) * this.meanMotion / Math.pow(this.sma * (1 - this.e * this.e), 2);
+        this.m0 = this.getMeanAnomalyByEpoch(epoch);
+        this.raan += rate * (epoch - this._epoch);
+        this._epoch = epoch;
+        return this;
     }
 
     getMeanAnomalyByEpoch(epoch) {
