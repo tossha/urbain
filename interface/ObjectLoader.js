@@ -46,6 +46,7 @@ class ObjectLoader
                 : new OrientationConstantAxis([0, 0, 1e-10]);
 
             BODIES[bodyId] = new Body(
+                bodyId,
                 visualModel,
                 new PhysicalBodyModel(
                     data.mu,

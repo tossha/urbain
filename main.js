@@ -14,7 +14,7 @@ function init() {
 
     rendererEvents = new EventHandler(renderer.domElement);
 
-    camera = new Camera(renderer.domElement, rendererEvents, EARTH, new Vector([300000, 300000, 300000]));
+    camera = new Camera(renderer.domElement, rendererEvents, EARTH, new Vector([30000, 30000, 10000]));
 
     document.getElementById('viewport').appendChild(renderer.domElement);
 
@@ -31,10 +31,8 @@ function init() {
     }
 
     settings = new Settings({
-        timeLineStart:      504921600,
-        timeLineEnd:        504921600 + 31557600,
-        timeLinePos:        504921600,
-        timeScale:          100,
+        timeLinePos:        TimeLine.getEpochByDate(new Date()),
+        timeScale:          0.001,
         isTimeRunning:      true,
         trackingObject:     EARTH,
         objectsForTracking: objectsForTracking,
@@ -57,7 +55,7 @@ function initBuiltIn() {
         const objId = parseInt(id);
 
         App.setTrajectory(objId, new TrajectoryKeplerianOrbit(
-            App.getReferenceFrame(EARTH, RF_TYPE_EQUATORIAL),
+            App.getReferenceFrame(RF_TYPE_ECI),
             new KeplerianObject(
                 tle.getE(),
                 tle.getSma(),
@@ -69,8 +67,7 @@ function initBuiltIn() {
                 BODIES[EARTH].physicalModel.mu,
                 false
             ),
-            TLEDATA[id].color ? TLEDATA[id].color : 'azure',
-            false
+            TLEDATA[id].color ? TLEDATA[id].color : 'azure'
         ));
     }
 }

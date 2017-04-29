@@ -35,9 +35,10 @@ class TLE
     }
 
     getEpoch() {
-        const years = parseInt(this.lineOne.substr(18, 2));
-        const days = parseFloat(this.lineTwo.substr(20, 12));
+        const yearDigit = parseInt(this.lineOne.substr(18, 2));
+        const days = parseFloat(this.lineOne.substr(20, 12));
+        const year = (yearDigit > 50) ? 1900 + yearDigit : 2000 + yearDigit;
 
-        return years * 31558152.27185062 + days * 86400;
+        return TimeLine.getEpochByDate(new Date(Date.UTC(year, 0, 0, 0, 0, days * 86400, 0)));
     }
 }
