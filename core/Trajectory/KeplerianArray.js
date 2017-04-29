@@ -1,16 +1,12 @@
-class TrajectoryKeplerianArray extends TrajectoryAbstract
+class TrajectoryKeplerianArray extends TrajectoryKeplerianAbstract
 {
     constructor(referenceFrame, color) {
-        super(referenceFrame);
+        super(referenceFrame, color);
 
         this.keplerianObjects = []; // array of class KeplerianObject
         this.minEpoch = null;
         this.maxEpoch = null;
         this.color = color;
-
-        if (color) {
-            this.visualModel = new VisualTrajectoryModelKeplerianArray(this, color);
-        }
     }
 
     addState(keplerianObject) {
@@ -27,10 +23,6 @@ class TrajectoryKeplerianArray extends TrajectoryAbstract
         ) {
             this.maxEpoch = keplerianObject.epoch;
         }
-    }
-
-    getStateInOwnFrameByEpoch(epoch) {
-        return this.getKeplerianObjectByEpoch(epoch).getStateByEpoch(epoch);
     }
 
     getKeplerianObjectByEpoch(epoch) {
