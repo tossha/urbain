@@ -1,4 +1,3 @@
-const INITIAL_LENGTH = Math.pow(2, 15);
 const INITIAL_SEGMENTS_NUMBER = 200;
 
 class HelperAngle
@@ -49,7 +48,7 @@ class HelperAngle
     initEditMode() {
         this.isEditMode = true;
         this.mouseDownListener = this.onMouseDown.bind(this);
-        document.addEventListener('mousedown', this.mouseDownListener, 2);
+        document.addEventListener('mousedown', this.mouseDownListener);
     }
 
     init() {
@@ -65,15 +64,33 @@ class HelperAngle
             )).createPointsGeometry(100);
 
             let material = new THREE.LineBasicMaterial({color: this.color});
-
             this.threeAngle = new LineObject(geometry, material);
+
+            geometry = new THREE.Geometry();
+            geometry.vertices.push(
+                this.position,
+                this.position.clone().add(this.mainAxis.clone().setLength(Math.pow(2, this.sizeParam)))
+            );
+            this.threeMainAxis = new THREE.Line(geometry, material);
+
+            material = new THREE.LineBasicMaterial({color : this.isEditMode ? 0xc2f442 : this.color});
+            geometry = new THREE.Geometry();
+            geometry.vertices.push(
+                this.position,
+                this.position.clone().add(this.direction.clone().setLength(Math.pow(2, this.sizeParam)))
+            );
+
+            this.threeDirection = new THREE.Line(geometry, material);
+
         } else {
+
             let geometry = new THREE.CircleGeometry(
                 Math.pow(2, this.sizeParam),
                 INITIAL_SEGMENTS_NUMBER,
                 0,
                 this.value
             );
+
             let material = new THREE.MeshBasicMaterial({
                 color: this.color,
                 opacity: 0.175,
@@ -82,22 +99,22 @@ class HelperAngle
             });
 
             this.threeAngle = new THREE.Mesh(geometry, material);
-        }; // TEMP! NEEDS REWORK
 
-        this.threeMainAxis = new THREE.ArrowHelper(
-            this.mainAxis,
-            this.position,
-            Math.pow(2, this.sizeParam),
-            this.color
-        );
+            this.threeMainAxis = new THREE.ArrowHelper(
+                this.mainAxis,
+                this.position,
+                Math.pow(2, this.sizeParam),
+                this.color
+            );
 
-        this.threeDirection = new THREE.ArrowHelper(
-            this.direction,
-            this.position,
-            Math.pow(2, this.sizeParam),
-            this.isEditMode ? 0xc2f442 : this.color
-        );
-        
+            this.threeDirection = new THREE.ArrowHelper(
+                this.direction,
+                this.position,
+                Math.pow(2, this.sizeParam),
+                this.isEditMode ? 0xc2f442 : this.color
+            );
+        }
+
         this.threeAngle.position.copy(this.position);
         this.threeAngle.quaternion.copy(this.quaternion);
         scene.add(this.threeAngle);
@@ -111,9 +128,28 @@ class HelperAngle
                 .sub(camera.lastPosition)
         );
 
+        if (this.isArcMode === true) {
+            this.threeMainAxis.geometry.dispose();
+            this.threeDirection.geometry.dispose();
+
+            this.threeMainAxis.geometry = new THREE.Geometry();
+            this.threeDirection.geometry = new THREE.Geometry();
+
+            this.threeMainAxis.geometry.vertices.push(
+                this.position,
+                this.position.clone().add(this.mainAxis.clone().setLength(Math.pow(2, this.sizeParam)))
+            );
+
+            this.threeDirection.geometry.vertices.push(
+                this.position,
+                this.position.clone().add(this.direction.clone().setLength(Math.pow(2, this.sizeParam)))
+            );
+        } else {
+            this.threeMainAxis.position.copy(this.position);
+            this.threeDirection.position.copy(this.position);
+        }
+
         this.threeAngle.position.copy(this.position);
-        this.threeMainAxis.position.copy(this.position);
-        this.threeDirection.position.copy(this.position);
     }
 
     resize(newValue) {
@@ -139,9 +175,21 @@ class HelperAngle
             ));
 
         this.direction = this.mainAxis
-            .clone()
-            .applyAxisAngle(this.normal, this.value);
-        this.threeDirection.setDirection(this.direction);
+                .clone()
+                .applyAxisAngle(this.normal, this.value);
+
+        if (this.isArcMode === true) {
+            this.threeDirection.geometry.dispose();
+
+            this.threeDirection.geometry = new THREE.Geometry();
+
+            this.threeDirection.geometry.vertices.push(
+                this.position,
+                this.position.clone().add(this.direction.clone().setLength(Math.pow(2, this.sizeParam)))
+            );
+        } else {
+            this.threeDirection.setDirection(this.direction);
+        }
 
         if (this.callback) {
             this.callback(newValue);
@@ -152,12 +200,30 @@ class HelperAngle
         this.mainAxis = (new THREE.Vector3).fromArray(newMainAxis).normalize();
         this.normal = (new THREE.Vector3).fromArray(newNormal).normalize();
 
-        this.threeMainAxis.setDirection(this.mainAxis);
-
         this.direction = this.mainAxis
             .clone()
             .applyAxisAngle(this.normal, this.value);
-        this.threeDirection.setDirection(this.direction);
+
+        if (this.isArcMode === true) {
+            this.threeMainAxis.geometry.dispose();
+            this.threeDirection.geometry.dispose();
+
+            this.threeMainAxis.geometry = new THREE.Geometry();
+            this.threeDirection.geometry = new THREE.Geometry();
+
+            this.threeMainAxis.geometry.vertices.push(
+                this.position,
+                this.position.clone().add(this.mainAxis.clone().setLength(Math.pow(2, this.sizeParam)))
+            );
+
+            this.threeDirection.geometry.vertices.push(
+                this.position,
+                this.position.clone().add(this.direction.clone().setLength(Math.pow(2, this.sizeParam)))
+            );
+        } else {
+            this.threeMainAxis.setDirection(this.mainAxis);
+            this.threeDirection.setDirection(this.direction);
+        }
 
         let quaternionZ = (new THREE.Quaternion).setFromUnitVectors(
             new THREE.Vector3(0, 0, 1),
@@ -174,7 +240,7 @@ class HelperAngle
     }
 
     getVirtualPlane() {
-        let mrVector = (new THREE.Vector3).crossVectors(this.normal, this.position);
+        let mrVector = (new THREE.Vector3).crossVectors(this.normal, this.position); //logic for names is required
         let mrCathetus = (new THREE.Vector3).crossVectors(this.normal, mrVector);
         let cos = this.position.dot(mrCathetus) / (this.position.length() * mrCathetus.length());
         let angle = (cos >= 0) ? Math.acos(cos) : Math.PI - Math.acos(cos);
@@ -190,23 +256,29 @@ class HelperAngle
     }
 
      onMouseDown(event) {
-        let intersection = raycaster.intersectObjects(
+        let intersection
+        if (this.isArcMode === true) {
+            intersection = raycaster.intersectObjects(
+            [this.threeDirection.line]
+        )[0];
+        } else {
+            intersection = raycaster.intersectObjects(
             [this.threeDirection.line, this.threeDirection.cone]
         )[0];
+        }
+
         if ((intersection !== undefined) && (event.button == 0)) { //check if the mouse button pressed is left
             this.mouseUpListener = this.onMouseUp.bind(this);
-            document.addEventListener('mouseup', this.mouseUpListener, 2);
+            document.addEventListener('mouseup', this.mouseUpListener);
             this.mouseMoveListener = this.onMouseMove.bind(this);
-            document.addEventListener('mousemove', this.mouseMoveListener, 2);
+            rendererEvents.addListener('mousemove', this.mouseMoveListener, 2);
         }
     }
 
     onMouseUp(event) { //check if the mouse button pressed is left
-        if (event.button == 0) {
-            document.removeEventListener('mouseup', this.mouseUpListener, 2);
-            document.removeEventListener('mousemove', this.mouseMoveListener, 2);
-        }
-    } 
+        document.removeEventListener('mouseup', this.mouseUpListener);
+        rendererEvents.removeListener('mousemove', this.mouseMoveListener);
+    }
 
     onMouseMove() {
         let intersection = raycaster.intersectObjects([this.getVirtualPlane()])[0];
@@ -222,7 +294,7 @@ class HelperAngle
 
             newAngleValue = (tempVector.dot(this.normal) > 0) ? newAngleValue : TWO_PI - newAngleValue;
             this.resize(newAngleValue);
-        }   
+        }
     }
 
     onMouseWheel() {
@@ -248,9 +320,27 @@ class HelperAngle
                     this.value
                 ));
 
-            this.threeMainAxis.setLength(Math.pow(2, this.sizeParam), this.threeMainAxis.headLength, this.threeMainAxis.headWidth);
-            this.threeDirection.setLength(Math.pow(2, this.sizeParam), this.threeDirection.headLength, this.threeDirection.headWidth);
-        };
+            if (this.isArcMode === true) {
+                this.threeMainAxis.geometry.dispose();
+                this.threeDirection.geometry.dispose();
+
+                this.threeMainAxis.geometry = new THREE.Geometry();
+                this.threeDirection.geometry = new THREE.Geometry();
+
+                this.threeMainAxis.geometry.vertices.push(
+                    this.position,
+                    this.position.clone().add(this.mainAxis.clone().setLength(Math.pow(2, this.sizeParam)))
+                );
+
+                this.threeDirection.geometry.vertices.push(
+                    this.position,
+                    this.position.clone().add(this.direction.clone().setLength(Math.pow(2, this.sizeParam)))
+                );
+            } else {
+                this.threeMainAxis.setLength(Math.pow(2, this.sizeParam), this.threeMainAxis.headLength, this.threeMainAxis.headWidth);
+                this.threeDirection.setLength(Math.pow(2, this.sizeParam), this.threeDirection.headLength, this.threeDirection.headWidth);
+            }
+        }
     }
 
     remove() {

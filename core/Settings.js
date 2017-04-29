@@ -172,8 +172,8 @@ class Settings
             },
 
             testFunction: function() {
-                /*let testMainAxis = App.getReferenceFrame(that.trackingObject, RF_TYPE_EQUATORIAL).getQuaternionByEpoch(time.epoch).rotate(new Vector([1, 0, 0]));
-                let testNormal = App.getReferenceFrame(that.trackingObject, RF_TYPE_EQUATORIAL).getQuaternionByEpoch(time.epoch).rotate(new Vector([0, 0, 1]));
+                /*let testMainAxis = App.getReferenceFrame(RF_TYPE_EQUATORIAL, that.trackingObject).getQuaternionByEpoch(time.epoch).rotate(new Vector([1, 0, 0]));
+                let testNormal = App.getReferenceFrame(RF_TYPE_EQUATORIAL, that.trackingObject).getQuaternionByEpoch(time.epoch).rotate(new Vector([0, 0, 1]));
                 let testCallback = function(val) {} ;
 
                 let testAngle = new HelperAngle(
@@ -182,10 +182,9 @@ class Settings
                     testNormal,
                     Math.PI / 4,
                     0xFC0FC0,
+                    false,
                     testCallback
-                );
-
-                testAngle.rearrange(testMainAxis.scale(-1), testNormal.scale(-1)); */
+                );*/
 
                 document.addEventListener('vr_select', function() {
                     event.detail.trajectory.keplerianEditor = new KeplerianEditor(event.detail.trajectory, false)
