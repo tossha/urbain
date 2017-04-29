@@ -93,7 +93,8 @@ class Camera
             break;
         case 2: this.rightButtonDown = true;
             break;
-}
+        }
+        this.isMouseDown = true;
     }
 
     onMouseMove(event) {

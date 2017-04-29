@@ -145,6 +145,50 @@ class Settings
 
                 that.guiAddTrajectoryElements.addTrajectoryFolder.open();
                 that.guiAddTrajectoryElements.settingsFolder.close();
+            },
+
+            createNewTrajectory: function() {
+                
+                KeplerianEditor.createNew();
+
+                that.guiAddTrajectoryElements.addTrajectoryFolder.open();
+                that.guiAddTrajectoryElements.settingsFolder.close();
+            },
+
+            cancelCreating: function() {
+                
+                KeplerianEditor.abortCreating();
+
+                that.guiAddTrajectoryElements.addTrajectoryFolder.open();
+                that.guiAddTrajectoryElements.settingsFolder.close();
+            },
+            
+            editExistingTrajectory: function() {
+                KeplerianEditor.editExisting();
+            },
+
+            cancelEditing: function() {
+                //
+            },
+
+            testFunction: function() {
+                /*let testMainAxis = App.getReferenceFrame(RF_TYPE_EQUATORIAL, that.trackingObject).getQuaternionByEpoch(time.epoch).rotate(new Vector([1, 0, 0]));
+                let testNormal = App.getReferenceFrame(RF_TYPE_EQUATORIAL, that.trackingObject).getQuaternionByEpoch(time.epoch).rotate(new Vector([0, 0, 1]));
+                let testCallback = function(val) {} ;
+
+                let testAngle = new HelperAngle(
+                    new FunctionOfEpochObjectPosition(that.trackingObject, RF_BASE),
+                    testMainAxis,
+                    testNormal,
+                    Math.PI / 4,
+                    0xFC0FC0,
+                    false,
+                    testCallback
+                );*/
+
+                document.addEventListener('vr_select', function() {
+                    event.detail.trajectory.keplerianEditor = new KeplerianEditor(event.detail.trajectory, false)
+                })
             }
         };
 
@@ -211,6 +255,12 @@ class Settings
         this.guiAddTrajectoryElements.addTrajectoryFolder.open();
 
         this.guiAddTrajectory.add(this.trajectorySettings, 'dropLastTrajectory');
+
+        this.guiAddTrajectory.add(this.trajectorySettings, 'createNewTrajectory');
+        this.guiAddTrajectory.add(this.trajectorySettings, 'cancelCreating');
+        this.guiAddTrajectory.add(this.trajectorySettings, 'editExistingTrajectory');
+        this.guiAddTrajectory.add(this.trajectorySettings, 'cancelEditing');
+        this.guiAddTrajectory.add(this.trajectorySettings, 'testFunction');
         document.getElementById('leftPanel').appendChild(this.guiAddTrajectory.domElement);
     }
 }

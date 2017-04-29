@@ -67,7 +67,8 @@ function initBuiltIn() {
                 BODIES[EARTH].physicalModel.mu,
                 false
             ),
-            TLEDATA[id].color ? TLEDATA[id].color : 'azure'
+            TLEDATA[id].color ? TLEDATA[id].color : 'azure',
+            false
         ));
     }
 }
