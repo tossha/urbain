@@ -1,7 +1,7 @@
 class TrajectoryKeplerianAbstract extends TrajectoryAbstract
-{	
-	getKeplerianObjectByEpoch(epoch) {}
-	
+{
+    getKeplerianObjectByEpoch(epoch) {}
+
     constructor(referenceFrame, color) {
         super(referenceFrame);
 
@@ -10,11 +10,11 @@ class TrajectoryKeplerianAbstract extends TrajectoryAbstract
         }
     }
 
-	isEditable() {
+    isEditable() {
 		return false;
-	}
-	
-	getStateInOwnFrameByEpoch(epoch) {
+    }
+
+    getStateInOwnFrameByEpoch(epoch) {
         return this.getKeplerianObjectByEpoch(epoch).getStateByEpoch(epoch);
     }
 }
