@@ -1,13 +1,9 @@
-class VisualTrajectoryModelKeplerianOrbit extends VisualTrajectoryModelAbstract
+class VisualTrajectoryModelKeplerian extends VisualTrajectoryModelAbstract
 {
-    getKeplerianObject(epoch) {
-        return this.trajectory.keplerianObject;
-    }
-
     render(epoch) {
         const endingBrightness = 0.35;
 
-        const traj = this.getKeplerianObject(epoch);
+        const traj = this.trajectory.getKeplerianObjectByEpoch(epoch);
         const centerPos = this.trajectory.referenceFrame.transformPositionByEpoch(epoch, ZERO_VECTOR, RF_BASE);
         const dr = -traj.sma * traj.e;
         const ta = traj.getTrueAnomalyByEpoch(epoch);

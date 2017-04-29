@@ -54,7 +54,7 @@ function initBuiltIn() {
         const tle = new TLE(TLEDATA[id].lines);
         const objId = parseInt(id);
 
-        App.setTrajectory(objId, new TrajectoryKeplerianOrbit(
+        App.setTrajectory(objId, new TrajectoryKeplerianPrecessing(
             App.getReferenceFrame(RF_TYPE_ECI),
             new KeplerianObject(
                 tle.getE(),
@@ -67,6 +67,8 @@ function initBuiltIn() {
                 BODIES[EARTH].physicalModel.mu,
                 false
             ),
+            BODIES[EARTH].physicalModel.radius,
+            0.00108263,
             TLEDATA[id].color ? TLEDATA[id].color : 'azure'
         ));
     }

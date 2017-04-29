@@ -29,7 +29,7 @@ class TrajectoryLoader
     }
 
     static createKeplerian(data) {
-        return new TrajectoryKeplerianOrbit(
+        return new TrajectoryKeplerianBasic(
             this.createFrame(data.parent),
             this.createKeplerianObject(data.trajectory),
             data.color

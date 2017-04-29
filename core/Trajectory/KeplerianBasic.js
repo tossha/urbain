@@ -1,13 +1,12 @@
-class TrajectoryKeplerianOrbit extends TrajectoryAbstract
+class TrajectoryKeplerianBasic extends TrajectoryKeplerianAbstract
 {
     constructor(referenceFrame, keplerianObject, color) {
-        super(referenceFrame);
-
+        super(referenceFrame, color);
         this.keplerianObject = keplerianObject;
+    }
 
-        if (color) {
-            this.visualModel = new VisualTrajectoryModelKeplerianOrbit(this, color);
-        }
+    isEditable() {
+        return true;
     }
 
     get mu() {
@@ -74,15 +73,12 @@ class TrajectoryKeplerianOrbit extends TrajectoryAbstract
         this.keplerianObject.epoch = value;
     }
 
-    /**
-     *  @see http://microsat.sm.bmstu.ru/e-library/Ballistics/kepler.pdf
-     */
-    getStateInOwnFrameByEpoch(epoch) {
-        return this.keplerianObject.getStateByEpoch(epoch);
+    getKeplerianObjectByEpoch(epoch) {
+        return this.keplerianObject;
     }
 
     static createFromState(referenceFrame, state, mu, epoch, color) {
-        return new TrajectoryKeplerianOrbit(
+        return new TrajectoryKeplerianBasic(
             referenceFrame,
             KeplerianObject.createFromState(state, mu, epoch),
             color

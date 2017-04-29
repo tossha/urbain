@@ -100,7 +100,7 @@ class Settings
                 that.guiAddTrajectoryElements.ta   .setValue(deg2rad(that.baseTrajectorySettings.ta  ));
 
                 if (!App.getTrajectory(lastTrajectoryId)) {
-                    App.setTrajectory(lastTrajectoryId, new TrajectoryKeplerianOrbit(
+                    App.setTrajectory(lastTrajectoryId, new TrajectoryKeplerianBasic(
                         App.getReferenceFrame(RF_TYPE_ECLIPTIC, that.trackingObject),
                         new KeplerianObject(
                             that.trajectorySettings.e,
