@@ -12,7 +12,7 @@ class TimeLine
             rightButton: false
         };
 
-        this.span = 4 * 2592000; // 4 * 30 * 86400
+        this.span = 86400;
 
         this.settings = settings;
         this.markDistance = 300;
@@ -80,21 +80,21 @@ class TimeLine
         this.canvasContext.fillStyle   = "#fff";
         this.canvasContext.font        = "11pt sans-serif";
 
-        let markDate = this.roundDateUp(this.getDateByEpoch(this.leftEpoch));
-        let markEpoch = this.getEpochByDate(markDate);
+        let markDate = this.roundDateUp(TimeLine.getDateByEpoch(this.leftEpoch));
+        let markEpoch = TimeLine.getEpochByDate(markDate);
 
         while (markEpoch < this.leftEpoch + this.span) {
             this.drawMark(this.getCanvasPositionByEpoch(markEpoch), this.formatDate(markDate));
             markDate = this.nextRenderingDate(markDate);
-            markEpoch = this.getEpochByDate(markDate);
+            markEpoch = TimeLine.getEpochByDate(markDate);
         }
     }
 
-    getDateByEpoch(epoch) {
+    static getDateByEpoch(epoch) {
         return new Date((J2000_TIMESTAMP + epoch) * 1000);
     }
 
-    getEpochByDate(date) {
+    static getEpochByDate(date) {
         return date / 1000 - J2000_TIMESTAMP;
     }
 

@@ -101,7 +101,7 @@ class Settings
 
                 if (!App.getTrajectory(lastTrajectoryId)) {
                     App.setTrajectory(lastTrajectoryId, new TrajectoryKeplerianOrbit(
-                        App.getReferenceFrame(that.trackingObject, RF_TYPE_ECLIPTIC),
+                        App.getReferenceFrame(RF_TYPE_ECLIPTIC, that.trackingObject),
                         new KeplerianObject(
                             that.trajectorySettings.e,
                             that.trajectorySettings.sma,

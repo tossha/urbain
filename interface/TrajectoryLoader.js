@@ -37,7 +37,7 @@ class TrajectoryLoader
     }
 
     static createFrame(origin) {
-        return App.getReferenceFrame(origin, RF_TYPE_ECLIPTIC);
+        return App.getReferenceFrame(RF_TYPE_ECLIPTIC, origin);
     }
 
     static createKeplerianObject(data) {

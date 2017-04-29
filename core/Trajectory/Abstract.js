@@ -15,6 +15,10 @@ class TrajectoryAbstract
         }
     }
 
+    setId(id) {
+        this.id = id;
+    }
+
     set isSelected(newValue) {
         if (this.visualModel) {
             this.visualModel.isSelected = newValue;

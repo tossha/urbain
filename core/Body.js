@@ -1,6 +1,7 @@
 class Body
 {
-    constructor(visualModel, physicalModel, trajectory, orientation) {
+    constructor(bodyId, visualModel, physicalModel, trajectory, orientation) {
+        this.id            = bodyId;
         this.visualModel   = visualModel;    // class VisualBodyModelBasic
         this.physicalModel = physicalModel;  // class PhysicalBodyModel
         this.trajectory    = trajectory;     // class TrajectoryAbstract
