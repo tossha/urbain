@@ -275,7 +275,7 @@ class HelperAngle
         }
     }
 
-    onMouseUp(event) { //check if the mouse button pressed is left
+    onMouseUp(event) {
         document.removeEventListener('mouseup', this.mouseUpListener);
         rendererEvents.removeListener('mousemove', this.mouseMoveListener);
     }

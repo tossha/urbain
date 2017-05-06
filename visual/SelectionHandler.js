@@ -14,6 +14,9 @@ class SelectionHandler
 
         document.addEventListener('vr_render', this.onRender.bind(this));
         window.addEventListener('click', this.onMouseClick.bind(this));
+        window.addEventListener('mousedown', this.onMouseDown.bind(this));
+
+        this.mouseMoveListener = this.onMouseMove.bind(this);
     }
 
     onRender() {
@@ -41,6 +44,16 @@ class SelectionHandler
             this.pointerSphere.visible = false;
             this.bestIntersection = null;
         }
+    }
+
+    onMouseDown(event) {
+        if ((event.button === 0) && (this.selectedObject) && (!this.bestIntersection)) {
+            window.addEventListener('mousemove', this.mouseMoveListener);
+        }
+    }
+
+    onMouseMove() {
+        this.hasMouseMoved = true;
     }
 
     onMouseClick() {
@@ -75,6 +88,19 @@ class SelectionHandler
                     {detail: {trajectory: this.selectedObject}}
                 ));
             }
+        } else {
+            if ((this.selectedObject) && (!this.hasMouseMoved)) {
+                this.selectedObject.isSelected = false;
+                this.selectedObject = null;
+
+                document.dispatchEvent(new CustomEvent(
+                    'vr_deselect',
+                    {detail: {trajectory: this.selectedObject}}
+                ));
+            };
+
+            window.removeEventListener('mousemove', this.mouseMoveListener);
+            this.hasMouseMoved = false;
         }
     }
 
