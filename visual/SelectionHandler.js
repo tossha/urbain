@@ -90,14 +90,15 @@ class SelectionHandler
             }
         } else {
             if ((this.selectedObject) && (!this.hasMouseMoved)) {
-                this.selectedObject.isSelected = false;
-                this.selectedObject = null;
 
                 document.dispatchEvent(new CustomEvent(
                     'vr_deselect',
                     {detail: {trajectory: this.selectedObject}}
                 ));
-            };
+
+                this.selectedObject.isSelected = false;
+                this.selectedObject = null;
+            }
 
             window.removeEventListener('mousemove', this.mouseMoveListener);
             this.hasMouseMoved = false;

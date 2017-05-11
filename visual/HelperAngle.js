@@ -2,7 +2,7 @@ const INITIAL_SEGMENTS_NUMBER = 200;
 
 class HelperAngle
 {
-    constructor(functionOfEpoch, mainAxis, normal, angleValue, color, isArcMode, callback) {
+    constructor(functionOfEpoch, mainAxis, normal, angleValue, color, coeff, isArcMode, callback) {
         this.value = angleValue;
         this.color = color;
         this.normal = (new THREE.Vector3).fromArray(normal).normalize();
@@ -11,6 +11,7 @@ class HelperAngle
         this.positionitionAtEpoch = functionOfEpoch;
         this.position = (new THREE.Vector3).fromArray(this.positionitionAtEpoch.evaluate(time.epoch).sub(camera.lastPosition));
         this.isArcMode = isArcMode;
+        this.coeff = coeff ? coeff : 1;
 
         this.sizeParam = Math.round(Math.log2(camera.position.mag)) - 1;
 
@@ -56,7 +57,7 @@ class HelperAngle
             let geometry = (new THREE.Path(
                 (new THREE.EllipseCurve(
                     0, 0,
-                    Math.pow(2, this.sizeParam) / 3, Math.pow(2, this.sizeParam) / 3,
+                    Math.pow(2, this.sizeParam) / (3 * this.coeff), Math.pow(2, this.sizeParam) / (3 * this.coeff),
                     0, this.value,
                     false,
                     0
@@ -69,7 +70,7 @@ class HelperAngle
             geometry = new THREE.Geometry();
             geometry.vertices.push(
                 this.position,
-                this.position.clone().add(this.mainAxis.clone().setLength(Math.pow(2, this.sizeParam)))
+                this.position.clone().add(this.mainAxis.clone().setLength(Math.pow(2, this.sizeParam) / this.coeff))
             );
             this.threeMainAxis = new THREE.Line(geometry, material);
 
@@ -77,7 +78,7 @@ class HelperAngle
             geometry = new THREE.Geometry();
             geometry.vertices.push(
                 this.position,
-                this.position.clone().add(this.direction.clone().setLength(Math.pow(2, this.sizeParam)))
+                this.position.clone().add(this.direction.clone().setLength(Math.pow(2, this.sizeParam) / this.coeff))
             );
 
             this.threeDirection = new THREE.Line(geometry, material);
@@ -85,7 +86,7 @@ class HelperAngle
         } else {
 
             let geometry = new THREE.CircleGeometry(
-                Math.pow(2, this.sizeParam),
+                Math.pow(2, this.sizeParam) / this.coeff,
                 INITIAL_SEGMENTS_NUMBER,
                 0,
                 this.value
@@ -103,14 +104,14 @@ class HelperAngle
             this.threeMainAxis = new THREE.ArrowHelper(
                 this.mainAxis,
                 this.position,
-                Math.pow(2, this.sizeParam),
+                Math.pow(2, this.sizeParam) / this.coeff,
                 this.color
             );
 
             this.threeDirection = new THREE.ArrowHelper(
                 this.direction,
                 this.position,
-                Math.pow(2, this.sizeParam),
+                Math.pow(2, this.sizeParam) / this.coeff,
                 this.isEditMode ? 0xc2f442 : this.color
             );
         }
@@ -137,12 +138,12 @@ class HelperAngle
 
             this.threeMainAxis.geometry.vertices.push(
                 this.position,
-                this.position.clone().add(this.mainAxis.clone().setLength(Math.pow(2, this.sizeParam)))
+                this.position.clone().add(this.mainAxis.clone().setLength(Math.pow(2, this.sizeParam) / this.coeff))
             );
 
             this.threeDirection.geometry.vertices.push(
                 this.position,
-                this.position.clone().add(this.direction.clone().setLength(Math.pow(2, this.sizeParam)))
+                this.position.clone().add(this.direction.clone().setLength(Math.pow(2, this.sizeParam) / this.coeff))
             );
         } else {
             this.threeMainAxis.position.copy(this.position);
@@ -160,7 +161,7 @@ class HelperAngle
             (new THREE.Path(
                 (new THREE.EllipseCurve(
                     0, 0,
-                    Math.pow(2, this.sizeParam) / 3, Math.pow(2, this.sizeParam) / 3,
+                    Math.pow(2, this.sizeParam) / (3 * this.coeff), Math.pow(2, this.sizeParam) / (3 * this.coeff),
                     0, this.value,
                     false,
                     0
@@ -168,7 +169,7 @@ class HelperAngle
             )).createPointsGeometry(100)
             :
             (new THREE.CircleGeometry(
-                Math.pow(2, this.sizeParam),
+                Math.pow(2, this.sizeParam) / this.coeff,
                 INITIAL_SEGMENTS_NUMBER,
                 0,
                 this.value
@@ -185,7 +186,7 @@ class HelperAngle
 
             this.threeDirection.geometry.vertices.push(
                 this.position,
-                this.position.clone().add(this.direction.clone().setLength(Math.pow(2, this.sizeParam)))
+                this.position.clone().add(this.direction.clone().setLength(Math.pow(2, this.sizeParam) / this.coeff))
             );
         } else {
             this.threeDirection.setDirection(this.direction);
@@ -213,12 +214,12 @@ class HelperAngle
 
             this.threeMainAxis.geometry.vertices.push(
                 this.position,
-                this.position.clone().add(this.mainAxis.clone().setLength(Math.pow(2, this.sizeParam)))
+                this.position.clone().add(this.mainAxis.clone().setLength(Math.pow(2, this.sizeParam) / this.coeff))
             );
 
             this.threeDirection.geometry.vertices.push(
                 this.position,
-                this.position.clone().add(this.direction.clone().setLength(Math.pow(2, this.sizeParam)))
+                this.position.clone().add(this.direction.clone().setLength(Math.pow(2, this.sizeParam) / this.coeff))
             );
         } else {
             this.threeMainAxis.setDirection(this.mainAxis);
@@ -306,7 +307,7 @@ class HelperAngle
                 (new THREE.Path(
                     (new THREE.EllipseCurve(
                         0, 0,
-                        Math.pow(2, this.sizeParam) / 3, Math.pow(2, this.sizeParam) / 3,
+                        Math.pow(2, this.sizeParam) / (3 * this.coeff), Math.pow(2, this.sizeParam) / (3 * this.coeff),
                         0, this.value,
                         false,
                         0
@@ -314,7 +315,7 @@ class HelperAngle
                 )).createPointsGeometry(100)
                 :
                 (new THREE.CircleGeometry(
-                    Math.pow(2, this.sizeParam),
+                    Math.pow(2, this.sizeParam) / this.coeff,
                     INITIAL_SEGMENTS_NUMBER,
                     0,
                     this.value
@@ -329,16 +330,16 @@ class HelperAngle
 
                 this.threeMainAxis.geometry.vertices.push(
                     this.position,
-                    this.position.clone().add(this.mainAxis.clone().setLength(Math.pow(2, this.sizeParam)))
+                    this.position.clone().add(this.mainAxis.clone().setLength(Math.pow(2, this.sizeParam) / this.coeff))
                 );
 
                 this.threeDirection.geometry.vertices.push(
                     this.position,
-                    this.position.clone().add(this.direction.clone().setLength(Math.pow(2, this.sizeParam)))
+                    this.position.clone().add(this.direction.clone().setLength(Math.pow(2, this.sizeParam) / this.coeff))
                 );
             } else {
-                this.threeMainAxis.setLength(Math.pow(2, this.sizeParam), this.threeMainAxis.headLength, this.threeMainAxis.headWidth);
-                this.threeDirection.setLength(Math.pow(2, this.sizeParam), this.threeDirection.headLength, this.threeDirection.headWidth);
+                this.threeMainAxis.setLength(Math.pow(2, this.sizeParam) / this.coeff, this.threeMainAxis.headLength, this.threeMainAxis.headWidth);
+                this.threeDirection.setLength(Math.pow(2, this.sizeParam) / this.coeff, this.threeDirection.headLength, this.threeDirection.headWidth);
             }
         }
     }

@@ -32,7 +32,7 @@ class KeplerianEditor
     }*/
 
     initAngles(event) {
-        const keplerianObject = this.trajectory.keplerianObject || this.trajectory.getKeplerianObjectByEpoch(event.detail.epoch);
+        const keplerianObject = this.trajectory.getKeplerianObjectByEpoch(event.detail.epoch);
 
         this.raanAngle = new HelperAngle(
             new FunctionOfEpochObjectPosition(this.trajectory.referenceFrame.origin, RF_BASE),
@@ -44,6 +44,7 @@ class KeplerianEditor
                 .rotate(new Vector([0, 0, 1])),
             keplerianObject.raan,
             0x7FFFD4, //lightblue
+            3,
             true
         );
 
@@ -73,6 +74,7 @@ class KeplerianEditor
             normal,
             keplerianObject.aop,
             0x9966CC, //violet
+            1,
             true
         );
 
@@ -91,6 +93,7 @@ class KeplerianEditor
             node,
             keplerianObject.inc,
             0xB00000, //red
+            3,
             true
         );
 
@@ -100,6 +103,7 @@ class KeplerianEditor
             normal,
             keplerianObject.ta,
             0xFC0FC0, //pink
+            3,
             true
         );
 
@@ -109,7 +113,7 @@ class KeplerianEditor
     }
 
     updateAngles(event) {
-        const keplerianObject = this.trajectory.keplerianObject || this.trajectory.getKeplerianObjectByEpoch(event.detail.epoch);
+        const keplerianObject = this.trajectory.getKeplerianObjectByEpoch(event.detail.epoch);
         this.raanAngle.resize(keplerianObject.raan);
         this.raanAngle.rearrange(
             this.trajectory.referenceFrame
@@ -158,5 +162,14 @@ class KeplerianEditor
 
         this.taAngle.resize(keplerianObject.ta);
         this.taAngle.rearrange(periapsis, normal);
+    }
+
+    remove() {
+        this.raanAngle.remove();
+        this.aopAngle.remove();
+        this.incAngle.remove();
+        this.taAngle.remove();
+
+        document.removeEventListener('vr_render', this.updateAnglesImproved);
     }
 }
