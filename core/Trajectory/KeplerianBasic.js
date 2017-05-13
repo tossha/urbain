@@ -77,6 +77,10 @@ class TrajectoryKeplerianBasic extends TrajectoryKeplerianAbstract
         return this.keplerianObject;
     }
 
+    getPeriapsisVector(epoch) {
+        return this.keplerianObject.getPeriapsisVector();
+    }
+    
     static createFromState(referenceFrame, state, mu, epoch, color) {
         return new TrajectoryKeplerianBasic(
             referenceFrame,

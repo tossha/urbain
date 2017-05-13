@@ -193,6 +193,18 @@ class KeplerianObject
         );
     }
 
+    getPeriapsisVector() {
+        let nodeQuaternion = new Quaternion(new Vector([0, 0, 1]), this._raan);
+        let normalQuaternion = new Quaternion(nodeQuaternion.rotate(new Vector([1, 0, 0])), this._inc);
+
+        let normal = normalQuaternion.rotate(new Vector([0, 0, 1]));
+
+        let periapsisQuaternion = (new Quaternion(normal, this._aop)).mul(nodeQuaternion);
+
+        let periapsis = periapsisQuaternion.rotate(new Vector([1, 0, 0]));
+
+        return periapsis;    
+    }
 
     /**
      *  @see http://microsat.sm.bmstu.ru/e-library/Ballistics/kepler.pdf

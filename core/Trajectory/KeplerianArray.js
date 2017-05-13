@@ -62,6 +62,10 @@ class TrajectoryKeplerianArray extends TrajectoryKeplerianAbstract
         );
     }
 
+    getPeriapsisVector(epoch) {
+        return this.getKeplerianObjectByEpoch(epoch).getPeriapsisVector();
+    }
+    
     approximateKeplerianObject(object1, object2, epoch) {
         const proportion = (epoch - object1.epoch) / (object2.epoch - object1.epoch);
         return new KeplerianObject(
