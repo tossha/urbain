@@ -74,6 +74,29 @@ class SelectionHandler
                     'vr_select',
                     {detail: {trajectory: this.selectedObject}}
                 ));
+
+                let worldIntersectionPoint = (new Vector([
+                    this.bestIntersection.point.x,
+                    this.bestIntersection.point.y,
+                    this.bestIntersection.point.z
+                ])).add_(camera.lastPosition);
+
+                worldIntersectionPoint = RF_BASE.transformPositionByEpoch(
+                    time.epoch,
+                    worldIntersectionPoint,
+                    this.selectedObject.referenceFrame
+                );
+
+                let pereapsisVector = this.selectedObject
+                    .getPeriapsisVector(time.epoch); 
+
+                let alpha = Math.acos(
+                    pereapsisVector
+                    .dot(worldIntersectionPoint)
+                    / worldIntersectionPoint.mag
+                    / pereapsisVector.mag)
+
+                this.selectedObject.alpha = alpha;
             }
         }
     }

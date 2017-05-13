@@ -12,6 +12,10 @@ class TrajectoryKeplerianPrecessing extends TrajectoryKeplerianBasic
         return this.keplerianObject.addPrecession(this.r, this.j2, epoch);
     }
 
+    getPeriapsisVector(epoch) {
+        return this.getKeplerianObjectByEpoch(epoch).getPeriapsisVector();
+    }
+    
     static createFromState(referenceFrame, state, mu, r, j2, epoch, color) {
         return new TrajectoryKeplerianPrecessing(
             referenceFrame,
