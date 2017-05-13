@@ -13,8 +13,8 @@ class SelectionHandler
         scene.add(this.pointerSphere);
 
         document.addEventListener('vr_render', this.onRender.bind(this));
-        window.addEventListener('click', this.onMouseClick.bind(this));
-        window.addEventListener('mousedown', this.onMouseDown.bind(this));
+        rendererEvents.addListener('click', this.onMouseClick.bind(this), 1);
+        rendererEvents.addListener('mousedown', this.onMouseDown.bind(this), 1);
 
         this.mouseMoveListener = this.onMouseMove.bind(this);
     }

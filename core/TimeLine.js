@@ -275,6 +275,7 @@ class TimeLine
         } else if (e.button === 2) {
             this.mouseState.rightButton = true;
         }
+        return false;
     }
 
     onMouseUp(e) {
@@ -283,6 +284,7 @@ class TimeLine
         } else if (e.button === 2) {
             this.mouseState.rightButton = false;
         }
+        return false;
     }
 
     onMouseMove(e) {
@@ -292,6 +294,7 @@ class TimeLine
 
         this.mouseState.x = e.x;
         this.mouseState.y = e.y;
+        return false;
     }
 
     onMouseWheel(e) {
@@ -305,6 +308,7 @@ class TimeLine
         this.span = newSpan;
 
         this.updateScaleType();
+        return false;
     }
 }
 
