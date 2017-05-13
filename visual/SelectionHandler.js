@@ -94,7 +94,7 @@ class SelectionHandler
                     pereapsisVector
                     .dot(worldIntersectionPoint)
                     / worldIntersectionPoint.mag
-                    / pereapsisVector.mag)
+                    / pereapsisVector.mag);
 
                 this.selectedObject.alpha = alpha;
             }
