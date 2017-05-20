@@ -8,8 +8,8 @@ class HelperAngle
         this.normal = (new THREE.Vector3).fromArray(normal).normalize();
         this.callback = callback;
         this.mainAxis = (new THREE.Vector3).fromArray(mainAxis).normalize();
-        this.positionitionAtEpoch = functionOfEpoch;
-        this.position = (new THREE.Vector3).fromArray(this.positionitionAtEpoch.evaluate(time.epoch).sub(camera.lastPosition));
+        this.positionAtEpoch = functionOfEpoch;
+        this.position = (new THREE.Vector3).fromArray(this.positionAtEpoch.evaluate(time.epoch).sub(camera.lastPosition));
         this.isArcMode = isArcMode;
         this.coeff = coeff ? coeff : 1;
 
@@ -125,7 +125,7 @@ class HelperAngle
 
     onRender(event) {
         this.position = (new THREE.Vector3).fromArray(
-            this.positionitionAtEpoch.evaluate(event.detail.epoch)
+            this.positionAtEpoch.evaluate(event.detail.epoch)
                 .sub(camera.lastPosition)
         );
 
