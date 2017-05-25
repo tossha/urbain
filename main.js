@@ -118,6 +118,14 @@ function render(curTime) {
     requestAnimationFrame(render);
 }
 
+function toggleVisibility(name) {
+    var blockSelector = $(`[name='blockShowHide${name}']`);
+    var togglerSelector = $(`[name='buttonShowHide${name}']`);
+    var isVisible = blockSelector.first().css("display") === "none";
+    togglerSelector.html(isVisible ? "Hide" : "Show");
+    blockSelector.fadeToggle();
+}
+
 function onWindowResize() {
     renderer.setSize(window.innerWidth, window.innerHeight);
     camera.onResize();
