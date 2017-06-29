@@ -16,11 +16,11 @@ $scripts = array_map('addTime', $scripts);
 <html>
 <head>
     <script src="http://code.jquery.com/jquery-3.2.1.min.js"></script>
-    <!--    <script src="https://threejs.org/build/three.min.js"></script>-->
+    <!--<script src="https://threejs.org/build/three.min.js"></script>
 
-    <!--        --><?php //foreach ($scripts as $script) { ?>
-    <!--            <script src="--><? //= $script ?><!--"></script>-->
-    <!--        --><?php //} ?>
+    <?php /*foreach ($scripts as $script) { */?>
+        <script src="<?/* //= $script */?>"></script>
+    --><?php /*} */?>
 
     <style type="text/css">
         html {
@@ -101,12 +101,20 @@ $scripts = array_map('addTime', $scripts);
             top: 0;
             right: 0;
         }
+
+        .toggleButton {
+            width: 49px;
+        }
+
+        #pauseButton {
+            width: 65px;
+        }
     </style>
 </head>
 
 <body>
-<!--<script type="text/javascript" src="--><? //= addTime('builtin.js') ?><!--"></script>-->
-<!--<script type="text/javascript" src="--><? //= addTime('main.js') ?><!--"></script>-->
+<!--<script type="text/javascript" src="<?/*= addTime('builtin.js') */?>"></script>
+<script type="text/javascript" src="<?/*= addTime('main.js') */?>"></script>-->
 
 <script>
     function changeVisibility(name) {
@@ -119,23 +127,11 @@ $scripts = array_map('addTime', $scripts);
         });
     }
 
-    function chooseButtonWidth(button, text1, text2) {
-        button.html(text1);
-        const firstWidth = button.outerWidth();
-        button.html(text2);
-        button.css('width', Math.max(firstWidth, button.outerWidth()) + 'px');
-    }
-
     $(() => {
         const pauseButton = $('#pauseButton');
         pauseButton.on('click', () => {
             pauseButton.html(pauseButton.html() === 'Pause' ? 'Resume' : 'Pause');
         });
-        chooseButtonWidth(pauseButton, 'Resume', 'Pause');
-
-        for (const name of ['metrics', 'positionCoordinate', 'velocityCoordinate', 'timeBox', 'cameraBox']) {
-            chooseButtonWidth($(`#${name}ToggleButton`), 'Show', 'Hide');
-        }
 
         for (const name of ['metrics', 'timeBox', 'cameraBox']) {
             const table = $(`#${name}Header`);
@@ -186,7 +182,7 @@ $scripts = array_map('addTime', $scripts);
                        ] as $param) { ?>
             <tr>
                 <td><?= $param[0] ?></td>
-                <td align="right"><?= $param[1] ?></td>
+                <td id="<?= strtolower($param[0]) ?>" align="right"><?= $param[1] ?></td>
                 <td><?= $param[2] ?></td>
             </tr>
         <?php } ?>
@@ -200,7 +196,7 @@ $scripts = array_map('addTime', $scripts);
         <?php foreach (['Distance', 'Velocity'] as $type) { ?>
             <tr>
                 <td colspan="2"><?= $type ?></td>
-                <td colspan="2">0</td>
+                <td id="<?= strtolower($type) ?>Mag" colspan="2">0</td>
                 <td colspan="2">
                     <?= generateToggleButton(strtolower($type) . "Coordinate") ?>
                 </td>
@@ -209,7 +205,7 @@ $scripts = array_map('addTime', $scripts);
             <?php foreach (['x', 'y', 'z'] as $coord) { ?>
                 <tr class="<?= strtolower($type) ?>Coordinate">
                     <td colspan="3"><?= $coord ?></td>
-                    <td colspan="3">0</td>
+                    <td id="<?= strtolower($type) . strtoupper($coord) ?>" colspan="3">0</td>
                 </tr>
             <?php } ?>
         <?php } ?>
@@ -248,7 +244,7 @@ $scripts = array_map('addTime', $scripts);
 
             <tr>
                 <td colspan="2">
-                    <input type="range" min="-2000" max="2000" style="width: 100%">
+                    <input id="timeScaleSlider" type="range" min="-2000" max="2000" style="width: 100%">
                 </td>
 
                 <td>
@@ -274,7 +270,7 @@ $scripts = array_map('addTime', $scripts);
                 <td colspan="2">Earth</td>
             </tr>
 
-            <tr>
+            <!--<tr>
                 <td><b>Mode:</b></td>
                 <td>
                     <input id="inputModeOrbit" type="radio" name="inputMode">
@@ -285,12 +281,12 @@ $scripts = array_map('addTime', $scripts);
                 <td>
                     <input type="number" value="60.0" step="0.1" min="0.0" max="360.0">
                 </td>
-            </tr>
+            </tr>-->
 
             <tr>
                 <td><b>Zoom:</b></td>
                 <td colspan="2">
-                    <input type="range" style="width: 100%">
+                    <input id="zoomSlider" type="range" style="width: 100%">
                 </td>
             </tr>
         </table>
