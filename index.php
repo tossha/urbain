@@ -182,7 +182,7 @@ $scripts = array_map('addTime', $scripts);
                        ] as $param) { ?>
             <tr>
                 <td><?= $param[0] ?></td>
-                <td id="<?= strtolower($param[0]) ?>" align="right"><?= $param[1] ?></td>
+                <td id="<?= strtolower($param[0]) ?>Value" align="right"><?= $param[1] ?></td>
                 <td><?= $param[2] ?></td>
             </tr>
         <?php } ?>
