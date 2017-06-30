@@ -26,7 +26,7 @@ function init() {
 
     selection = new SelectionHandler(raycaster);
 
-    for (let objId in SSDATA) {
+    for (const objId in SSDATA) {
         objectsForTracking[SSDATA[objId].name] = objId;
     }
 
@@ -50,7 +50,7 @@ function initBuiltIn() {
 
     stars = new VisualStarsModel(STARDATA);
 
-    for (let id in TLEDATA) {
+    for (const id in TLEDATA) {
         const tle = new TLE(TLEDATA[id].lines);
         const objId = parseInt(id);
 
@@ -88,7 +88,7 @@ function render(curTime) {
 
     camera.update(time.epoch);
 
-    for (let bodyIdx in BODIES) {
+    for (const bodyIdx in BODIES) {
         BODIES[bodyIdx].render(time.epoch);
     }
 
@@ -101,13 +101,12 @@ function render(curTime) {
         {detail: {epoch: time.epoch}}
     ));
 
-    const trajectoryMenu = settings.currentTrajectoryMenu;
     const state = App.getTrajectory(settings.trackingObject).getStateByEpoch(time.epoch, RF_BASE);
-    for (let group of ['velocity', 'position']) {
-        const trajectoryGroup = trajectoryMenu[group];
+    for (const group of ['velocity', 'position']) {
         const stateGroup = state[group];
-        for (let id of ['x', 'y', 'z', 'mag']) {
-            trajectoryGroup[id].setValue("" + stateGroup[id]);
+        for (const id of ['x', 'y', 'z', 'mag']) {
+            const selector = $(`#${group}${id.substr(0, 1).toUpperCase()}${id.substr(1)}`) ;
+            selector.html('' + stateGroup[id]);
         }
     }
 
@@ -123,6 +122,16 @@ function onWindowResize() {
     camera.onResize();
 }
 
+function changeVisibility(name) {
+    const selector = $('.' + name);
+    const button = $(`#${name}ToggleButton`);
+    button.attr('disabled', 'true');
+    selector.fadeToggle(400, 'swing', () => {
+        button.html(selector.is(':visible') ? 'Hide' : 'Show');
+        button.removeAttr('disabled');
+    });
+}
+
 var camera, scene, renderer, axisHelper, raycaster;
 var settings, time, globalTime;
 var textureLoader;
@@ -133,8 +142,8 @@ var selection;
 var statistics;
 var rendererEvents;
 
-window.onload = function () {
+$(() => {
     init();
     initBuiltIn();
     requestAnimationFrame(firstRender);
-};
+});

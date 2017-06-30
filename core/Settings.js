@@ -7,60 +7,27 @@ class Settings
         this.timeScale = initial.timeScale;
         this.isTimeRunning = initial.isTimeRunning;
         this.trackingObject = initial.trackingObject;
-        this.currentDate = '';
 
         this.showStatistics = false;
         this.guiMain.add(this, 'showStatistics').onChange((value) => {
             statistics.dom.style.display = value ? "" : "none";
         });
 
-        this.guiMain.add(this, 'timeScale', -2000, 2000);
-        this.guiMain.add(this, 'currentDate').listen();
-        this.guiIsTimeRunning = this.guiMain.add(this, 'isTimeRunning');
+        const timeScaleSlider = $('#timeScaleSlider');
+        timeScaleSlider.on('change', () => {
+            this.timeScale = timeScaleSlider.val();
+            $('#timeScaleValue').html('' + this.timeScale);
+        });
+
+        const pauseButton = $('#pauseButton');
+        pauseButton.on('click', () => {
+            this.isTimeRunning = !this.isTimeRunning;
+            pauseButton.html(this.isTimeRunning ? 'Pause' : 'Resume');
+        });
+
         this.guiMain.add(this, 'trackingObject', initial.objectsForTracking).onChange(function(value) {
             camera.setOrbitingPoint(value);
         });
-
-        const trajectoryMenu = {
-            velocity: {
-                folder: null,
-                x   : null,
-                y   : null,
-                z   : null,
-                mag : null,
-
-                values: {
-                    x   : "",
-                    y   : "",
-                    z   : "",
-                    mag : ""
-                }
-            },
-
-            position: {
-                folder: null,
-                x   : null,
-                y   : null,
-                z   : null,
-                mag : null,
-
-                values: {
-                    x   : "",
-                    y   : "",
-                    z   : "",
-                    mag : ""
-                }
-            }
-        };
-
-        for (let group of ['velocity', 'position']) {
-            trajectoryMenu[group].folder = this.guiMain.addFolder(group);
-            for (let id of ['x', 'y', 'z', 'mag']) {
-                trajectoryMenu[group][id] = trajectoryMenu[group].folder.add(trajectoryMenu[group].values, id);
-            }
-        }
-
-        this.currentTrajectoryMenu = trajectoryMenu;
 
         this.guiAddTrajectory = new dat.GUI({
             autoPlace: false,
