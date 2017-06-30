@@ -57,7 +57,7 @@ class TimeLine
             this.settings.timeLine = this.epoch;
         }
 
-        this.settings.currentDate = "" + new Date((J2000_TIMESTAMP + this.epoch) * 1000);
+        $('#currentDateValue').html(this.formatDate(new Date((J2000_TIMESTAMP + this.epoch) * 1000)));
         this.redraw();
     }
 
@@ -66,16 +66,24 @@ class TimeLine
         this.tick(0);
     }
 
+    useCurrentTime() {
+        this.forceEpoch(TimeLine.getEpochByDate(new Date));
+    }
+
+    useRealTimeScale() {
+        const selector = $('#timeScaleSlider');
+        selector.val(0.001);
+        selector.trigger('change');
+        this.settings.timeScale = 0.001;
+    }
+
     redraw() {
-        // TODO: заменить
         this.canvasContext.fillStyle = "#222";
         this.canvasContext.fillRect(0, 0, this.domElement.width, this.domElement.height);
 
-        // TODO: заменить
         this.canvasContext.fillStyle = "#2FA1D6";
         this.drawCurrentTimeMark();
 
-        // TODO: заменить
         this.canvasContext.strokeStyle = "#fff";
         this.canvasContext.fillStyle   = "#fff";
         this.canvasContext.font        = "11pt sans-serif";
@@ -112,7 +120,7 @@ class TimeLine
         const secondsPerPeriod = this.markDistance * this.span / this.domElement.width;
         let bestScale = false;
 
-        for (let scale in TimeLine.scales) {
+        for (const scale in TimeLine.scales) {
             if (!bestScale) {
                 bestScale = scale;
                 continue;
@@ -145,7 +153,7 @@ class TimeLine
     }
 
     roundDateUp(date) {
-        var d = new Date(date);
+        const d = new Date(date);
         if (this.scaleType === "minute") {
             d.setSeconds(60, 0);
         } else if (this.scaleType === "fiveMinutes") {
@@ -186,7 +194,7 @@ class TimeLine
     }
 
     nextRenderingDate(date) {
-        var d = new Date(date);
+        const d = new Date(date);
         if (this.scaleType === "minute") {
             d.setMinutes(d.getMinutes() + 1);
         } else if (this.scaleType === "fiveMinutes") {
@@ -326,4 +334,4 @@ TimeLine.scales = {
     threeMonths: 7776000,
     year: 31557600,
     fiveYears: 157788000,
-}
+};

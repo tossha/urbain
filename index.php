@@ -16,11 +16,11 @@ $scripts = array_map('addTime', $scripts);
 <html>
 <head>
     <script src="http://code.jquery.com/jquery-3.2.1.min.js"></script>
-    <!--<script src="https://threejs.org/build/three.min.js"></script>
+    <script src="https://threejs.org/build/three.min.js"></script>
 
-    <?php /*foreach ($scripts as $script) { */?>
-        <script src="<?/* //= $script */?>"></script>
-    --><?php /*} */?>
+    <?php foreach ($scripts as $script) { ?>
+        <script src="<?= $script ?>"></script>
+    <?php } ?>
 
     <style type="text/css">
         html {
@@ -88,8 +88,9 @@ $scripts = array_map('addTime', $scripts);
             display: inline-block;
         }
 
-        table {
+        .menuBlock, #metricsPanel {
             border: 1px solid black;
+            background-color: white;
         }
 
         button {
@@ -100,6 +101,18 @@ $scripts = array_map('addTime', $scripts);
             position: absolute;
             top: 0;
             right: 0;
+        }
+
+        #timeBoxHeader {
+            width: 300px;
+        }
+
+        #cameraBoxHeader {
+            width: 200px;
+        }
+
+        .metrics {
+            width: 100%;
         }
 
         .toggleButton {
@@ -113,38 +126,13 @@ $scripts = array_map('addTime', $scripts);
 </head>
 
 <body>
-<!--<script type="text/javascript" src="<?/*= addTime('builtin.js') */?>"></script>
-<script type="text/javascript" src="<?/*= addTime('main.js') */?>"></script>-->
-
-<script>
-    function changeVisibility(name) {
-        const selector = $('.' + name);
-        const button = $(`#${name}ToggleButton`);
-        button.attr('disabled', 'true');
-        selector.fadeToggle(400, 'swing', () => {
-            button.html(selector.is(':visible') ? 'Hide' : 'Show');
-            button.removeAttr('disabled');
-        });
-    }
-
-    $(() => {
-        const pauseButton = $('#pauseButton');
-        pauseButton.on('click', () => {
-            pauseButton.html(pauseButton.html() === 'Pause' ? 'Resume' : 'Pause');
-        });
-
-        for (const name of ['metrics', 'timeBox', 'cameraBox']) {
-            const table = $(`#${name}Header`);
-            table.css('width', '100%');
-            table.css('width', table.outerWidth() + 'px');
-        }
-    });
-</script>
+<script type="text/javascript" src="<?= addTime('builtin.js') ?>"></script>
+<script type="text/javascript" src="<?= addTime('main.js') ?>"></script>
 
 <div id="leftPanel"></div>
 <div id="viewport"></div>
 <div id="metricsPanel">
-    <table id="metricsHeader">
+    <table id="metricsHeader" style="width: 300px">
         <tr>
             <td>
                 Metrics
@@ -173,12 +161,12 @@ $scripts = array_map('addTime', $scripts);
         </tr>
 
         <?php foreach ([
-                           ['Ecc' , '0.4532', ''    ],
-                           ['SMA' , '412'   , 'Mkm' ],
-                           ['Inc' , '0.02'  , 'deg.'],
-                           ['AoP' , '78'    , 'deg.'],
-                           ['RAAN', '200'   , 'deg.'],
-                           ['TA'  , '153'   , 'deg.'],
+                           ['Ecc', '0.4532', ''],
+                           ['SMA', '412', 'Mkm'],
+                           ['Inc', '0.02', 'deg.'],
+                           ['AoP', '78', 'deg.'],
+                           ['RAAN', '200', 'deg.'],
+                           ['TA', '153', 'deg.'],
                        ] as $param) { ?>
             <tr>
                 <td><?= $param[0] ?></td>
@@ -193,19 +181,19 @@ $scripts = array_map('addTime', $scripts);
             <td colspan="6">Cartesian</td>
         </tr>
 
-        <?php foreach (['Distance', 'Velocity'] as $type) { ?>
+        <?php foreach (['Position', 'Velocity'] as $type) { ?>
             <tr>
-                <td colspan="2"><?= $type ?></td>
-                <td id="<?= strtolower($type) ?>Mag" colspan="2">0</td>
-                <td colspan="2">
+                <td style="width: 65px"><?= $type ?></td>
+                <td id="<?= strtolower($type) ?>Mag">0</td>
+                <td style="width: 49px">
                     <?= generateToggleButton(strtolower($type) . "Coordinate") ?>
                 </td>
             </tr>
 
             <?php foreach (['x', 'y', 'z'] as $coord) { ?>
                 <tr class="<?= strtolower($type) ?>Coordinate">
-                    <td colspan="3"><?= $coord ?></td>
-                    <td id="<?= strtolower($type) . strtoupper($coord) ?>" colspan="3">0</td>
+                    <td><?= $coord ?></td>
+                    <td id="<?= strtolower($type) . strtoupper($coord) ?>" colspan="2">0</td>
                 </tr>
             <?php } ?>
         <?php } ?>
@@ -222,29 +210,29 @@ $scripts = array_map('addTime', $scripts);
             </tr>
         </table>
 
-        <table class="timeBox">
+        <table class="timeBox" style="width: 100%">
 
             <tr>
-                <td><b>Current:</b></td>
+                <td style="width: 65px"><b>Current:</b></td>
 
-                <td>14.05.2016 13:42:10</td>
+                <td id="currentDateValue">14.05.2016 13:42:10</td>
 
-                <td>
-                    <button>Now</button>
+                <td style="width: 70px">
+                    <button onclick="time.useCurrentTime()">Now</button>
                 </td>
             </tr>
 
             <tr>
                 <td><b>Rate:</b></td>
-                <td>1.3 days per second</td>
+                <td id="timeScaleValue">1.3 days per second</td>
                 <td>
-                    <button>Real</button>
+                    <button onclick="time.useRealTimeScale()">Real</button>
                 </td>
             </tr>
 
             <tr>
                 <td colspan="2">
-                    <input id="timeScaleSlider" type="range" min="-2000" max="2000" style="width: 100%">
+                    <input id="timeScaleSlider" type="range" min="-2000" max="2000" step="0.001" value="0.001" style="width: 100%">
                 </td>
 
                 <td>

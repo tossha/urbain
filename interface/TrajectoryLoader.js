@@ -22,7 +22,7 @@ class TrajectoryLoader
             data.color
         );
 
-        for (let i in data.trajectory) {
+        for (const i in data.trajectory) {
             traj.addState(this.createKeplerianObject(data.trajectory[i]));
         }
         return traj;

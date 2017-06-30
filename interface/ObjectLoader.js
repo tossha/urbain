@@ -1,7 +1,7 @@
 class ObjectLoader
 {
     static loadFromCnfig(config) {
-        for (let bodyId in config) {
+        for (const bodyId in config) {
             this.loadObject(bodyId, config[bodyId]);
         }
 

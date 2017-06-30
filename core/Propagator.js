@@ -14,7 +14,7 @@ class Propagator
         while (currentEpoch < exitEpoch) {
             let acceleration = ZERO_VECTOR;
 
-            for (let bodyIdIdx in this.significantBodies) {
+            for (const bodyIdIdx in this.significantBodies) {
                 const body = BODIES[this.significantBodies[bodyIdIdx]];
                 if (!body.physicalModel.mu) {
                     continue;

@@ -46,7 +46,7 @@ class EventHandler
 
         const highestPriority = list.reduce((val, a) => Math.max(val, a.priority), list[0].priority);
 
-        for (let listener of list) {
+        for (const listener of list) {
             if (listener.priority === highestPriority) {
                 listener.handler(eventObject);
             }
