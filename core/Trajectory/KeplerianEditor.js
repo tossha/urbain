@@ -7,29 +7,6 @@ class KeplerianEditor
         this.initAnglesImproved = this.initAngles.bind(this);
         document.addEventListener('vr_render', this.initAnglesImproved);
     }
-    /*editExisting() {
-        
-    }
-
-    static createNew() {
-        if (KeplerianEditor.isEditMode !== true) {
-
-            KeplerianEditor.helperGrid = new HelperGrid(App.getReferenceFrame(settings.trackingObject, RF_TYPE_EQUATORIAL));
-            KeplerianEditor.isEditMode = true;
-
-            //plane
-        }
-
-        
-    }
-
-    static abortCreating() {
-        if ((KeplerianEditor.isEditMode)&&(KeplerianEditor.helperGrid !== undefined)) {
-            KeplerianEditor.helperGrid.remove();
-
-            KeplerianEditor.isEditMode = false;
-        }
-    }*/
 
     initAngles(event) {
         const keplerianObject = this.trajectory.getKeplerianObjectByEpoch(event.detail.epoch);
@@ -78,10 +55,8 @@ class KeplerianEditor
             true
         );
 
-        let nodePerp = nodeQuaternion
-            .rotate(
-                (new Vector([1, 0, 0]))
-                .rotateZ(Math.PI / 2));
+        let nodePerp = nodeQuaternion.rotate(
+            new Vector([1, 0, 0]));
 
         nodePerp = this.trajectory.referenceFrame
             .getQuaternionByEpoch(event.detail.epoch)
@@ -151,7 +126,7 @@ class KeplerianEditor
         let nodePerp = nodeQuaternion
             .rotate(
                 (new Vector([1, 0, 0]))
-                .rotateZ(Math.PI / 2));
+                    .rotateZ(Math.PI / 2));
 
         nodePerp = this.trajectory.referenceFrame
             .getQuaternionByEpoch(event.detail.epoch)

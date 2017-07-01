@@ -2,16 +2,16 @@ const INITIAL_SEGMENTS_NUMBER = 200;
 
 class HelperAngle
 {
-    constructor(functionOfEpoch, mainAxis, normal, angleValue, color, coeff, isArcMode, callback) {
+    constructor(functionOfEpoch, mainAxis, normal, angleValue, color, coefficientOfAxesLengthDecrease, isArcMode, editingCallback) {
         this.value = angleValue;
         this.color = color;
         this.normal = (new THREE.Vector3).fromArray(normal).normalize();
-        this.callback = callback;
+        this.editingCallback = editingCallback;
         this.mainAxis = (new THREE.Vector3).fromArray(mainAxis).normalize();
         this.positionAtEpoch = functionOfEpoch;
         this.position = (new THREE.Vector3).fromArray(this.positionAtEpoch.evaluate(time.epoch).sub(camera.lastPosition));
         this.isArcMode = isArcMode;
-        this.coeff = coeff ? coeff : 1;
+        this.coefficientOfAxesLengthDecrease = coefficientOfAxesLengthDecrease ? coefficientOfAxesLengthDecrease : 1;
 
         this.sizeParam = camera.position.mag / 2;
 
@@ -33,7 +33,7 @@ class HelperAngle
             .clone()
             .applyAxisAngle(this.normal, this.value);
 
-        if (this.callback) {
+        if (this.editingCallback) {
             this.initEditMode();
         }
 
@@ -57,7 +57,7 @@ class HelperAngle
             let geometry = (new THREE.Path(
                 (new THREE.EllipseCurve(
                     0, 0,
-                    this.sizeParam / (3 * this.coeff), this.sizeParam / (3 * this.coeff),
+                    this.sizeParam / (3 * this.coefficientOfAxesLengthDecrease), this.sizeParam / (3 * this.coefficientOfAxesLengthDecrease),
                     0, this.value,
                     false,
                     0
@@ -70,7 +70,7 @@ class HelperAngle
             geometry = new THREE.Geometry();
             geometry.vertices.push(
                 this.position,
-                this.position.clone().add(this.mainAxis.clone().setLength(this.sizeParam / this.coeff))
+                this.position.clone().add(this.mainAxis.clone().setLength(this.sizeParam / this.coefficientOfAxesLengthDecrease))
             );
             this.threeMainAxis = new THREE.Line(geometry, material);
 
@@ -78,7 +78,7 @@ class HelperAngle
             geometry = new THREE.Geometry();
             geometry.vertices.push(
                 this.position,
-                this.position.clone().add(this.direction.clone().setLength(this.sizeParam / this.coeff))
+                this.position.clone().add(this.direction.clone().setLength(this.sizeParam / this.coefficientOfAxesLengthDecrease))
             );
 
             this.threeDirection = new THREE.Line(geometry, material);
@@ -86,7 +86,7 @@ class HelperAngle
         } else {
 
             let geometry = new THREE.CircleGeometry(
-                this.sizeParam / this.coeff,
+                this.sizeParam / this.coefficientOfAxesLengthDecrease,
                 INITIAL_SEGMENTS_NUMBER,
                 0,
                 this.value
@@ -104,14 +104,14 @@ class HelperAngle
             this.threeMainAxis = new THREE.ArrowHelper(
                 this.mainAxis,
                 this.position,
-                this.sizeParam / this.coeff,
+                this.sizeParam / this.coefficientOfAxesLengthDecrease,
                 this.color
             );
 
             this.threeDirection = new THREE.ArrowHelper(
                 this.direction,
                 this.position,
-                this.sizeParam / this.coeff,
+                this.sizeParam / this.coefficientOfAxesLengthDecrease,
                 this.isEditMode ? 0xc2f442 : this.color
             );
         }
@@ -138,12 +138,12 @@ class HelperAngle
 
             this.threeMainAxis.geometry.vertices.push(
                 this.position,
-                this.position.clone().add(this.mainAxis.clone().setLength(this.sizeParam / this.coeff))
+                this.position.clone().add(this.mainAxis.clone().setLength(this.sizeParam / this.coefficientOfAxesLengthDecrease))
             );
 
             this.threeDirection.geometry.vertices.push(
                 this.position,
-                this.position.clone().add(this.direction.clone().setLength(this.sizeParam / this.coeff))
+                this.position.clone().add(this.direction.clone().setLength(this.sizeParam / this.coefficientOfAxesLengthDecrease))
             );
         } else {
             this.threeMainAxis.position.copy(this.position);
@@ -161,7 +161,7 @@ class HelperAngle
             (new THREE.Path(
                 (new THREE.EllipseCurve(
                     0, 0,
-                    this.sizeParam / (3 * this.coeff), this.sizeParam / (3 * this.coeff),
+                    this.sizeParam / (3 * this.coefficientOfAxesLengthDecrease), this.sizeParam / (3 * this.coefficientOfAxesLengthDecrease),
                     0, this.value,
                     false,
                     0
@@ -169,7 +169,7 @@ class HelperAngle
             )).createPointsGeometry(100)
             :
             (new THREE.CircleGeometry(
-                this.sizeParam / this.coeff,
+                this.sizeParam / this.coefficientOfAxesLengthDecrease,
                 INITIAL_SEGMENTS_NUMBER,
                 0,
                 this.value
@@ -186,14 +186,14 @@ class HelperAngle
 
             this.threeDirection.geometry.vertices.push(
                 this.position,
-                this.position.clone().add(this.direction.clone().setLength(this.sizeParam / this.coeff))
+                this.position.clone().add(this.direction.clone().setLength(this.sizeParam / this.coefficientOfAxesLengthDecrease))
             );
         } else {
             this.threeDirection.setDirection(this.direction);
         }
 
-        if (this.callback) {
-            this.callback(newValue);
+        if (this.editingCallback) {
+            this.editingCallback(newValue);
         }
     }
 
@@ -214,12 +214,12 @@ class HelperAngle
 
             this.threeMainAxis.geometry.vertices.push(
                 this.position,
-                this.position.clone().add(this.mainAxis.clone().setLength(this.sizeParam / this.coeff))
+                this.position.clone().add(this.mainAxis.clone().setLength(this.sizeParam / this.coefficientOfAxesLengthDecrease))
             );
 
             this.threeDirection.geometry.vertices.push(
                 this.position,
-                this.position.clone().add(this.direction.clone().setLength(this.sizeParam / this.coeff))
+                this.position.clone().add(this.direction.clone().setLength(this.sizeParam / this.coefficientOfAxesLengthDecrease))
             );
         } else {
             this.threeMainAxis.setDirection(this.mainAxis);
@@ -257,14 +257,14 @@ class HelperAngle
     }
 
      onMouseDown(event) {
-        let intersection
+        let intersection;
         if (this.isArcMode === true) {
             intersection = raycaster.intersectObjects(
-            [this.threeDirection.line]
+                [this.threeDirection.line]
         )[0];
-        } else {
+            } else {
             intersection = raycaster.intersectObjects(
-            [this.threeDirection.line, this.threeDirection.cone]
+                [this.threeDirection.line, this.threeDirection.cone]
         )[0];
         }
 
@@ -302,11 +302,11 @@ class HelperAngle
         this.sizeParam = camera.position.mag / 2;
 
         this.threeAngle.geometry.dispose();
-        this.threeAngle.geometry = (this.isArcMode) ?
-            (new THREE.Path(
+        this.threeAngle.geometry = (this.isArcMode) 
+            ?(new THREE.Path(
                 (new THREE.EllipseCurve(
                     0, 0,
-                    this.sizeParam / (3 * this.coeff), this.sizeParam / (3 * this.coeff),
+                    this.sizeParam / (3 * this.coefficientOfAxesLengthDecrease), this.sizeParam / (3 * this.coefficientOfAxesLengthDecrease),
                     0, this.value,
                     false,
                     0
@@ -314,7 +314,7 @@ class HelperAngle
             )).createPointsGeometry(100)
             :
             (new THREE.CircleGeometry(
-                this.sizeParam / this.coeff,
+                this.sizeParam / this.coefficientOfAxesLengthDecrease,
                 INITIAL_SEGMENTS_NUMBER,
                 0,
                 this.value
@@ -329,16 +329,16 @@ class HelperAngle
 
             this.threeMainAxis.geometry.vertices.push(
                 this.position,
-                this.position.clone().add(this.mainAxis.clone().setLength(this.sizeParam / this.coeff))
+                this.position.clone().add(this.mainAxis.clone().setLength(this.sizeParam / this.coefficientOfAxesLengthDecrease))
             );
 
             this.threeDirection.geometry.vertices.push(
                 this.position,
-                this.position.clone().add(this.direction.clone().setLength(this.sizeParam / this.coeff))
+                this.position.clone().add(this.direction.clone().setLength(this.sizeParam / this.coefficientOfAxesLengthDecrease))
             );
         } else {
-            this.threeMainAxis.setLength(this.sizeParam / this.coeff, this.threeMainAxis.headLength, this.threeMainAxis.headWidth);
-            this.threeDirection.setLength(this.sizeParam / this.coeff, this.threeDirection.headLength, this.threeDirection.headWidth);
+            this.threeMainAxis.setLength(this.sizeParam / this.coefficientOfAxesLengthDecrease, this.threeMainAxis.headLength, this.threeMainAxis.headWidth);
+            this.threeDirection.setLength(this.sizeParam / this.coefficientOfAxesLengthDecrease, this.threeDirection.headLength, this.threeDirection.headWidth);
         }
     }
 
