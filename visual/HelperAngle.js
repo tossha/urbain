@@ -5,33 +5,17 @@ class HelperAngle
     constructor(functionOfEpoch, mainAxis, normal, angleValue, color, coefficientOfAxesLengthDecrease, isArcMode, editingCallback) {
         this.value = angleValue;
         this.color = color;
-        this.normal = (new THREE.Vector3).fromArray(normal).normalize();
         this.editingCallback = editingCallback;
-        this.mainAxis = (new THREE.Vector3).fromArray(mainAxis).normalize();
         this.positionAtEpoch = functionOfEpoch;
         this.position = (new THREE.Vector3).fromArray(this.positionAtEpoch.evaluate(time.epoch).sub(camera.lastPosition));
         this.isArcMode = isArcMode;
         this.coefficientOfAxesLengthDecrease = coefficientOfAxesLengthDecrease ? coefficientOfAxesLengthDecrease : 1;
 
+        this.setVectors(mainAxis, normal);
+
         this.sizeParam = camera.position.mag / 2;
 
         this.isEditMode = false;
-
-        let quaternionZ = (new THREE.Quaternion).setFromUnitVectors(
-            new THREE.Vector3(0, 0, 1),
-            this.normal
-        );
-
-        let quaternionX = (new THREE.Quaternion).setFromUnitVectors(
-            (new THREE.Vector3(1, 0, 0)).applyQuaternion(quaternionZ),
-            this.mainAxis
-        );
-
-        this.quaternion = quaternionX.multiply(quaternionZ);
-
-        this.direction = this.mainAxis
-            .clone()
-            .applyAxisAngle(this.normal, this.value);
 
         if (this.editingCallback) {
             this.initEditMode();
@@ -90,6 +74,8 @@ class HelperAngle
             );
         }
 
+        this.calculateQuaternions();
+
         this.threeAngle.position.copy(this.position);
         this.threeAngle.quaternion.copy(this.quaternion);
         scene.add(this.threeAngle);
@@ -144,12 +130,7 @@ class HelperAngle
     }
 
     rearrange(newMainAxis, newNormal) {
-        this.mainAxis = (new THREE.Vector3).fromArray(newMainAxis).normalize();
-        this.normal = (new THREE.Vector3).fromArray(newNormal).normalize();
-
-        this.direction = this.mainAxis
-            .clone()
-            .applyAxisAngle(this.normal, this.value);
+        this.setVectors(newMainAxis, newNormal);
 
         if (this.isArcMode === true) {
             this.deletePointersGeometries();
@@ -159,17 +140,7 @@ class HelperAngle
             this.threeDirection.setDirection(this.direction);
         }
 
-        let quaternionZ = (new THREE.Quaternion).setFromUnitVectors(
-            new THREE.Vector3(0, 0, 1),
-            this.normal
-        );
-
-        let quaternionX = (new THREE.Quaternion).setFromUnitVectors(
-            (new THREE.Vector3(1, 0, 0)).applyQuaternion(quaternionZ),
-            this.mainAxis
-        );
-
-        this.quaternion = quaternionX.multiply(quaternionZ);
+        this.calculateQuaternions();
         this.threeAngle.quaternion.copy(this.quaternion);
     }
 
@@ -279,6 +250,15 @@ class HelperAngle
         this.disposeGeometry(this.threeDirection)
     }
 
+    setVectors(mainAxis, normal) {
+        this.mainAxis = (new THREE.Vector3).fromArray(mainAxis).normalize();
+        this.normal   = (new THREE.Vector3).fromArray(normal).normalize();
+
+        this.direction = this.mainAxis
+            .clone()
+            .applyAxisAngle(this.normal, this.value);
+    }
+
     createArcModeAngleGeometry() {
         if (this.threeAngle === undefined) {
             this.threeAngle = {}
@@ -310,5 +290,19 @@ class HelperAngle
 
     disposeGeometry(objectOfDisposal) {
         objectOfDisposal.geometry.dispose();
+    }
+
+    calculateQuaternions() {
+        let quaternionZ = (new THREE.Quaternion).setFromUnitVectors(
+            new THREE.Vector3(0, 0, 1),
+            this.normal
+        );
+
+        let quaternionX = (new THREE.Quaternion).setFromUnitVectors(
+            (new THREE.Vector3(1, 0, 0)).applyQuaternion(quaternionZ),
+            this.mainAxis
+        );
+
+        this.quaternion = quaternionX.multiply(quaternionZ);
     }
 }

@@ -65,14 +65,9 @@ class SelectionHandler
 
             if ((Math.abs(this.mouse.x - newMouse.x) < 1e-8) && (Math.abs(this.mouse.y - newMouse.y) < 1e-8)) {
                 if (currentTraj === this.selectedObject) {
-                    currentTraj.isSelected = false;
-
                     this.dispatchVRDeselect();
-                    this.selectedObject = null;
                 } else {
                     if (this.selectedObject) {
-                        this.selectedObject.isSelected = false;
-
                         this.dispatchVRDeselect();
                     }
 
@@ -87,11 +82,7 @@ class SelectionHandler
             }
         } else {
             if ((this.selectedObject) && (!this.hasMouseMoved)) {
-
                 this.dispatchVRDeselect();
-
-                this.selectedObject.isSelected = false;
-                this.selectedObject = null;
             }
             document.removeEventListener('mousemove', this.mouseMoveListener);
             this.hasMouseMoved = false;
@@ -107,5 +98,8 @@ class SelectionHandler
             'vr_deselect',
             {detail: {trajectory: this.selectedObject}}
         ));
+
+        this.selectedObject.isSelected = false;
+        this.selectedObject = null;
     }
 }

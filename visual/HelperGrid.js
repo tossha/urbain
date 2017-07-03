@@ -4,7 +4,7 @@ class HelperGrid
         this.referenceFrame = referenceFrame;
         this.centerObject = referenceFrame.origin;
 
-        this.gridSizeParameter = this.getCurrentGridSizeParameter(camera.lastPosition.mag);
+        this.gridSizeParameter = this.getCurrentGridSizeParameter();
 
         this.onRenderListener = this.onRender.bind(this);
         document.addEventListener('vr_render', this.onRenderListener);
@@ -37,7 +37,7 @@ class HelperGrid
     }
 
     onZoom() {
-        let pow = this.getCurrentGridSizeParameter(camera.lastPosition.mag);
+        let pow = this.getCurrentGridSizeParameter();
         if (pow != this.gridSizeParameter) {
             scene.remove(this.threeGrid);
 
@@ -53,7 +53,7 @@ class HelperGrid
         document.removeEventListener('vr_render', this.onRenderListener);
     }
 
-    getCurrentGridSizeParameter(cameraPositionMagnitude) {
+    getCurrentGridSizeParameter() {
         return Math.round(Math.log2(camera.position.mag))
     }
 }
