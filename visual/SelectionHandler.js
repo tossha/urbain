@@ -13,7 +13,10 @@ class SelectionHandler
         scene.add(this.pointerSphere);
 
         document.addEventListener('vr_render', this.onRender.bind(this));
-        window.addEventListener('click', this.onMouseClick.bind(this));
+        rendererEvents.addListener('click', this.onMouseClick.bind(this), 1);
+        rendererEvents.addListener('mousedown', this.onMouseDown.bind(this), 1);
+
+        this.mouseMoveListener = this.onMouseMove.bind(this);
     }
 
     onRender() {
@@ -43,42 +46,60 @@ class SelectionHandler
         }
     }
 
+    onMouseDown(event) {
+        if ((event.button === 0) && (this.selectedObject) && (!this.bestIntersection)) {
+            document.addEventListener('mousemove', this.mouseMoveListener);
+        }
+
+        this.mouse = new THREE.Vector2((event.clientX / window.innerWidth ) * 2 - 1, - ( event.clientY / window.innerHeight ) * 2 + 1);
+    }
+
+    onMouseMove() {
+        this.hasMouseMoved = true;
+    }
+
     onMouseClick() {
         if (this.bestIntersection) {
             const currentTraj = this.bestIntersection.object.userData.trajectory;
+            let newMouse = new THREE.Vector2((event.clientX / window.innerWidth ) * 2 - 1, - ( event.clientY / window.innerHeight ) * 2 + 1);
 
-            if (currentTraj === this.selectedObject) {
-                currentTraj.isSelected = false;
+            if ((Math.abs(this.mouse.x - newMouse.x) < 1e-8) && (Math.abs(this.mouse.y - newMouse.y) < 1e-8)) {
+                if (currentTraj === this.selectedObject) {
+                    this.dispatchVRDeselect();
+                } else {
+                    if (this.selectedObject) {
+                        this.dispatchVRDeselect();
+                    }
 
-                document.dispatchEvent(new CustomEvent(
-                    'vr_deselect',
-                    {detail: {trajectory: this.selectedObject}}
-                ));
-
-                this.selectedObject = null;
-            }
-            else {
-                if (this.selectedObject) {
-                    this.selectedObject.isSelected = false;
+                    this.selectedObject = currentTraj;
+                    currentTraj.isSelected = true;
 
                     document.dispatchEvent(new CustomEvent(
-                        'vr_deselect',
+                        'vr_select',
                         {detail: {trajectory: this.selectedObject}}
                     ));
                 }
-
-                this.selectedObject = currentTraj;
-                currentTraj.isSelected = true;
-
-                document.dispatchEvent(new CustomEvent(
-                    'vr_select',
-                    {detail: {trajectory: this.selectedObject}}
-                ));
             }
+        } else {
+            if ((this.selectedObject) && (!this.hasMouseMoved)) {
+                this.dispatchVRDeselect();
+            }
+            document.removeEventListener('mousemove', this.mouseMoveListener);
+            this.hasMouseMoved = false;
         }
     }
 
     getSelectedObject() {
         return this.selectedObject;
+    }
+
+    dispatchVRDeselect() {
+        document.dispatchEvent(new CustomEvent(
+            'vr_deselect',
+            {detail: {trajectory: this.selectedObject}}
+        ));
+
+        this.selectedObject.isSelected = false;
+        this.selectedObject = null;
     }
 }
