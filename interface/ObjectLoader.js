@@ -32,10 +32,19 @@ class ObjectLoader
                     null,
                     null
                 )
-                : new VisualBodyModelBasic(
-                    visualShape,
-                    data.color,
-                    data.texture
+                : ((bodyId == SATURN)
+                    ? new VisualBodyModelRings(
+                        visualShape,
+                        data.color,
+                        data.texture.split('&')[0],
+                        data.texture.split('&')[1],
+                        data.texture.split('&')[2]
+                    )
+                    : new VisualBodyModelBasic(
+                        visualShape,
+                        data.color,
+                        data.texture
+                    )
                 );
             let orientation = data.orientation
                 ? new OrientationIAUModel(
