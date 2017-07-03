@@ -67,19 +67,13 @@ class SelectionHandler
                 if (currentTraj === this.selectedObject) {
                     currentTraj.isSelected = false;
 
-                    document.dispatchEvent(new CustomEvent(
-                        'vr_deselect',
-                        {detail: {trajectory: this.selectedObject}}
-                    ));
+                    this.dispatchVRDeselect();
                     this.selectedObject = null;
                 } else {
                     if (this.selectedObject) {
                         this.selectedObject.isSelected = false;
 
-                        document.dispatchEvent(new CustomEvent(
-                            'vr_deselect',
-                            {detail: {trajectory: this.selectedObject}}
-                        ));
+                        this.dispatchVRDeselect();
                     }
 
                     this.selectedObject = currentTraj;
@@ -94,10 +88,7 @@ class SelectionHandler
         } else {
             if ((this.selectedObject) && (!this.hasMouseMoved)) {
 
-                document.dispatchEvent(new CustomEvent(
-                    'vr_deselect',
-                    {detail: {trajectory: this.selectedObject}}
-                ));
+                this.dispatchVRDeselect();
 
                 this.selectedObject.isSelected = false;
                 this.selectedObject = null;
@@ -109,5 +100,12 @@ class SelectionHandler
 
     getSelectedObject() {
         return this.selectedObject;
+    }
+
+    dispatchVRDeselect() {
+        document.dispatchEvent(new CustomEvent(
+            'vr_deselect',
+            {detail: {trajectory: this.selectedObject}}
+        ));
     }
 }

@@ -4,13 +4,13 @@ class HelperGrid
         this.referenceFrame = referenceFrame;
         this.centerObject = referenceFrame.origin;
 
-        this.gridSizeParam = Math.round(Math.log2(camera.position.mag));
+        this.gridSizeParameter = this.getCurrentGridSizeParameter(camera.lastPosition.mag);
 
         this.onRenderListener = this.onRender.bind(this);
         document.addEventListener('vr_render', this.onRenderListener);
 
-        this.zoomListener = this.onZoom.bind(this);
-        document.addEventListener('wheel', this.zoomListener);
+        this.ZoomListener = this.onZoom.bind(this);
+        document.addEventListener('wheel', this.ZoomListener);
 
         this.init();
     }
@@ -19,7 +19,7 @@ class HelperGrid
         let pos = App.getTrajectory(this.centerObject).getPositionByEpoch(time.epoch, RF_BASE);
 
         this.threeGrid = new THREE.PolarGridHelper(
-            Math.pow(2, this.gridSizeParam),
+            Math.pow(2, this.gridSizeParameter),
             32,
             32,
             200
@@ -37,12 +37,11 @@ class HelperGrid
     }
 
     onZoom() {
-        let pow = Math.round(Math.log2(camera.position.mag));
-
-        if (pow != this.gridSizeParam) {
+        let pow = this.getCurrentGridSizeParameter(camera.lastPosition.mag);
+        if (pow != this.gridSizeParameter) {
             scene.remove(this.threeGrid);
 
-            this.gridSizeParam = pow;
+            this.gridSizeParameter = pow;
 
             this.init();
         }
@@ -50,7 +49,11 @@ class HelperGrid
 
     remove() {
         scene.remove(this.threeGrid);
-        document.removeEventListener('wheel', this.zoomListener);
+        document.removeEventListener('wheel', this.ZoomListener);
         document.removeEventListener('vr_render', this.onRenderListener);
+    }
+
+    getCurrentGridSizeParameter(cameraPositionMagnitude) {
+        return Math.round(Math.log2(camera.position.mag))
     }
 }

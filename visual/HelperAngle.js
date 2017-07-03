@@ -41,7 +41,7 @@ class HelperAngle
         document.addEventListener('vr_render', this.onRenderListener);
 
         this.onWheelListener = this.onMouseWheel.bind(this);
-        document.addEventListener('vr_render', this.onWheelListener);
+        document.addEventListener('wheel', this.onWheelListener);
 
         this.init();
     }
@@ -54,44 +54,18 @@ class HelperAngle
 
     init() {
         if (this.isArcMode === true) {
-            let geometry = (new THREE.Path(
-                (new THREE.EllipseCurve(
-                    0, 0,
-                    this.sizeParam / (3 * this.coefficientOfAxesLengthDecrease), this.sizeParam / (3 * this.coefficientOfAxesLengthDecrease),
-                    0, this.value,
-                    false,
-                    0
-                )).getPoints(100)
-            )).createPointsGeometry(100);
+            this.createArcModeAngleGeometry();
 
             let material = new THREE.LineBasicMaterial({color: this.color});
-            this.threeAngle = new LineObject(geometry, material);
+            this.threeAngle = new LineObject(this.threeAnglegeometry, material);
 
-            geometry = new THREE.Geometry();
-            geometry.vertices.push(
-                this.position,
-                this.position.clone().add(this.mainAxis.clone().setLength(this.sizeParam / this.coefficientOfAxesLengthDecrease))
-            );
-            this.threeMainAxis = new THREE.Line(geometry, material);
-
-            material = new THREE.LineBasicMaterial({color : this.isEditMode ? 0xc2f442 : this.color});
-            geometry = new THREE.Geometry();
-            geometry.vertices.push(
-                this.position,
-                this.position.clone().add(this.direction.clone().setLength(this.sizeParam / this.coefficientOfAxesLengthDecrease))
-            );
-
-            this.threeDirection = new THREE.Line(geometry, material);
+            this.createPointersGeometries();
+            this.threeMainAxis = new THREE.Line(this.threeMainAxis.geometry, material);
+            this.threeDirection = new THREE.Line(this.threeDirection.geometry, material);
 
         } else {
-
-            let geometry = new THREE.CircleGeometry(
-                this.sizeParam / this.coefficientOfAxesLengthDecrease,
-                INITIAL_SEGMENTS_NUMBER,
-                0,
-                this.value
-            );
-
+            this.createSectorModeAngleGeometry();
+            
             let material = new THREE.MeshBasicMaterial({
                 color: this.color,
                 opacity: 0.175,
@@ -133,18 +107,7 @@ class HelperAngle
             this.threeMainAxis.geometry.dispose();
             this.threeDirection.geometry.dispose();
 
-            this.threeMainAxis.geometry = new THREE.Geometry();
-            this.threeDirection.geometry = new THREE.Geometry();
-
-            this.threeMainAxis.geometry.vertices.push(
-                this.position,
-                this.position.clone().add(this.mainAxis.clone().setLength(this.sizeParam / this.coefficientOfAxesLengthDecrease))
-            );
-
-            this.threeDirection.geometry.vertices.push(
-                this.position,
-                this.position.clone().add(this.direction.clone().setLength(this.sizeParam / this.coefficientOfAxesLengthDecrease))
-            );
+            this.createPointersGeometries();
         } else {
             this.threeMainAxis.position.copy(this.position);
             this.threeDirection.position.copy(this.position);
@@ -157,23 +120,6 @@ class HelperAngle
         this.value = newValue;
 
         this.threeAngle.geometry.dispose();
-        this.threeAngle.geometry = (this.isArcMode) ? 
-            (new THREE.Path(
-                (new THREE.EllipseCurve(
-                    0, 0,
-                    this.sizeParam / (3 * this.coefficientOfAxesLengthDecrease), this.sizeParam / (3 * this.coefficientOfAxesLengthDecrease),
-                    0, this.value,
-                    false,
-                    0
-                )).getPoints(100)
-            )).createPointsGeometry(100)
-            :
-            (new THREE.CircleGeometry(
-                this.sizeParam / this.coefficientOfAxesLengthDecrease,
-                INITIAL_SEGMENTS_NUMBER,
-                0,
-                this.value
-            ));
 
         this.direction = this.mainAxis
                 .clone()
@@ -183,13 +129,15 @@ class HelperAngle
             this.threeDirection.geometry.dispose();
 
             this.threeDirection.geometry = new THREE.Geometry();
-
             this.threeDirection.geometry.vertices.push(
                 this.position,
                 this.position.clone().add(this.direction.clone().setLength(this.sizeParam / this.coefficientOfAxesLengthDecrease))
             );
+
+            this.createArcModeAngleGeometry();
         } else {
             this.threeDirection.setDirection(this.direction);
+            this.createSectorModeAngleGeometry();
         }
 
         if (this.editingCallback) {
@@ -206,21 +154,8 @@ class HelperAngle
             .applyAxisAngle(this.normal, this.value);
 
         if (this.isArcMode === true) {
-            this.threeMainAxis.geometry.dispose();
-            this.threeDirection.geometry.dispose();
-
-            this.threeMainAxis.geometry = new THREE.Geometry();
-            this.threeDirection.geometry = new THREE.Geometry();
-
-            this.threeMainAxis.geometry.vertices.push(
-                this.position,
-                this.position.clone().add(this.mainAxis.clone().setLength(this.sizeParam / this.coefficientOfAxesLengthDecrease))
-            );
-
-            this.threeDirection.geometry.vertices.push(
-                this.position,
-                this.position.clone().add(this.direction.clone().setLength(this.sizeParam / this.coefficientOfAxesLengthDecrease))
-            );
+            this.deletePointersGeometries();
+            this.createPointersGeometries();
         } else {
             this.threeMainAxis.setDirection(this.mainAxis);
             this.threeDirection.setDirection(this.direction);
@@ -302,41 +237,13 @@ class HelperAngle
         this.sizeParam = camera.position.mag / 2;
 
         this.threeAngle.geometry.dispose();
-        this.threeAngle.geometry = (this.isArcMode) 
-            ?(new THREE.Path(
-                (new THREE.EllipseCurve(
-                    0, 0,
-                    this.sizeParam / (3 * this.coefficientOfAxesLengthDecrease), this.sizeParam / (3 * this.coefficientOfAxesLengthDecrease),
-                    0, this.value,
-                    false,
-                    0
-                )).getPoints(100)
-            )).createPointsGeometry(100)
-            :
-            (new THREE.CircleGeometry(
-                this.sizeParam / this.coefficientOfAxesLengthDecrease,
-                INITIAL_SEGMENTS_NUMBER,
-                0,
-                this.value
-            ));
 
         if (this.isArcMode === true) {
-            this.threeMainAxis.geometry.dispose();
-            this.threeDirection.geometry.dispose();
-
-            this.threeMainAxis.geometry = new THREE.Geometry();
-            this.threeDirection.geometry = new THREE.Geometry();
-
-            this.threeMainAxis.geometry.vertices.push(
-                this.position,
-                this.position.clone().add(this.mainAxis.clone().setLength(this.sizeParam / this.coefficientOfAxesLengthDecrease))
-            );
-
-            this.threeDirection.geometry.vertices.push(
-                this.position,
-                this.position.clone().add(this.direction.clone().setLength(this.sizeParam / this.coefficientOfAxesLengthDecrease))
-            );
+            this.createArcModeAngleGeometry();
+            this.deletePointersGeometries();
+            this.createPointersGeometries();
         } else {
+            this.createSectorModeAngleGeometry();
             this.threeMainAxis.setLength(this.sizeParam / this.coefficientOfAxesLengthDecrease, this.threeMainAxis.headLength, this.threeMainAxis.headWidth);
             this.threeDirection.setLength(this.sizeParam / this.coefficientOfAxesLengthDecrease, this.threeDirection.headLength, this.threeDirection.headWidth);
         }
@@ -348,5 +255,58 @@ class HelperAngle
         scene.remove(this.threeDirection);
 
         document.removeEventListener('vr_render', this.onRenderListener);
+    }
+
+    createPointersGeometries() {
+        if (this.threeMainAxis === undefined){
+            this.threeMainAxis = {};
+            this.threeDirection = {}; 
+        }
+        this.threeMainAxis.geometry  = new THREE.Geometry();
+        this.threeDirection.geometry = new THREE.Geometry();
+
+        this.threeMainAxis.geometry.vertices.push(
+            this.position,
+            this.position.clone().add(this.mainAxis.clone().setLength(this.sizeParam / this.coefficientOfAxesLengthDecrease))
+        );
+
+        this.threeDirection.geometry.vertices.push(
+            this.position,
+            this.position.clone().add(this.direction.clone().setLength(this.sizeParam / this.coefficientOfAxesLengthDecrease))
+        );
+    }
+
+    deletePointersGeometries() {
+        this.threeMainAxis.geometry.dispose();
+        this.threeDirection.geometry.dispose();
+    }
+
+    createArcModeAngleGeometry() {
+        if (this.threeAngle === undefined) {
+            this.threeAngle = {}
+        }
+
+        this.threeAngle.geometry = (new THREE.Path(
+            (new THREE.EllipseCurve(
+                0, 0,
+                this.sizeParam / (3 * this.coefficientOfAxesLengthDecrease), this.sizeParam / (3 * this.coefficientOfAxesLengthDecrease),
+                0, this.value,
+                false,
+                0
+            )).getPoints(100)
+        )).createPointsGeometry(100);
+    }
+
+    createSectorModeAngleGeometry() {
+        if (this.threeAngle === undefined) {
+            this.threeAngle = {}
+        }
+
+        this.threeAngle.geometry = new THREE.CircleGeometry(
+            this.sizeParam / this.coefficientOfAxesLengthDecrease,
+            INITIAL_SEGMENTS_NUMBER,
+            0,
+            this.value
+        );
     }
 }
