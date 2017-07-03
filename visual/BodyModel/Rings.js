@@ -3,9 +3,9 @@ class VisualBodyModelRings extends VisualBodyModelAbstract
     constructor(shape, color, texturePath, ringsColorMapPath, ringsAlphaMapPath){
         super(shape, color);
 
-        if (texturePath) {
-            var that = this;
+        let that = this;
 
+        if (texturePath) {
             textureLoader.load(
                 COMMON_TEXTURE_PATH + texturePath,
                 function(txt) {
@@ -20,8 +20,6 @@ class VisualBodyModelRings extends VisualBodyModelAbstract
         }
 
         if (ringsColorMapPath) {
-            var that = this;
-
             textureLoader.load(
                 COMMON_TEXTURE_PATH + ringsColorMapPath,
                 function(txt) {
@@ -36,8 +34,6 @@ class VisualBodyModelRings extends VisualBodyModelAbstract
         }
 
         if (ringsAlphaMapPath) {
-            var that = this;
-
             textureLoader.load(
                 COMMON_TEXTURE_PATH + ringsAlphaMapPath,
                 function(txt) {
@@ -61,7 +57,7 @@ class VisualBodyModelRings extends VisualBodyModelAbstract
         );
 
         this.ringsThreeObj = new THREE.Mesh(
-            new THREE.CircleGeometry(137316, 32),
+            new THREE.CircleGeometry(140220, 32),
             this.getMaterial({color: this.color, wireframe: true})
         );
 
@@ -72,7 +68,7 @@ class VisualBodyModelRings extends VisualBodyModelAbstract
     }
 
     updateRingsMaterial() {
-        if(this.ringsColorMap && this.ringsAlphaMap) {
+        if (this.ringsColorMap && this.ringsAlphaMap) {
             this.ringsThreeObj.material.dispose();
             this.ringsThreeObj.material = this.getMaterial({
                 map: this.ringsColorMap,
