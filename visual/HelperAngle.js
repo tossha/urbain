@@ -65,7 +65,7 @@ class HelperAngle
 
         } else {
             this.createSectorModeAngleGeometry();
-            
+
             let material = new THREE.MeshBasicMaterial({
                 color: this.color,
                 opacity: 0.175,
@@ -104,9 +104,7 @@ class HelperAngle
         );
 
         if (this.isArcMode === true) {
-            this.threeMainAxis.geometry.dispose();
-            this.threeDirection.geometry.dispose();
-
+            this.deletePointersGeometries();
             this.createPointersGeometries();
         } else {
             this.threeMainAxis.position.copy(this.position);
@@ -119,14 +117,14 @@ class HelperAngle
     resize(newValue) {
         this.value = newValue;
 
-        this.threeAngle.geometry.dispose();
+        this.disposeGeometry(this.threeAngle);
 
         this.direction = this.mainAxis
                 .clone()
                 .applyAxisAngle(this.normal, this.value);
 
         if (this.isArcMode === true) {
-            this.threeDirection.geometry.dispose();
+            this.disposeGeometry(this.threeDirection);
 
             this.threeDirection.geometry = new THREE.Geometry();
             this.threeDirection.geometry.vertices.push(
@@ -236,7 +234,7 @@ class HelperAngle
     onMouseWheel() {
         this.sizeParam = camera.position.mag / 2;
 
-        this.threeAngle.geometry.dispose();
+        this.disposeGeometry(this.threeAngle);
 
         if (this.isArcMode === true) {
             this.createArcModeAngleGeometry();
@@ -277,8 +275,8 @@ class HelperAngle
     }
 
     deletePointersGeometries() {
-        this.threeMainAxis.geometry.dispose();
-        this.threeDirection.geometry.dispose();
+        this.disposeGeometry(this.threeMainAxis);
+        this.disposeGeometry(this.threeDirection)
     }
 
     createArcModeAngleGeometry() {
@@ -308,5 +306,9 @@ class HelperAngle
             0,
             this.value
         );
+    }
+
+    disposeGeometry(objectOfDisposal) {
+        objectOfDisposal.geometry.dispose();
     }
 }
