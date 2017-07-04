@@ -43,6 +43,16 @@ function init() {
     statistics = new Stats();
     document.body.appendChild(statistics.dom);
     statistics.dom.style.display = "none";
+
+    document.addEventListener('vr_select', e => {
+        const keplerianObject = selection.getSelectedObject().getKeplerianObjectByEpoch(time.epoch);
+        $( '#eccValue'  ).html('' + keplerianObject.e    );
+        $( '#smaValue'  ).html('' + keplerianObject.sma  );
+        $( '#incValue'  ).html('' + keplerianObject.inc  );
+        $( '#aopValue'  ).html('' + keplerianObject.aop  );
+        $( '#raanValue' ).html('' + keplerianObject.raan );
+        $( '#taValue'   ).html('' + keplerianObject.ta   );
+    });
 }
 
 function initBuiltIn() {
