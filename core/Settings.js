@@ -9,13 +9,13 @@ class Settings
         this.trackingObject = initial.trackingObject;
 
         this.showStatistics = false;
-        this.guiMain.add(this, 'showStatistics').onChange((value) => {
+        this.guiMain.add(this, 'showStatistics').onChange(value => {
             statistics.dom.style.display = value ? "" : "none";
         });
 
         const timeScaleSlider = $('#timeScaleSlider');
         timeScaleSlider.on('change', () => {
-            this.timeScale = timeScaleSlider.val();
+             this.timeScale = timeScaleSlider.val();
             $('#timeScaleValue').html('' + this.timeScale);
         });
 
@@ -34,7 +34,6 @@ class Settings
             width: 350
         });
 
-        const that = this;
         this.baseTrajectorySettings = {
             sma  : 120000000,
             e    : 0,
@@ -49,6 +48,7 @@ class Settings
             settingsFolder: null, addTrajectoryFolder: null
         };
 
+        const that = this;
         this.trajectorySettings = {
             sma  : this.baseTrajectorySettings.sma  + 1e-2,
             e    : this.baseTrajectorySettings.e    + 1e-2,
