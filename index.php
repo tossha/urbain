@@ -168,10 +168,10 @@ $scripts = array_map('addTime', $scripts);
                            ['RAAN', '200', 'deg.'],
                            ['TA', '153', 'deg.'],
                        ] as $param) { ?>
-            <tr>
-                <td><?= $param[0] ?></td>
+            <tr class="keplerianParameter">
+                <td style="width: 60px"><?= $param[0] ?></td>
                 <td id="<?= strtolower($param[0]) ?>Value" align="right"><?= $param[1] ?></td>
-                <td><?= $param[2] ?></td>
+                <td style="width: 60px"><?= $param[2] ?></td>
             </tr>
         <?php } ?>
     </table>

@@ -43,16 +43,6 @@ function init() {
     statistics = new Stats();
     document.body.appendChild(statistics.dom);
     statistics.dom.style.display = "none";
-
-    document.addEventListener('vr_select', e => {
-        const keplerianObject = selection.getSelectedObject().getKeplerianObjectByEpoch(time.epoch);
-        $( '#eccValue'  ).html('' + keplerianObject.e    );
-        $( '#smaValue'  ).html('' + keplerianObject.sma  );
-        $( '#incValue'  ).html('' + keplerianObject.inc  );
-        $( '#aopValue'  ).html('' + keplerianObject.aop  );
-        $( '#raanValue' ).html('' + keplerianObject.raan );
-        $( '#taValue'   ).html('' + keplerianObject.ta   );
-    });
 }
 
 function initBuiltIn() {
@@ -115,12 +105,25 @@ function render(curTime) {
     for (const group of ['velocity', 'position']) {
         const stateGroup = state[group];
         for (const id of ['x', 'y', 'z', 'mag']) {
-            const selector = $(`#${group}${id.substr(0, 1).toUpperCase()}${id.substr(1)}`) ;
-            selector.html('' + stateGroup[id]);
+            const selector = $(`#${group}${id.substr(0, 1).toUpperCase()}${id.substr(1)}`);
+            selector.html('' + stateGroup[id].toPrecision(5));
         }
     }
 
     axisHelper.position.fromArray(camera.lastPosition.mul(-1));
+
+    const selectedObject = selection.getSelectedObject();
+    $('.keplerianParameter')[selectedObject ? 'show' : 'hide']();
+
+    if (selectedObject) {
+        const keplerianObject = selectedObject.getKeplerianObjectByEpoch(time.epoch);
+        $( '#eccValue'  ).html('' + keplerianObject.e    .toPrecision(5) );
+        $( '#smaValue'  ).html('' + keplerianObject.sma  .toPrecision(5) );
+        $( '#incValue'  ).html('' + keplerianObject.inc  .toPrecision(5) );
+        $( '#aopValue'  ).html('' + keplerianObject.aop  .toPrecision(5) );
+        $( '#raanValue' ).html('' + keplerianObject.raan .toPrecision(5) );
+        $( '#taValue'   ).html('' + keplerianObject.ta   .toPrecision(5) );
+    }
 
     renderer.render(scene, camera.threeCamera);
     statistics.update();
