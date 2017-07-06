@@ -38,6 +38,16 @@ function init() {
         objectsForTracking: objectsForTracking,
     });
 
+    document.addEventListener('vr_select', () => {
+        const data = SSDATA[selection.getSelectedObject().id];
+        if (data) {
+            $('#relativeTo').html(SSDATA[data.parent].name);
+            $('#metricsOf').html(data.name);
+        } else {
+            $('#relativeTo,#metricsOf').html('');
+        }
+    });
+
     time = new TimeLine(settings);
 
     statistics = new Stats();
@@ -113,7 +123,7 @@ function render(curTime) {
     for (const group of ['velocity', 'position']) {
         const stateGroup = state[group];
         for (const id of ['x', 'y', 'z', 'mag']) {
-            const selector = $(`#${group}${id.substr(0, 1).toUpperCase()}${id.substr(1)}`);
+            const selector = $('#' + group + id.substr(0, 1).toUpperCase() + id.substr(1));
             selector.html('' + stateGroup[id].toPrecision(5));
         }
     }
@@ -125,12 +135,12 @@ function render(curTime) {
 
     if (selectedObject) {
         const keplerianObject = selectedObject.getKeplerianObjectByEpoch(time.epoch);
-        $( '#eccValue'  ).html('' + keplerianObject.e    .toPrecision(5) );
-        $( '#smaValue'  ).html('' + keplerianObject.sma  .toPrecision(5) );
-        $( '#incValue'  ).html('' + keplerianObject.inc  .toPrecision(5) );
-        $( '#aopValue'  ).html('' + keplerianObject.aop  .toPrecision(5) );
-        $( '#raanValue' ).html('' + keplerianObject.raan .toPrecision(5) );
-        $( '#taValue'   ).html('' + keplerianObject.ta   .toPrecision(5) );
+        $( '#eccValue'  ).html('' +        ( keplerianObject.e         ).toPrecision(5) );
+        $( '#smaValue'  ).html('' +        ( keplerianObject.sma / 1e6 ).toPrecision(5) );
+        $( '#incValue'  ).html('' + rad2deg( keplerianObject.inc       ).toPrecision(5) );
+        $( '#aopValue'  ).html('' + rad2deg( keplerianObject.aop       ).toPrecision(5) );
+        $( '#raanValue' ).html('' + rad2deg( keplerianObject.raan      ).toPrecision(5) );
+        $( '#taValue'   ).html('' + rad2deg( keplerianObject.ta        ).toPrecision(5) );
     }
 
     renderer.render(scene, camera.threeCamera);
