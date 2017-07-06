@@ -143,13 +143,13 @@ $scripts = array_map('addTime', $scripts);
 
     <table class="metrics">
         <tr>
-            <td><b>of</b></td>
-            <td>Cassini</td>
+            <td style="width: 80px"><b>of</b></td>
+            <td id="metricsOf">Cassini</td>
         </tr>
 
         <tr>
             <td><b>relative to</b></td>
-            <td>Sun</td>
+            <td id="relativeTo">Sun</td>
         </tr>
     </table>
 
@@ -184,7 +184,8 @@ $scripts = array_map('addTime', $scripts);
         <?php foreach (['Position', 'Velocity'] as $type) { ?>
             <tr>
                 <td style="width: 65px"><?= $type ?></td>
-                <td id="<?= strtolower($type) ?>Mag">0</td>
+                <td id="<?= strtolower($type) ?>Mag" align="right">0</td>
+                <td style="width: 60px">km<?= $type == 'Velocity' ? 'ps' : '' ?></td>
                 <td style="width: 49px">
                     <?= generateToggleButton(strtolower($type) . "Coordinate") ?>
                 </td>
@@ -193,7 +194,9 @@ $scripts = array_map('addTime', $scripts);
             <?php foreach (['x', 'y', 'z'] as $coord) { ?>
                 <tr class="<?= strtolower($type) ?>Coordinate">
                     <td><?= $coord ?></td>
-                    <td id="<?= strtolower($type) . strtoupper($coord) ?>" colspan="2">0</td>
+                    <td id="<?= strtolower($type) . strtoupper($coord) ?>" align="right">0</td>
+                    <td>km<?= $type == 'Velocity' ? 'ps' : '' ?></td>
+                    <td></td>
                 </tr>
             <?php } ?>
         <?php } ?>
