@@ -1691,6 +1691,49 @@ var xform = {};
         return out;
     };
 
+    Quaternion.slerp = function(q1, q2, t) {
+        if (t == 0) {
+            return Quaternion.copy(q1);
+        } else if (t == 1) {
+            return Quaternion.copy(q2);
+        }
+
+        let res = Quaternion.copy(q2);
+        let cosHalfTheta = q1.t * q2.t + q1.v[0] * q2.v[0] + q1.v[1] * q2.v[1] + q1.v[2] * q2.v[2];
+
+        if (cosHalfTheta < 0) {
+            res.t = -q2.t;
+            res.v[0] = -q2.v[0];
+            res.v[1] = -q2.v[1];
+            res.v[2] = -q2.v[2];
+            cosHalfTheta = -cosHalfTheta;
+        }
+
+        if (cosHalfTheta >= 1) {
+            return Quaternion.copy(q1);
+        }
+
+        let sinHalfTheta = Math.sqrt(1 - cosHalfTheta * cosHalfTheta);
+
+        if (sinHalfTheta < 0.001) {
+            res.t = (q1.t + res.t) / 2;
+            res.v[0] = (q1.v[0] + res.v[0]) / 2;
+            res.v[1] = (q1.v[1] + res.v[1]) / 2;
+            res.v[2] = (q1.v[2] + res.v[2]) / 2;
+            return res;
+        }
+
+        const halfTheta = Math.atan2(sinHalfTheta, cosHalfTheta);
+        const ratio1 = Math.sin((1 - t) * halfTheta) / sinHalfTheta;
+        const ratio2 = Math.sin(t * halfTheta) / sinHalfTheta;
+
+        res.t = q1.t * ratio1 + res.t * ratio2;
+        res.v[0] = q1.v[0] * ratio1 + res.v[0] * ratio2;
+        res.v[1] = q1.v[1] * ratio1 + res.v[1] * ratio2;
+        res.v[2] = q1.v[2] * ratio1 + res.v[2] * ratio2;
+        return res;
+    };
+
     /**
      * @name quadrance
      * @memberof Quaternion.prototype

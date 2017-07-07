@@ -18,8 +18,8 @@ class Settings
         this.guiMain.add(this, 'currentDate').listen();
         this.guiIsTimeRunning = this.guiMain.add(this, 'isTimeRunning');
         this.guiMain.add(this, 'trackingObject', initial.objectsForTracking).onChange(function(value) {
-            camera.setOrbitingPoint(value);
-        });
+            camera.setOrbitingPoint(value, true);
+        }).listen();
 
         const trajectoryMenu = {
             velocity: {
