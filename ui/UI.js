@@ -2,18 +2,48 @@ class UI
 {
     constructor(precision) {
         this.precision = precision;
+        this.renderHandler = this.handleRender.bind(this);
+
+        document.addEventListener('vr_select', () => this.handleSelect());
+        document.addEventListener('vr_deselect', () => this.handleDeselect());
     }
 
-    update() {
-        const selectedObject = selection.getSelectedObject();
-        $('#metricsPanel')[selectedObject ? 'show' : 'hide']();
+    changeVisibility(name) {
+        const selector = $('.' + name);
+        const button = $(`#${name}ToggleButton`);
+        button.attr('disabled', 'true');
+        selector.fadeToggle(400, 'swing', () => {
+            button.html(selector.is(':visible') ? 'Hide' : 'Show');
+            button.removeAttr('disabled');
+        });
+    }
 
+    handleRender() {
+        const selectedObject = selection.getSelectedObject();
         if (!selectedObject) {
             return;
         }
 
         this.updateCartessian(selectedObject);
         this.updateKeplerian(selectedObject);
+    }
+
+    handleSelect() {
+        $('#metricsPanel').show();
+
+        const data = SSDATA[selection.getSelectedObject().id];
+        if (data) {
+            $('#relativeTo').html(SSDATA[data.parent].name);
+            $('#metricsOf').html(data.name);
+        } else {
+            $('#relativeTo,#metricsOf').html('');
+        }
+        document.addEventListener('vr_render', this.renderHandler);
+    }
+
+    handleDeselect() {
+        $('#metricsPanel').hide();
+        document.removeEventListener('vr_render', this.renderHandler);
     }
 
     updateCartessian(selectedObject) {

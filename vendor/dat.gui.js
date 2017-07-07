@@ -1598,7 +1598,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	  };
 	
 	  OptionController.prototype.updateDisplay = function updateDisplay() {
-	    if (_dom2.default.isActive(this.__select)) return this; // prevent number from updating if user is trying to manually update
+	    if (_dom2.default.isActive(this.__select)) return this; // prevent number from updating if user is trying to manually updateState
 	    this.__select.value = this.getValue();
 	    return _Controller.prototype.updateDisplay.call(this);
 	  };
@@ -1998,7 +1998,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	  }
 	
 	  NumberControllerBox.prototype.updateDisplay = function updateDisplay() {
-	    if (_dom2.default.isActive(this.__input)) return this; // prevent number from updating if user is trying to manually update
+	    if (_dom2.default.isActive(this.__input)) return this; // prevent number from updating if user is trying to manually updateState
 	    this.__input.value = this.__truncationSuspended ? this.getValue() : roundToDecimal(this.getValue(), this.__precision);
 	    return _NumberController.prototype.updateDisplay.call(this);
 	  };
