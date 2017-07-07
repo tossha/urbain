@@ -6,7 +6,8 @@ $scripts = array_merge(
     reorderScripts(array_merge(
         getDirScripts('core'),
         getDirScripts('visual'),
-        getDirScripts('interface')
+        getDirScripts('interface'),
+        getDirScripts('ui')
     )),
     ['algebra.js', 'const.js', 'ssdata.js']
 );
