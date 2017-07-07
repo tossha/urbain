@@ -25,10 +25,6 @@ class Settings
             pauseButton.html(this.isTimeRunning ? 'Pause' : 'Resume');
         });
 
-        this.guiMain.add(this, 'trackingObject', initial.objectsForTracking).onChange(function(value) {
-            camera.setOrbitingPoint(value, true);
-        }).listen();
-
         this.guiAddTrajectory = new dat.GUI({
             autoPlace: false,
             width: 350

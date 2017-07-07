@@ -119,21 +119,29 @@ function render(curTime) {
         {detail: {epoch: time.epoch}}
     ));
 
-    const state = App.getTrajectory(settings.trackingObject).getStateByEpoch(time.epoch, RF_BASE);
-    for (const group of ['velocity', 'position']) {
-        const stateGroup = state[group];
-        for (const id of ['x', 'y', 'z', 'mag']) {
-            const selector = $('#' + group + id.substr(0, 1).toUpperCase() + id.substr(1));
-            selector.html('' + stateGroup[id].toPrecision(5));
-        }
-    }
-
     axisHelper.position.fromArray(camera.lastPosition.mul(-1));
 
     const selectedObject = selection.getSelectedObject();
-    $('.keplerianParameter')[selectedObject ? 'show' : 'hide']();
+    $('#metricsPanel')[selectedObject ? 'show' : 'hide']();
 
     if (selectedObject) {
+        const state = selectedObject.getStateInOwnFrameByEpoch(time.epoch);
+        function displayVector(vec) {
+            const stateGroup = state[vec];
+            function displayCoord(coord) {
+                const selector = $('#' + vec + coord);
+                selector.html('' + stateGroup[coord.toLowerCase()].toPrecision(5));
+            }
+
+            displayCoord('X');
+            displayCoord('Y');
+            displayCoord('Z');
+            displayCoord('Mag');
+        }
+
+        displayVector('velocity');
+        displayVector('position');
+
         const keplerianObject = selectedObject.getKeplerianObjectByEpoch(time.epoch);
         $( '#eccValue'  ).html('' +        ( keplerianObject.e         ).toPrecision(5) );
         $( '#smaValue'  ).html('' +        ( keplerianObject.sma / 1e6 ).toPrecision(5) );

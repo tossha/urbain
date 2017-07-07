@@ -168,7 +168,7 @@ $scripts = array_map('addTime', $scripts);
                            ['RAAN', '200', 'deg.'],
                            ['TA', '153', 'deg.'],
                        ] as $param) { ?>
-            <tr class="keplerianParameter">
+            <tr>
                 <td style="width: 60px"><?= $param[0] ?></td>
                 <td id="<?= strtolower($param[0]) ?>Value" align="right"><?= $param[1] ?></td>
                 <td style="width: 60px"><?= $param[2] ?></td>
@@ -192,7 +192,7 @@ $scripts = array_map('addTime', $scripts);
             </tr>
 
             <?php foreach (['x', 'y', 'z'] as $coord) { ?>
-                <tr class="<?= strtolower($type) ?>Coordinate">
+                <tr class="<?= strtolower($type) ?>Coordinate trajectoryParameter">
                     <td><?= $coord ?></td>
                     <td id="<?= strtolower($type) . strtoupper($coord) ?>" align="right">0</td>
                     <td>km<?= $type == 'Velocity' ? 'ps' : '' ?></td>
