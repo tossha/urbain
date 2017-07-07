@@ -1,21 +1,19 @@
 class Settings
 {
     constructor(initial) {
-        this.guiMain = new dat.GUI({width: 350});
-
         this.timeLine = initial.timeLinePos;
         this.timeScale = initial.timeScale;
         this.isTimeRunning = initial.isTimeRunning;
         this.trackingObject = initial.trackingObject;
 
-        this.showStatistics = false;
-        this.guiMain.add(this, 'showStatistics').onChange(value => {
-            statistics.dom.style.display = value ? "" : "none";
-        });
-
         this.guiAddTrajectory = new dat.GUI({
             autoPlace: false,
             width: 350
+        });
+
+        this.showStatistics = false;
+        this.guiAddTrajectory.add(this, 'showStatistics').onChange(value => {
+            statistics.dom.style.display = value ? "" : "none";
         });
 
         this.baseTrajectorySettings = {
