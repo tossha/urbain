@@ -22,6 +22,7 @@ class UI
             .val(EARTH);
 
         this.handleTimeScaleChange();
+        this.handleDeselect();
         this.handleRender();
     }
 
