@@ -88,6 +88,8 @@ class Camera
         } else {
             this.startAnimation();
         }
+
+        $('#targetSelect').val(pointId);
     }
 
     startAnimation() {
