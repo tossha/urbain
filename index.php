@@ -182,21 +182,24 @@ $scripts = array_map('addTime', $scripts);
             <td colspan="6">Cartesian</td>
         </tr>
 
-        <?php foreach (['Position', 'Velocity'] as $type) { ?>
+        <?php foreach ([
+                           ['Position', 'km'],
+                           ['Velocity', 'km/s']
+                       ] as $type) { ?>
             <tr>
-                <td style="width: 65px"><?= $type ?></td>
-                <td id="<?= strtolower($type) ?>Mag" align="right">0</td>
-                <td style="width: 60px">km<?= $type == 'Velocity' ? 'ps' : '' ?></td>
+                <td style="width: 65px"><?= $type[0] ?></td>
+                <td id="<?= strtolower($type[0]) ?>Mag" align="right">0</td>
+                <td style="width: 60px"><?= $type[1] ?></td>
                 <td style="width: 49px">
-                    <?= generateToggleButton(strtolower($type) . "Coordinate") ?>
+                    <?= generateToggleButton(strtolower($type[0]) . "Coordinate") ?>
                 </td>
             </tr>
 
             <?php foreach (['x', 'y', 'z'] as $coord) { ?>
-                <tr class="<?= strtolower($type) ?>Coordinate trajectoryParameter">
+                <tr class="<?= strtolower($type[0]) ?>Coordinate trajectoryParameter">
                     <td><?= $coord ?></td>
-                    <td id="<?= strtolower($type) . strtoupper($coord) ?>" align="right">0</td>
-                    <td>km<?= $type == 'Velocity' ? 'ps' : '' ?></td>
+                    <td id="<?= strtolower($type[0]) . strtoupper($coord) ?>" align="right">0</td>
+                    <td><?= $type[1] ?></td>
                     <td></td>
                 </tr>
             <?php } ?>
@@ -236,7 +239,8 @@ $scripts = array_map('addTime', $scripts);
 
             <tr>
                 <td colspan="2">
-                    <input id="timeScaleSlider" type="range" min="-2000" max="2000" step="0.001" value="0.001" style="width: 100%">
+                    <input id="timeScaleSlider" type="range" min="-1" max="1" step="0.001" value="0"
+                           style="width: 100%">
                 </td>
 
                 <td>

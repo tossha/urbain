@@ -27,10 +27,10 @@ class TimeLine
 
         this.updateScaleType();
 
-        this.domElement.addEventListener("mousedown",  (e) => this.onMouseDown  (e));
-        window         .addEventListener("mouseup",    (e) => this.onMouseUp    (e));
-        window         .addEventListener("mousemove",  (e) => this.onMouseMove  (e));
-        this.domElement.addEventListener("mousewheel", (e) => this.onMouseWheel (e));
+        this.domElement.addEventListener("mousedown",  this.onMouseDown  .bind(this));
+        window         .addEventListener("mouseup",    this.onMouseUp    .bind(this));
+        window         .addEventListener("mousemove",  this.onMouseMove  .bind(this));
+        this.domElement.addEventListener("mousewheel", this.onMouseWheel .bind(this));
 
         window.addEventListener("keypress", (e) => {
             if (e.key === " ") {
@@ -38,7 +38,7 @@ class TimeLine
             }
         });
 
-        window.addEventListener("resize", () => this.updateCanvasStyle());
+        window.addEventListener("resize", this.updateCanvasStyle.bind(this));
         window.oncontextmenu = () => false;
     }
 
@@ -57,7 +57,7 @@ class TimeLine
             this.settings.timeLine = this.epoch;
         }
 
-        $('#currentDateValue').html(this.formatDate(new Date((J2000_TIMESTAMP + this.epoch) * 1000)));
+        $('#currentDateValue').html(new Date((J2000_TIMESTAMP + this.epoch) * 1000).toLocaleString('ru'));
         this.redraw();
     }
 
@@ -71,10 +71,7 @@ class TimeLine
     }
 
     useRealTimeScale() {
-        const selector = $('#timeScaleSlider');
-        selector.val(0.001);
-        selector.trigger('change');
-        this.settings.timeScale = 0.001;
+        $('#timeScaleSlider').val(0).trigger('change');
     }
 
     redraw() {
@@ -254,7 +251,7 @@ class TimeLine
             };
         } else if ((this.scaleType === "day")
             || (this.scaleType === "week")
-         ) {
+        ) {
             formatOptions = {
                 day: "2-digit",
                 month: "2-digit",
@@ -262,7 +259,7 @@ class TimeLine
             };
         } else if ((this.scaleType === "month")
             || (this.scaleType === "threeMonths")
-         ) {
+        ) {
             formatOptions = {
                 month: "long",
                 year: "numeric"
@@ -275,6 +272,32 @@ class TimeLine
             };
         }
         return d.toLocaleString('ru', formatOptions);
+    }
+
+    formatRate(rate, precision) {
+        const prefix = (rate < 0) ? '-' : '';
+        const abs = Math.abs(rate);
+        if (abs === 0) {
+            return '0';
+        }
+
+        if (abs < 60) {
+            return prefix + abs.toPrecision(precision) + ' s/s';
+        }
+
+        if (abs < 3600) {
+            return prefix + (abs / 60).toPrecision(precision) + ' min/s';
+        }
+
+        if (abs < 86400) {
+            return prefix + (abs / 3600).toPrecision(precision) + ' h/s';
+        }
+
+        if (abs < 2592000) {
+            return prefix + (abs / 86400).toPrecision(precision) + ' days/s';
+        }
+
+        return prefix + '1 month/s';
     }
 
     onMouseDown(e) {
