@@ -188,7 +188,7 @@ $scripts = array_map('addTime', $scripts);
                        ] as $type) { ?>
             <tr>
                 <td style="width: 65px"><?= $type[0] ?></td>
-                <td id="<?= strtolower($type[0]) ?>Mag" align="right">0</td>
+                <td id="<?= strtolower($type[0]) ?>Mag" align="right"></td>
                 <td style="width: 60px"><?= $type[1] ?></td>
                 <td style="width: 49px">
                     <?= generateToggleButton(strtolower($type[0]) . "Coordinate") ?>
@@ -198,7 +198,7 @@ $scripts = array_map('addTime', $scripts);
             <?php foreach (['x', 'y', 'z'] as $coord) { ?>
                 <tr class="<?= strtolower($type[0]) ?>Coordinate trajectoryParameter">
                     <td><?= $coord ?></td>
-                    <td id="<?= strtolower($type[0]) . strtoupper($coord) ?>" align="right">0</td>
+                    <td id="<?= strtolower($type[0]) . strtoupper($coord) ?>" align="right"></td>
                     <td><?= $type[1] ?></td>
                     <td></td>
                 </tr>
@@ -231,7 +231,7 @@ $scripts = array_map('addTime', $scripts);
 
             <tr>
                 <td><b>Rate:</b></td>
-                <td id="timeScaleValue">1.0 s/s</td>
+                <td id="timeScaleValue"></td>
                 <td>
                     <button onclick="time.useRealTimeScale()">Real</button>
                 </td>

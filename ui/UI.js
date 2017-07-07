@@ -20,6 +20,9 @@ class UI
             .html(selections)
             .on('change', () => camera.setOrbitingPoint(dropdownList.val(), true))
             .val(EARTH);
+
+        this.handleTimeScaleChange();
+        this.handleRender();
     }
 
     changeVisibility(name) {
