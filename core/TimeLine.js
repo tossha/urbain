@@ -71,7 +71,7 @@ class TimeLine
     }
 
     useRealTimeScale() {
-        $('#timeScaleSlider').val(0).trigger('change');
+        $('#timeScaleSlider').val(0.001).trigger('change');
     }
 
     redraw() {
