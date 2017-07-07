@@ -89,7 +89,7 @@ class Camera
             this.startAnimation();
         }
 
-        $('#targetSelect').val(pointId);
+        ui.updateTarget();
     }
 
     startAnimation() {

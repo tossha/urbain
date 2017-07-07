@@ -76,6 +76,10 @@ class UI
         document.removeEventListener('vr_render', this.renderHandler);
     }
 
+    updateTarget() {
+        $('#targetSelect').val(camera.orbitingPoint);
+    }
+
     updateCartessian(selectedObject) {
         const state = selectedObject.getStateInOwnFrameByEpoch(time.epoch);
         this.updateVector(state, 'velocity');
