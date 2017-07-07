@@ -162,17 +162,17 @@ $scripts = array_map('addTime', $scripts);
         </tr>
 
         <?php foreach ([
-                           ['Ecc', '0.4532', ''],
-                           ['SMA', '412', 'Mkm'],
-                           ['Inc', '0.02', 'deg.'],
-                           ['AoP', '78', 'deg.'],
-                           ['RAAN', '200', 'deg.'],
-                           ['TA', '153', 'deg.'],
+                           ['Ecc', ''],
+                           ['SMA', 'Mkm'],
+                           ['Inc', 'deg.'],
+                           ['AoP', 'deg.'],
+                           ['RAAN', 'deg.'],
+                           ['TA', 'deg.'],
                        ] as $param) { ?>
             <tr>
                 <td style="width: 60px"><?= $param[0] ?></td>
-                <td id="<?= strtolower($param[0]) ?>Value" align="right"><?= $param[1] ?></td>
-                <td style="width: 60px"><?= $param[2] ?></td>
+                <td id="<?= strtolower($param[0]) ?>Value" align="right"></td>
+                <td style="width: 60px"><?= $param[1] ?></td>
             </tr>
         <?php } ?>
     </table>
@@ -222,7 +222,7 @@ $scripts = array_map('addTime', $scripts);
             <tr>
                 <td style="width: 65px"><b>Current:</b></td>
 
-                <td id="currentDateValue">14.05.2016 13:42:10</td>
+                <td id="currentDateValue">01.01.2000 12:00:00</td>
 
                 <td style="width: 70px">
                     <button onclick="time.useCurrentTime()">Now</button>

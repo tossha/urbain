@@ -57,7 +57,7 @@ class TimeLine
             this.settings.timeLine = this.epoch;
         }
 
-        $('#currentDateValue').html(new Date((J2000_TIMESTAMP + this.epoch) * 1000).toLocaleString('ru'));
+        ui.updateTime(new Date((J2000_TIMESTAMP + this.epoch) * 1000));
         this.redraw();
     }
 
@@ -68,10 +68,6 @@ class TimeLine
 
     useCurrentTime() {
         this.forceEpoch(TimeLine.getEpochByDate(new Date));
-    }
-
-    useRealTimeScale() {
-        $('#timeScaleSlider').val(0.001).trigger('change');
     }
 
     redraw() {

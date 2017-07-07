@@ -29,7 +29,7 @@ class UI
         const selector = $('.' + name);
         const button = $(`#${name}ToggleButton`);
         button.attr('disabled', 'true');
-        selector.fadeToggle(400, 'swing', () => {
+        selector.fadeToggle(200, 'swing', () => {
             button.html(selector.is(':visible') ? 'Hide' : 'Show');
             button.removeAttr('disabled');
         });
@@ -54,7 +54,7 @@ class UI
             return;
         }
 
-        this.updateCartessian(selectedObject);
+        this.updateCartesian(selectedObject);
         this.updateKeplerian(selectedObject);
     }
 
@@ -80,7 +80,11 @@ class UI
         $('#targetSelect').val(value);
     }
 
-    updateCartessian(selectedObject) {
+    updateTime(date) {
+        $('#currentDateValue').html(date.toLocaleString('ru'));
+    }
+
+    updateCartesian(selectedObject) {
         const state = selectedObject.getStateInOwnFrameByEpoch(time.epoch);
         this.updateVector(state, 'velocity');
         this.updateVector(state, 'position');
@@ -98,14 +102,13 @@ class UI
 
     updateVector(state, vec) {
         const stateGroup = state[vec];
-        this.updateCoordinate(stateGroup, vec, 'Mag');
-        this.updateCoordinate(stateGroup, vec, 'X');
-        this.updateCoordinate(stateGroup, vec, 'Y');
-        this.updateCoordinate(stateGroup, vec, 'Z');
+        $( `#${vec}Mag` ).html(stateGroup.mag.toPrecision(this.precision));
+        $( `#${vec}X`   ).html(stateGroup.  x.toPrecision(this.precision));
+        $( `#${vec}Y`   ).html(stateGroup.  y.toPrecision(this.precision));
+        $( `#${vec}Z`   ).html(stateGroup.  z.toPrecision(this.precision));
     }
 
-    updateCoordinate(stateGroup, vec, coord) {
-        const selector = $('#' + vec + coord);
-        selector.html('' + stateGroup[coord.toLowerCase()].toPrecision(this.precision));
+    useRealTimeScale() {
+        $('#timeScaleSlider').val(0.001).trigger('change');
     }
 }
