@@ -1598,7 +1598,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	  };
 	
 	  OptionController.prototype.updateDisplay = function updateDisplay() {
-	    if (_dom2.default.isActive(this.__select)) return this; // prevent number from updating if user is trying to manually updateState
+	    if (_dom2.default.isActive(this.__select)) return this; // prevent number from updating if user is trying to manually update
 	    this.__select.value = this.getValue();
 	    return _Controller.prototype.updateDisplay.call(this);
 	  };
