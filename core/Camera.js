@@ -89,7 +89,7 @@ class Camera
             this.startAnimation();
         }
 
-        ui.updateTarget();
+        ui.updateTarget(pointId);
     }
 
     startAnimation() {

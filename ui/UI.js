@@ -76,8 +76,8 @@ class UI
         document.removeEventListener('vr_render', this.renderHandler);
     }
 
-    updateTarget() {
-        $('#targetSelect').val(camera.orbitingPoint);
+    updateTarget(value) {
+        $('#targetSelect').val(value);
     }
 
     updateCartessian(selectedObject) {
