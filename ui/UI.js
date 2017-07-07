@@ -1,35 +1,47 @@
-function updateInterface() {
-    const selectedObject = selection.getSelectedObject();
-    $('#metricsPanel')[selectedObject ? 'show' : 'hide']();
-
-    if (!selectedObject) {
-        return;
+class UI
+{
+    constructor(precision) {
+        this.precision = precision;
     }
 
-    const state = selectedObject.getStateInOwnFrameByEpoch(time.epoch);
+    update() {
+        const selectedObject = selection.getSelectedObject();
+        $('#metricsPanel')[selectedObject ? 'show' : 'hide']();
 
-    function displayVector(vec) {
-        const stateGroup = state[vec];
-
-        function displayCoord(coord) {
-            const selector = $('#' + vec + coord);
-            selector.html('' + stateGroup[coord.toLowerCase()].toPrecision(5));
+        if (!selectedObject) {
+            return;
         }
 
-        displayCoord('X');
-        displayCoord('Y');
-        displayCoord('Z');
-        displayCoord('Mag');
+        this.updateCartessian(selectedObject);
+        this.updateKeplerian(selectedObject);
     }
 
-    displayVector('velocity');
-    displayVector('position');
+    updateCartessian(selectedObject) {
+        const state = selectedObject.getStateInOwnFrameByEpoch(time.epoch);
+        this.updateVector(state, 'velocity');
+        this.updateVector(state, 'position');
+    }
 
-    const keplerianObject = selectedObject.getKeplerianObjectByEpoch(time.epoch);
-    $('#eccValue').html('' + ( keplerianObject.e         ).toPrecision(5));
-    $('#smaValue').html('' + ( keplerianObject.sma / 1e6 ).toPrecision(5));
-    $('#incValue').html('' + rad2deg(keplerianObject.inc).toPrecision(5));
-    $('#aopValue').html('' + rad2deg(keplerianObject.aop).toPrecision(5));
-    $('#raanValue').html('' + rad2deg(keplerianObject.raan).toPrecision(5));
-    $('#taValue').html('' + rad2deg(keplerianObject.ta).toPrecision(5));
+    updateKeplerian(selectedObject) {
+        const keplerianObject = selectedObject.getKeplerianObjectByEpoch(time.epoch);
+        $( '#eccValue'  ).html('' +        ( keplerianObject.e         ).toPrecision(this.precision));
+        $( '#smaValue'  ).html('' +        ( keplerianObject.sma / 1e6 ).toPrecision(this.precision));
+        $( '#incValue'  ).html('' + rad2deg( keplerianObject.inc       ).toPrecision(this.precision));
+        $( '#aopValue'  ).html('' + rad2deg( keplerianObject.aop       ).toPrecision(this.precision));
+        $( '#raanValue' ).html('' + rad2deg( keplerianObject.raan      ).toPrecision(this.precision));
+        $( '#taValue'   ).html('' + rad2deg( keplerianObject.ta        ).toPrecision(this.precision));
+    }
+
+    updateVector(state, vec) {
+        const stateGroup = state[vec];
+        this.updateCoordinate(stateGroup, vec, 'Mag');
+        this.updateCoordinate(stateGroup, vec, 'X');
+        this.updateCoordinate(stateGroup, vec, 'Y');
+        this.updateCoordinate(stateGroup, vec, 'Z');
+    }
+
+    updateCoordinate(stateGroup, vec, coord) {
+        const selector = $('#' + vec + coord);
+        selector.html('' + stateGroup[coord.toLowerCase()].toPrecision(this.precision));
+    }
 }
