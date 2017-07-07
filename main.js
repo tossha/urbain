@@ -40,7 +40,7 @@ function init() {
 
     time = new TimeLine(settings);
 
-    ui = new UI(5);
+    ui = new UI(5, objectsForTracking);
 
     statistics = new Stats();
     document.body.appendChild(statistics.dom);
@@ -48,11 +48,11 @@ function init() {
 
     document.addEventListener('vr_select', function() {
         event.detail.trajectory.keplerianEditor = new KeplerianEditor(event.detail.trajectory, false)
-    })
+    });
 
     document.addEventListener('vr_deselect', function() {
         event.detail.trajectory.keplerianEditor.remove();
-    })
+    });
 }
 
 function initBuiltIn() {

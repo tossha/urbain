@@ -1,6 +1,6 @@
 class UI
 {
-    constructor(precision) {
+    constructor(precision, objectsForTracking) {
         this.precision = precision;
 
         $('#timeScaleSlider').on('input change', this.handleTimeScaleChange.bind(this));
@@ -9,6 +9,17 @@ class UI
         this.renderHandler = this.handleRender.bind(this);
         document.addEventListener('vr_select', this.handleSelect.bind(this));
         document.addEventListener('vr_deselect', this.handleDeselect.bind(this));
+
+        let selections = '';
+        for (const id in objectsForTracking) {
+            selections += `<option value="${objectsForTracking[id]}">${id}</option>`;
+        }
+
+        const dropdownList = $('#targetSelect');
+        dropdownList
+            .html(selections)
+            .on('change', () => camera.setOrbitingPoint(dropdownList.val(), true))
+            .val(EARTH);
     }
 
     changeVisibility(name) {

@@ -109,7 +109,7 @@ $scripts = array_map('addTime', $scripts);
         }
 
         #cameraBoxHeader {
-            width: 200px;
+            width: 235px;
         }
 
         .metrics {
@@ -263,7 +263,10 @@ $scripts = array_map('addTime', $scripts);
         <table class="cameraBox">
             <tr>
                 <td><b>Target:</b></td>
-                <td colspan="2">Earth</td>
+                <td colspan="2">
+                    <select id="targetSelect">
+                    </select>
+                </td>
             </tr>
 
             <!--<tr>
@@ -279,12 +282,12 @@ $scripts = array_map('addTime', $scripts);
                 </td>
             </tr>-->
 
-            <tr>
+            <!--<tr>
                 <td><b>Zoom:</b></td>
                 <td colspan="2">
                     <input id="zoomSlider" type="range" style="width: 100%">
                 </td>
-            </tr>
+            </tr>-->
         </table>
     </div>
 
