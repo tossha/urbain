@@ -50,6 +50,8 @@ function init() {
 
     time = new TimeLine(settings);
 
+    ui = new UI(5);
+
     statistics = new Stats();
     document.body.appendChild(statistics.dom);
     statistics.dom.style.display = "none";
@@ -121,7 +123,7 @@ function render(curTime) {
 
     axisHelper.position.fromArray(camera.lastPosition.mul(-1));
 
-    updateInterface();
+    ui.update();
 
     renderer.render(scene, camera.threeCamera);
     statistics.update();
@@ -152,6 +154,7 @@ var trajArray = [];
 var selection;
 var statistics;
 var rendererEvents;
+var ui;
 
 $(() => {
     init();
