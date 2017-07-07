@@ -53,6 +53,6 @@ function reorderScripts($files) {
 
 
 function generateToggleButton($name) {
-    return '<button id="' . $name . 'ToggleButton" onclick="changeVisibility(\''
+    return '<button id="' . $name . 'ToggleButton" onclick="ui.changeVisibility(\''
         . $name . '\')" class="toggleButton">Hide</button>';
 }

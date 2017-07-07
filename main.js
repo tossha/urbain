@@ -38,16 +38,6 @@ function init() {
         objectsForTracking: objectsForTracking,
     });
 
-    document.addEventListener('vr_select', () => {
-        const data = SSDATA[selection.getSelectedObject().id];
-        if (data) {
-            $('#relativeTo').html(SSDATA[data.parent].name);
-            $('#metricsOf').html(data.name);
-        } else {
-            $('#relativeTo,#metricsOf').html('');
-        }
-    });
-
     time = new TimeLine(settings);
 
     ui = new UI(5);
@@ -123,8 +113,6 @@ function render(curTime) {
 
     axisHelper.position.fromArray(camera.lastPosition.mul(-1));
 
-    ui.update();
-
     renderer.render(scene, camera.threeCamera);
     statistics.update();
     requestAnimationFrame(render);
@@ -133,16 +121,6 @@ function render(curTime) {
 function onWindowResize() {
     renderer.setSize(window.innerWidth, window.innerHeight);
     camera.onResize();
-}
-
-function changeVisibility(name) {
-    const selector = $('.' + name);
-    const button = $(`#${name}ToggleButton`);
-    button.attr('disabled', 'true');
-    selector.fadeToggle(400, 'swing', () => {
-        button.html(selector.is(':visible') ? 'Hide' : 'Show');
-        button.removeAttr('disabled');
-    });
 }
 
 var camera, scene, renderer, axisHelper, raycaster;
