@@ -1,9 +1,6 @@
 class Camera
 {
-
     constructor (domElement, eventHandler, initialOrbitingPoint, initialPosition) {
-        let that = this;
-
         this.threeCamera = new THREE.PerspectiveCamera(60, domElement.width / domElement.height, 1, 1e15);
         this.domElement = domElement;
         this.isMouseDown = false;
@@ -17,6 +14,16 @@ class Camera
         this.threeCamera.position.fromArray([0, 0, 0]);
 
         this.rightButtonDown = false;
+        this.isLookingAside = true;
+        this.zoomingAside = 0;
+
+        this.isAnimnating = false;
+
+        this.settings = {
+            animationDuration: 200,
+            zoomFactor: 1.5,
+            pixelsToObjectUnderMouse: 20
+        };
 
         eventHandler.addListener('mousedown', this.onMouseDown.bind(this) , 1);
         eventHandler.addListener('mousemove', this.onMouseMove.bind(this) , 1);
@@ -26,18 +33,22 @@ class Camera
 
     init(epoch) {
         this.lastEpoch = epoch;
-        this.setOrbitingPoint(this.orbitingPoint);
+        this.setOrbitingPoint(this.orbitingPoint, false);
     }
 
-    updatePole(epoch) {
+    getPoleVector() {
         if (BODIES[this.orbitingPoint] === undefined) {
-            this.pole = new Vector([0, 0, 1]);
+            return new Vector([0, 0, 1]);
         } else {
-            this.pole = BODIES[this.orbitingPoint].orientation.getQuaternionByEpoch(epoch).rotate_(new Vector([0, 0, 1]));
+            return BODIES[this.orbitingPoint].orientation.getQuaternionByEpoch(this.lastEpoch).rotate_(new Vector([0, 0, 1]));
         }
     }
 
-    _getQuaternionByPosition(position) {
+    updatePole() {
+        this.pole = this.getPoleVector();
+    }
+
+    _getQuaternionByPosition(position, pole) {
         const defaultDirection = new Vector([0, 0, 1]); // must be unit length
         const defaultUp = new Vector([0, 1, 0]);        // must be unit length
 
@@ -48,7 +59,7 @@ class Camera
 
         const newUp = directionQuaternion.rotate(defaultUp);
         const neededUp = (new Quaternion()).setAxisAngle(
-            position.cross(this.pole),
+            position.cross(pole),
             Math.PI / 2
         ).rotate(position);
 
@@ -60,25 +71,118 @@ class Camera
         return rollQuaternion.mul(directionQuaternion);
     }
 
-    setOrbitingPoint(pointId) {
+    setOrbitingPoint(pointId, animate) {
         this.position
             .add_(App.getTrajectory(this.orbitingPoint).getPositionByEpoch(this.lastEpoch, RF_BASE))
             .sub_(App.getTrajectory(pointId).getPositionByEpoch(this.lastEpoch, RF_BASE));
         this.orbitingPoint = pointId;
-        this.updatePole(this.lastEpoch);
-        this.quaternion = this._getQuaternionByPosition(this.position);
+        this.isLookingAside = false;
+        this.zoomingAside = 0;
+
+        settings.trackingObject = pointId;
+
+        if (!animate) {
+            this.updatePole();
+            this.quaternion = this._getQuaternionByPosition(this.position, this.pole);
+            this.isLookingAside = false;
+        } else {
+            this.startAnimation();
+        }
+    }
+
+    startAnimation() {
+        this.animationStartingTime = (new Date()).getTime();
+        this.animationDuration = this.settings.animationDuration;
+        this.animationStartingPole = Vector.copy(this.pole);
+        this.animationStartingQuaternion = Quaternion.copy(this.quaternion);
+        this.isAnimnating = true;
+    }
+
+    animate() {
+        const time = (new Date()).getTime();
+        const percent = (time - this.animationStartingTime) / this.animationDuration;
+        const targetPole = this.getPoleVector();
+        const targetQuat = this._getQuaternionByPosition(this.position, targetPole);
+
+        if (percent >= 1) {
+            this.pole = targetPole;
+            this.quaternion = targetQuat;
+            this.isAnimnating = false;
+            this.isLookingAside = false;
+            return;
+        }
+
+        const poleTargetQuat = Quaternion.transfer(this.animationStartingPole, targetPole);
+        const poleQuat = Quaternion.slerp(new Quaternion(), poleTargetQuat, percent);
+
+        this.pole = poleQuat.rotate(this.animationStartingPole);
+        this.quaternion = Quaternion.slerp(this.animationStartingQuaternion, targetQuat, percent);
     }
 
     getOrbitingPointPosition(epoch) {
         return App.getTrajectory(this.orbitingPoint).getPositionByEpoch(epoch, RF_BASE);
     }
 
+    findObjectUnderMouse() {
+        let biggestRadius = 0;
+        let biggestObject = false;
+        for (let bodyIdx in BODIES) {
+            const dist = raycaster.getPixelDistance(
+                BODIES[bodyIdx].getPositionByEpoch(this.lastEpoch, RF_BASE)
+            );
+            if (dist < this.settings.pixelsToObjectUnderMouse) {
+                if (biggestObject === false) {
+                    biggestObject = bodyIdx;
+                }
+                const r = BODIES[bodyIdx].physicalModel.radius;
+                if (r && r > biggestRadius) {
+                    biggestRadius = r;
+                    biggestObject = bodyIdx;
+                }
+            }
+        }
+        return biggestObject;
+    }
+
     onMouseWheel(event) {
-        const koeff = 1.5;
-        if (event.deltaY < 0) {
-            this.position.scale(1 / koeff);
-        } else if (event.deltaY > 0) {
-            this.position.scale(koeff);
+        if (!event.deltaY) {
+            return;
+        }
+
+        const factor = this.settings.zoomFactor;
+        let objectToZoomTo = this.findObjectUnderMouse();
+
+        if (objectToZoomTo === this.orbitingPoint) {
+            objectToZoomTo = false;
+        }
+
+        if (objectToZoomTo !== false) {
+            this.position
+                .add_(App.getTrajectory(this.orbitingPoint).getPositionByEpoch(this.lastEpoch, RF_BASE))
+                .sub_(App.getTrajectory(objectToZoomTo).getPositionByEpoch(this.lastEpoch, RF_BASE));
+        } else {
+            this.zoomingAside = 0;
+        }
+
+        this.position.scale(
+            event.deltaY < 0
+                ? 1 / factor
+                : factor
+        );
+
+        if (objectToZoomTo !== false) {
+            this.position
+                .add_(App.getTrajectory(objectToZoomTo).getPositionByEpoch(this.lastEpoch, RF_BASE))
+                .sub_(App.getTrajectory(this.orbitingPoint).getPositionByEpoch(this.lastEpoch, RF_BASE));
+            this.isLookingAside = true;
+            this.zoomingAside++;
+
+        } else if (this.isLookingAside) {
+            this.startAnimation();
+        }
+
+        if (this.zoomingAside === 3) {
+            this.setOrbitingPoint(objectToZoomTo, true);
         }
     }
 
@@ -86,13 +190,14 @@ class Camera
         this.accountedMousePos = new Vector([event.clientX, event.clientY]);
         this.currentMousePos = Vector.copy(this.accountedMousePos);
         this.isMouseDown = true;
-        switch ( event.button ) {
-        case 0: //left
-            break;
-        case 1: // middle
-            break;
-        case 2: this.rightButtonDown = true;
-            break;
+        switch (event.button) {
+            case 0: //left
+                break;
+            case 1: // middle
+                break;
+            case 2:
+                this.rightButtonDown = true;
+                break;
         }
     }
 
@@ -115,7 +220,13 @@ class Camera
     update(epoch) {
         let mouseShift = this.currentMousePos.sub(this.accountedMousePos);
 
-        this.updatePole(epoch);
+        this.lastEpoch = epoch;
+
+        if (this.isAnimnating) {
+            this.animate()
+        } else {
+            this.updatePole();
+        }
 
         if (mouseShift[0] || mouseShift[1]) {
             const polarConstraint = 0.00001;
@@ -136,6 +247,5 @@ class Camera
         }
         this.threeCamera.quaternion.copy(this.quaternion.toThreejs());
         this.lastPosition = this.getOrbitingPointPosition(epoch).add_(this.position);
-        this.lastEpoch = epoch;
     }
 }
