@@ -231,7 +231,7 @@ $scripts = array_map('addTime', $scripts);
 
             <tr>
                 <td><b>Rate:</b></td>
-                <td id="timeScaleValue">1.3 days per second</td>
+                <td id="timeScaleValue">1.0 s/s</td>
                 <td>
                     <button onclick="time.useRealTimeScale()">Real</button>
                 </td>
@@ -239,7 +239,7 @@ $scripts = array_map('addTime', $scripts);
 
             <tr>
                 <td colspan="2">
-                    <input id="timeScaleSlider" type="range" min="-1" max="1" step="0.001" value="0"
+                    <input id="timeScaleSlider" type="range" min="-1" max="1" step="0.001" value="0.001"
                            style="width: 100%">
                 </td>
 
