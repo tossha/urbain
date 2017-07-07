@@ -13,18 +13,6 @@ class Settings
             statistics.dom.style.display = value ? "" : "none";
         });
 
-        const timeScaleSlider = $('#timeScaleSlider');
-        timeScaleSlider.on('change', () => {
-             this.timeScale = timeScaleSlider.val();
-            $('#timeScaleValue').html('' + this.timeScale);
-        });
-
-        const pauseButton = $('#pauseButton');
-        pauseButton.on('click', () => {
-            this.isTimeRunning = !this.isTimeRunning;
-            pauseButton.html(this.isTimeRunning ? 'Pause' : 'Resume');
-        });
-
         this.guiAddTrajectory = new dat.GUI({
             autoPlace: false,
             width: 350

@@ -2,10 +2,13 @@ class UI
 {
     constructor(precision) {
         this.precision = precision;
-        this.renderHandler = this.handleRender.bind(this);
 
-        document.addEventListener('vr_select', () => this.handleSelect());
-        document.addEventListener('vr_deselect', () => this.handleDeselect());
+        $('#timeScaleSlider').on('input change', this.handleTimeScaleChange.bind(this));
+        $('#pauseButton').on('click', this.handlePauseClick.bind(this));
+
+        this.renderHandler = this.handleRender.bind(this);
+        document.addEventListener('vr_select', this.handleSelect.bind(this));
+        document.addEventListener('vr_deselect', this.handleDeselect.bind(this));
     }
 
     changeVisibility(name) {
@@ -16,6 +19,19 @@ class UI
             button.html(selector.is(':visible') ? 'Hide' : 'Show');
             button.removeAttr('disabled');
         });
+    }
+
+    handleTimeScaleChange() {
+        const val = +$('#timeScaleSlider').val();
+        const rate = Math.sign(val) * Math.pow(2592000, Math.abs(val));
+        // settings.timeScale = 0.001 * Math.sign(val) * Math.pow(2592000, Math.abs(val));
+        // settings.timeScale = val;
+        $('#timeScaleValue').html(time.formatRate(rate, 2));
+        settings.timeScale = rate / 1000;
+    }
+
+    handlePauseClick() {
+        $('#pauseButton').html((settings.isTimeRunning ^= true) ? 'Pause' : 'Resume');
     }
 
     handleRender() {
