@@ -152,7 +152,7 @@ $scripts = array_map('addTime', $scripts);
                 <td><b>Rate:</b></td>
                 <td id="timeScaleValue"></td>
                 <td>
-                    <button onclick="time.useRealTimeScale()">Real</button>
+                    <button onclick="ui.useRealTimeScale()">Real</button>
                 </td>
             </tr>
 
