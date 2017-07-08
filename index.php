@@ -16,8 +16,9 @@ $scripts = array_map('addTime', $scripts);
 <!DOCTYPE html>
 <html>
 <head>
-    <script src="http://code.jquery.com/jquery-3.2.1.min.js"></script>
-    <script src="https://threejs.org/build/three.min.js"></script>
+    <link rel="stylesheet" href="ui.css"/>
+    <script src="vendor/jquery-3.2.1.min.js"></script>
+    <script src="vendor/three.min.js"></script>
 
     <?php foreach ($scripts as $script) { ?>
         <script src="<?= $script ?>"></script>
@@ -41,88 +42,6 @@ $scripts = array_map('addTime', $scripts);
             height: 100%;
         }
 
-        #leftPanel {
-            position: absolute;
-            left: 0;
-            top: 0;
-            margin-right: auto;
-            margin-bottom: auto;
-            background-color: black;
-            opacity: 1;
-            font: 13px/1.231 "Lucida Grande", Lucida, Verdana, sans-serif;
-        }
-
-        #bottomPanel {
-            position: absolute;
-            bottom: 0;
-            left: 5%;
-            margin-left: auto;
-            margin-right: auto;
-            width: 90%;
-            /*height: 35px;*/
-            /*background-color: black;*/
-            opacity: 1;
-            font: 13px/1.231 "Lucida Grande", Lucida, Verdana, sans-serif;
-        }
-
-        #timeLineCanvas {
-            height: 35px;
-        }
-
-        /*#bottomPanel .property-name {*/
-        /*width: 4%;*/
-        /*}*/
-
-        /*#bottomPanel .c {*/
-        /*width: 96%;*/
-        /*}*/
-
-        /*#bottomPanel .slider {*/
-        /*width: 92%;*/
-        /*}*/
-
-        /*#bottomPanel input {*/
-        /*width: 7%;*/
-        /*}*/
-
-        .menuBlock {
-            display: inline-block;
-        }
-
-        .menuBlock, #metricsPanel {
-            border: 1px solid black;
-            background-color: white;
-        }
-
-        button {
-            float: right;
-        }
-
-        #metricsPanel {
-            position: absolute;
-            top: 0;
-            right: 0;
-        }
-
-        #timeBoxHeader {
-            width: 300px;
-        }
-
-        #cameraBoxHeader {
-            width: 235px;
-        }
-
-        .metrics {
-            width: 100%;
-        }
-
-        .toggleButton {
-            width: 49px;
-        }
-
-        #pauseButton {
-            width: 65px;
-        }
     </style>
 </head>
 
@@ -132,8 +51,8 @@ $scripts = array_map('addTime', $scripts);
 
 <div id="leftPanel"></div>
 <div id="viewport"></div>
-<div id="metricsPanel">
-    <table id="metricsHeader" style="width: 300px">
+<div id="metricsPanel" class="panel">
+    <table id="metricsHeader" class="panelHeader">
         <tr>
             <td>
                 Metrics
@@ -207,10 +126,10 @@ $scripts = array_map('addTime', $scripts);
     </table>
 </div>
 <div id="bottomPanel">
-    <div class="menuBlock">
-        <table id="timeBoxHeader">
+    <div class="panel">
+        <table id="timeBoxHeader" class="panelHeader">
             <tr>
-                <td align="center">
+                <td>
                     Time
                     <?= generateToggleButton('timeBox') ?>
                 </td>
@@ -250,10 +169,10 @@ $scripts = array_map('addTime', $scripts);
         </table>
     </div>
 
-    <div class="menuBlock">
-        <table id="cameraBoxHeader">
+    <div class="panel">
+        <table id="cameraBoxHeader" class="panelHeader">
             <tr>
-                <td align="center">
+                <td>
                     Camera
                     <?= generateToggleButton('cameraBox') ?>
                 </td>
