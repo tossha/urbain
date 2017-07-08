@@ -1,5 +1,11 @@
 button {
   float: right;
+  background-color: #666;
+  border: 1px solid #999;
+}
+
+button:hover {
+  background-color: #999;
 }
 
 #leftPanel {
