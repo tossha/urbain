@@ -4,7 +4,7 @@ class UI
         this.precision = precision;
 
         $('#timeScaleSlider').on('input change', this.handleTimeScaleChange.bind(this));
-        $('#pauseButton').on('click', this.handlePauseClick.bind(this));
+        $('#pauseButton').on('click', this.togglePause.bind(this));
 
         this.renderHandler = this.handleRender.bind(this);
         document.addEventListener('vr_select', this.handleSelect.bind(this));
@@ -43,10 +43,6 @@ class UI
         // settings.timeScale = val;
         $('#timeScaleValue').html(time.formatRate(rate, 2));
         settings.timeScale = rate / 1000;
-    }
-
-    handlePauseClick() {
-        $('#pauseButton').html((settings.isTimeRunning ^= true) ? 'Pause' : 'Resume');
     }
 
     handleRender() {
@@ -111,5 +107,9 @@ class UI
 
     useRealTimeScale() {
         $('#timeScaleSlider').val(0.001).trigger('change');
+    }
+
+    togglePause() {
+        $('#pauseButton').html((settings.isTimeRunning ^= true) ? 'Pause' : 'Resume');
     }
 }

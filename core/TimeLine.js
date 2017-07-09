@@ -32,9 +32,9 @@ class TimeLine
         window         .addEventListener("mousemove",  this.onMouseMove  .bind(this));
         this.domElement.addEventListener("mousewheel", this.onMouseWheel .bind(this));
 
-        window.addEventListener("keypress", (e) => {
-            if (e.key === " ") {
-                this.settings.guiIsTimeRunning.setValue(!this.settings.isTimeRunning);
+        window.addEventListener('keypress', e => {
+            if (e.key === ' ') {
+                ui.togglePause();
             }
         });
 
