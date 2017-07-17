@@ -1,73 +1,21 @@
 class Settings
 {
     constructor(initial) {
-        this.guiMain = new dat.GUI({width: 350});
-
         this.timeLine = initial.timeLinePos;
         this.timeScale = initial.timeScale;
         this.isTimeRunning = initial.isTimeRunning;
         this.trackingObject = initial.trackingObject;
-        this.currentDate = '';
-
-        this.showStatistics = false;
-        this.guiMain.add(this, 'showStatistics').onChange((value) => {
-            statistics.dom.style.display = value ? "" : "none";
-        });
-
-        this.guiMain.add(this, 'timeScale', -2000, 2000);
-        this.guiMain.add(this, 'currentDate').listen();
-        this.guiIsTimeRunning = this.guiMain.add(this, 'isTimeRunning');
-        this.guiMain.add(this, 'trackingObject', initial.objectsForTracking).onChange(function(value) {
-            camera.setOrbitingPoint(value, true);
-        }).listen();
-
-        const trajectoryMenu = {
-            velocity: {
-                folder: null,
-                x   : null,
-                y   : null,
-                z   : null,
-                mag : null,
-
-                values: {
-                    x   : "",
-                    y   : "",
-                    z   : "",
-                    mag : ""
-                }
-            },
-
-            position: {
-                folder: null,
-                x   : null,
-                y   : null,
-                z   : null,
-                mag : null,
-
-                values: {
-                    x   : "",
-                    y   : "",
-                    z   : "",
-                    mag : ""
-                }
-            }
-        };
-
-        for (let group of ['velocity', 'position']) {
-            trajectoryMenu[group].folder = this.guiMain.addFolder(group);
-            for (let id of ['x', 'y', 'z', 'mag']) {
-                trajectoryMenu[group][id] = trajectoryMenu[group].folder.add(trajectoryMenu[group].values, id);
-            }
-        }
-
-        this.currentTrajectoryMenu = trajectoryMenu;
 
         this.guiAddTrajectory = new dat.GUI({
             autoPlace: false,
             width: 350
         });
 
-        const that = this;
+        this.showStatistics = false;
+        this.guiAddTrajectory.add(this, 'showStatistics').onChange(value => {
+            statistics.dom.style.display = value ? "" : "none";
+        });
+
         this.baseTrajectorySettings = {
             sma  : 120000000,
             e    : 0,
@@ -82,6 +30,7 @@ class Settings
             settingsFolder: null, addTrajectoryFolder: null
         };
 
+        const that = this;
         this.trajectorySettings = {
             sma  : this.baseTrajectorySettings.sma  + 1e-2,
             e    : this.baseTrajectorySettings.e    + 1e-2,

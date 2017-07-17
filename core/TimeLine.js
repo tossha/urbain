@@ -27,18 +27,18 @@ class TimeLine
 
         this.updateScaleType();
 
-        this.domElement.addEventListener("mousedown",  (e) => this.onMouseDown  (e));
-        window         .addEventListener("mouseup",    (e) => this.onMouseUp    (e));
-        window         .addEventListener("mousemove",  (e) => this.onMouseMove  (e));
-        this.domElement.addEventListener("mousewheel", (e) => this.onMouseWheel (e));
+        this.domElement.addEventListener("mousedown",  this.onMouseDown  .bind(this));
+        window         .addEventListener("mouseup",    this.onMouseUp    .bind(this));
+        window         .addEventListener("mousemove",  this.onMouseMove  .bind(this));
+        this.domElement.addEventListener("mousewheel", this.onMouseWheel .bind(this));
 
-        window.addEventListener("keypress", (e) => {
-            if (e.key === " ") {
-                this.settings.guiIsTimeRunning.setValue(!this.settings.isTimeRunning);
+        window.addEventListener('keypress', e => {
+            if (e.key === ' ') {
+                ui.togglePause();
             }
         });
 
-        window.addEventListener("resize", () => this.updateCanvasStyle());
+        window.addEventListener("resize", this.updateCanvasStyle.bind(this));
         window.oncontextmenu = () => false;
     }
 
@@ -57,7 +57,7 @@ class TimeLine
             this.settings.timeLine = this.epoch;
         }
 
-        this.settings.currentDate = "" + new Date((J2000_TIMESTAMP + this.epoch) * 1000);
+        ui.updateTime(new Date((J2000_TIMESTAMP + this.epoch) * 1000));
         this.redraw();
     }
 
@@ -66,16 +66,17 @@ class TimeLine
         this.tick(0);
     }
 
+    useCurrentTime() {
+        this.forceEpoch(TimeLine.getEpochByDate(new Date));
+    }
+
     redraw() {
-        // TODO: заменить
         this.canvasContext.fillStyle = "#222";
         this.canvasContext.fillRect(0, 0, this.domElement.width, this.domElement.height);
 
-        // TODO: заменить
         this.canvasContext.fillStyle = "#2FA1D6";
         this.drawCurrentTimeMark();
 
-        // TODO: заменить
         this.canvasContext.strokeStyle = "#fff";
         this.canvasContext.fillStyle   = "#fff";
         this.canvasContext.font        = "11pt sans-serif";
@@ -112,7 +113,7 @@ class TimeLine
         const secondsPerPeriod = this.markDistance * this.span / this.domElement.width;
         let bestScale = false;
 
-        for (let scale in TimeLine.scales) {
+        for (const scale in TimeLine.scales) {
             if (!bestScale) {
                 bestScale = scale;
                 continue;
@@ -145,7 +146,7 @@ class TimeLine
     }
 
     roundDateUp(date) {
-        var d = new Date(date);
+        const d = new Date(date);
         if (this.scaleType === "minute") {
             d.setSeconds(60, 0);
         } else if (this.scaleType === "fiveMinutes") {
@@ -186,7 +187,7 @@ class TimeLine
     }
 
     nextRenderingDate(date) {
-        var d = new Date(date);
+        const d = new Date(date);
         if (this.scaleType === "minute") {
             d.setMinutes(d.getMinutes() + 1);
         } else if (this.scaleType === "fiveMinutes") {
@@ -246,7 +247,7 @@ class TimeLine
             };
         } else if ((this.scaleType === "day")
             || (this.scaleType === "week")
-         ) {
+        ) {
             formatOptions = {
                 day: "2-digit",
                 month: "2-digit",
@@ -254,7 +255,7 @@ class TimeLine
             };
         } else if ((this.scaleType === "month")
             || (this.scaleType === "threeMonths")
-         ) {
+        ) {
             formatOptions = {
                 month: "long",
                 year: "numeric"
@@ -267,6 +268,32 @@ class TimeLine
             };
         }
         return d.toLocaleString('ru', formatOptions);
+    }
+
+    formatRate(rate, precision) {
+        const prefix = (rate < 0) ? '-' : '';
+        const abs = Math.abs(rate);
+        if (abs === 0) {
+            return '0';
+        }
+
+        if (abs < 60) {
+            return prefix + abs.toPrecision(precision) + ' s/s';
+        }
+
+        if (abs < 3600) {
+            return prefix + (abs / 60).toPrecision(precision) + ' min/s';
+        }
+
+        if (abs < 86400) {
+            return prefix + (abs / 3600).toPrecision(precision) + ' h/s';
+        }
+
+        if (abs < 2592000) {
+            return prefix + (abs / 86400).toPrecision(precision) + ' days/s';
+        }
+
+        return prefix + '1 month/s';
     }
 
     onMouseDown(e) {
@@ -326,4 +353,4 @@ TimeLine.scales = {
     threeMonths: 7776000,
     year: 31557600,
     fiveYears: 157788000,
-}
+};

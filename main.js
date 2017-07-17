@@ -26,7 +26,7 @@ function init() {
 
     selection = new SelectionHandler(raycaster);
 
-    for (let objId in SSDATA) {
+    for (const objId in SSDATA) {
         objectsForTracking[SSDATA[objId].name] = objId;
     }
 
@@ -40,17 +40,19 @@ function init() {
 
     time = new TimeLine(settings);
 
+    ui = new UI(5, objectsForTracking);
+
     statistics = new Stats();
     document.body.appendChild(statistics.dom);
     statistics.dom.style.display = "none";
 
     document.addEventListener('vr_select', function() {
         event.detail.trajectory.keplerianEditor = new KeplerianEditor(event.detail.trajectory, false)
-    })
+    });
 
     document.addEventListener('vr_deselect', function() {
         event.detail.trajectory.keplerianEditor.remove();
-    })
+    });
 }
 
 function initBuiltIn() {
@@ -58,7 +60,7 @@ function initBuiltIn() {
 
     stars = new VisualStarsModel(STARDATA);
 
-    for (let id in TLEDATA) {
+    for (const id in TLEDATA) {
         const tle = new TLE(TLEDATA[id].lines);
         const objId = parseInt(id);
 
@@ -96,7 +98,7 @@ function render(curTime) {
 
     camera.update(time.epoch);
 
-    for (let bodyIdx in BODIES) {
+    for (const bodyIdx in BODIES) {
         BODIES[bodyIdx].render(time.epoch);
     }
 
@@ -108,16 +110,6 @@ function render(curTime) {
         'vr_render',
         {detail: {epoch: time.epoch}}
     ));
-
-    const trajectoryMenu = settings.currentTrajectoryMenu;
-    const state = App.getTrajectory(settings.trackingObject).getStateByEpoch(time.epoch, RF_BASE);
-    for (let group of ['velocity', 'position']) {
-        const trajectoryGroup = trajectoryMenu[group];
-        const stateGroup = state[group];
-        for (let id of ['x', 'y', 'z', 'mag']) {
-            trajectoryGroup[id].setValue("" + stateGroup[id]);
-        }
-    }
 
     axisHelper.position.fromArray(camera.lastPosition.mul(-1));
 
@@ -140,9 +132,10 @@ var trajArray = [];
 var selection;
 var statistics;
 var rendererEvents;
+var ui;
 
-window.onload = function () {
+$(() => {
     init();
     initBuiltIn();
     requestAnimationFrame(firstRender);
-};
+});

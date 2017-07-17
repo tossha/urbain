@@ -88,6 +88,8 @@ class Camera
         } else {
             this.startAnimation();
         }
+
+        ui.updateTarget(pointId);
     }
 
     startAnimation() {
