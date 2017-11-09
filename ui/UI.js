@@ -89,20 +89,20 @@ class UI
 
     updateKeplerian(selectedObject) {
         const keplerianObject = selectedObject.getKeplerianObjectByEpoch(time.epoch);
-        $( '#eccValue'  ).html('' +        ( keplerianObject.e         ).toPrecision(this.precision));
-        $( '#smaValue'  ).html('' +        ( keplerianObject.sma / 1e6 ).toPrecision(this.precision));
-        $( '#incValue'  ).html('' + rad2deg( keplerianObject.inc       ).toPrecision(this.precision));
-        $( '#aopValue'  ).html('' + rad2deg( keplerianObject.aop       ).toPrecision(this.precision));
-        $( '#raanValue' ).html('' + rad2deg( keplerianObject.raan      ).toPrecision(this.precision));
-        $( '#taValue'   ).html('' + rad2deg( keplerianObject.ta        ).toPrecision(this.precision));
+        $('#eccValue' ).html('' +        ( keplerianObject.e   ).toPrecision(this.precision));
+        $('#smaValue' ).html('' + presentNumberWithPrefix(keplerianObject.sma));
+        $('#incValue' ).html('' + rad2deg( keplerianObject.inc ).toPrecision(this.precision));
+        $('#aopValue' ).html('' + rad2deg( keplerianObject.aop ).toPrecision(this.precision));
+        $('#raanValue').html('' + rad2deg( keplerianObject.raan).toPrecision(this.precision));
+        $('#taValue'  ).html('' + rad2deg( keplerianObject.ta  ).toPrecision(this.precision));
     }
 
     updateVector(state, vec) {
         const stateGroup = state[vec];
-        $( `#${vec}Mag` ).html(stateGroup.mag.toPrecision(this.precision));
-        $( `#${vec}X`   ).html(stateGroup.  x.toPrecision(this.precision));
-        $( `#${vec}Y`   ).html(stateGroup.  y.toPrecision(this.precision));
-        $( `#${vec}Z`   ).html(stateGroup.  z.toPrecision(this.precision));
+        $(`#${vec}Mag`).html(presentNumberWithPrefix(stateGroup.mag));
+        $(`#${vec}X`  ).html(presentNumberWithPrefix(stateGroup.x));
+        $(`#${vec}Y`  ).html(presentNumberWithPrefix(stateGroup.y));
+        $(`#${vec}Z`  ).html(presentNumberWithPrefix(stateGroup.z));
     }
 
     useRealTimeScale() {

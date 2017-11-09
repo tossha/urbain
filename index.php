@@ -82,7 +82,7 @@ $scripts = array_map('addTime', $scripts);
 
         <?php foreach ([
                            ['Ecc', ''],
-                           ['SMA', 'Mkm'],
+                           ['SMA', 'km'],
                            ['Inc', 'deg.'],
                            ['AoP', 'deg.'],
                            ['RAAN', 'deg.'],

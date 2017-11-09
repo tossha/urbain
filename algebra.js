@@ -29,3 +29,25 @@ function approximateAngle(ang1, ang2, proportion) {
 function approximateNumber(n1, n2, proportion) {
     return n1 + (n2 - n1) * proportion;
 }
+
+function presentNumberWithPrefix(number) {
+    if (Math.abs(number) >= 1000000000) {
+        return (number / 1000000000).toFixed(3) + ' G';
+    }
+    if (Math.abs(number) >= 1000000) {
+        return (number / 1000000).toFixed(3) + ' M';
+    }
+    if (Math.abs(number) >= 1000) {
+        return (number / 1000).toFixed(3) + ' K';
+    }
+    if (Math.abs(number) <= 0.000000001) {
+        return (number / 0.000000001).toFixed(3) + ' n';
+    }
+    if (Math.abs(number) <= 0.000001) {
+        return (number / 0.000001).toFixed(3) + ' µ';
+    }
+    if (Math.abs(number) <= 0.001) {
+        return (number / 0.001).toFixed(3) + ' m';
+    }
+    return number.toPrecision(6) + ' ';
+}
