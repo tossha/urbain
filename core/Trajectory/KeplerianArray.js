@@ -33,10 +33,10 @@ class TrajectoryKeplerianArray extends TrajectoryKeplerianAbstract
         }
 
         if (epoch <= this.minEpoch) {
-            return this.keplerianObjects[0].getStateByEpoch(epoch);
+            return this.keplerianObjects[0];
         }
         if (epoch >= this.maxEpoch) {
-            return this.keplerianObjects[this.keplerianObjects.length - 1].getStateByEpoch(epoch);
+            return this.keplerianObjects[this.keplerianObjects.length - 1];
         }
 
         let nextIdx = Math.ceil((epoch - this.minEpoch) / (this.maxEpoch - this.minEpoch) * (this.keplerianObjects.length - 1));
