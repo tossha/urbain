@@ -65,7 +65,7 @@ function initBuiltIn() {
         const objId = parseInt(id);
 
         App.setTrajectory(objId, new TrajectoryKeplerianPrecessing(
-            App.getReferenceFrame(RF_TYPE_ECI),
+            ReferenceFrame.getInertialBodyEquatorial(EARTH),
             new KeplerianObject(
                 tle.getE(),
                 tle.getSma(),

@@ -1,11 +1,11 @@
 class ReferenceFrameAbstract
 {
-    constructor(origin) {
-        this.origin = origin;
-    }
-
     getQuaternionByEpoch(epoch) {
         return IDENTITY_QUATERNION;
+    }
+
+    getOriginPositionByEpoch(epoch) {
+        return new Vector(3);
     }
 
     transformStateVectorByEpoch(epoch, state, destinationFrame) {

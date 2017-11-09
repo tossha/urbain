@@ -1,4 +1,4 @@
-const RF_BASE = App.getReferenceFrame(RF_TYPE_ECLIPTIC, SOLAR_SYSTEM_BARYCENTER);
+const RF_BASE = new ReferenceFrameBase();
 
 const BODIES = {};
 
