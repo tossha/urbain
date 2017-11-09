@@ -9,15 +9,15 @@ class VisualStarsModel
         for(let params of STARDATA) {
 
             threeGeometry.vertices.push(new THREE.Vector3(
-                starDist * Math.cos(deg2rad(params[0])) * Math.sin(deg2rad(params[1])),
-                starDist * Math.sin(deg2rad(params[0])) * Math.sin(deg2rad(params[1])),
-                starDist * Math.cos(deg2rad(params[1]))
+                starDist * Math.cos(deg2rad(params[0])) * Math.cos(deg2rad(params[1])),
+                starDist * Math.sin(deg2rad(params[0])) * Math.cos(deg2rad(params[1])),
+                starDist * Math.sin(deg2rad(params[1]))
             ));
 
             threeGeometry.colors.push(new THREE.Color(
-                params[2] / 100,
-                params[2] / 100,
-                params[2] / 100
+                params[2] / 50,
+                params[2] / 50,
+                params[2] / 50
             ));
         }
 
@@ -29,6 +29,8 @@ class VisualStarsModel
                 sizeAttenuation: false
             })
         );
+
+        this.threeObj.quaternion.copy(new Quaternion([-1, 0, 0], deg2rad(23.4)).toThreejs());
 
         scene.add(this.threeObj);
     }
