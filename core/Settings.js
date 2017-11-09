@@ -50,7 +50,7 @@ class Settings
 
                 if (!App.getTrajectory(lastTrajectoryId)) {
                     App.setTrajectory(lastTrajectoryId, new TrajectoryKeplerianBasic(
-                        App.getReferenceFrame(RF_TYPE_ECLIPTIC, that.trackingObject),
+                        ReferenceFrame.getInertialEcliptic(that.trackingObject),
                         new KeplerianObject(
                             that.trajectorySettings.e,
                             that.trajectorySettings.sma,

@@ -1,7 +1,16 @@
 class ReferenceFrameInertialAbstract extends ReferenceFrameAbstract
 {
+    constructor(stateOfEpoch) {
+        super();
+        this.stateOfEpoch = stateOfEpoch;
+    }
+
+    getOriginPositionByEpoch(epoch) {
+        return this.stateOfEpoch.evaluate(epoch).position;
+    }
+
     stateVectorFromBaseReferenceFrameByEpoch(epoch, state) {
-        const originState = App.getTrajectory(this.origin).getStateByEpoch(epoch, RF_BASE);
+        const originState = this.stateOfEpoch.evaluate(epoch);
         const rotation = this.getQuaternionByEpoch(epoch).invert();
 
         return new StateVector(
@@ -11,7 +20,7 @@ class ReferenceFrameInertialAbstract extends ReferenceFrameAbstract
     }
 
     stateVectorToBaseReferenceFrameByEpoch(epoch, state) {
-        const originState = App.getTrajectory(this.origin).getStateByEpoch(epoch, RF_BASE);
+        const originState = this.stateOfEpoch.evaluate(epoch);
         const rotation = this.getQuaternionByEpoch(epoch);
 
         return new StateVector(

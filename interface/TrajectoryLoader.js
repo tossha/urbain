@@ -37,7 +37,7 @@ class TrajectoryLoader
     }
 
     static createFrame(origin) {
-        return App.getReferenceFrame(RF_TYPE_ECLIPTIC, origin);
+        return ReferenceFrame.getInertialEcliptic(origin);
     }
 
     static createKeplerianObject(data) {
