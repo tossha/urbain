@@ -3,6 +3,9 @@ class TrajectoryAbstract
     constructor(referenceFrame) {
         let that = this;
 
+        this.cachedEpoch = null;
+        this.cachedState = null;
+
         this.referenceFrame = referenceFrame || null; // class ReferenceFrameAbstract
         document.addEventListener('vr_render', function (event) {
             that.render(event.detail.epoch);
@@ -30,7 +33,16 @@ class TrajectoryAbstract
     }
 
     getStateByEpoch(epoch, referenceFrame) {
-        let state = this.getStateInOwnFrameByEpoch(epoch);
+        let state;
+        if (referenceFrame === RF_BASE && epoch === this.cachedEpoch) {
+            state = this.cachedState;
+        } else {
+            state = this.getStateInOwnFrameByEpoch(epoch);
+            if (referenceFrame === RF_BASE && epoch === time.epoch) {
+                this.cachedState = state;
+            }
+        }
+
         return this.referenceFrame.transformStateVectorByEpoch(epoch, state, referenceFrame);
     }
 
