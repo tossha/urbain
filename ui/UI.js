@@ -99,10 +99,10 @@ class UI
 
     updateVector(state, vec) {
         const stateGroup = state[vec];
-        $( `#${vec}Mag` ).html(stateGroup.mag.toPrecision(this.precision));
-        $( `#${vec}X`   ).html(stateGroup.  x.toPrecision(this.precision));
-        $( `#${vec}Y`   ).html(stateGroup.  y.toPrecision(this.precision));
-        $( `#${vec}Z`   ).html(stateGroup.  z.toPrecision(this.precision));
+        $( `#${vec}Mag` ).html(presentNumberWithPrefix(stateGroup.mag));
+        $( `#${vec}X`   ).html(presentNumberWithPrefix(stateGroup.  x));
+        $( `#${vec}Y`   ).html(presentNumberWithPrefix(stateGroup.  y));
+        $( `#${vec}Z`   ).html(presentNumberWithPrefix(stateGroup.  z));
     }
 
     useRealTimeScale() {
