@@ -151,8 +151,11 @@ class Camera
             return;
         }
 
-        const factor = this.settings.zoomFactor;
+        const factor = event.deltaY < 0
+            ? 1 / this.settings.zoomFactor
+            : this.settings.zoomFactor;
         let objectToZoomTo = this.findObjectUnderMouse();
+        let zoomingTo = this.orbitingPoint;
 
         if (objectToZoomTo === this.orbitingPoint) {
             objectToZoomTo = false;
@@ -162,15 +165,17 @@ class Camera
             this.position
                 .add_(App.getTrajectory(this.orbitingPoint).getPositionByEpoch(this.lastEpoch, RF_BASE))
                 .sub_(App.getTrajectory(objectToZoomTo).getPositionByEpoch(this.lastEpoch, RF_BASE));
+            zoomingTo = objectToZoomTo;
         } else {
             this.zoomingAside = 0;
         }
 
-        this.position.scale(
-            event.deltaY < 0
-                ? 1 / factor
-                : factor
-        );
+        if (BODIES[zoomingTo] && BODIES[zoomingTo].physicalModel.radius) {
+            const currentMag = this.position.magnitude();
+            this.position.scale((BODIES[zoomingTo].physicalModel.radius + (currentMag - BODIES[zoomingTo].physicalModel.radius) * factor) / currentMag);
+        } else {
+            this.position.scale(factor);
+        }
 
         if (objectToZoomTo !== false) {
             this.position
