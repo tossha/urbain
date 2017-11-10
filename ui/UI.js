@@ -78,17 +78,17 @@ class UI
     }
 
     updateTime(date) {
-        let string = date.toLocaleString('ru', {
+        let string = date.toLocaleString([], {
             day: "2-digit",
             month: "2-digit",
             year: "numeric"
         });
 
-        string += " " + date.toLocaleString('ru', {
+        string += " " + date.toLocaleString([], {
             hour: "numeric"
         }).padStart(2, '0');
 
-        string += ":" + date.toLocaleString('ru', {
+        string += ":" + date.toLocaleString([], {
             second: "2-digit",
             minute: "2-digit"
         });
