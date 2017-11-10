@@ -38,7 +38,7 @@ class UI
 
     handleTimeScaleChange() {
         const val = +$('#timeScaleSlider').val();
-        const rate = Math.sign(val) * Math.pow(2592000, Math.abs(val));
+        const rate = Math.sign(val) * Math.pow(984362.83, 1.2 * Math.abs(val));
         // settings.timeScale = 0.001 * Math.sign(val) * Math.pow(2592000, Math.abs(val));
         // settings.timeScale = val;
         $('#timeScaleValue').html(time.formatRate(rate, 2));
@@ -78,7 +78,22 @@ class UI
     }
 
     updateTime(date) {
-        $('#currentDateValue').html(date.toLocaleString('ru'));
+        let string = date.toLocaleString([], {
+            day: "2-digit",
+            month: "2-digit",
+            year: "numeric"
+        });
+
+        string += " " + date.toLocaleString([], {
+            hour: "numeric"
+        }).padStart(2, '0');
+
+        string += ":" + date.toLocaleString([], {
+            second: "2-digit",
+            minute: "2-digit"
+        });
+
+        $('#currentDateValue').html(string);
     }
 
     updateCartesian(selectedObject) {

@@ -293,7 +293,11 @@ class TimeLine
             return prefix + (abs / 86400).toPrecision(precision) + ' days/s';
         }
 
-        return prefix + '1 month/s';
+        if (abs < 31557600) {
+            return prefix + (abs / 2592000).toPrecision(precision) + ' months/s';
+        }
+
+        return prefix + (abs / 31557600).toPrecision(precision) + ' years/s';
     }
 
     onMouseDown(e) {
