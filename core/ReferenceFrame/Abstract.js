@@ -8,6 +8,10 @@ class ReferenceFrameAbstract
         return new Vector(3);
     }
 
+    getOriginStateByEpoch(epoch) {
+        return new StateVector();
+    }
+
     transformStateVectorByEpoch(epoch, state, destinationFrame) {
         if (this === destinationFrame) {
             return state;

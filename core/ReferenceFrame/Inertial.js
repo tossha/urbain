@@ -7,6 +7,6 @@ class ReferenceFrameInertial extends ReferenceFrameInertialAbstract
     }
 
     getQuaternionByEpoch(epoch) {
-        return this.quaternion;
+        return Quaternion.copy(this.quaternion);
     }
 }

@@ -11,6 +11,13 @@ function rad2deg(radians) {
     return radians * 180 / Math.PI;
 }
 
+function getAngleBySinCos(sin, cos) {
+    const ang = Math.acos(cos);
+    return (sin > 0)
+        ? ang
+        : (2 * Math.PI - ang);
+}
+
 function approximateAngle(ang1, ang2, proportion) {
     ang1 = ((ang1 % TWO_PI) + TWO_PI) % TWO_PI;
     ang2 = ((ang2 % TWO_PI) + TWO_PI) % TWO_PI;

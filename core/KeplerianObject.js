@@ -148,11 +148,8 @@ class KeplerianObject
         const sin = Math.sin(ta);
         const cosE = (this._e + cos) / (1 + this._e * cos);
         const sinE = Math.sqrt(1 - this._e * this._e) * sin / (1 + this._e * cos);
-        const ang = Math.acos(cosE);
 
-        return (sinE > 0)
-            ? ang
-            : (2 * Math.PI - ang);
+        return getAngleBySinCos(sinE, cosE);
     }
 
     getTrueAnomalyByMeanAnomaly(ma) {
@@ -164,6 +161,11 @@ class KeplerianObject
     getTrueAnomalyByEccentricAnomaly(ea) {
         const phi = Math.atan2(Math.sqrt(1.0 - this._e * this._e) * Math.sin(ea), Math.cos(ea) - this._e);
         return (phi > 0) ? phi : (phi + 2 * Math.PI);
+    }
+
+    getEllipseCoordsByTrueAnomaly(ta) {
+        const r = this._sma * (1.0 - this._e * this._e) / (1 + this._e * Math.cos(ta));
+        return new Vector([r * Math.cos(ta), r * Math.sin(ta), 0]);
     }
 
     /**
@@ -193,6 +195,24 @@ class KeplerianObject
         );
     }
 
+    getNormalVector() {
+        const nodeQuaternion = new Quaternion(new Vector([0, 0, 1]), this._raan);
+        const normalQuaternion = new Quaternion(nodeQuaternion.rotate(new Vector([1, 0, 0])), this._inc);
+
+        return normalQuaternion.rotate(new Vector([0, 0, 1]));
+    }
+
+    getOrbitalFrameQuaternion() {
+        return (new Quaternion(new Vector([0, 0, 1]), this._raan))
+            .mul(new Quaternion(new Vector([1, 0, 0]), this._inc))
+            .mul(new Quaternion(new Vector([0, 0, 1]), this._aop))
+        ;
+    }
+
+    getPeriapsisVector() {
+        return this.getOrbitalFrameQuaternion().rotate(new Vector([1, 0, 0]));
+
+    }
 
     /**
      *  @see http://microsat.sm.bmstu.ru/e-library/Ballistics/kepler.pdf
