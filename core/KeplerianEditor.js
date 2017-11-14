@@ -15,10 +15,15 @@ class KeplerianEditor
 
     initAngles(event) {
         const keplerianObject = this.trajectory.getKeplerianObjectByEpoch(event.detail.epoch);
+        let that = this;
+        const originPosition = new FunctionOfEpochCustom((epoch) => {
+            return that.trajectory.referenceFrame.getOriginPositionByEpoch(epoch)
+        });
+
         this.calculateAdditionalParameters(keplerianObject);
 
         this.raanAngle = new HelperAngle(
-            new FunctionOfEpochObjectPosition(this.trajectory.referenceFrame.origin, RF_BASE),
+            originPosition,
             this.trajectory.referenceFrame
                 .getQuaternionByEpoch(event.detail.epoch)
                 .rotate(new Vector([1, 0, 0])),
@@ -32,7 +37,7 @@ class KeplerianEditor
         );
 
         this.aopAngle = new HelperAngle(
-            new FunctionOfEpochObjectPosition(this.trajectory.referenceFrame.origin, RF_BASE),
+            originPosition,
             this.node,
             this.normal,
             keplerianObject.aop,
@@ -42,7 +47,7 @@ class KeplerianEditor
         );
 
         this.incAngle = new HelperAngle(
-            new FunctionOfEpochObjectPosition(this.trajectory.referenceFrame.origin, RF_BASE),
+            originPosition,
             this.nodePerp,
             this.node,
             keplerianObject.inc,
@@ -52,7 +57,7 @@ class KeplerianEditor
         );
 
         this.taAngle = new HelperAngle(
-            new FunctionOfEpochObjectPosition(this.trajectory.referenceFrame.origin, RF_BASE),
+            originPosition,
             this.periapsis,
             this.normal,
             keplerianObject.ta,

@@ -9,6 +9,10 @@ class ReferenceFrameInertialAbstract extends ReferenceFrameAbstract
         return this.stateOfEpoch.evaluate(epoch).position;
     }
 
+    getOriginStateByEpoch(epoch) {
+        return this.stateOfEpoch.evaluate(epoch);
+    }
+
     stateVectorFromBaseReferenceFrameByEpoch(epoch, state) {
         const originState = this.stateOfEpoch.evaluate(epoch);
         const rotation = this.getQuaternionByEpoch(epoch).invert();

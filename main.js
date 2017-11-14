@@ -9,7 +9,7 @@ function init() {
     axisHelper = new THREE.AxisHelper(100000000);
     scene.add(axisHelper);
 
-    renderer = new THREE.WebGLRenderer();
+    renderer = new THREE.WebGLRenderer({antialias: true});
     renderer.setSize(window.innerWidth, window.innerHeight);
 
     rendererEvents = new EventHandler(renderer.domElement);
