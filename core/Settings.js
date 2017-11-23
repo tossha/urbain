@@ -10,12 +10,15 @@ class Settings
             autoPlace: false,
             width: 350
         });
-
+        
         this.showStatistics = false;
         this.guiAddTrajectory.add(this, 'showStatistics').onChange(value => {
             statistics.dom.style.display = value ? "" : "none";
         });
+        
+        this.showAnglesOfSelectedOrbit = true;
 
+        
         this.baseTrajectorySettings = {
             sma  : 120000000,
             e    : 0,

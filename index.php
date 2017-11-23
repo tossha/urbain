@@ -79,7 +79,18 @@ $scripts = array_map('addTime', $scripts);
                 Keplerian
             </td>
         </tr>
-
+        <tr>
+            <td colspan="3">
+                <label for="showAnglesOfSelectedOrbit">Show angles of selected orbit</label>
+            </td>
+            <td></td>
+            <td>
+                <input type="checkbox" id="showAnglesOfSelectedOrbit" checked>
+            </td>
+        </tr>
+        
+        
+        
         <?php foreach ([
                            ['Ecc', ''],
                            ['SMA', 'km'],
