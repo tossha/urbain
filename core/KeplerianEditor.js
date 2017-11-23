@@ -3,16 +3,18 @@ class KeplerianEditor
     constructor(trajectory, isEditMode) {
         this.isEditMode = isEditMode;
         this.trajectory = trajectory;
-
-        this.initAnglesListener = this.initAngles.bind(this);
-        document.addEventListener('vr_render', this.initAnglesListener);
-
+        if (settings.showAnglesOfSelectedOrbit) {
+            this.init();
+        }
         this.raanAngleColor = 0x7FFFD4; //lightblue
         this.aopAngleColor  = 0x9966CC; //violet
         this.incAngleColor  = 0xB00000; //red
         this.taAngleColor   = 0xFC0FC0; //pink
     }
-
+    init() {
+        this.initAnglesListener = this.initAngles.bind(this);
+        document.addEventListener('vr_render', this.initAnglesListener);
+    }
     initAngles(event) {
         const keplerianObject = this.trajectory.getKeplerianObjectByEpoch(event.detail.epoch);
         let that = this;
@@ -97,10 +99,10 @@ class KeplerianEditor
     }
 
     remove() {
-        this.raanAngle.remove();
-        this.aopAngle.remove();
-        this.incAngle.remove();
-        this.taAngle.remove();
+        if (this.raanAngle) this.raanAngle.remove();
+        if (this.aopAngle)  this.aopAngle.remove();
+        if (this.incAngle)  this.incAngle.remove();
+        if (this.taAngle)   this.taAngle.remove();
 
         document.removeEventListener('vr_render', this.updateAnglesListener);
     }
