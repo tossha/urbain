@@ -7,12 +7,12 @@ class UI
         $('#pauseButton').on('click', this.togglePause.bind(this));
 
         this.renderHandler = this.handleRender.bind(this);
-        document.addEventListener('vr_select', this.handleSelect.bind(this));
-        document.addEventListener('vr_deselect', this.handleDeselect.bind(this));
+        document.addEventListener(Events.SELECT, this.handleSelect.bind(this));
+        document.addEventListener(Events.DESELECT, this.handleDeselect.bind(this));
 
         let selections = '';
         for (const id in objectsForTracking) {
-            selections += `<option value="${objectsForTracking[id]}">${id}</option>`;
+            selections += '<option value="' + id + '">' + objectsForTracking[id] + '</option>';
         }
 
         $('#showAnglesOfSelectedOrbit').on('change', function() {
@@ -30,7 +30,7 @@ class UI
         dropdownList
             .html(selections)
             .on('change', () => camera.setOrbitingPoint(dropdownList.val(), true))
-            .val(EARTH);
+            .val(settings.trackingObject);
 
         this.handleTimeScaleChange();
         this.handleDeselect();
@@ -69,19 +69,19 @@ class UI
     handleSelect() {
         $('#metricsPanel').show();
 
-        const data = SSDATA[selection.getSelectedObject().id];
-        if (data) {
-            $('#relativeTo').html(SSDATA[data.parent].name);
-            $('#metricsOf').html(data.name);
+        const object = selection.getSelectedObject().object;
+        if (object) {
+            // $('#relativeTo').html(object.trajectory.referenceFrame.name);
+            $('#metricsOf').html(object.name);
         } else {
             $('#relativeTo,#metricsOf').html('');
         }
-        document.addEventListener('vr_render', this.renderHandler);
+        document.addEventListener(Events.RENDER, this.renderHandler);
     }
 
     handleDeselect() {
         $('#metricsPanel').hide();
-        document.removeEventListener('vr_render', this.renderHandler);
+        document.removeEventListener(Events.RENDER, this.renderHandler);
     }
 
     updateTarget(value) {
@@ -89,21 +89,12 @@ class UI
     }
 
     updateTime(date) {
-        let string = date.toLocaleString([], {
-            day: "2-digit",
-            month: "2-digit",
-            year: "numeric"
-        });
-
-        string += " " + date.toLocaleString([], {
-            hour: "numeric"
-        }).padStart(2, '0');
-
-        string += ":" + date.toLocaleString([], {
-            second: "2-digit",
-            minute: "2-digit"
-        });
-
+        let string = date.getYear() + 1900;
+        string += '-' + (date.getMonth() + 1);
+        string += '-' + date.getDate();
+        string += ' ' + (date.getHours() + '').padStart(2, '0');
+        string += ':' + (date.getMinutes() + '').padStart(2, '0');
+        string += ':' + (date.getSeconds() + '').padStart(2, '0');
         $('#currentDateValue').html(string);
     }
 
@@ -116,7 +107,7 @@ class UI
     updateKeplerian(selectedObject) {
         const keplerianObject = selectedObject.getKeplerianObjectByEpoch(time.epoch);
         $('#eccValue' ).html('' +        ( keplerianObject.e   ).toPrecision(this.precision));
-        $('#smaValue' ).html('' + presentNumberWithPrefix(keplerianObject.sma));
+        $('#smaValue' ).html('' + presentNumberWithSuffix(keplerianObject.sma));
         $('#incValue' ).html('' + rad2deg( keplerianObject.inc ).toPrecision(this.precision));
         $('#aopValue' ).html('' + rad2deg( keplerianObject.aop ).toPrecision(this.precision));
         $('#raanValue').html('' + rad2deg( keplerianObject.raan).toPrecision(this.precision));
@@ -125,10 +116,10 @@ class UI
 
     updateVector(state, vec) {
         const stateGroup = state[vec];
-        $(`#${vec}Mag`).html(presentNumberWithPrefix(stateGroup.mag));
-        $(`#${vec}X`  ).html(presentNumberWithPrefix(stateGroup.x));
-        $(`#${vec}Y`  ).html(presentNumberWithPrefix(stateGroup.y));
-        $(`#${vec}Z`  ).html(presentNumberWithPrefix(stateGroup.z));
+        $(`#${vec}Mag`).html(presentNumberWithSuffix(stateGroup.mag));
+        $(`#${vec}X`  ).html(presentNumberWithSuffix(stateGroup.x));
+        $(`#${vec}Y`  ).html(presentNumberWithSuffix(stateGroup.y));
+        $(`#${vec}Z`  ).html(presentNumberWithSuffix(stateGroup.z));
     }
 
     useRealTimeScale() {

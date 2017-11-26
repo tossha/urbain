@@ -11,10 +11,12 @@ class KeplerianEditor
         this.incAngleColor  = 0xB00000; //red
         this.taAngleColor   = 0xFC0FC0; //pink
     }
+
     init() {
         this.initAnglesListener = this.initAngles.bind(this);
-        document.addEventListener('vr_render', this.initAnglesListener);
+        document.addEventListener(Events.RENDER, this.initAnglesListener);
     }
+
     initAngles(event) {
         const keplerianObject = this.trajectory.getKeplerianObjectByEpoch(event.detail.epoch);
         let that = this;
@@ -68,9 +70,9 @@ class KeplerianEditor
             true
         );
 
-        document.removeEventListener('vr_render', this.initAnglesListener);
+        document.removeEventListener(Events.RENDER, this.initAnglesListener);
         this.updateAnglesListener = this.updateAngles.bind(this);
-        document.addEventListener('vr_render', this.updateAnglesListener);
+        document.addEventListener(Events.RENDER, this.updateAnglesListener);
     }
 
     updateAngles(event) {
@@ -104,7 +106,7 @@ class KeplerianEditor
         if (this.incAngle)  this.incAngle.remove();
         if (this.taAngle)   this.taAngle.remove();
 
-        document.removeEventListener('vr_render', this.updateAnglesListener);
+        document.removeEventListener(Events.RENDER, this.updateAnglesListener);
     }
 
     calculateAdditionalParameters(keplerianObject) {

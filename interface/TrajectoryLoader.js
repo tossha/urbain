@@ -1,55 +1,83 @@
 class TrajectoryLoader
 {
-    static create(data) {
-        let type = data.trajectory_type;
-
-        if (type === 'keplerian_array') {
-            if (data.trajectory.length !== 1) {
-                return this.createKeplerianArray(data);
-            }
-            type = 'keplerian';
-            data.trajectory = data.trajectory[0];
-        }
+    static create(starSystem, config) {
+        let type = config.type;
 
         if (type === 'keplerian') {
-            return this.createKeplerian(data);
+            return this.createKeplerian(starSystem, config);
+        }
+
+        if (type === 'keplerian_precessing') {
+            return this.createKeplerianPrecessing(starSystem, config);
+        }
+
+        if (type === 'keplerian_array') {
+            return this.createKeplerianArray(starSystem, config);
+        }
+
+        if (type === 'keplerian_precessing_array') {
+            return this.createKeplerianPrecessingArray(starSystem, config);
         }
     }
 
-    static createKeplerianArray(data) {
+    static createKeplerianArray(starSystem, config) {
         let traj = new TrajectoryKeplerianArray(
-            this.createFrame(data.parent),
-            data.color
+            starSystem,
+            config.data.referenceFrame,
+            config.color
         );
 
-        for (const i in data.trajectory) {
-            traj.addState(this.createKeplerianObject(data.trajectory[i]));
+        for (const entry of config.data.elementsArray) {
+            traj.addState(this.createKeplerianObject(entry));
         }
         return traj;
     }
 
-    static createKeplerian(data) {
+    static createKeplerianPrecessingArray(starSystem, config) {
+        let traj = new TrajectoryKeplerianPrecessingArray(
+            starSystem,
+            config.data.referenceFrame,
+            config.data.radius,
+            config.data.j2,
+            config.color
+        );
+
+        for (const entry of config.data.elementsArray) {
+            traj.addState(this.createKeplerianObject(entry));
+        }
+        return traj;
+    }
+
+    static createKeplerian(starSystem, config) {
         return new TrajectoryKeplerianBasic(
-            this.createFrame(data.parent),
-            this.createKeplerianObject(data.trajectory),
-            data.color
+            starSystem,
+            config.data.referenceFrame,
+            this.createKeplerianObject(config.data.elements),
+            config.color
         );
     }
 
-    static createFrame(origin) {
-        return ReferenceFrame.getInertialEcliptic(origin);
+    static createKeplerianPrecessing(starSystem, config) {
+        return new TrajectoryKeplerianPrecessing(
+            starSystem,
+            config.data.referenceFrame,
+            this.createKeplerianObject(config.data.elements),
+            config.data.radius,
+            config.data.j2,
+            config.color
+        );
     }
 
-    static createKeplerianObject(data) {
+    static createKeplerianObject(elements) {
         return new KeplerianObject(
-            data[0], // ecc
-            data[1] / (1 - data[0]), // sma = Rper / (1 - ecc)
-            data[2], // aop
-            data[3], // inc
-            data[4], // raan
-            data[5], // mean anomaly
-            data[6], // epoch
-            data[7], // mu
+            elements[0], // ecc
+            elements[1] / (1 - elements[0]), // sma = Rper / (1 - ecc)
+            elements[2], // aop
+            elements[3], // inc
+            elements[4], // raan
+            elements[5], // mean anomaly
+            elements[6], // epoch
+            elements[7], // mu
             false
         );
     }

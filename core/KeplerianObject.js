@@ -18,6 +18,10 @@ class KeplerianObject
         this.updateMeanMotion();
     }
 
+    copy() {
+        return new KeplerianObject(this._e, this._sma, this._aop, this._raan, this.m0, this._epoch, this._mu, false);
+    }
+
     updateMeanMotion() {
         this.meanMotion = Math.sqrt(this._mu / this._sma) / this._sma;
     }

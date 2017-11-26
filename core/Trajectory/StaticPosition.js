@@ -1,7 +1,7 @@
 class TrajectoryStaticPosition extends TrajectoryAbstract
 {
-    constructor(referenceFrame, pos) {
-        super(referenceFrame);
+    constructor(starSystem, referenceFrameId, pos) {
+        super(starSystem, referenceFrameId);
 
         this.pos = pos;
     }

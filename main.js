@@ -1,12 +1,8 @@
 function init() {
-    let objectsForTracking = {
-        'Solar System barycenter': SOLAR_SYSTEM_BARYCENTER
-    };
-
     scene = new THREE.Scene();
     scene.add(new THREE.AmbientLight(0xFFEFD5, 0.15));
 
-    axisHelper = new THREE.AxisHelper(100000000);
+    axisHelper = new THREE.AxisHelper(1000000);
     scene.add(axisHelper);
 
     renderer = new THREE.WebGLRenderer({antialias: true});
@@ -14,7 +10,7 @@ function init() {
 
     rendererEvents = new EventHandler(renderer.domElement);
 
-    camera = new Camera(renderer.domElement, rendererEvents, EARTH, new Vector([30000, 30000, 10000]));
+    camera = new Camera(renderer.domElement, rendererEvents, starSystem.mainObject, new Vector([30000, 30000, 10000]));
 
     document.getElementById('viewport').appendChild(renderer.domElement);
 
@@ -24,48 +20,45 @@ function init() {
 
     raycaster = new VisualRaycaster(camera.threeCamera, 7);
 
-    selection = new SelectionHandler(raycaster);
-
-    for (const objId in SSDATA) {
-        objectsForTracking[SSDATA[objId].name] = objId;
-    }
+    selection = new SelectionHandler(scene, raycaster);
 
     settings = new Settings({
         timeLinePos:        TimeLine.getEpochByDate(new Date()),
         timeScale:          0.001,
         isTimeRunning:      true,
-        trackingObject:     EARTH,
-        objectsForTracking: objectsForTracking,
+        trackingObject:     starSystem.mainObject,
     });
 
     time = new TimeLine(settings);
 
-    ui = new UI(5, objectsForTracking);
+    ui = new UI(5, starSystem.getObjectNames());
 
     statistics = new Stats();
     document.body.appendChild(statistics.dom);
     statistics.dom.style.display = "none";
 
-    document.addEventListener('vr_select', function() {
+    document.addEventListener(Events.SELECT, function() {
         event.detail.trajectory.keplerianEditor = new KeplerianEditor(event.detail.trajectory, false)
     });
 
-    document.addEventListener('vr_deselect', function() {
+    document.addEventListener(Events.DESELECT, function() {
         event.detail.trajectory.keplerianEditor.remove();
     });
+
+    document.dispatchEvent(new CustomEvent(
+        Events.SCENE_READY,
+        {detail: {scene: scene}}
+    ));
 }
 
 function initBuiltIn() {
-    ObjectLoader.loadFromCnfig(SSDATA);
-
-    stars = new VisualStarsModel(STARDATA);
-
     for (const id in TLEDATA) {
         const tle = new TLE(TLEDATA[id].lines);
         const objId = parseInt(id);
 
-        App.setTrajectory(objId, new TrajectoryKeplerianPrecessing(
-            ReferenceFrame.getInertialBodyEquatorial(EARTH),
+        starSystem.addTrajectory(objId, new TrajectoryKeplerianPrecessing(
+            starSystem,
+            RF_EARTH_EQUATORIAL_INERTIAL,
             new KeplerianObject(
                 tle.getE(),
                 tle.getSma(),
@@ -74,10 +67,10 @@ function initBuiltIn() {
                 tle.getRaan(),
                 tle.getMeanAnomaly(),
                 tle.getEpoch(),
-                BODIES[EARTH].physicalModel.mu,
+                starSystem.getObject(EARTH).physicalModel.mu,
                 false
             ),
-            BODIES[EARTH].physicalModel.radius,
+            starSystem.getObject(EARTH).physicalModel.radius,
             0.00108263,
             TLEDATA[id].color ? TLEDATA[id].color : 'azure'
         ));
@@ -98,16 +91,12 @@ function render(curTime) {
 
     camera.update(time.epoch);
 
-    for (const bodyIdx in BODIES) {
-        BODIES[bodyIdx].render(time.epoch);
-    }
-
-    if (lastTrajectory = App.getTrajectory(lastTrajectoryId)) {
+    if (lastTrajectory = starSystem.getTrajectory(lastTrajectoryId)) {
         lastTrajectory.epoch = time.epoch;
     }
 
     document.dispatchEvent(new CustomEvent(
-        'vr_render',
+        Events.RENDER,
         {detail: {epoch: time.epoch}}
     ));
 
@@ -127,7 +116,6 @@ var camera, scene, renderer, axisHelper, raycaster;
 var settings, time, globalTime;
 var textureLoader;
 var lastTrajectoryId = -1;
-var stars;
 var trajArray = [];
 var selection;
 var statistics;

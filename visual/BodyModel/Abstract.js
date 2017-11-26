@@ -1,15 +1,14 @@
-class VisualBodyModelAbstract
+class VisualBodyModelAbstract extends VisualModelAbstract
 {
     constructor(shape, color) {
+        super();
+
         this.shape = shape;   // class VisualShapeAbstract
         this.color = color;
         this.body = null; // class Body
 
         this.threeObj = this.getThreeObj();
-        this.axisHelper = new THREE.AxisHelper(shape.radius * 2);
-
-        scene.add(this.threeObj);
-        scene.add(this.axisHelper);
+        this.threeObj.add(new THREE.AxisHelper(shape.radius * 2));
     }
 
     getThreeObj() {
@@ -23,12 +22,10 @@ class VisualBodyModelAbstract
         return new THREE.MeshStandardMaterial(parameters);
     }
 
-    render(epoch, pos) {
-        this.threeObj.position.fromArray(pos.sub(camera.lastPosition));
+    render(epoch) {
+        this.threeObj.position.fromArray(this.body.getPositionByEpoch(epoch).sub(camera.lastPosition));
         this.threeObj.quaternion.copy(
             this.body.orientation.getQuaternionByEpoch(epoch).toThreejs()
         );
-        this.axisHelper.position.copy(this.threeObj.position);
-        this.axisHelper.quaternion.copy(this.threeObj.quaternion);
     }
 }

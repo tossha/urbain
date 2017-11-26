@@ -220,54 +220,39 @@ class TimeLine
         return d;
     }
 
-    formatDate(d) {
-        let formatOptions;
+    formatDate(date) {
         if ((this.scaleType === "minute")
             || (this.scaleType === "fiveMinutes")
             || (this.scaleType === "tenMinutes")
             || (this.scaleType === "thirtyMinutes")
-        ) {
-            formatOptions = {
-                minute: "2-digit",
-                hour: "2-digit",
-                day: "2-digit",
-                month: "2-digit",
-                year: "numeric"
-            };
-        } else if ((this.scaleType === "hour")
+            || (this.scaleType === "hour")
             || (this.scaleType === "threeHours")
             || (this.scaleType === "sixHours")
         ) {
-            formatOptions = {
-                minute: "2-digit",
-                hour: "2-digit",
-                day: "2-digit",
-                month: "2-digit",
-                year: "numeric"
-            };
+            let string = date.getYear() + 1900;
+            string += '-' + ((date.getMonth() + 1) + '').padStart(2, '0');
+            string += '-' + (date.getDate() + '').padStart(2, '0');
+            string += ' ' + (date.getHours() + '').padStart(2, '0');
+            string += ':' + (date.getMinutes() + '').padStart(2, '0');
+            return string;
         } else if ((this.scaleType === "day")
             || (this.scaleType === "week")
         ) {
-            formatOptions = {
-                day: "2-digit",
-                month: "2-digit",
-                year: "numeric"
-            };
+            let string = date.getYear() + 1900;
+            string += '-' + ((date.getMonth() + 1) + '').padStart(2, '0');
+            string += '-' + (date.getDate() + '').padStart(2, '0');
+            return string;
         } else if ((this.scaleType === "month")
             || (this.scaleType === "threeMonths")
         ) {
-            formatOptions = {
-                month: "long",
-                year: "numeric"
-            };
+            const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+            return months[date.getMonth()] + ' ' + (date.getYear() + 1900);
         } else if ((this.scaleType === "year")
             || (this.scaleType === "fiveYears")
         ) {
-            formatOptions = {
-                year: "numeric"
-            };
+            return (date.getYear() + 1900) + '';
         }
-        return d.toLocaleString('ru', formatOptions);
+        return date.toString();
     }
 
     formatRate(rate, precision) {

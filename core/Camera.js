@@ -7,6 +7,7 @@ class Camera
         this.orbitingPoint = initialOrbitingPoint;
 
         this.position = initialPosition;
+        this.referenceFrame = starSystem.getReferenceFrame(RF_BASE);
 
         this.currentMousePos = new Vector([0, 0]);
         this.accountedMousePos = new Vector([0, 0]);
@@ -37,10 +38,10 @@ class Camera
     }
 
     getPoleVector() {
-        if (BODIES[this.orbitingPoint] === undefined) {
-            return new Vector([0, 0, 1]);
+        if (starSystem.getObject(this.orbitingPoint) instanceof Body) {
+            return starSystem.getObject(this.orbitingPoint).orientation.getQuaternionByEpoch(this.lastEpoch).rotate_(new Vector([0, 0, 1]));
         } else {
-            return BODIES[this.orbitingPoint].orientation.getQuaternionByEpoch(this.lastEpoch).rotate_(new Vector([0, 0, 1]));
+            return new Vector([0, 0, 1]);
         }
     }
 
@@ -73,8 +74,8 @@ class Camera
 
     setOrbitingPoint(pointId, animate) {
         this.position
-            .add_(App.getTrajectory(this.orbitingPoint).getPositionByEpoch(this.lastEpoch, RF_BASE))
-            .sub_(App.getTrajectory(pointId).getPositionByEpoch(this.lastEpoch, RF_BASE));
+            .add_(starSystem.getTrajectory(this.orbitingPoint).getPositionByEpoch(this.lastEpoch, RF_BASE))
+            .sub_(starSystem.getTrajectory(pointId).getPositionByEpoch(this.lastEpoch, RF_BASE));
         this.orbitingPoint = pointId;
         this.isLookingAside = false;
         this.zoomingAside = 0;
@@ -95,8 +96,8 @@ class Camera
     startAnimation() {
         this.animationStartingTime = (new Date()).getTime();
         this.animationDuration = this.settings.animationDuration;
-        this.animationStartingPole = Vector.copy(this.pole);
-        this.animationStartingQuaternion = Quaternion.copy(this.quaternion);
+        this.animationStartingPole = this.pole.copy();
+        this.animationStartingQuaternion = this.quaternion.copy();
         this.isAnimnating = true;
     }
 
@@ -122,24 +123,24 @@ class Camera
     }
 
     getOrbitingPointPosition(epoch) {
-        return App.getTrajectory(this.orbitingPoint).getPositionByEpoch(epoch, RF_BASE);
+        return starSystem.getTrajectory(this.orbitingPoint).getPositionByEpoch(epoch, RF_BASE);
     }
 
     findObjectUnderMouse() {
         let biggestRadius = 0;
         let biggestObject = false;
-        for (let bodyIdx in BODIES) {
+        for (const body of starSystem.getBodies()) {
             const dist = raycaster.getPixelDistance(
-                BODIES[bodyIdx].getPositionByEpoch(this.lastEpoch, RF_BASE)
+                body.getPositionByEpoch(this.lastEpoch, RF_BASE)
             );
             if (dist < this.settings.pixelsToObjectUnderMouse) {
                 if (biggestObject === false) {
-                    biggestObject = bodyIdx;
+                    biggestObject = body.id;
                 }
-                const r = BODIES[bodyIdx].physicalModel.radius;
+                const r = body.physicalModel.radius;
                 if (r && r > biggestRadius) {
                     biggestRadius = r;
-                    biggestObject = bodyIdx;
+                    biggestObject = body.id;
                 }
             }
         }
@@ -163,24 +164,24 @@ class Camera
 
         if (objectToZoomTo !== false) {
             this.position
-                .add_(App.getTrajectory(this.orbitingPoint).getPositionByEpoch(this.lastEpoch, RF_BASE))
-                .sub_(App.getTrajectory(objectToZoomTo).getPositionByEpoch(this.lastEpoch, RF_BASE));
+                .add_(starSystem.getTrajectory(this.orbitingPoint).getPositionByEpoch(this.lastEpoch, RF_BASE))
+                .sub_(starSystem.getTrajectory(objectToZoomTo).getPositionByEpoch(this.lastEpoch, RF_BASE));
             zoomingTo = objectToZoomTo;
         } else {
             this.zoomingAside = 0;
         }
 
-        if (BODIES[zoomingTo] && BODIES[zoomingTo].physicalModel.radius) {
-            const currentMag = this.position.magnitude();
-            this.position.scale((BODIES[zoomingTo].physicalModel.radius + (currentMag - BODIES[zoomingTo].physicalModel.radius) * factor) / currentMag);
+        if (starSystem.getObject(zoomingTo).physicalModel && starSystem.getObject(zoomingTo).physicalModel.radius) {
+            const currentMag = this.position.mag;
+            this.position.mul_((starSystem.getObject(zoomingTo).physicalModel.radius + (currentMag - starSystem.getObject(zoomingTo).physicalModel.radius) * factor) / currentMag);
         } else {
-            this.position.scale(factor);
+            this.position.mul_(factor);
         }
 
         if (objectToZoomTo !== false) {
             this.position
-                .add_(App.getTrajectory(objectToZoomTo).getPositionByEpoch(this.lastEpoch, RF_BASE))
-                .sub_(App.getTrajectory(this.orbitingPoint).getPositionByEpoch(this.lastEpoch, RF_BASE));
+                .add_(starSystem.getTrajectory(objectToZoomTo).getPositionByEpoch(this.lastEpoch, RF_BASE))
+                .sub_(starSystem.getTrajectory(this.orbitingPoint).getPositionByEpoch(this.lastEpoch, RF_BASE));
             this.isLookingAside = true;
             this.zoomingAside++;
 
@@ -195,7 +196,7 @@ class Camera
 
     onMouseDown(event) {
         this.accountedMousePos = new Vector([event.clientX, event.clientY]);
-        this.currentMousePos = Vector.copy(this.accountedMousePos);
+        this.currentMousePos = this.accountedMousePos.copy();
         this.isMouseDown = true;
         switch (event.button) {
             case 0: //left
@@ -250,7 +251,7 @@ class Camera
             }
             this.quaternion = mainQuaternion.mul(this.quaternion);
 
-            this.accountedMousePos = Vector.copy(this.currentMousePos);
+            this.accountedMousePos = this.currentMousePos.copy();
         }
         this.threeCamera.quaternion.copy(this.quaternion.toThreejs());
         this.lastPosition = this.getOrbitingPointPosition(epoch).add_(this.position);

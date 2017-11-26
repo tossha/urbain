@@ -4,14 +4,15 @@ class ReferenceFrameBodyFixed extends ReferenceFrameAbstract
         super();
         this.origin = origin;
         this.isInertial = isInertial;
+        this.body = starSystem.getObject(this.origin);
     }
 
     getQuaternionByEpoch(epoch) {
-        return BODIES[this.origin].orientation.getQuaternionByEpoch(epoch);
+        return this.body.orientation.getQuaternionByEpoch(epoch);
     }
 
     getOriginStateByEpoch(epoch) {
-        return App.getTrajectory(this.origin).getStateByEpoch(epoch, RF_BASE);
+        return starSystem.getTrajectory(this.origin).getStateByEpoch(epoch, RF_BASE);
     }
 
     getOriginPositionByEpoch(epoch) {
@@ -19,7 +20,7 @@ class ReferenceFrameBodyFixed extends ReferenceFrameAbstract
     }
 
     getRotationVelocityByEpoch(epoch) {
-        return new Vector([0, 0, BODIES[this.origin].orientation.angularVel]);
+        return new Vector([0, 0, this.body.orientation.angularVel]);
     }
 
     stateVectorFromBaseReferenceFrameByEpoch(epoch, state) {

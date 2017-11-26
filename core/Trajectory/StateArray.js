@@ -1,7 +1,7 @@
 class TrajectoryStateArray extends TrajectoryAbstract
 {
-    constructor(referenceFrame, color) {
-        super(referenceFrame);
+    constructor(starSystem, referenceFrameId, color) {
+        super(starSystem, referenceFrameId);
 
         this.states = []; // array of {epoch: epoch, state: class StateVector}
         this.minEpoch = null;

@@ -2,8 +2,8 @@ class TrajectoryKeplerianAbstract extends TrajectoryAbstract
 {
     getKeplerianObjectByEpoch(epoch) {}
 
-    constructor(referenceFrame, color) {
-        super(referenceFrame);
+    constructor(starSystem, referenceFrameId, color) {
+        super(starSystem, referenceFrameId);
 
         let that = this;
         this.orbitalReferenceFrame = new ReferenceFrameInertialDynamic(
@@ -15,7 +15,7 @@ class TrajectoryKeplerianAbstract extends TrajectoryAbstract
                     that.getKeplerianObjectByEpoch(epoch).getOrbitalFrameQuaternion()
                 );
             })
-        );
+        ).setStarSystem(starSystem);
 
         if (color) {
             this.visualModel = new VisualTrajectoryModelKeplerian(this, color);

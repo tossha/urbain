@@ -1,25 +1,28 @@
 class TrajectoryAbstract
 {
-    constructor(referenceFrame) {
-        let that = this;
+    constructor(starSystem, referenceFrameId) {
+        this.minEpoch = null;
+        this.maxEpoch = null;
 
         this.cachedEpoch = null;
         this.cachedState = null;
 
-        this.referenceFrame = referenceFrame || null; // class ReferenceFrameAbstract
-        document.addEventListener('vr_render', function (event) {
-            that.render(event.detail.epoch);
-        });
+        this.visualModel = null;
+        this.object = null;
+
+        this.starSystem = starSystem;
+        this.referenceFrameId = referenceFrameId;
+        this.referenceFrame = starSystem.getReferenceFrame(referenceFrameId);
+    }
+
+    setObject(object) {
+        this.object = object;
     }
 
     drop() {
         if (this.visualModel) {
             this.visualModel.drop();
         }
-    }
-
-    setId(id) {
-        this.id = id;
     }
 
     set isSelected(newValue) {
@@ -29,7 +32,7 @@ class TrajectoryAbstract
     }
 
     getStateInOwnFrameByEpoch(epoch) {
-        return ZERO_STATE_VECTOR;
+        return new StateVector();
     }
 
     getStateByEpoch(epoch, referenceFrame) {
@@ -40,6 +43,7 @@ class TrajectoryAbstract
             state = this.getStateInOwnFrameByEpoch(epoch);
             if (referenceFrame === RF_BASE && epoch === time.epoch) {
                 this.cachedState = state;
+                this.cachedEpoch = epoch;
             }
         }
 
@@ -52,11 +56,5 @@ class TrajectoryAbstract
 
     getVelocityByEpoch(epoch, referenceFrame) {
         return this.getStateByEpoch(epoch, referenceFrame).velocity;
-    }
-
-    render(epoch) {
-        if (this.visualModel) {
-            this.visualModel.render(epoch);
-        }
     }
 }

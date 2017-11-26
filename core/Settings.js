@@ -51,9 +51,9 @@ class Settings
                 that.guiAddTrajectoryElements.aop  .setValue(deg2rad(that.baseTrajectorySettings.aop ));
                 that.guiAddTrajectoryElements.ta   .setValue(deg2rad(that.baseTrajectorySettings.ta  ));
 
-                if (!App.getTrajectory(lastTrajectoryId)) {
-                    App.setTrajectory(lastTrajectoryId, new TrajectoryKeplerianBasic(
-                        ReferenceFrame.getInertialEcliptic(that.trackingObject),
+                if (!starSystem.getTrajectory(lastTrajectoryId)) {
+                    starSystem.addTrajectory(lastTrajectoryId, new TrajectoryKeplerianBasic(
+                        that.trackingObject * 1000 + 1,
                         new KeplerianObject(
                             that.trajectorySettings.e,
                             that.trajectorySettings.sma,
@@ -62,8 +62,8 @@ class Settings
                             deg2rad(that.trajectorySettings.raan),
                             deg2rad(that.trajectorySettings.ta  ),
                             time.epoch,
-                            BODIES[that.trackingObject]
-                                ? BODIES[that.trackingObject].physicalModel.mu
+                            starSystem.getObject(that.trackingObject).physicalModel
+                                ? starSystem.getObject(that.trackingObject).physicalModel.mu
                                 : 0,
                             true
                         ),
@@ -76,7 +76,7 @@ class Settings
             },
 
             saveTrajectory: function() {
-                while (App.getTrajectory(lastTrajectoryId)) {
+                while (starSystem.getTrajectory(lastTrajectoryId)) {
                     --lastTrajectoryId;
                 }
 
@@ -85,14 +85,14 @@ class Settings
             },
 
             dropLastTrajectory: function() {
-                while (!App.getTrajectory(lastTrajectoryId)
+                while (!starSystem.getTrajectory(lastTrajectoryId)
                     && (lastTrajectoryId !== -1)
                 ) {
                     ++lastTrajectoryId;
                 }
 
-                if (App.getTrajectory(lastTrajectoryId)) {
-                    App.deleteTrajectory(lastTrajectoryId);
+                if (starSystem.getTrajectory(lastTrajectoryId)) {
+                    starSystem.deleteTrajectory(lastTrajectoryId);
                 }
 
                 that.guiAddTrajectoryElements.addTrajectoryFolder.open();
@@ -105,7 +105,7 @@ class Settings
         this.guiAddTrajectoryElements.sma = this.guiAddTrajectoryElements.settingsFolder.add(
             this.trajectorySettings, 'sma', 1500000, 8000000000
         ).onChange(function(value) {
-            const trajectory = App.getTrajectory(lastTrajectoryId);
+            const trajectory = starSystem.getTrajectory(lastTrajectoryId);
             if (trajectory) {
                 trajectory.sma = value;
             }
@@ -114,7 +114,7 @@ class Settings
         this.guiAddTrajectoryElements.e = this.guiAddTrajectoryElements.settingsFolder.add(
             this.trajectorySettings, 'e', 0, 1
         ).onChange(function(value) {
-            const trajectory = App.getTrajectory(lastTrajectoryId);
+            const trajectory = starSystem.getTrajectory(lastTrajectoryId);
             if (trajectory) {
                 trajectory.e = value;
             }
@@ -123,7 +123,7 @@ class Settings
         this.guiAddTrajectoryElements.inc = this.guiAddTrajectoryElements.settingsFolder.add(
             this.trajectorySettings, 'inc', 0, 180
         ).onChange(function(value) {
-            const trajectory = App.getTrajectory(lastTrajectoryId);
+            const trajectory = starSystem.getTrajectory(lastTrajectoryId);
             if (trajectory) {
                 trajectory.inc = deg2rad(value);
             }
@@ -132,7 +132,7 @@ class Settings
         this.guiAddTrajectoryElements.raan = this.guiAddTrajectoryElements.settingsFolder.add(
             this.trajectorySettings, 'raan', 0, 360
         ).onChange(function(value) {
-            const trajectory = App.getTrajectory(lastTrajectoryId);
+            const trajectory = starSystem.getTrajectory(lastTrajectoryId);
             if (trajectory) {
                 trajectory.raan = deg2rad(value);
             }
@@ -141,7 +141,7 @@ class Settings
         this.guiAddTrajectoryElements.aop = this.guiAddTrajectoryElements.settingsFolder.add(
             this.trajectorySettings, 'aop', 0, 360
         ).onChange(function(value) {
-            const trajectory = App.getTrajectory(lastTrajectoryId);
+            const trajectory = starSystem.getTrajectory(lastTrajectoryId);
             if (trajectory) {
                 trajectory.aop = deg2rad(value);
             }
@@ -150,7 +150,7 @@ class Settings
         this.guiAddTrajectoryElements.ta = this.guiAddTrajectoryElements.settingsFolder.add(
             this.trajectorySettings, 'ta', 0, 360
         ).onChange(function(value) {
-            const trajectory = App.getTrajectory(lastTrajectoryId);
+            const trajectory = starSystem.getTrajectory(lastTrajectoryId);
             if (trajectory) {
                 trajectory.ta = deg2rad(value);
             }

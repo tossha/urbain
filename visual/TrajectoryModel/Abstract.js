@@ -1,6 +1,8 @@
-class VisualTrajectoryModelAbstract
+class VisualTrajectoryModelAbstract extends VisualModelAbstract
 {
     constructor(trajectory, color) {
+        super();
+
         this.trajectory = trajectory;
         this.standardColor = color;
         this.color = color;
@@ -11,9 +13,10 @@ class VisualTrajectoryModelAbstract
         );
 
         this.threeObj.userData = {trajectory: trajectory};
+    }
 
-        scene.add(this.threeObj);
-
+    onSceneReady() {
+        super.onSceneReady();
         trajArray.push(this.threeObj);
     }
 
@@ -28,11 +31,10 @@ class VisualTrajectoryModelAbstract
 
     drop()
     {
-        scene.remove(this.threeObj);
+        this.scene.remove(this.threeObj);
         this.threeObj.geometry.dispose();
         this.threeObj.material.dispose();
+        this.threeObj.remove();
         delete this.threeObj;
     }
-
-    render(epoch) {}
 }

@@ -1,11 +1,9 @@
 class TrajectoryKeplerianArray extends TrajectoryKeplerianAbstract
 {
-    constructor(referenceFrame, color) {
-        super(referenceFrame, color);
+    constructor(starSystem, referenceFrameId, color) {
+        super(starSystem, referenceFrameId, color);
 
         this.keplerianObjects = []; // array of class KeplerianObject
-        this.minEpoch = null;
-        this.maxEpoch = null;
         this.color = color;
     }
 

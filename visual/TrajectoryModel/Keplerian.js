@@ -6,7 +6,7 @@ class VisualTrajectoryModelKeplerian extends VisualTrajectoryModelAbstract
 
         const traj = this.trajectory.getKeplerianObjectByEpoch(epoch);
         const orbitQuaternion = this.trajectory.orbitalReferenceFrame.getQuaternionByEpoch(epoch);
-        const cameraPosition = RF_BASE.transformPositionByEpoch(epoch, camera.lastPosition, this.trajectory.orbitalReferenceFrame);
+        const cameraPosition = starSystem.getReferenceFrame(RF_BASE).transformPositionByEpoch(epoch, camera.lastPosition, this.trajectory.orbitalReferenceFrame);
         const visualOrigin = new Vector([cameraPosition.x, cameraPosition.y, 0]);
         const actualVisualOrigin = this.trajectory.orbitalReferenceFrame.transformPositionByEpoch(epoch, visualOrigin, RF_BASE);
         const ta = traj.getTrueAnomalyByEpoch(epoch);
@@ -62,17 +62,20 @@ class VisualTrajectoryModelKeplerian extends VisualTrajectoryModelAbstract
     }
 
     getEllipsePoints(curve, pointsNum, densityCenter, proportion) {
+        let nearSegmentSize = 0.25;
         if (proportion > 30) {
+            nearSegmentSize = 1 / ((Math.min(proportion, 530) - 30) / 60 + 4);
             proportion = 30;
         }
 
         let coords = [];
         let angs = [];
         const segments = pointsNum - 3;
+        const otherSegmentsSize = (1 - nearSegmentSize) / 3;
         const segmentsFar    = Math.floor(segments / (proportion + 2 * Math.sqrt(proportion) + 1));
         const segmentsMedium = Math.floor(Math.sqrt(proportion) * segmentsFar);
         const segmentsNear   = segments - segmentsFar - 2 * segmentsMedium;
-        let curPos = densityCenter - 0.125;
+        let curPos = densityCenter - nearSegmentSize / 2;
 
         if (curPos < 0) {
             curPos += 1;
@@ -80,9 +83,9 @@ class VisualTrajectoryModelKeplerian extends VisualTrajectoryModelAbstract
         coords.push(curve.getPoint(curPos));
         angs.push(curPos);
 
-        for (const partSize of [segmentsNear, segmentsMedium, segmentsFar, segmentsMedium]) {
-            for (let i = 0; i < partSize; ++i) {
-                curPos += 0.25 / partSize;
+        for (const partSize of [[segmentsNear, nearSegmentSize], [segmentsMedium, otherSegmentsSize], [segmentsFar, otherSegmentsSize], [segmentsMedium, otherSegmentsSize]]) {
+            for (let i = 0; i < partSize[0]; ++i) {
+                curPos += partSize[1] / partSize[0];
                 if (curPos > 1) {
                     coords.push(curve.getPoint(1));
                     angs.push(1);

@@ -1,6 +1,6 @@
 class SelectionHandler
 {
-    constructor(raycaster) {
+    constructor(scene, raycaster) {
         this.selectionRaycaster = raycaster;
         this.selectedObject = null;
         this.bestIntersection = null;
@@ -12,7 +12,7 @@ class SelectionHandler
 
         scene.add(this.pointerSphere);
 
-        document.addEventListener('vr_render', this.onRender.bind(this));
+        document.addEventListener(Events.RENDER, this.onRender.bind(this));
         rendererEvents.addListener('click', this.onMouseClick.bind(this), 1);
         rendererEvents.addListener('mousedown', this.onMouseDown.bind(this), 1);
 
@@ -75,7 +75,7 @@ class SelectionHandler
                     currentTraj.isSelected = true;
 
                     document.dispatchEvent(new CustomEvent(
-                        'vr_select',
+                        Events.SELECT,
                         {detail: {trajectory: this.selectedObject}}
                     ));
                 }
@@ -95,7 +95,7 @@ class SelectionHandler
 
     dispatchVRDeselect() {
         document.dispatchEvent(new CustomEvent(
-            'vr_deselect',
+            Events.DESELECT,
             {detail: {trajectory: this.selectedObject}}
         ));
 

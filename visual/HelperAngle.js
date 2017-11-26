@@ -22,7 +22,7 @@ class HelperAngle
         }
 
         this.onRenderListener = this.onRender.bind(this);
-        document.addEventListener('vr_render', this.onRenderListener);
+        document.addEventListener(Events.RENDER, this.onRenderListener);
 
         this.onWheelListener = this.onMouseWheel.bind(this);
         document.addEventListener('wheel', this.onWheelListener);
@@ -223,7 +223,7 @@ class HelperAngle
         scene.remove(this.threeMainAxis);
         scene.remove(this.threeDirection);
 
-        document.removeEventListener('vr_render', this.onRenderListener);
+        document.removeEventListener(Events.RENDER, this.onRenderListener);
     }
 
     createPointersGeometries() {

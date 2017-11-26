@@ -9,7 +9,7 @@ $scripts = array_merge(
         getDirScripts('interface'),
         getDirScripts('ui')
     )),
-    ['algebra.js', 'const.js', 'ssdata.js']
+    ['algebra.js']
 );
 $scripts = array_map('addTime', $scripts);
 ?>
@@ -47,6 +47,7 @@ $scripts = array_map('addTime', $scripts);
 
 <body>
 <script type="text/javascript" src="<?= addTime('builtin.js') ?>"></script>
+<script type="text/javascript" src="<?= addTime('solar_system.js') ?>"></script>
 <script type="text/javascript" src="<?= addTime('main.js') ?>"></script>
 
 <div id="leftPanel"></div>
