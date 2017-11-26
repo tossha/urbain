@@ -9,7 +9,7 @@ class VisualReferenceFrame extends VisualModelAbstract
     }
 
     render(epoch) {
-        const position = this.referenceFrame.getOriginPositionByEpoch(epoch).sub(camera.lastPosition);
+        const position = sim.getVisualCoords(this.referenceFrame.getOriginPositionByEpoch(epoch));
         const scale = position.mag / 10;
         this.threeObj.position.copy(position);
         this.threeObj.quaternion.copy(

@@ -7,12 +7,12 @@ class VisualBodyModelRings extends VisualBodyModelAbstract
         this.ringsAlphaMapPath = ringsAlphaMapPath;
     }
 
-    onSceneReady() {
-        super.onSceneReady();
+    onLoadFinish() {
+        super.onLoadFinish();
         let that = this;
 
         if (this.texturePath) {
-            textureLoader.load(
+            sim.textureLoader.load(
                 VisualModelAbstract.texturePath + this.texturePath,
                 function(txt) {
                     that.bodyThreeObj.material.dispose();
@@ -26,7 +26,7 @@ class VisualBodyModelRings extends VisualBodyModelAbstract
         }
 
         if (this.ringsColorMapPath) {
-            textureLoader.load(
+            sim.textureLoader.load(
                 VisualModelAbstract.texturePath + this.ringsColorMapPath,
                 function(txt) {
                     that.ringsColorMap = txt;
@@ -40,7 +40,7 @@ class VisualBodyModelRings extends VisualBodyModelAbstract
         }
 
         if (this.ringsAlphaMapPath) {
-            textureLoader.load(
+            sim.textureLoader.load(
                 VisualModelAbstract.texturePath + this.ringsAlphaMapPath,
                 function(txt) {
                     that.ringsAlphaMap = txt;

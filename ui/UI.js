@@ -29,8 +29,8 @@ class UI
         const dropdownList = $('#targetSelect');
         dropdownList
             .html(selections)
-            .on('change', () => camera.setOrbitingPoint(dropdownList.val(), true))
-            .val(settings.trackingObject);
+            .on('change', () => sim.camera.setOrbitingPoint(dropdownList.val(), true))
+            .val(sim.settings.trackingObject);
 
         this.handleTimeScaleChange();
         this.handleDeselect();
@@ -50,14 +50,13 @@ class UI
     handleTimeScaleChange() {
         const val = +$('#timeScaleSlider').val();
         const rate = Math.sign(val) * Math.pow(984362.83, 1.2 * Math.abs(val));
-        // settings.timeScale = 0.001 * Math.sign(val) * Math.pow(2592000, Math.abs(val));
-        // settings.timeScale = val;
-        $('#timeScaleValue').html(time.formatRate(rate, 2));
-        settings.timeScale = rate / 1000;
+
+        $('#timeScaleValue').html(sim.time.formatRate(rate, 2));
+        sim.time.setTimeScale(rate / 1000);
     }
 
     handleRender() {
-        const selectedObject = selection.getSelectedObject();
+        const selectedObject = sim.selection.getSelectedObject();
         if (!selectedObject) {
             return;
         }
@@ -69,7 +68,7 @@ class UI
     handleSelect() {
         $('#metricsPanel').show();
 
-        const object = selection.getSelectedObject().object;
+        const object = sim.selection.getSelectedObject().object;
         if (object) {
             // $('#relativeTo').html(object.trajectory.referenceFrame.name);
             $('#metricsOf').html(object.name);
@@ -99,13 +98,13 @@ class UI
     }
 
     updateCartesian(selectedObject) {
-        const state = selectedObject.getStateInOwnFrameByEpoch(time.epoch);
+        const state = selectedObject.getStateInOwnFrameByEpoch(sim.currentEpoch);
         this.updateVector(state, 'velocity');
         this.updateVector(state, 'position');
     }
 
     updateKeplerian(selectedObject) {
-        const keplerianObject = selectedObject.getKeplerianObjectByEpoch(time.epoch);
+        const keplerianObject = selectedObject.getKeplerianObjectByEpoch(sim.currentEpoch);
         $('#eccValue' ).html('' +        ( keplerianObject.e   ).toPrecision(this.precision));
         $('#smaValue' ).html('' + presentNumberWithSuffix(keplerianObject.sma));
         $('#incValue' ).html('' + rad2deg( keplerianObject.inc ).toPrecision(this.precision));
@@ -127,6 +126,6 @@ class UI
     }
 
     togglePause() {
-        $('#pauseButton').html((settings.isTimeRunning ^= true) ? 'Pause' : 'Resume');
+        $('#pauseButton').html((sim.time.isTimeRunning) ? 'Pause' : 'Resume');
     }
 }

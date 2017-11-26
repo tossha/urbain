@@ -2,11 +2,7 @@ class ReferenceFrameAbstract
 {
     setId(id) {
         this.id = id;
-        return this;
-    }
-
-    setStarSystem(starSystem) {
-        this.starSystem = starSystem;
+        this.originId = Math.floor(id / 100000);
         return this;
     }
 
@@ -25,7 +21,7 @@ class ReferenceFrameAbstract
     transformStateVectorByEpoch(epoch, state, destinationFrame) {
         let destinationFrameObj = (destinationFrame instanceof ReferenceFrameAbstract)
             ? destinationFrame
-            : this.starSystem.getReferenceFrame(destinationFrame);
+            : sim.starSystem.getReferenceFrame(destinationFrame);
 
         if (this === destinationFrameObj) {
             return state;

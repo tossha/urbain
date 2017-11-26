@@ -1,7 +1,7 @@
 class Body extends EphemerisObject
 {
-    constructor(starSystem, bodyId, name, trajectory, visualModel, physicalModel, orientation) {
-        super(starSystem, bodyId, name, trajectory);
+    constructor(bodyId, name, trajectory, visualModel, physicalModel, orientation) {
+        super(bodyId, name, trajectory);
 
         this.visualModel   = visualModel;    // class VisualBodyModelBasic
         this.physicalModel = physicalModel;  // class PhysicalBodyModel

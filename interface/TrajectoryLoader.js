@@ -1,28 +1,27 @@
 class TrajectoryLoader
 {
-    static create(starSystem, config) {
+    static create(config) {
         let type = config.type;
 
         if (type === 'keplerian') {
-            return this.createKeplerian(starSystem, config);
+            return this.createKeplerian(config);
         }
 
         if (type === 'keplerian_precessing') {
-            return this.createKeplerianPrecessing(starSystem, config);
+            return this.createKeplerianPrecessing(config);
         }
 
         if (type === 'keplerian_array') {
-            return this.createKeplerianArray(starSystem, config);
+            return this.createKeplerianArray(config);
         }
 
         if (type === 'keplerian_precessing_array') {
-            return this.createKeplerianPrecessingArray(starSystem, config);
+            return this.createKeplerianPrecessingArray(config);
         }
     }
 
-    static createKeplerianArray(starSystem, config) {
+    static createKeplerianArray(config) {
         let traj = new TrajectoryKeplerianArray(
-            starSystem,
             config.data.referenceFrame,
             config.color
         );
@@ -33,9 +32,8 @@ class TrajectoryLoader
         return traj;
     }
 
-    static createKeplerianPrecessingArray(starSystem, config) {
+    static createKeplerianPrecessingArray(config) {
         let traj = new TrajectoryKeplerianPrecessingArray(
-            starSystem,
             config.data.referenceFrame,
             config.data.radius,
             config.data.j2,
@@ -48,18 +46,16 @@ class TrajectoryLoader
         return traj;
     }
 
-    static createKeplerian(starSystem, config) {
+    static createKeplerian(config) {
         return new TrajectoryKeplerianBasic(
-            starSystem,
             config.data.referenceFrame,
             this.createKeplerianObject(config.data.elements),
             config.color
         );
     }
 
-    static createKeplerianPrecessing(starSystem, config) {
+    static createKeplerianPrecessing(config) {
         return new TrajectoryKeplerianPrecessing(
-            starSystem,
             config.data.referenceFrame,
             this.createKeplerianObject(config.data.elements),
             config.data.radius,

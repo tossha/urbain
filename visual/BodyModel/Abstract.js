@@ -23,7 +23,7 @@ class VisualBodyModelAbstract extends VisualModelAbstract
     }
 
     render(epoch) {
-        this.threeObj.position.fromArray(this.body.getPositionByEpoch(epoch).sub(camera.lastPosition));
+        this.threeObj.position.fromArray(sim.getVisualCoords(body.getPositionByEpoch(epoch)));
         this.threeObj.quaternion.copy(
             this.body.orientation.getQuaternionByEpoch(epoch).toThreejs()
         );

@@ -6,12 +6,12 @@ class VisualBodyModelBasic extends VisualBodyModelAbstract
         this.texturePath = texturePath;
     }
 
-    onSceneReady() {
-        super.onSceneReady();
+    onLoadFinish() {
+        super.onLoadFinish();
         if (this.texturePath) {
             let that = this;
 
-            textureLoader.load(
+            sim.textureLoader.load(
                 VisualModelAbstract.texturePath + this.texturePath,
                 function(txt) {
                     that.threeObj.material.dispose();

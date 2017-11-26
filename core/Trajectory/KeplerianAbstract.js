@@ -15,11 +15,22 @@ class TrajectoryKeplerianAbstract extends TrajectoryAbstract
                     that.getKeplerianObjectByEpoch(epoch).getOrbitalFrameQuaternion()
                 );
             })
-        ).setStarSystem(starSystem);
+        );
 
         if (color) {
             this.visualModel = new VisualTrajectoryModelKeplerian(this, color);
         }
+    }
+
+    select() {
+        this.keplerianEditor = new KeplerianEditor(this, false);
+        super.select();
+    }
+
+    deselect() {
+        this.keplerianEditor.remove();
+        delete this.keplerianEditor;
+        super.deselect();
     }
 
     getPeriapsisVector(epoch) {

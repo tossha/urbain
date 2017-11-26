@@ -1,7 +1,7 @@
 class TrajectoryKeplerianArray extends TrajectoryKeplerianAbstract
 {
-    constructor(starSystem, referenceFrameId, color) {
-        super(starSystem, referenceFrameId, color);
+    constructor(referenceFrameId, color) {
+        super(referenceFrameId, color);
 
         this.keplerianObjects = []; // array of class KeplerianObject
         this.color = color;

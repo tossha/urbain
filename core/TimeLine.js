@@ -2,8 +2,10 @@ const J2000_TIMESTAMP = 946728000;
 
 class TimeLine
 {
-    constructor(settings) {
-        this.epoch = settings.timeLine; // time in seconds
+    constructor(epoch, timeScale, isTimeRunning) {
+        this.epoch = epoch;
+        this.timeScale = timeScale;
+        this.isTimeRunning = isTimeRunning;
 
         this.mouseState = {
             x: 0,
@@ -14,7 +16,6 @@ class TimeLine
 
         this.span = 86400;
 
-        this.settings = settings;
         this.markDistance = 300;
         this.scaleType = "month";
 
@@ -34,7 +35,7 @@ class TimeLine
 
         window.addEventListener('keypress', e => {
             if (e.key === ' ') {
-                ui.togglePause();
+                this.togglePause();
             }
         });
 
@@ -42,22 +43,30 @@ class TimeLine
         window.oncontextmenu = () => false;
     }
 
+    setTimeScale(newScale) {
+        this.timeScale = newScale;
+    }
+
+    togglePause() {
+        this.isTimeRunning = !this.isTimeRunning;
+        sim.ui.togglePause();
+    }
+
     tick(timePassed) {
         if (this.mouseState.leftButton) {
             this.epoch = this.leftEpoch + (this.mouseState.x
                 - this.canvasRect.left) * this.span / this.domElement.width;
-        } else if (this.settings.isTimeRunning && !this.isMousePressed) {
+        } else if (this.isTimeRunning) {
             if ((this.leftEpoch < this.epoch)
                 && (this.epoch < this.leftEpoch + this.span)
             ) {
-                this.leftEpoch += this.settings.timeScale * timePassed;
+                this.leftEpoch += this.timeScale * timePassed;
             }
 
-            this.epoch += this.settings.timeScale * timePassed;
-            this.settings.timeLine = this.epoch;
+            this.epoch += this.timeScale * timePassed;
         }
 
-        ui.updateTime(new Date((J2000_TIMESTAMP + this.epoch) * 1000));
+        sim.ui.updateTime(new Date((J2000_TIMESTAMP + this.epoch) * 1000));
         this.redraw();
     }
 

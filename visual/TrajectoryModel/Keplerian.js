@@ -6,7 +6,7 @@ class VisualTrajectoryModelKeplerian extends VisualTrajectoryModelAbstract
 
         const traj = this.trajectory.getKeplerianObjectByEpoch(epoch);
         const orbitQuaternion = this.trajectory.orbitalReferenceFrame.getQuaternionByEpoch(epoch);
-        const cameraPosition = starSystem.getReferenceFrame(RF_BASE).transformPositionByEpoch(epoch, camera.lastPosition, this.trajectory.orbitalReferenceFrame);
+        const cameraPosition = sim.starSystem.getReferenceFrame(RF_BASE).transformPositionByEpoch(epoch, sim.camera.lastPosition, this.trajectory.orbitalReferenceFrame);
         const visualOrigin = new Vector([cameraPosition.x, cameraPosition.y, 0]);
         const actualVisualOrigin = this.trajectory.orbitalReferenceFrame.transformPositionByEpoch(epoch, visualOrigin, RF_BASE);
         const ta = traj.getTrueAnomalyByEpoch(epoch);
@@ -58,7 +58,7 @@ class VisualTrajectoryModelKeplerian extends VisualTrajectoryModelAbstract
         }
 
         this.threeObj.quaternion.copy(orbitQuaternion.toThreejs());
-        this.threeObj.position.fromArray(actualVisualOrigin.sub(camera.lastPosition));
+        this.threeObj.position.fromArray(sim.getVisualCoords(actualVisualOrigin));
     }
 
     getEllipsePoints(curve, pointsNum, densityCenter, proportion) {

@@ -1,7 +1,7 @@
 class TrajectoryKeplerianPrecessingArray extends TrajectoryKeplerianArray
 {
-    constructor(starSystem, referenceFrameId, r, j2, color) {
-        super(starSystem, referenceFrameId, color);
+    constructor(referenceFrameId, r, j2, color) {
+        super(referenceFrameId, color);
 
         this.r = r;
         this.j2 = j2;

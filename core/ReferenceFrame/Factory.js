@@ -1,6 +1,6 @@
 class ReferenceFrameFactory
 {
-    static create(starSystem, id, type, config) {
+    static create(id, type, config) {
         let res = null;
 
         if (type == ReferenceFrame.INERTIAL_ECLIPTIC) {
@@ -54,12 +54,12 @@ class ReferenceFrameFactory
             res = new ReferenceFrameBase();
         }
 
-        return res ? res.setId(id).setStarSystem(starSystem) : null;
+        return res ? res.setId(id) : null;
     }
 
     static createById(starSystem, id) {
-        const type = Math.floor(id / 1000000);
-        const origin = Math.floor((id % 1000000) / 1000);
+        const type = Math.floor(id / 1000) % 100;
+        const origin = Math.floor(id / 100000);
 
         if ((type === ReferenceFrame.INERTIAL_ECLIPTIC)
             || (type === ReferenceFrame.INERTIAL_BODY_EQUATORIAL)
@@ -74,7 +74,7 @@ class ReferenceFrameFactory
     }
 }
 
-const RF_BASE = 1000000;
+const RF_BASE = 1000;
 
 const ReferenceFrame = {
     BASE: 0,

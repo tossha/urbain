@@ -1,8 +1,6 @@
 class StarSystemLoader
 {
-    static loadFromConfig(config) {
-        let starSystem = new StarSystem(config.id);
-
+    static loadFromConfig(starSystem, config) {
         // Loading name
         starSystem.name = config.name;
 
@@ -11,12 +9,12 @@ class StarSystemLoader
 
         // Loading reference frames
         starSystem.addReferenceFrame(
-            ReferenceFrameFactory.create(starSystem, RF_BASE, ReferenceFrame.BASE)
+            ReferenceFrameFactory.create(RF_BASE, ReferenceFrame.BASE)
         );
 
         for (const frame of config.referenceFrames) {
             starSystem.addReferenceFrame(
-                ReferenceFrameFactory.create(starSystem, frame.id, frame.type, frame.config)
+                ReferenceFrameFactory.create(frame.id, frame.type, frame.config)
             );
         }
 
@@ -27,12 +25,10 @@ class StarSystemLoader
 
         // Loading stars
         starSystem.addStars(new VisualStarsModel(config.stars));
-
-        return starSystem;
     }
 
     static _loadObject(starSystem, config) {
-        let trajectory = TrajectoryLoader.create(starSystem, config.trajectory);
+        let trajectory = TrajectoryLoader.create(config.trajectory);
         let object;
 
         starSystem.addTrajectory(config.id, trajectory);
@@ -76,7 +72,6 @@ class StarSystemLoader
                 : new OrientationConstantAxis([0, 0, 1e-10]);
 
             object = new Body(
-                starSystem,
                 config.id,
                 config.name,
                 trajectory,
@@ -89,7 +84,6 @@ class StarSystemLoader
             );
         } else {
             object = new EphemerisObject(
-                starSystem,
                 config.id,
                 config.name,
                 trajectory

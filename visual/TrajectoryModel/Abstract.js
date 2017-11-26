@@ -15,18 +15,17 @@ class VisualTrajectoryModelAbstract extends VisualModelAbstract
         this.threeObj.userData = {trajectory: trajectory};
     }
 
-    onSceneReady() {
-        super.onSceneReady();
-        trajArray.push(this.threeObj);
+    onLoadFinish() {
+        super.onLoadFinish();
+        sim.selection.addSelectableObject(this.threeObj);
     }
 
-    set isSelected(newValue) {
-        if(newValue) {
-            this.color = 0xFFFFFF;
-        }
-        else {
-            this.color = this.standardColor;
-        }
+    select() {
+        this.color = 0xFFFFFF;
+    }
+
+    deselect() {
+        this.color = this.standardColor;
     }
 
     drop()

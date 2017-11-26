@@ -1,6 +1,6 @@
 class TrajectoryAbstract
 {
-    constructor(starSystem, referenceFrameId) {
+    constructor(referenceFrameId) {
         this.minEpoch = null;
         this.maxEpoch = null;
 
@@ -10,9 +10,8 @@ class TrajectoryAbstract
         this.visualModel = null;
         this.object = null;
 
-        this.starSystem = starSystem;
         this.referenceFrameId = referenceFrameId;
-        this.referenceFrame = starSystem.getReferenceFrame(referenceFrameId);
+        this.referenceFrame = sim.starSystem.getReferenceFrame(referenceFrameId);
     }
 
     setObject(object) {
@@ -25,10 +24,12 @@ class TrajectoryAbstract
         }
     }
 
-    set isSelected(newValue) {
-        if (this.visualModel) {
-            this.visualModel.isSelected = newValue;
-        }
+    select() {
+        this.visualModel && this.visualModel.select();
+    }
+
+    deselect() {
+        this.visualModel && this.visualModel.deselect();
     }
 
     getStateInOwnFrameByEpoch(epoch) {
@@ -41,7 +42,7 @@ class TrajectoryAbstract
             state = this.cachedState;
         } else {
             state = this.getStateInOwnFrameByEpoch(epoch);
-            if (referenceFrame === RF_BASE && epoch === time.epoch) {
+            if (referenceFrame === RF_BASE && epoch === sim.currentEpoch) {
                 this.cachedState = state;
                 this.cachedEpoch = epoch;
             }

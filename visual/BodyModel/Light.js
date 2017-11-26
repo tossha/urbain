@@ -5,14 +5,14 @@ class VisualBodyModelLight extends VisualBodyModelBasic
         this.light = new THREE.PointLight(lightColor, lightIntensity, lightDistance, lightDecay);
     }
 
-    onSceneReady() {
-        super.onSceneReady();
+    onLoadFinish() {
+        super.onLoadFinish();
         this.scene.add(this.light);
     }
 
     render(epoch) {
         super.render(epoch);
-        this.light.position.fromArray(this.body.getPositionByEpoch(epoch).sub(camera.lastPosition));
+        this.light.position.fromArray(sim.getVisualCoords(this.body.getPositionByEpoch(epoch)));
     }
 
     getMaterial(parameters) {

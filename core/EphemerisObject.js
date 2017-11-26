@@ -1,7 +1,6 @@
 class EphemerisObject
 {
-    constructor(starSystem, bodyId, name, trajectory) {
-        this.starSystem    = starSystem;
+    constructor(bodyId, name, trajectory) {
         this.id            = bodyId;
         this.name          = name;
         this.trajectory    = trajectory;     // class TrajectoryAbstract

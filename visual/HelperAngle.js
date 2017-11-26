@@ -7,13 +7,13 @@ class HelperAngle
         this.color = color;
         this.editingCallback = editingCallback;
         this.positionAtEpoch = functionOfEpoch;
-        this.position = (new THREE.Vector3).fromArray(this.positionAtEpoch.evaluate(time.epoch).sub(camera.lastPosition));
+        this.position = (new THREE.Vector3()).fromArray(sim.getVisualCoords(this.positionAtEpoch.evaluate(sim.currentEpoch)));
         this.isArcMode = isArcMode;
         this.coefficientOfAxesLengthDecrease = coefficientOfAxesLengthDecrease ? coefficientOfAxesLengthDecrease : 1;
 
         this.setVectors(mainAxis, normal);
 
-        this.sizeParam = camera.position.mag / 2;
+        this.sizeParam = sim.camera.position.mag / 2;
 
         this.isEditMode = false;
 
@@ -78,15 +78,14 @@ class HelperAngle
 
         this.threeAngle.position.copy(this.position);
         this.threeAngle.quaternion.copy(this.quaternion);
-        scene.add(this.threeAngle);
-        scene.add(this.threeMainAxis);
-        scene.add(this.threeDirection);
+        sim.scene.add(this.threeAngle);
+        sim.scene.add(this.threeMainAxis);
+        sim.scene.add(this.threeDirection);
     }
 
     onRender(event) {
         this.position = (new THREE.Vector3).fromArray(
-            this.positionAtEpoch.evaluate(event.detail.epoch)
-                .sub(camera.lastPosition)
+            sim.getVisualCoords(this.positionAtEpoch.evaluate(event.detail.epoch))
         );
 
         if (this.isArcMode === true) {
@@ -163,11 +162,11 @@ class HelperAngle
      onMouseDown(event) {
         let intersection;
         if (this.isArcMode === true) {
-            intersection = raycaster.intersectObjects(
+            intersection = sim.raycaster.intersectObjects(
                 [this.threeDirection.line]
         )[0];
             } else {
-            intersection = raycaster.intersectObjects(
+            intersection = sim.raycaster.intersectObjects(
                 [this.threeDirection.line, this.threeDirection.cone]
         )[0];
         }
@@ -176,17 +175,17 @@ class HelperAngle
             this.mouseUpListener = this.onMouseUp.bind(this);
             document.addEventListener('mouseup', this.mouseUpListener);
             this.mouseMoveListener = this.onMouseMove.bind(this);
-            rendererEvents.addListener('mousemove', this.mouseMoveListener, 2);
+            sim.addEventListener('mousemove', this.mouseMoveListener, 2);
         }
     }
 
     onMouseUp(event) {
         document.removeEventListener('mouseup', this.mouseUpListener);
-        rendererEvents.removeListener('mousemove', this.mouseMoveListener);
+        sim.removeEventListener('mousemove', this.mouseMoveListener);
     }
 
     onMouseMove() {
-        let intersection = raycaster.intersectObjects([this.getVirtualPlane()])[0];
+        let intersection = sim.raycaster.intersectObjects([this.getVirtualPlane()])[0];
         if (intersection !== undefined) { 
             const direction = intersection.point
                 .clone()
@@ -203,7 +202,7 @@ class HelperAngle
     }
 
     onMouseWheel() {
-        this.sizeParam = camera.position.mag / 2;
+        this.sizeParam = sim.camera.position.mag / 2;
 
         this.disposeGeometry(this.threeAngle);
 
@@ -219,9 +218,9 @@ class HelperAngle
     }
 
     remove() {
-        scene.remove(this.threeAngle);
-        scene.remove(this.threeMainAxis);
-        scene.remove(this.threeDirection);
+        sim.scene.remove(this.threeAngle);
+        sim.scene.remove(this.threeMainAxis);
+        sim.scene.remove(this.threeDirection);
 
         document.removeEventListener(Events.RENDER, this.onRenderListener);
     }

@@ -1,7 +1,7 @@
 class TrajectoryKeplerianPrecessing extends TrajectoryKeplerianBasic
 {
-    constructor(starSystem, referenceFrameId, keplerianObject, r, j2, color) {
-        super(starSystem, referenceFrameId, keplerianObject, color);
+    constructor(referenceFrameId, keplerianObject, r, j2, color) {
+        super(referenceFrameId, keplerianObject, color);
 
         this.r = r;
         this.j2 = j2;

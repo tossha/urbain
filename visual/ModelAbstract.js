@@ -3,20 +3,20 @@ class VisualModelAbstract
     constructor() {
         this.threeObj = null;
         this.scene = null;
-        this.sceneReadyListener = this._onSceneReady.bind(this);
+        this.loadFinishListener = this._onLoadFinish.bind(this);
         this.renderListener = this._onRender.bind(this);
-        document.addEventListener(Events.SCENE_READY, this.sceneReadyListener);
+        document.addEventListener(Events.LOAD_FINISH, this.loadFinishListener);
         document.addEventListener(Events.RENDER, this.renderListener);
     }
 
-    _onSceneReady(event) {
+    _onLoadFinish(event) {
         this.scene = event.detail.scene;
-        this.onSceneReady();
-        document.removeEventListener(Events.SCENE_READY, this.sceneReadyListener);
-        delete this.sceneReadyListener;
+        this.onLoadFinish();
+        document.removeEventListener(Events.LOAD_FINISH, this.loadFinishListener);
+        delete this.loadFinishListener;
     }
 
-    onSceneReady() {
+    onLoadFinish() {
         if (this.threeObj) {
             this.scene.add(this.threeObj);
         }

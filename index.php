@@ -42,6 +42,10 @@ $scripts = array_map('addTime', $scripts);
             height: 100%;
         }
 
+        .dg.a {
+            float: left;
+        }
+
     </style>
 </head>
 
@@ -153,7 +157,7 @@ $scripts = array_map('addTime', $scripts);
                 <td id="currentDateValue">01.01.2000 12:00:00</td>
 
                 <td style="width: 70px">
-                    <button onclick="time.useCurrentTime()">Now</button>
+                    <button onclick="sim.time.useCurrentTime()">Now</button>
                 </td>
             </tr>
 
@@ -161,7 +165,7 @@ $scripts = array_map('addTime', $scripts);
                 <td><b>Rate:</b></td>
                 <td id="timeScaleValue"></td>
                 <td>
-                    <button onclick="ui.useRealTimeScale()">Real</button>
+                    <button onclick="sim.ui.useRealTimeScale()">Real</button>
                 </td>
             </tr>
 

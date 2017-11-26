@@ -1,45 +1,39 @@
 class Camera
 {
-    constructor (domElement, eventHandler, initialOrbitingPoint, initialPosition) {
-        this.threeCamera = new THREE.PerspectiveCamera(60, domElement.width / domElement.height, 1, 1e15);
-        this.domElement = domElement;
-        this.isMouseDown = false;
-        this.orbitingPoint = initialOrbitingPoint;
-
-        this.position = initialPosition;
-        this.referenceFrame = starSystem.getReferenceFrame(RF_BASE);
-
-        this.currentMousePos = new Vector([0, 0]);
-        this.accountedMousePos = new Vector([0, 0]);
-
-        this.threeCamera.position.fromArray([0, 0, 0]);
-
-        this.rightButtonDown = false;
-        this.isLookingAside = true;
-        this.zoomingAside = 0;
-
-        this.isAnimnating = false;
-
+    constructor(domElement, initialReferenceFrame, initialPosition) {
         this.settings = {
+            fov: 60,
             animationDuration: 200,
             zoomFactor: 1.5,
             pixelsToObjectUnderMouse: 20
         };
 
-        eventHandler.addListener('mousedown', this.onMouseDown.bind(this) , 1);
-        eventHandler.addListener('mousemove', this.onMouseMove.bind(this) , 1);
-        eventHandler.addListener('mouseup',   this.onMouseUp.bind(this)   , 1);
-        eventHandler.addListener('wheel',     this.onMouseWheel.bind(this), 1);
-    }
+        this.domElement = domElement;
+        this.position = initialPosition;
 
-    init(epoch) {
-        this.lastEpoch = epoch;
-        this.setOrbitingPoint(this.orbitingPoint, false);
+        this.referenceFrame = sim.starSystem.getReferenceFrame(initialReferenceFrame);
+
+        this.currentMousePos = new Vector([0, 0]);
+        this.accountedMousePos = new Vector([0, 0]);
+
+        this.threeCamera = new THREE.PerspectiveCamera(this.settings.fov, domElement.width / domElement.height, 1, 1e15);
+        this.threeCamera.position.fromArray([0, 0, 0]);
+
+        this.isMouseDown = false;
+        this.rightButtonDown = false;
+        this.isLookingAside = true;
+        this.zoomingAside = 0;
+        this.isAnimnating = false;
+
+        sim.addEventListener('mousedown', this.onMouseDown.bind(this) , 1);
+        sim.addEventListener('mousemove', this.onMouseMove.bind(this) , 1);
+        sim.addEventListener('mouseup',   this.onMouseUp.bind(this)   , 1);
+        sim.addEventListener('wheel',     this.onMouseWheel.bind(this), 1);
     }
 
     getPoleVector() {
-        if (starSystem.getObject(this.orbitingPoint) instanceof Body) {
-            return starSystem.getObject(this.orbitingPoint).orientation.getQuaternionByEpoch(this.lastEpoch).rotate_(new Vector([0, 0, 1]));
+        if (sim.starSystem.getObject(this.orbitingPoint) instanceof Body) {
+            return sim.starSystem.getObject(this.orbitingPoint).orientation.getQuaternionByEpoch(sim.currentEpoch).rotate_(new Vector([0, 0, 1]));
         } else {
             return new Vector([0, 0, 1]);
         }
@@ -74,13 +68,13 @@ class Camera
 
     setOrbitingPoint(pointId, animate) {
         this.position
-            .add_(starSystem.getTrajectory(this.orbitingPoint).getPositionByEpoch(this.lastEpoch, RF_BASE))
-            .sub_(starSystem.getTrajectory(pointId).getPositionByEpoch(this.lastEpoch, RF_BASE));
+            .add_(sim.starSystem.getTrajectory(this.orbitingPoint).getPositionByEpoch(sim.currentEpoch, RF_BASE))
+            .sub_(sim.starSystem.getTrajectory(pointId).getPositionByEpoch(sim.currentEpoch, RF_BASE));
         this.orbitingPoint = pointId;
         this.isLookingAside = false;
         this.zoomingAside = 0;
 
-        settings.trackingObject = pointId;
+        sim.settings.trackingObject = pointId;
 
         if (!animate) {
             this.updatePole();
@@ -90,7 +84,7 @@ class Camera
             this.startAnimation();
         }
 
-        ui.updateTarget(pointId);
+        sim.ui.updateTarget(pointId);
     }
 
     startAnimation() {
@@ -123,15 +117,15 @@ class Camera
     }
 
     getOrbitingPointPosition(epoch) {
-        return starSystem.getTrajectory(this.orbitingPoint).getPositionByEpoch(epoch, RF_BASE);
+        return sim.starSystem.getTrajectory(this.orbitingPoint).getPositionByEpoch(epoch, RF_BASE);
     }
 
     findObjectUnderMouse() {
         let biggestRadius = 0;
         let biggestObject = false;
-        for (const body of starSystem.getBodies()) {
-            const dist = raycaster.getPixelDistance(
-                body.getPositionByEpoch(this.lastEpoch, RF_BASE)
+        for (const body of sim.starSystem.getBodies()) {
+            const dist = sim.raycaster.getPixelDistance(
+                body.getPositionByEpoch(sim.currentEpoch, RF_BASE)
             );
             if (dist < this.settings.pixelsToObjectUnderMouse) {
                 if (biggestObject === false) {
@@ -164,24 +158,24 @@ class Camera
 
         if (objectToZoomTo !== false) {
             this.position
-                .add_(starSystem.getTrajectory(this.orbitingPoint).getPositionByEpoch(this.lastEpoch, RF_BASE))
-                .sub_(starSystem.getTrajectory(objectToZoomTo).getPositionByEpoch(this.lastEpoch, RF_BASE));
+                .add_(sim.starSystem.getTrajectory(this.orbitingPoint).getPositionByEpoch(sim.currentEpoch, RF_BASE))
+                .sub_(sim.starSystem.getTrajectory(objectToZoomTo).getPositionByEpoch(sim.currentEpoch, RF_BASE));
             zoomingTo = objectToZoomTo;
         } else {
             this.zoomingAside = 0;
         }
 
-        if (starSystem.getObject(zoomingTo).physicalModel && starSystem.getObject(zoomingTo).physicalModel.radius) {
+        if (sim.starSystem.getObject(zoomingTo).physicalModel && sim.starSystem.getObject(zoomingTo).physicalModel.radius) {
             const currentMag = this.position.mag;
-            this.position.mul_((starSystem.getObject(zoomingTo).physicalModel.radius + (currentMag - starSystem.getObject(zoomingTo).physicalModel.radius) * factor) / currentMag);
+            this.position.mul_((sim.starSystem.getObject(zoomingTo).physicalModel.radius + (currentMag - sim.starSystem.getObject(zoomingTo).physicalModel.radius) * factor) / currentMag);
         } else {
             this.position.mul_(factor);
         }
 
         if (objectToZoomTo !== false) {
             this.position
-                .add_(starSystem.getTrajectory(objectToZoomTo).getPositionByEpoch(this.lastEpoch, RF_BASE))
-                .sub_(starSystem.getTrajectory(this.orbitingPoint).getPositionByEpoch(this.lastEpoch, RF_BASE));
+                .add_(sim.starSystem.getTrajectory(objectToZoomTo).getPositionByEpoch(sim.currentEpoch, RF_BASE))
+                .sub_(sim.starSystem.getTrajectory(this.orbitingPoint).getPositionByEpoch(sim.currentEpoch, RF_BASE));
             this.isLookingAside = true;
             this.zoomingAside++;
 
@@ -227,8 +221,6 @@ class Camera
 
     update(epoch) {
         let mouseShift = this.currentMousePos.sub(this.accountedMousePos);
-
-        this.lastEpoch = epoch;
 
         if (this.isAnimnating) {
             this.animate()
