@@ -15,6 +15,17 @@ class UI
             selections += `<option value="${objectsForTracking[id]}">${id}</option>`;
         }
 
+        $('#showAnglesOfSelectedOrbit').on('change', function() {
+            settings.showAnglesOfSelectedOrbit = this.checked;
+            if (selection.getSelectedObject()) {
+                if (this.checked) {
+                        selection.getSelectedObject().keplerianEditor.init();
+                } else {
+                        selection.getSelectedObject().keplerianEditor.remove();
+                }
+            }
+        });
+
         const dropdownList = $('#targetSelect');
         dropdownList
             .html(selections)

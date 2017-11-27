@@ -10,23 +10,15 @@ class Settings
             autoPlace: false,
             width: 350
         });
-        
+
         this.showStatistics = false;
         this.guiAddTrajectory.add(this, 'showStatistics').onChange(value => {
             statistics.dom.style.display = value ? "" : "none";
         });
-        
+
         this.showAnglesOfSelectedOrbit = true;
-        this.guiAddTrajectory.add(this, 'showAnglesOfSelectedOrbit').onChange(value => {
-            if (selection.getSelectedObject()) {
-                if (value) {
-                        selection.getSelectedObject().keplerianEditor.init();
-                } else {
-                        selection.getSelectedObject().keplerianEditor.remove();
-                }
-            }
-        });
-        
+
+
         this.baseTrajectorySettings = {
             sma  : 120000000,
             e    : 0,
