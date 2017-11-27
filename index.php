@@ -64,16 +64,24 @@ $scripts = array_map('addTime', $scripts);
     <table class="metrics">
         <tr>
             <td style="width: 80px"><b>of</b></td>
-            <td id="metricsOf">Cassini</td>
+            <td id="metricsOf"></td>
         </tr>
-
         <tr>
             <td><b>relative to</b></td>
-            <td id="relativeTo">Sun</td>
+            <td id="relativeTo"></td>
         </tr>
     </table>
 
     <table class="metrics">
+        <tr>
+            <td colspan="3">
+                <label for="showAnglesOfSelectedOrbit">Show angles of selected orbit</label>
+            </td>
+            <td></td>
+            <td>
+                <input type="checkbox" id="showAnglesOfSelectedOrbit" checked>
+            </td>
+        </tr>
         <tr>
             <td colspan="3">
                 Keplerian

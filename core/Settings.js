@@ -16,6 +16,9 @@ class Settings
             statistics.dom.style.display = value ? "" : "none";
         });
 
+        this.showAnglesOfSelectedOrbit = true;
+
+
         this.baseTrajectorySettings = {
             sma  : 120000000,
             e    : 0,
