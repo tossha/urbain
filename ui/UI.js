@@ -4,7 +4,7 @@ class UI
         this.precision = precision;
 
         $('#timeScaleSlider').on('input change', this.handleTimeScaleChange.bind(this));
-        $('#pauseButton').on('click', this.togglePause.bind(this));
+        $('#pauseButton').on('click', () => sim.time.togglePause());
 
         this.renderHandler = this.handleRender.bind(this);
         document.addEventListener(Events.SELECT, this.handleSelect.bind(this));
