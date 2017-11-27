@@ -19,9 +19,9 @@ class UI
             settings.showAnglesOfSelectedOrbit = this.checked;
             if (selection.getSelectedObject()) {
                 if (this.checked) {
-                        selection.getSelectedObject().keplerianEditor.init();
+                    selection.getSelectedObject().keplerianEditor.init();
                 } else {
-                        selection.getSelectedObject().keplerianEditor.remove();
+                    selection.getSelectedObject().keplerianEditor.remove();
                 }
             }
         });
