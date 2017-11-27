@@ -7,6 +7,11 @@ class StarSystemLoader
         // Loading main object
         starSystem.mainObject = config.mainObject;
 
+        // Loading objects
+        for (const objectConfig of config.objects) {
+            this._loadObject(starSystem, objectConfig);
+        }
+
         // Loading reference frames
         starSystem.addReferenceFrame(
             ReferenceFrameFactory.create(RF_BASE, ReferenceFrame.BASE)
@@ -18,9 +23,9 @@ class StarSystemLoader
             );
         }
 
-        // Loading objects
+        // Loading trajectories
         for (const objectConfig of config.objects) {
-            this._loadObject(starSystem, objectConfig);
+            starSystem.addTrajectory(objectConfig.id, TrajectoryLoader.create(objectConfig.trajectory));
         }
 
         // Loading stars
@@ -28,10 +33,7 @@ class StarSystemLoader
     }
 
     static _loadObject(starSystem, config) {
-        let trajectory = TrajectoryLoader.create(config.trajectory);
         let object;
-
-        starSystem.addTrajectory(config.id, trajectory);
 
         if (config.visual) {
             let visualShape = new VisualShapeSphere(
@@ -74,7 +76,6 @@ class StarSystemLoader
             object = new Body(
                 config.id,
                 config.name,
-                trajectory,
                 visualModel,
                 new PhysicalBodyModel(
                     config.physical.mu,
@@ -85,8 +86,7 @@ class StarSystemLoader
         } else {
             object = new EphemerisObject(
                 config.id,
-                config.name,
-                trajectory
+                config.name
             );
         }
 

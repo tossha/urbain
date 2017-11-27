@@ -293,7 +293,7 @@ class Quaternion
         return this.rotate_(vector.copy());
     }
 
-    mul(quat) {
+    mul_(quat) {
         const w = this.t;
         const x = this.v[0];
         const y = this.v[1];
@@ -309,6 +309,10 @@ class Quaternion
         this.v[2] = w * oz + x * oy - y * ox + z * ow;
 
         return this;
+    }
+
+    mul(quat) {
+        return this.mul_(quat);
     }
 
     setAxisAngle(axis, angle) {

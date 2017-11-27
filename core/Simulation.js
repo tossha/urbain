@@ -19,7 +19,14 @@ class Simulation
 
         this.rendererEvents = new EventHandler(this.renderer.domElement);
 
-        this.camera = new Camera(this.renderer.domElement, this.starSystem.mainObject, new Vector([30000, 30000, 10000]));
+        this.camera = new Camera(
+            this.renderer.domElement,
+            this.starSystem.getObjectReferenceFrameId(
+                this.starSystem.mainObject,
+                ReferenceFrame.INERTIAL_BODY_EQUATORIAL
+            ),
+            new Vector([30000, 30000, 10000])
+        );
 
         this.textureLoader = new THREE.TextureLoader();
 

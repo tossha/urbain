@@ -1,10 +1,12 @@
 class EphemerisObject
 {
-    constructor(bodyId, name, trajectory) {
-        this.id            = bodyId;
-        this.name          = name;
-        this.trajectory    = trajectory;     // class TrajectoryAbstract
+    constructor(bodyId, name) {
+        this.id   = bodyId;
+        this.name = name;
+    }
 
+    setTrajectory(trajectory) {
+        this.trajectory = trajectory;     // class TrajectoryAbstract
         this.trajectory.setObject(this);
     }
 

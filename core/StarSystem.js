@@ -18,9 +18,21 @@ class StarSystem
         this.referenceFrames[frame.id] = frame;
     }
 
+    getObjectReferenceFrameId(objectId, referenceFrameType) {
+        return objectId * 100000 + referenceFrameType * 1000;
+    }
+
+    getReferenceFrameIdObject(referenceFrameId) {
+        return Math.floor(referenceFrameId / 100000);
+    }
+
+    getReferenceFrameIdType(referenceFrameId) {
+        return Math.floor((referenceFrameId % 100000)/ 1000);
+    }
+
     getReferenceFrame(id) {
         if (this.referenceFrames[id] === undefined) {
-            this.referenceFrames[id] = ReferenceFrameFactory.createById(this, id);
+            this.referenceFrames[id] = ReferenceFrameFactory.createById(id);
         }
         return this.referenceFrames[id];
     }
@@ -34,6 +46,7 @@ class StarSystem
 
     addTrajectory(objectId, trajectory) {
         this.trajectories[objectId] = trajectory;
+        this.getObject(objectId).setTrajectory(trajectory);
     }
 
     deleteTrajectory(objectId) {
@@ -42,10 +55,10 @@ class StarSystem
     }
 
     getObject(id) {
-        if (this.objects && this.objects[id]) {
-            return this.objects[id];
+        if (this.objects[id] === undefined) {
+            this.objects[id] = new EphemerisObject(id, 'Unknown #' + id);
         }
-        return null;
+        return this.objects[id];
     }
 
     getObjectNames() {

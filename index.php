@@ -200,6 +200,13 @@ $scripts = array_map('addTime', $scripts);
                     </select>
                 </td>
             </tr>
+            <tr>
+                <td><b>Frame type:</b></td>
+                <td colspan="2">
+                    <select id="rfTypeSelect">
+                    </select>
+                </td>
+            </tr>
 
             <!--<tr>
                 <td><b>Mode:</b></td>

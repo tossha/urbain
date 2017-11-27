@@ -4,7 +4,7 @@ class ReferenceFrameBodyFixed extends ReferenceFrameAbstract
         super();
         this.origin = origin;
         this.isInertial = isInertial;
-        this.body = starSystem.getObject(this.origin);
+        this.body = sim.starSystem.getObject(this.origin);
     }
 
     getQuaternionByEpoch(epoch) {
@@ -12,7 +12,7 @@ class ReferenceFrameBodyFixed extends ReferenceFrameAbstract
     }
 
     getOriginStateByEpoch(epoch) {
-        return starSystem.getTrajectory(this.origin).getStateByEpoch(epoch, RF_BASE);
+        return sim.starSystem.getTrajectory(this.origin).getStateByEpoch(epoch, RF_BASE);
     }
 
     getOriginPositionByEpoch(epoch) {

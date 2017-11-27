@@ -2,7 +2,8 @@ class ReferenceFrameAbstract
 {
     setId(id) {
         this.id = id;
-        this.originId = Math.floor(id / 100000);
+        this.originId = sim.starSystem.getReferenceFrameIdObject(id);
+        this.type = sim.starSystem.getReferenceFrameIdType(id);
         return this;
     }
 

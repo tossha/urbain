@@ -12,6 +12,9 @@ class Camera
         this.position = initialPosition;
 
         this.referenceFrame = sim.starSystem.getReferenceFrame(initialReferenceFrame);
+        this.orbitingPoint = this.referenceFrame.originId;
+        this.frameType = this.referenceFrame.type;
+        this.quaternion = this._getQuaternionByPosition(this.position);
 
         this.currentMousePos = new Vector([0, 0]);
         this.accountedMousePos = new Vector([0, 0]);
@@ -21,7 +24,7 @@ class Camera
 
         this.isMouseDown = false;
         this.rightButtonDown = false;
-        this.isLookingAside = true;
+        this.isLookingAside = false;
         this.zoomingAside = 0;
         this.isAnimnating = false;
 
@@ -29,18 +32,6 @@ class Camera
         sim.addEventListener('mousemove', this.onMouseMove.bind(this) , 1);
         sim.addEventListener('mouseup',   this.onMouseUp.bind(this)   , 1);
         sim.addEventListener('wheel',     this.onMouseWheel.bind(this), 1);
-    }
-
-    getPoleVector() {
-        if (sim.starSystem.getObject(this.orbitingPoint) instanceof Body) {
-            return sim.starSystem.getObject(this.orbitingPoint).orientation.getQuaternionByEpoch(sim.currentEpoch).rotate_(new Vector([0, 0, 1]));
-        } else {
-            return new Vector([0, 0, 1]);
-        }
-    }
-
-    updatePole() {
-        this.pole = this.getPoleVector();
     }
 
     _getQuaternionByPosition(position, pole) {
@@ -54,7 +45,7 @@ class Camera
 
         const newUp = directionQuaternion.rotate(defaultUp);
         const neededUp = (new Quaternion()).setAxisAngle(
-            position.cross(pole),
+            position.cross(pole || new Vector([0, 0, 1])),
             Math.PI / 2
         ).rotate(position);
 
@@ -66,31 +57,53 @@ class Camera
         return rollQuaternion.mul(directionQuaternion);
     }
 
-    setOrbitingPoint(pointId, animate) {
-        this.position
-            .add_(sim.starSystem.getTrajectory(this.orbitingPoint).getPositionByEpoch(sim.currentEpoch, RF_BASE))
-            .sub_(sim.starSystem.getTrajectory(pointId).getPositionByEpoch(sim.currentEpoch, RF_BASE));
-        this.orbitingPoint = pointId;
-        this.isLookingAside = false;
-        this.zoomingAside = 0;
-
-        sim.settings.trackingObject = pointId;
-
-        if (!animate) {
-            this.updatePole();
-            this.quaternion = this._getQuaternionByPosition(this.position, this.pole);
-            this.isLookingAside = false;
-        } else {
-            this.startAnimation();
-        }
-
-        sim.ui.updateTarget(pointId);
+    changeReferenceFrameType(newType) {
+        this.changeReferenceFrame(sim.starSystem.getObjectReferenceFrameId(this.orbitingPoint, newType), true);
     }
 
-    startAnimation() {
+    changeOrigin(newObjectId) {
+        this.changeReferenceFrame(sim.starSystem.getObjectReferenceFrameId(newObjectId, this.frameType), true);
+    }
+
+    changeReferenceFrame(newFrameId, animate) {
+        let newFrame = sim.starSystem.getReferenceFrame(newFrameId);
+
+        if (newFrame === null) {
+            newFrame = sim.starSystem.getReferenceFrame(
+                sim.starSystem.getObjectReferenceFrameId(
+                    sim.starSystem.getReferenceFrameIdObject(newFrameId),
+                    ReferenceFrame.INERTIAL_ECLIPTIC
+                )
+            );
+
+        }
+
+        this.position = this.referenceFrame.transformPositionByEpoch(sim.currentEpoch, this.position, newFrame);
+        this.isLookingAside = false;
+        this.zoomingAside = 0;
+        this.orbitingPoint = newFrame.originId;
+        this.frameType = newFrame.type;
+        sim.ui.updateFrameType(this.frameType);
+
+        if (animate) {
+            this.startAnimation(newFrame);
+        } else {
+            this.quaternion = this._getQuaternionByPosition(this.position);
+        }
+
+        this.referenceFrame = newFrame;
+
+        sim.ui.updateTarget(this.referenceFrame.originId);
+    }
+
+    startAnimation(newFrame) {
+        if (newFrame) {
+            let transferQuaternion = this.referenceFrame.getQuaternionByEpoch(sim.currentEpoch).invert_().mul_(newFrame.getQuaternionByEpoch(sim.currentEpoch));
+            this.quaternion = transferQuaternion.invert_().mul(this.quaternion);
+        }
+
         this.animationStartingTime = (new Date()).getTime();
         this.animationDuration = this.settings.animationDuration;
-        this.animationStartingPole = this.pole.copy();
         this.animationStartingQuaternion = this.quaternion.copy();
         this.isAnimnating = true;
     }
@@ -98,26 +111,16 @@ class Camera
     animate() {
         const time = (new Date()).getTime();
         const percent = (time - this.animationStartingTime) / this.animationDuration;
-        const targetPole = this.getPoleVector();
-        const targetQuat = this._getQuaternionByPosition(this.position, targetPole);
+        const targetQuat = this._getQuaternionByPosition(this.position);
 
         if (percent >= 1) {
-            this.pole = targetPole;
             this.quaternion = targetQuat;
             this.isAnimnating = false;
             this.isLookingAside = false;
             return;
         }
 
-        const poleTargetQuat = Quaternion.transfer(this.animationStartingPole, targetPole);
-        const poleQuat = Quaternion.slerp(new Quaternion(), poleTargetQuat, percent);
-
-        this.pole = poleQuat.rotate(this.animationStartingPole);
         this.quaternion = Quaternion.slerp(this.animationStartingQuaternion, targetQuat, percent);
-    }
-
-    getOrbitingPointPosition(epoch) {
-        return sim.starSystem.getTrajectory(this.orbitingPoint).getPositionByEpoch(epoch, RF_BASE);
     }
 
     findObjectUnderMouse() {
@@ -157,9 +160,7 @@ class Camera
         }
 
         if (objectToZoomTo !== false) {
-            this.position
-                .add_(sim.starSystem.getTrajectory(this.orbitingPoint).getPositionByEpoch(sim.currentEpoch, RF_BASE))
-                .sub_(sim.starSystem.getTrajectory(objectToZoomTo).getPositionByEpoch(sim.currentEpoch, RF_BASE));
+            this.position = this.referenceFrame.transformPositionByEpoch(sim.currentEpoch, this.position, objectToZoomTo * 100000 + 1000);
             zoomingTo = objectToZoomTo;
         } else {
             this.zoomingAside = 0;
@@ -173,9 +174,7 @@ class Camera
         }
 
         if (objectToZoomTo !== false) {
-            this.position
-                .add_(sim.starSystem.getTrajectory(objectToZoomTo).getPositionByEpoch(sim.currentEpoch, RF_BASE))
-                .sub_(sim.starSystem.getTrajectory(this.orbitingPoint).getPositionByEpoch(sim.currentEpoch, RF_BASE));
+            this.position = sim.starSystem.getReferenceFrame(objectToZoomTo * 100000 + 1000).transformPositionByEpoch(sim.currentEpoch, this.position, this.referenceFrame);
             this.isLookingAside = true;
             this.zoomingAside++;
 
@@ -184,7 +183,7 @@ class Camera
         }
 
         if (this.zoomingAside === 3) {
-            this.setOrbitingPoint(objectToZoomTo, true);
+            this.changeOrigin(objectToZoomTo, true);
         }
     }
 
@@ -220,32 +219,38 @@ class Camera
     }
 
     update(epoch) {
+        const rfQuaternion = this.referenceFrame.getQuaternionByEpoch(epoch);
         let mouseShift = this.currentMousePos.sub(this.accountedMousePos);
 
         if (this.isAnimnating) {
             this.animate()
-        } else {
-            this.updatePole();
         }
 
         if (mouseShift[0] || mouseShift[1]) {
             const polarConstraint = 0.00001;
-            let poleAngle = this.position.angle(this.pole);
+            const pole = new Vector([0, 0, 1]);
+            let poleAngle = this.position.angle(pole);
             let verticalRotationAxis = this.rightButtonDown
-                ? this.quaternion.rotate(new Vector([0, 0, 1])).cross(this.pole)
-                : this.position.cross(this.pole);
+                ? this.quaternion.rotate(new Vector([0, 0, 1])).cross(pole)
+                : this.position.cross(pole);
 
             let verticalQuaternion = new Quaternion(verticalRotationAxis, Math.min(Math.max(mouseShift[1] * 0.01, poleAngle - Math.PI + polarConstraint), poleAngle - polarConstraint));
-            let mainQuaternion = (new Quaternion()).setAxisAngle(this.pole, -mouseShift[0] * 0.01).mul(verticalQuaternion);
+            let mainQuaternion = (new Quaternion()).setAxisAngle(pole, -mouseShift[0] * 0.01).mul_(verticalQuaternion);
 
             if (!this.rightButtonDown) {
                 mainQuaternion.rotate_(this.position);
             }
-            this.quaternion = mainQuaternion.mul(this.quaternion);
+            this.quaternion = mainQuaternion.mul_(this.quaternion);
 
             this.accountedMousePos = this.currentMousePos.copy();
         }
-        this.threeCamera.quaternion.copy(this.quaternion.toThreejs());
-        this.lastPosition = this.getOrbitingPointPosition(epoch).add_(this.position);
+        this.threeCamera.quaternion.copy(rfQuaternion.mul_(this.quaternion).toThreejs());
+        this.lastPosition = this.referenceFrame.transformPositionByEpoch(epoch, this.position, RF_BASE);
     }
 }
+
+Camera.selectableReferenceFrameTypes = {
+    [ReferenceFrame.INERTIAL_ECLIPTIC]: 'Ecliptic',
+    [ReferenceFrame.INERTIAL_BODY_EQUATORIAL]: 'Equatorial',
+    [ReferenceFrame.INERTIAL_BODY_FIXED]: 'Body fixed',
+};

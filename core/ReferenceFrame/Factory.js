@@ -9,47 +9,67 @@ class ReferenceFrameFactory
                 new Quaternion()
             );
         } else if (type == ReferenceFrame.INERTIAL_BODY_EQUATORIAL) {
-            res = new ReferenceFrameInertialDynamic(
-                new FunctionOfEpochObjectState(config.origin, RF_BASE),
-                new FunctionOfEpochCustom((epoch) => {
-                    const z = starSystem.getObject(config.origin).orientation.getQuaternionByEpoch(epoch).rotate_(new Vector([0, 0, 1]));
-                    const equinox = z.cross(new Vector([0, 0, 1]));
-                    return Quaternion.transfer(new Vector([0, 0, 1]), z).mul(
-                        Quaternion.transfer(new Vector([1, 0, 0]), equinox)
-                    );
-                })
-            );
+            if (sim.starSystem.getObject(config.origin) instanceof Body) {
+                res = new ReferenceFrameInertialDynamic(
+                    new FunctionOfEpochObjectState(config.origin, RF_BASE),
+                    new FunctionOfEpochCustom((epoch) => {
+                        const z = sim.starSystem.getObject(config.origin).orientation.getQuaternionByEpoch(epoch).rotate_(new Vector([0, 0, 1]));
+                        const equinox = z.cross(new Vector([0, 0, 1]));
+                        return Quaternion.transfer(new Vector([0, 0, 1]), z).mul(
+                            Quaternion.transfer(new Vector([1, 0, 0]), equinox)
+                        );
+                    })
+                );
+            } else {
+                res = null;
+            }
         } else if (type == ReferenceFrame.INERTIAL_BODY_FIXED) {
-            res = new ReferenceFrameBodyFixed(
-                config.origin,
-                true
-            );
+            if (sim.starSystem.getObject(config.origin) instanceof Body) {
+                res = new ReferenceFrameBodyFixed(
+                    config.origin,
+                    true
+                );
+            } else {
+                res = null;
+            }
         } else if (type == ReferenceFrame.INERTIAL_TOPOCENTRIC) {
-            res = new ReferenceFrameTopocentric(
-                config.origin,
-                config.lat,
-                config.lon,
-                config.height,
-                true
-            );
+            if (sim.starSystem.getObject(config.origin) instanceof Body) {
+                res = new ReferenceFrameTopocentric(
+                    config.origin,
+                    config.lat,
+                    config.lon,
+                    config.height,
+                    true
+                );
+            } else {
+                res = null;
+            }
         } else if (type == ReferenceFrame.ICRF && EARTH !== undefined) {
             res = new ReferenceFrameInertial(
                 new FunctionOfEpochObjectState(EARTH, RF_BASE),
                 new Quaternion([-1, 0, 0], deg2rad(23.4))
             );
         } else if (type == ReferenceFrame.BODY_FIXED) {
-            res = new ReferenceFrameBodyFixed(
-                config.origin,
-                false
-            );
+            if (sim.starSystem.getObject(config.origin) instanceof Body) {
+                res = new ReferenceFrameBodyFixed(
+                    config.origin,
+                    false
+                );
+            } else {
+                res = null;
+            }
         } else if (type == ReferenceFrame.TOPOCENTRIC) {
-            res = new ReferenceFrameTopocentric(
-                config.origin,
-                config.lat,
-                config.lon,
-                height,
-                false
-            );
+            if (sim.starSystem.getObject(config.origin) instanceof Body) {
+                res = new ReferenceFrameTopocentric(
+                    config.origin,
+                    config.lat,
+                    config.lon,
+                    height,
+                    false
+                );
+            } else {
+                res = null;
+            }
         } else if (type == ReferenceFrame.BASE) {
             res = new ReferenceFrameBase();
         }
@@ -57,7 +77,7 @@ class ReferenceFrameFactory
         return res ? res.setId(id) : null;
     }
 
-    static createById(starSystem, id) {
+    static createById(id) {
         const type = Math.floor(id / 1000) % 100;
         const origin = Math.floor(id / 100000);
 
@@ -67,10 +87,22 @@ class ReferenceFrameFactory
             || (type === ReferenceFrame.ICRF)
             || (type === ReferenceFrame.BODY_FIXED)
         ) {
-            return this.create(starSystem, id, type, {origin: origin});
+            return this.create(id, type, {origin: origin});
         }
 
         return null;
+    }
+
+    static getTypeNames() {
+        return {
+            [ReferenceFrame.INERTIAL_ECLIPTIC]: 'Ecliptic',
+            [ReferenceFrame.INERTIAL_BODY_EQUATORIAL]: 'Ecliptic',
+            [ReferenceFrame.INERTIAL_BODY_FIXED]: 'Ecliptic',
+            [ReferenceFrame.INERTIAL_ECLIPTIC]: 'Ecliptic',
+            [ReferenceFrame.INERTIAL_ECLIPTIC]: 'Ecliptic',
+            [ReferenceFrame.INERTIAL_ECLIPTIC]: 'Ecliptic',
+            [ReferenceFrame.INERTIAL_ECLIPTIC]: 'Ecliptic',
+        }
     }
 }
 

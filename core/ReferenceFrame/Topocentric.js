@@ -17,7 +17,7 @@ class ReferenceFrameTopocentric extends ReferenceFrameBodyFixed
     }
 
     getOriginStateByEpoch(epoch) {
-        const bodyState = starSystem.getTrajectory(this.origin).getStateByEpoch(epoch, RF_BASE);
+        const bodyState = sim.starSystem.getTrajectory(this.origin).getStateByEpoch(epoch, RF_BASE);
         const bodyQuaternion = this.body.orientation.getQuaternionByEpoch(epoch);
 
         let rfVel = this.bodyFixedPosition.cross(

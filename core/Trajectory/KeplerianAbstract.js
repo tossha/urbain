@@ -2,8 +2,8 @@ class TrajectoryKeplerianAbstract extends TrajectoryAbstract
 {
     getKeplerianObjectByEpoch(epoch) {}
 
-    constructor(starSystem, referenceFrameId, color) {
-        super(starSystem, referenceFrameId);
+    constructor(referenceFrameId, color) {
+        super(referenceFrameId);
 
         let that = this;
         this.orbitalReferenceFrame = new ReferenceFrameInertialDynamic(
