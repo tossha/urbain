@@ -1,3 +1,0 @@
-class ReferenceFrameBase extends ReferenceFrameAbstract
-{
-}
