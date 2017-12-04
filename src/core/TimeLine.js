@@ -14,7 +14,7 @@ export default class TimeLine
             rightButton: false
         };
 
-        this.span = 86400;
+        this.span = timeScale * 86400;
 
         this.markDistance = 300;
         this.scaleType = "month";
