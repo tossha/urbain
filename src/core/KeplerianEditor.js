@@ -51,7 +51,7 @@ export default class KeplerianEditor
             this.normal,
             keplerianObject.aop,
             this.aopAngleColor,
-            1,
+            2,
             true
         );
 
@@ -61,7 +61,7 @@ export default class KeplerianEditor
             this.node,
             keplerianObject.inc,
             this.incAngleColor,
-            3,
+            2,
             true
         );
 
@@ -71,7 +71,7 @@ export default class KeplerianEditor
             this.normal,
             keplerianObject.ta,
             this.taAngleColor,
-            3,
+            1.5,
             true
         );
 
