@@ -9,7 +9,7 @@ export default class VisualBodyModelAbstract extends VisualModelAbstract
         this.color = color;
         this.body = null; // class Body
 
-        this.threeObj = this.getThreeObj();
+        this.setThreeObj(this.getThreeObj());
         this.threeObj.add(new THREE.AxisHelper(shape.radius * 2));
     }
 

@@ -19,6 +19,8 @@ export default class Camera
         this.frameType = this.referenceFrame.type;
         this.quaternion = this._getQuaternionByPosition(this.position);
 
+        this.lastPosition = this.referenceFrame.transformPositionByEpoch(sim.currentEpoch, this.position, RF_BASE);
+
         this.currentMousePos = new Vector([0, 0]);
         this.accountedMousePos = new Vector([0, 0]);
 

@@ -4,24 +4,14 @@ export default class VisualModelAbstract
 {
     constructor() {
         this.threeObj = null;
-        this.scene = null;
-        this.loadFinishListener = this._onLoadFinish.bind(this);
+        this.scene = sim.scene;
         this.renderListener = this._onRender.bind(this);
-        document.addEventListener(Events.LOAD_FINISH, this.loadFinishListener);
         document.addEventListener(Events.RENDER, this.renderListener);
     }
 
-    _onLoadFinish(event) {
-        this.scene = event.detail.scene;
-        this.onLoadFinish();
-        document.removeEventListener(Events.LOAD_FINISH, this.loadFinishListener);
-        delete this.loadFinishListener;
-    }
-
-    onLoadFinish() {
-        if (this.threeObj) {
-            this.scene.add(this.threeObj);
-        }
+    setThreeObj(obj) {
+        this.threeObj = obj;
+        this.scene.add(this.threeObj);
     }
 
     _onRender(event) {
@@ -29,6 +19,20 @@ export default class VisualModelAbstract
     }
 
     render(epoch) {}
+
+    drop() {
+        if (this.threeObj) {
+            this.scene.remove(this.threeObj);
+            if (this.threeObj.geometry) {
+                this.threeObj.geometry.dispose();
+            }
+            if (this.threeObj.material) {
+                this.threeObj.material.dispose();
+            }
+            delete this.threeObj;
+        }
+        document.removeEventListener(Events.RENDER, this.renderListener);
+    }
 }
 
 VisualModelAbstract.texturePath = 'texture/';
