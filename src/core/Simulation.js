@@ -46,10 +46,6 @@ export default class Simulation
         this.raycaster = new VisualRaycaster(this.renderer.domElement, this.camera.threeCamera, 7);
 
         this.ui = new UI(5, this.starSystem.getObjectNames());
-
-        document.dispatchEvent(new CustomEvent(
-            Events.LOAD_FINISH
-        ));
     }
 
     get currentEpoch() {
