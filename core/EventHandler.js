@@ -9,9 +9,7 @@ class EventHandler
     addListener(eventName, listener, priority) {
         if (!this.handlers[eventName]) {
             this.listeners[eventName] = [];
-            this.handlers[eventName] = (e) => {
-                this.handleEvent(eventName, e)
-            };
+            this.handlers[eventName] = (event) => this.handleEvent(eventName, event);
             this.domElement.addEventListener(eventName, this.handlers[eventName]);
         }
 

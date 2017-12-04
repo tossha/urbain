@@ -4,33 +4,45 @@ class UI
         this.precision = precision;
 
         $('#timeScaleSlider').on('input change', this.handleTimeScaleChange.bind(this));
-        $('#pauseButton').on('click', this.togglePause.bind(this));
+        $('#pauseButton').on('click', () => sim.time.togglePause());
 
         this.renderHandler = this.handleRender.bind(this);
-        document.addEventListener('vr_select', this.handleSelect.bind(this));
-        document.addEventListener('vr_deselect', this.handleDeselect.bind(this));
+        document.addEventListener(Events.SELECT, this.handleSelect.bind(this));
+        document.addEventListener(Events.DESELECT, this.handleDeselect.bind(this));
 
-        let selections = '';
-        for (const id in objectsForTracking) {
-            selections += `<option value="${objectsForTracking[id]}">${id}</option>`;
-        }
+        this.showAnglesOfSelectedOrbit = true;
 
         $('#showAnglesOfSelectedOrbit').on('change', function() {
-            settings.showAnglesOfSelectedOrbit = this.checked;
-            if (selection.getSelectedObject()) {
+            sim.ui.showAnglesOfSelectedOrbit = this.checked;
+            if (sim.selection.getSelectedObject()) {
                 if (this.checked) {
-                    selection.getSelectedObject().keplerianEditor.init();
+                    sim.selection.getSelectedObject().keplerianEditor.init();
                 } else {
-                    selection.getSelectedObject().keplerianEditor.remove();
+                    sim.selection.getSelectedObject().keplerianEditor.remove();
                 }
             }
         });
 
-        const dropdownList = $('#targetSelect');
-        dropdownList
+        const dropdownList1 = $('#targetSelect');
+        let selections = '';
+        for (const id in objectsForTracking) {
+            selections += '<option value="' + id + '">' + objectsForTracking[id] + '</option>';
+        }
+        dropdownList1
             .html(selections)
-            .on('change', () => camera.setOrbitingPoint(dropdownList.val(), true))
-            .val(EARTH);
+            .on('change', () => sim.camera.changeOrigin(dropdownList1.val()))
+            .val(sim.camera.referenceFrame.originId);
+
+
+        const dropdownList2 = $('#rfTypeSelect');
+        selections = '';
+        for (const id in Camera.selectableReferenceFrameTypes) {
+            selections += '<option value="' + id + '">' + Camera.selectableReferenceFrameTypes[id] + '</option>';
+        }
+        dropdownList2
+            .html(selections)
+            .on('change', () => sim.camera.changeReferenceFrameType(dropdownList2.val()))
+            .val(sim.camera.frameType);
 
         this.handleTimeScaleChange();
         this.handleDeselect();
@@ -50,14 +62,13 @@ class UI
     handleTimeScaleChange() {
         const val = +$('#timeScaleSlider').val();
         const rate = Math.sign(val) * Math.pow(984362.83, 1.2 * Math.abs(val));
-        // settings.timeScale = 0.001 * Math.sign(val) * Math.pow(2592000, Math.abs(val));
-        // settings.timeScale = val;
-        $('#timeScaleValue').html(time.formatRate(rate, 2));
-        settings.timeScale = rate / 1000;
+
+        $('#timeScaleValue').html(sim.time.formatRate(rate, 2));
+        sim.time.setTimeScale(rate / 1000);
     }
 
     handleRender() {
-        const selectedObject = selection.getSelectedObject();
+        const selectedObject = sim.selection.getSelectedObject();
         if (!selectedObject) {
             return;
         }
@@ -69,54 +80,49 @@ class UI
     handleSelect() {
         $('#metricsPanel').show();
 
-        const data = SSDATA[selection.getSelectedObject().id];
-        if (data) {
-            $('#relativeTo').html(SSDATA[data.parent].name);
-            $('#metricsOf').html(data.name);
+        const object = sim.selection.getSelectedObject().object;
+        if (object) {
+            // $('#relativeTo').html(object.trajectory.referenceFrame.name);
+            $('#metricsOf').html(object.name);
         } else {
             $('#relativeTo,#metricsOf').html('');
         }
-        document.addEventListener('vr_render', this.renderHandler);
+        document.addEventListener(Events.RENDER, this.renderHandler);
     }
 
     handleDeselect() {
         $('#metricsPanel').hide();
-        document.removeEventListener('vr_render', this.renderHandler);
+        document.removeEventListener(Events.RENDER, this.renderHandler);
     }
 
     updateTarget(value) {
         $('#targetSelect').val(value);
     }
 
+    updateFrameType(value) {
+        $('#rfTypeSelect').val(value);
+    }
+
     updateTime(date) {
-        let string = date.toLocaleString([], {
-            day: "2-digit",
-            month: "2-digit",
-            year: "numeric"
-        });
-
-        string += " " + date.toLocaleString([], {
-            hour: "numeric"
-        }).padStart(2, '0');
-
-        string += ":" + date.toLocaleString([], {
-            second: "2-digit",
-            minute: "2-digit"
-        });
-
+        let string = date.getYear() + 1900;
+        string += '-' + (date.getMonth() + 1);
+        string += '-' + date.getDate();
+        string += ' ' + (date.getHours() + '').padStart(2, '0');
+        string += ':' + (date.getMinutes() + '').padStart(2, '0');
+        string += ':' + (date.getSeconds() + '').padStart(2, '0');
         $('#currentDateValue').html(string);
     }
 
     updateCartesian(selectedObject) {
-        const state = selectedObject.getStateInOwnFrameByEpoch(time.epoch);
+        const state = selectedObject.getStateInOwnFrameByEpoch(sim.currentEpoch);
         this.updateVector(state, 'velocity');
         this.updateVector(state, 'position');
     }
 
     updateKeplerian(selectedObject) {
-        const keplerianObject = selectedObject.getKeplerianObjectByEpoch(time.epoch);
+        const keplerianObject = selectedObject.getKeplerianObjectByEpoch(sim.currentEpoch);
         $('#eccValue' ).html('' +        ( keplerianObject.e   ).toPrecision(this.precision));
-        $('#smaValue' ).html('' + presentNumberWithPrefix(keplerianObject.sma));
+        $('#smaValue' ).html('' + presentNumberWithSuffix(keplerianObject.sma));
         $('#incValue' ).html('' + rad2deg( keplerianObject.inc ).toPrecision(this.precision));
         $('#aopValue' ).html('' + rad2deg( keplerianObject.aop ).toPrecision(this.precision));
         $('#raanValue').html('' + rad2deg( keplerianObject.raan).toPrecision(this.precision));
@@ -125,10 +131,10 @@ class UI
 
     updateVector(state, vec) {
         const stateGroup = state[vec];
-        $(`#${vec}Mag`).html(presentNumberWithPrefix(stateGroup.mag));
-        $(`#${vec}X`  ).html(presentNumberWithPrefix(stateGroup.x));
-        $(`#${vec}Y`  ).html(presentNumberWithPrefix(stateGroup.y));
-        $(`#${vec}Z`  ).html(presentNumberWithPrefix(stateGroup.z));
+        $(`#${vec}Mag`).html(presentNumberWithSuffix(stateGroup.mag));
+        $(`#${vec}X`  ).html(presentNumberWithSuffix(stateGroup.x));
+        $(`#${vec}Y`  ).html(presentNumberWithSuffix(stateGroup.y));
+        $(`#${vec}Z`  ).html(presentNumberWithSuffix(stateGroup.z));
     }
 
     useRealTimeScale() {
@@ -136,6 +142,6 @@ class UI
     }
 
     togglePause() {
-        $('#pauseButton').html((settings.isTimeRunning ^= true) ? 'Pause' : 'Resume');
+        $('#pauseButton').html((sim.time.isTimeRunning) ? 'Pause' : 'Resume');
     }
 }

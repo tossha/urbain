@@ -1,16 +1,16 @@
 class StateVector
 {
     constructor(position, velocity) {
-        this._position = position ? Vector.copy(position) : new Vector(3);
-        this._velocity = velocity ? Vector.copy(velocity) : new Vector(3);
+        this._position = position ? position.copy() : new Vector();
+        this._velocity = velocity ? velocity.copy() : new Vector();
     }
 
     get position() {
-        return Vector.copy(this._position);
+        return this._position.copy();
     }
 
     get velocity() {
-        return Vector.copy(this._velocity);
+        return this._velocity.copy();
     }
 
     static create(x, y, z, vx, vy, vz) {

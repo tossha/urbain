@@ -2,8 +2,8 @@ class TrajectoryKeplerianAbstract extends TrajectoryAbstract
 {
     getKeplerianObjectByEpoch(epoch) {}
 
-    constructor(referenceFrame, color) {
-        super(referenceFrame);
+    constructor(referenceFrameId, color) {
+        super(referenceFrameId);
 
         let that = this;
         this.orbitalReferenceFrame = new ReferenceFrameInertialDynamic(
@@ -20,6 +20,17 @@ class TrajectoryKeplerianAbstract extends TrajectoryAbstract
         if (color) {
             this.visualModel = new VisualTrajectoryModelKeplerian(this, color);
         }
+    }
+
+    select() {
+        this.keplerianEditor = new KeplerianEditor(this, false);
+        super.select();
+    }
+
+    deselect() {
+        this.keplerianEditor.remove();
+        delete this.keplerianEditor;
+        super.deselect();
     }
 
     getPeriapsisVector(epoch) {

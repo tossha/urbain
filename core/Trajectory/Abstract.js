@@ -1,15 +1,21 @@
 class TrajectoryAbstract
 {
-    constructor(referenceFrame) {
-        let that = this;
+    constructor(referenceFrameId) {
+        this.minEpoch = null;
+        this.maxEpoch = null;
 
         this.cachedEpoch = null;
         this.cachedState = null;
 
-        this.referenceFrame = referenceFrame || null; // class ReferenceFrameAbstract
-        document.addEventListener('vr_render', function (event) {
-            that.render(event.detail.epoch);
-        });
+        this.visualModel = null;
+        this.object = null;
+
+        this.referenceFrameId = referenceFrameId;
+        this.referenceFrame = sim.starSystem.getReferenceFrame(referenceFrameId);
+    }
+
+    setObject(object) {
+        this.object = object;
     }
 
     drop() {
@@ -18,18 +24,16 @@ class TrajectoryAbstract
         }
     }
 
-    setId(id) {
-        this.id = id;
+    select() {
+        this.visualModel && this.visualModel.select();
     }
 
-    set isSelected(newValue) {
-        if (this.visualModel) {
-            this.visualModel.isSelected = newValue;
-        }
+    deselect() {
+        this.visualModel && this.visualModel.deselect();
     }
 
     getStateInOwnFrameByEpoch(epoch) {
-        return ZERO_STATE_VECTOR;
+        return new StateVector();
     }
 
     getStateByEpoch(epoch, referenceFrame) {
@@ -38,8 +42,9 @@ class TrajectoryAbstract
             state = this.cachedState;
         } else {
             state = this.getStateInOwnFrameByEpoch(epoch);
-            if (referenceFrame === RF_BASE && epoch === time.epoch) {
+            if (referenceFrame === RF_BASE && epoch === sim.currentEpoch) {
                 this.cachedState = state;
+                this.cachedEpoch = epoch;
             }
         }
 
@@ -52,11 +57,5 @@ class TrajectoryAbstract
 
     getVelocityByEpoch(epoch, referenceFrame) {
         return this.getStateByEpoch(epoch, referenceFrame).velocity;
-    }
-
-    render(epoch) {
-        if (this.visualModel) {
-            this.visualModel.render(epoch);
-        }
     }
 }

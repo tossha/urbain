@@ -1,22 +1,12 @@
-class Body
+class Body extends EphemerisObject
 {
-    constructor(bodyId, visualModel, physicalModel, trajectory, orientation) {
-        this.id            = bodyId;
+    constructor(bodyId, name, visualModel, physicalModel, orientation) {
+        super(bodyId, name);
+
         this.visualModel   = visualModel;    // class VisualBodyModelBasic
         this.physicalModel = physicalModel;  // class PhysicalBodyModel
-        this.trajectory    = trajectory;     // class TrajectoryAbstract
         this.orientation   = orientation;    // class OrientationAbstract
+
         this.visualModel.body = this;
-    }
-
-    getPositionByEpoch(epoch, referenceFrame) {
-        return this.trajectory.getPositionByEpoch(epoch, referenceFrame);
-    }
-
-    render(epoch) {
-        return this.visualModel.render(
-            epoch,
-            this.getPositionByEpoch(epoch, RF_BASE)
-        );
     }
 }

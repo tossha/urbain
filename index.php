@@ -9,7 +9,7 @@ $scripts = array_merge(
         getDirScripts('interface'),
         getDirScripts('ui')
     )),
-    ['algebra.js', 'const.js', 'ssdata.js']
+    ['algebra.js']
 );
 $scripts = array_map('addTime', $scripts);
 ?>
@@ -42,11 +42,16 @@ $scripts = array_map('addTime', $scripts);
             height: 100%;
         }
 
+        .dg.a {
+            float: left;
+        }
+
     </style>
 </head>
 
 <body>
 <script type="text/javascript" src="<?= addTime('builtin.js') ?>"></script>
+<script type="text/javascript" src="<?= addTime('solar_system.js') ?>"></script>
 <script type="text/javascript" src="<?= addTime('main.js') ?>"></script>
 
 <div id="leftPanel"></div>
@@ -152,7 +157,7 @@ $scripts = array_map('addTime', $scripts);
                 <td id="currentDateValue">01.01.2000 12:00:00</td>
 
                 <td style="width: 70px">
-                    <button onclick="time.useCurrentTime()">Now</button>
+                    <button onclick="sim.time.useCurrentTime()">Now</button>
                 </td>
             </tr>
 
@@ -160,7 +165,7 @@ $scripts = array_map('addTime', $scripts);
                 <td><b>Rate:</b></td>
                 <td id="timeScaleValue"></td>
                 <td>
-                    <button onclick="ui.useRealTimeScale()">Real</button>
+                    <button onclick="sim.ui.useRealTimeScale()">Real</button>
                 </td>
             </tr>
 
@@ -192,6 +197,13 @@ $scripts = array_map('addTime', $scripts);
                 <td><b>Target:</b></td>
                 <td colspan="2">
                     <select id="targetSelect">
+                    </select>
+                </td>
+            </tr>
+            <tr>
+                <td><b>Frame type:</b></td>
+                <td colspan="2">
+                    <select id="rfTypeSelect">
                     </select>
                 </td>
             </tr>

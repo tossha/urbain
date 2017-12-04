@@ -1,7 +1,7 @@
 class TrajectoryKeplerianBasic extends TrajectoryKeplerianAbstract
 {
-    constructor(referenceFrame, keplerianObject, color) {
-        super(referenceFrame, color);
+    constructor(referenceFrameId, keplerianObject, color) {
+        super(referenceFrameId, color);
         this.keplerianObject = keplerianObject;
     }
 

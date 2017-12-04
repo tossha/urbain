@@ -1,13 +1,19 @@
 class VisualBodyModelRings extends VisualBodyModelAbstract
 {
-    constructor(shape, color, texturePath, ringsColorMapPath, ringsAlphaMapPath){
+    constructor(shape, color, texturePath, ringsColorMapPath, ringsAlphaMapPath) {
         super(shape, color);
+        this.texturePath = texturePath;
+        this.ringsColorMapPath = ringsColorMapPath;
+        this.ringsAlphaMapPath = ringsAlphaMapPath;
+    }
 
+    onLoadFinish() {
+        super.onLoadFinish();
         let that = this;
 
-        if (texturePath) {
-            textureLoader.load(
-                COMMON_TEXTURE_PATH + texturePath,
+        if (this.texturePath) {
+            sim.textureLoader.load(
+                VisualModelAbstract.texturePath + this.texturePath,
                 function(txt) {
                     that.bodyThreeObj.material.dispose();
                     that.bodyThreeObj.material = that.getMaterial({map: txt});
@@ -19,9 +25,9 @@ class VisualBodyModelRings extends VisualBodyModelAbstract
             );
         }
 
-        if (ringsColorMapPath) {
-            textureLoader.load(
-                COMMON_TEXTURE_PATH + ringsColorMapPath,
+        if (this.ringsColorMapPath) {
+            sim.textureLoader.load(
+                VisualModelAbstract.texturePath + this.ringsColorMapPath,
                 function(txt) {
                     that.ringsColorMap = txt;
                     that.updateRingsMaterial();
@@ -33,9 +39,9 @@ class VisualBodyModelRings extends VisualBodyModelAbstract
             );
         }
 
-        if (ringsAlphaMapPath) {
-            textureLoader.load(
-                COMMON_TEXTURE_PATH + ringsAlphaMapPath,
+        if (this.ringsAlphaMapPath) {
+            sim.textureLoader.load(
+                VisualModelAbstract.texturePath + this.ringsAlphaMapPath,
                 function(txt) {
                     that.ringsAlphaMap = txt;
                     that.updateRingsMaterial();
@@ -57,7 +63,7 @@ class VisualBodyModelRings extends VisualBodyModelAbstract
         );
 
         this.ringsThreeObj = new THREE.Mesh(
-            new THREE.CircleGeometry(140220, 32),
+            new THREE.CircleGeometry(140220, 64),
             this.getMaterial({color: this.color, wireframe: true})
         );
 

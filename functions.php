@@ -34,6 +34,12 @@ function reorderScripts($files) {
             preg_match('/extends ([\S]+)/', $contents, $matches);
             $parentClass = $matches[1];
 
+            // костыль :(
+            if ($class === 'Camera') {
+                $delayed[] = $file;
+                continue;
+            }
+
             if (!$parentClass || in_array($parentClass, $includedClasses)) {
                 $includedClasses[] = $class;
                 $reordered[] = $file;
@@ -53,6 +59,6 @@ function reorderScripts($files) {
 
 
 function generateToggleButton($name) {
-    return '<button id="' . $name . 'ToggleButton" onclick="ui.changeVisibility(\''
+    return '<button id="' . $name . 'ToggleButton" onclick="sim.ui.changeVisibility(\''
         . $name . '\')" class="toggleButton">Hide</button>';
 }

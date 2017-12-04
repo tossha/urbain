@@ -31,7 +31,7 @@ class TLE
 
     getSma() {
         //sma^3 = mu[earth] / (2PI * Frequency)^2
-        return Math.cbrt(BODIES[EARTH].physicalModel.mu / Math.pow(2 * Math.PI * (this.getMeanMotion()), 2));
+        return Math.cbrt(starSystem.getObject(EARTH).physicalModel.mu / Math.pow(2 * Math.PI * (this.getMeanMotion()), 2));
     }
 
     getEpoch() {

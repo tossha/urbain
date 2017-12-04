@@ -1,7 +1,14 @@
 class ReferenceFrameAbstract
 {
+    setId(id) {
+        this.id = id;
+        this.originId = sim.starSystem.getReferenceFrameIdObject(id);
+        this.type = sim.starSystem.getReferenceFrameIdType(id);
+        return this;
+    }
+
     getQuaternionByEpoch(epoch) {
-        return IDENTITY_QUATERNION;
+        return new Quaternion();
     }
 
     getOriginPositionByEpoch(epoch) {
@@ -13,22 +20,26 @@ class ReferenceFrameAbstract
     }
 
     transformStateVectorByEpoch(epoch, state, destinationFrame) {
-        if (this === destinationFrame) {
+        let destinationFrameObj = (destinationFrame instanceof ReferenceFrameAbstract)
+            ? destinationFrame
+            : sim.starSystem.getReferenceFrame(destinationFrame);
+
+        if (this === destinationFrameObj) {
             return state;
         }
 
-        if (this === RF_BASE) {
-            return destinationFrame.stateVectorFromBaseReferenceFrameByEpoch(
+        if (this.id === RF_BASE) {
+            return destinationFrameObj.stateVectorFromBaseReferenceFrameByEpoch(
                 epoch,
                 state
             );
         }
 
-        if (destinationFrame === RF_BASE) {
+        if (destinationFrameObj.id === RF_BASE) {
             return this.stateVectorToBaseReferenceFrameByEpoch(epoch, state);
         }
 
-        return destinationFrame.stateVectorFromBaseReferenceFrameByEpoch(
+        return destinationFrameObj.stateVectorFromBaseReferenceFrameByEpoch(
             epoch,
             this.stateVectorToBaseReferenceFrameByEpoch(epoch, state)
         );

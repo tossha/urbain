@@ -12,10 +12,10 @@ class Propagator
         let currentEpoch = lastState.epoch;
 
         while (currentEpoch < exitEpoch) {
-            let acceleration = ZERO_VECTOR;
+            let acceleration = new Vector();
 
             for (const bodyIdIdx in this.significantBodies) {
-                const body = BODIES[this.significantBodies[bodyIdIdx]];
+                const body = starSystem.getObject(this.significantBodies[bodyIdIdx]);
                 if (!body.physicalModel.mu) {
                     continue;
                 }

@@ -1,6 +1,8 @@
-class VisualTrajectoryModelAbstract
+class VisualTrajectoryModelAbstract extends VisualModelAbstract
 {
     constructor(trajectory, color) {
+        super();
+
         this.trajectory = trajectory;
         this.standardColor = color;
         this.color = color;
@@ -11,28 +13,27 @@ class VisualTrajectoryModelAbstract
         );
 
         this.threeObj.userData = {trajectory: trajectory};
-
-        scene.add(this.threeObj);
-
-        trajArray.push(this.threeObj);
     }
 
-    set isSelected(newValue) {
-        if(newValue) {
-            this.color = 0xFFFFFF;
-        }
-        else {
-            this.color = this.standardColor;
-        }
+    onLoadFinish() {
+        super.onLoadFinish();
+        sim.selection.addSelectableObject(this.threeObj);
+    }
+
+    select() {
+        this.color = 0xFFFFFF;
+    }
+
+    deselect() {
+        this.color = this.standardColor;
     }
 
     drop()
     {
-        scene.remove(this.threeObj);
+        this.scene.remove(this.threeObj);
         this.threeObj.geometry.dispose();
         this.threeObj.material.dispose();
+        this.threeObj.remove();
         delete this.threeObj;
     }
-
-    render(epoch) {}
 }

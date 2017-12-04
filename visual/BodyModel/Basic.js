@@ -3,11 +3,16 @@ class VisualBodyModelBasic extends VisualBodyModelAbstract
     constructor(shape, color, texturePath) {
         super(shape, color);
 
-        if (texturePath) {
-            var that = this;
+        this.texturePath = texturePath;
+    }
 
-            textureLoader.load(
-                COMMON_TEXTURE_PATH + texturePath,
+    onLoadFinish() {
+        super.onLoadFinish();
+        if (this.texturePath) {
+            let that = this;
+
+            sim.textureLoader.load(
+                VisualModelAbstract.texturePath + this.texturePath,
                 function(txt) {
                     that.threeObj.material.dispose();
                     that.threeObj.material = that.getMaterial({map: txt});
