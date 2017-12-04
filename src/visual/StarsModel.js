@@ -25,14 +25,14 @@ export default class VisualStarsModel extends VisualModelAbstract
             ));
         }
 
-        this.threeObj = new THREE.Points(
+        this.setThreeObj(new THREE.Points(
             threeGeometry,
             new THREE.PointsMaterial({
                 vertexColors: THREE.VertexColors,
                 size: 2,
                 sizeAttenuation: false
             })
-        );
+        ));
 
         this.threeObj.quaternion.copy(new Quaternion([-1, 0, 0], deg2rad(23.4)).toThreejs());
     }

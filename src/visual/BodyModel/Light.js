@@ -5,10 +5,6 @@ export default class VisualBodyModelLight extends VisualBodyModelBasic
     constructor(shape, color, texturePath, lightColor, lightIntensity, lightDistance, lightDecay) {
         super(shape, color, texturePath);
         this.light = new THREE.PointLight(lightColor, lightIntensity, lightDistance, lightDecay);
-    }
-
-    onLoadFinish() {
-        super.onLoadFinish();
         this.scene.add(this.light);
     }
 

@@ -1574,7 +1574,6 @@ const Events = {
     RENDER: 'urb_render',
     SELECT: 'urb_select',
     DESELECT: 'urb_deselect',
-    LOAD_FINISH: 'urb_load_finish',
 };
 /* harmony export (immutable) */ __webpack_exports__["a"] = Events;
 
@@ -1624,24 +1623,14 @@ class VisualModelAbstract
 {
     constructor() {
         this.threeObj = null;
-        this.scene = null;
-        this.loadFinishListener = this._onLoadFinish.bind(this);
+        this.scene = sim.scene;
         this.renderListener = this._onRender.bind(this);
-        document.addEventListener(__WEBPACK_IMPORTED_MODULE_0__core_Events__["a" /* Events */].LOAD_FINISH, this.loadFinishListener);
         document.addEventListener(__WEBPACK_IMPORTED_MODULE_0__core_Events__["a" /* Events */].RENDER, this.renderListener);
     }
 
-    _onLoadFinish(event) {
-        this.scene = event.detail.scene;
-        this.onLoadFinish();
-        document.removeEventListener(__WEBPACK_IMPORTED_MODULE_0__core_Events__["a" /* Events */].LOAD_FINISH, this.loadFinishListener);
-        delete this.loadFinishListener;
-    }
-
-    onLoadFinish() {
-        if (this.threeObj) {
-            this.scene.add(this.threeObj);
-        }
+    setThreeObj(obj) {
+        this.threeObj = obj;
+        this.scene.add(this.threeObj);
     }
 
     _onRender(event) {
@@ -1649,6 +1638,20 @@ class VisualModelAbstract
     }
 
     render(epoch) {}
+
+    drop() {
+        if (this.threeObj) {
+            this.scene.remove(this.threeObj);
+            if (this.threeObj.geometry) {
+                this.threeObj.geometry.dispose();
+            }
+            if (this.threeObj.material) {
+                this.threeObj.material.dispose();
+            }
+            delete this.threeObj;
+        }
+        document.removeEventListener(__WEBPACK_IMPORTED_MODULE_0__core_Events__["a" /* Events */].RENDER, this.renderListener);
+    }
 }
 /* harmony export (immutable) */ __webpack_exports__["a"] = VisualModelAbstract;
 
@@ -1690,7 +1693,15 @@ class KeplerianObject
     }
 
     updateMeanMotion() {
-        this.meanMotion = Math.sqrt(this._mu / this._sma) / this._sma;
+        this.meanMotion = Math.sqrt(this._mu / Math.abs(this._sma)) / Math.abs(this._sma);
+    }
+
+    get isHyperbolic() {
+        return this._e > 1;
+    }
+
+    get isElliptic() {
+        return this._e < 1;
     }
 
     get mu() {
@@ -1784,7 +1795,11 @@ class KeplerianObject
     }
 
     getMeanAnomalyByEccentricAnomaly(ea) {
-        return ea - this._e * Math.sin(ea);
+        if (this.isElliptic) {
+            return ea - this._e * Math.sin(ea);
+        } else {
+            return this._e * Math.sinh(ea) - ea;
+        }
     }
 
     getMeanAnomalyByTrueAnomaly(ta) {
@@ -1796,31 +1811,49 @@ class KeplerianObject
     getEccentricAnomalyByMeanAnomaly(ma) {
         const maxIter = 30;
         const delta = 0.00000001;
-        let M = ma / (2.0 * Math.PI);
+        let M = ma;
         let E, F, i = 0;
 
-        M = 2.0 * Math.PI * (M - Math.floor(M));
+        if (this.isElliptic) {
+            M = M / (2.0 * Math.PI);
+            M = 2.0 * Math.PI * (M - Math.floor(M));
 
-        E = (this._e < 0.8) ? M : Math.PI;
+            E = (this._e < 0.8) ? M : Math.PI;
 
-        F = E - this._e * Math.sin(M) - M;
-
-        while ((Math.abs(F) > delta) && (i < maxIter)) {
-            E = E - F / (1.0 - this._e * Math.cos(E));
             F = E - this._e * Math.sin(E) - M;
-            i = i + 1;
+
+            while ((Math.abs(F) > delta) && (i < maxIter)) {
+                E = E - F / (1.0 - this._e * Math.cos(E));
+                F = E - this._e * Math.sin(E) - M;
+                i = i + 1;
+            }
+        } else {
+            E = (Math.log(2 * (Math.abs(M) + 1/3)) + 1) / this._e + (1 - 1 / this._e) * Math.asinh(Math.abs(M) / this._e);
+            E *= Math.sign(M);
+
+            F = this._e * Math.sinh(E) - E - M;
+
+            while ((Math.abs(F) > delta) && (i < maxIter)) {
+                E = E - F / (this._e * Math.cosh(E) - 1);
+                F = this._e * Math.sinh(E) - E - M;
+                i = i + 1;
+            }
         }
 
         return E;
     }
 
     getEccentricAnomalyByTrueAnomaly(ta) {
-        const cos = Math.cos(ta);
-        const sin = Math.sin(ta);
-        const cosE = (this._e + cos) / (1 + this._e * cos);
-        const sinE = Math.sqrt(1 - this._e * this._e) * sin / (1 + this._e * cos);
+        if (this.isElliptic) {
+            const cos = Math.cos(ta);
+            const sin = Math.sin(ta);
+            const cosE = (this._e + cos) / (1 + this._e * cos);
+            const sinE = Math.sqrt(1 - this._e * this._e) * sin / (1 + this._e * cos);
 
-        return Object(__WEBPACK_IMPORTED_MODULE_0__algebra__["g" /* getAngleBySinCos */])(sinE, cosE);
+            return Object(__WEBPACK_IMPORTED_MODULE_0__algebra__["g" /* getAngleBySinCos */])(sinE, cosE);
+        } else {
+            return 2 * Math.atanh(Math.tan(ta / 2) / Math.sqrt((this._e + 1) / (this._e - 1)));
+        }
     }
 
     getTrueAnomalyByMeanAnomaly(ma) {
@@ -1830,40 +1863,64 @@ class KeplerianObject
     }
 
     getTrueAnomalyByEccentricAnomaly(ea) {
-        const phi = Math.atan2(Math.sqrt(1.0 - this._e * this._e) * Math.sin(ea), Math.cos(ea) - this._e);
-        return (phi > 0) ? phi : (phi + 2 * Math.PI);
+        if (this.isElliptic) {
+            const phi = Math.atan2(Math.sqrt(1.0 - this._e * this._e) * Math.sin(ea), Math.cos(ea) - this._e);
+            return (phi > 0) ? phi : (phi + 2 * Math.PI);
+        } else {
+            return 2 * Math.atan(Math.sqrt((this._e + 1) / (this._e - 1)) * Math.tanh(ea / 2));
+        }
     }
 
-    getEllipseCoordsByTrueAnomaly(ta) {
+    getOwnCoordsByTrueAnomaly(ta) {
         const r = this._sma * (1.0 - this._e * this._e) / (1 + this._e * Math.cos(ta));
         return new __WEBPACK_IMPORTED_MODULE_0__algebra__["c" /* Vector */]([r * Math.cos(ta), r * Math.sin(ta), 0]);
+    }
+
+    getAsymptoteTa() {
+        if (this.isElliptic) {
+            return false;
+        }
+        return Math.acos(-1 / this._e);
     }
 
     /**
      *  @see http://microsat.sm.bmstu.ru/e-library/Ballistics/kepler.pdf
      */
     getStateByEpoch(epoch) {
-        const ea = this.getEccentricAnomalyByEpoch(epoch);
-        const cos = Math.cos(ea);
-        const sin = Math.sin(ea);
-        const koeff = Math.sqrt(this._mu / this._sma) / (1 - this._e * cos);
+        if (this.isElliptic) {
+            const ea = this.getEccentricAnomalyByEpoch(epoch);
+            const cos = Math.cos(ea);
+            const sin = Math.sin(ea);
+            const koeff = Math.sqrt(this._mu / this._sma) / (1 - this._e * cos);
 
-        let pos = new __WEBPACK_IMPORTED_MODULE_0__algebra__["c" /* Vector */]([
-            this._sma * (cos - this._e),
-            this._sma * Math.sqrt(1 - this._e * this._e) * sin,
-            0
-        ]);
+            let pos = new __WEBPACK_IMPORTED_MODULE_0__algebra__["c" /* Vector */]([
+                this._sma * (cos - this._e),
+                this._sma * Math.sqrt(1 - this._e * this._e) * sin,
+                0
+            ]);
 
-        let vel = new __WEBPACK_IMPORTED_MODULE_0__algebra__["c" /* Vector */]([
-            -koeff * sin,
-            koeff * Math.sqrt(1 - this._e * this._e) * cos,
-            0
-        ]);
+            let vel = new __WEBPACK_IMPORTED_MODULE_0__algebra__["c" /* Vector */]([
+                -koeff * sin,
+                koeff * Math.sqrt(1 - this._e * this._e) * cos,
+                0
+            ]);
 
-        return new __WEBPACK_IMPORTED_MODULE_1__StateVector__["a" /* default */](
-            pos.rotateZ(this._aop).rotateX(this._inc).rotateZ(this._raan),
-            vel.rotateZ(this._aop).rotateX(this._inc).rotateZ(this._raan)
-        );
+            return new __WEBPACK_IMPORTED_MODULE_1__StateVector__["a" /* default */](
+                pos.rotateZ(this._aop).rotateX(this._inc).rotateZ(this._raan),
+                vel.rotateZ(this._aop).rotateX(this._inc).rotateZ(this._raan)
+            );
+        } else {
+            const ta = this.getTrueAnomalyByEpoch(epoch);
+            const orbitalQuat = this.getOrbitalFrameQuaternion();
+            const pos = this.getOwnCoordsByTrueAnomaly(ta);
+            const flightPathAngle = Math.atan(this._e * Math.sin(ta) / (1 + this._e * Math.cos(ta)));
+            let vel = new __WEBPACK_IMPORTED_MODULE_0__algebra__["c" /* Vector */]([Math.sqrt(this._mu * (2 / pos.mag - 1 / this._sma)), 0, 0]);
+
+            return new __WEBPACK_IMPORTED_MODULE_1__StateVector__["a" /* default */](
+                orbitalQuat.rotate_(pos),
+                orbitalQuat.rotate_(vel.rotateZ(ta + Math.PI / 2 - flightPathAngle)),
+            );
+        }
     }
 
     getNormalVector() {
@@ -1881,7 +1938,7 @@ class KeplerianObject
     }
 
     getPeriapsisVector() {
-        return this.getOrbitalFrameQuaternion().rotate(new __WEBPACK_IMPORTED_MODULE_0__algebra__["c" /* Vector */]([1, 0, 0]));
+        return this.getOrbitalFrameQuaternion().rotate_(new __WEBPACK_IMPORTED_MODULE_0__algebra__["c" /* Vector */]([1, 0, 0]));
 
     }
 
@@ -1904,11 +1961,8 @@ class KeplerianObject
         const p = pos.rotateZ(-raan).rotateX(-inc);
         const u = Math.atan2(p.y , p.x);
 
-        const radVel = pos.dot(vel) / pos.mag;
-        const cosE = (sma - pos.mag) / (sma * e);
-        const sinE = (pos.mag * radVel) / (e * Math.sqrt(mu * sma));
-        let ta = Math.atan2((Math.sqrt(1.0 - e * e) * sinE) , (cosE - e));
-        ta = (ta > 0) ? ta : (ta + 2 * Math.PI);
+        const radVel = pos.dot(vel);
+        const ta = Math.acos((sma*(1 - e*e) / pos.mag - 1) / e) * Math.sign(radVel);
 
         const aop = ((u - ta) > 0) ? (u - ta) : 2 * Math.PI + (u - ta);
 
@@ -2847,16 +2901,11 @@ class VisualBodyModelBasic extends __WEBPACK_IMPORTED_MODULE_0__Abstract__["a" /
     constructor(shape, color, texturePath) {
         super(shape, color);
 
-        this.texturePath = texturePath;
-    }
-
-    onLoadFinish() {
-        super.onLoadFinish();
-        if (this.texturePath) {
+        if (texturePath) {
             let that = this;
 
             sim.textureLoader.load(
-                __WEBPACK_IMPORTED_MODULE_1__ModelAbstract__["a" /* default */].texturePath + this.texturePath,
+                __WEBPACK_IMPORTED_MODULE_1__ModelAbstract__["a" /* default */].texturePath + texturePath,
                 function(txt) {
                     that.threeObj.material.dispose();
                     that.threeObj.material = that.getMaterial({map: txt});
@@ -2896,7 +2945,7 @@ class VisualBodyModelAbstract extends __WEBPACK_IMPORTED_MODULE_0__ModelAbstract
         this.color = color;
         this.body = null; // class Body
 
-        this.threeObj = this.getThreeObj();
+        this.setThreeObj(this.getThreeObj());
         this.threeObj.add(new THREE.AxisHelper(shape.radius * 2));
     }
 
@@ -2949,6 +2998,8 @@ class Camera
         this.orbitingPoint = this.referenceFrame.originId;
         this.frameType = this.referenceFrame.type;
         this.quaternion = this._getQuaternionByPosition(this.position);
+
+        this.lastPosition = this.referenceFrame.transformPositionByEpoch(sim.currentEpoch, this.position, __WEBPACK_IMPORTED_MODULE_1__ReferenceFrame_Factory__["a" /* RF_BASE */]);
 
         this.currentMousePos = new __WEBPACK_IMPORTED_MODULE_0__algebra__["c" /* Vector */]([0, 0]);
         this.accountedMousePos = new __WEBPACK_IMPORTED_MODULE_0__algebra__["c" /* Vector */]([0, 0]);
@@ -7499,22 +7550,26 @@ module.exports = __webpack_amd_options__;
 class Simulation
 {
     init(domElementId, starSystemConfig) {
+        this.scene = new THREE.Scene();
+        this.textureLoader = new THREE.TextureLoader();
+        this.renderer = new THREE.WebGLRenderer({antialias: true});
+        this.rendererEvents = new __WEBPACK_IMPORTED_MODULE_0__EventHandler__["a" /* default */](this.renderer.domElement);
+
+        this.selection = new __WEBPACK_IMPORTED_MODULE_7__visual_SelectionHandler__["a" /* default */]();
+
         this.starSystem = new __WEBPACK_IMPORTED_MODULE_9__StarSystem__["a" /* default */](starSystemConfig.id);
 
         __WEBPACK_IMPORTED_MODULE_5__interface_StarSystemLoader__["a" /* default */].loadFromConfig(this.starSystem, starSystemConfig);
-        this.time = new __WEBPACK_IMPORTED_MODULE_4__TimeLine__["a" /* default */](__WEBPACK_IMPORTED_MODULE_4__TimeLine__["a" /* default */].getEpochByDate(new Date()), 0.001, true);
 
-        this.scene = new THREE.Scene();
+        this.time = new __WEBPACK_IMPORTED_MODULE_4__TimeLine__["a" /* default */](__WEBPACK_IMPORTED_MODULE_4__TimeLine__["a" /* default */].getEpochByDate(new Date(1516193355000 + 86400000*30*4)), 86.4 * 0.005, false);
+
         this.scene.add(new THREE.AmbientLight(0xFFEFD5, 0.15));
 
-        this.renderer = new THREE.WebGLRenderer({antialias: true});
         this.renderer.setSize(window.innerWidth, window.innerHeight);
 
         this.domElement = document.getElementById(domElementId);
         this.domElement.appendChild(this.renderer.domElement);
         this.domElement.addEventListener('resize', this.onWindowResize.bind(this));
-
-        this.rendererEvents = new __WEBPACK_IMPORTED_MODULE_0__EventHandler__["a" /* default */](this.renderer.domElement);
 
         this.camera = new __WEBPACK_IMPORTED_MODULE_10__Camera__["a" /* default */](
             this.renderer.domElement,
@@ -7525,18 +7580,9 @@ class Simulation
             new __WEBPACK_IMPORTED_MODULE_1__algebra__["c" /* Vector */]([30000, 30000, 10000])
         );
 
-        this.textureLoader = new THREE.TextureLoader();
-
         this.raycaster = new __WEBPACK_IMPORTED_MODULE_6__visual_VisualRaycaster__["a" /* default */](this.renderer.domElement, this.camera.threeCamera, 7);
 
-        this.selection = new __WEBPACK_IMPORTED_MODULE_7__visual_SelectionHandler__["a" /* default */]();
-
         this.ui = new __WEBPACK_IMPORTED_MODULE_8__ui_UI__["a" /* default */](5, this.starSystem.getObjectNames());
-
-        document.dispatchEvent(new CustomEvent(
-            __WEBPACK_IMPORTED_MODULE_2__Events__["a" /* Events */].LOAD_FINISH,
-            {detail: {scene: this.scene}}
-        ));
     }
 
     get currentEpoch() {
@@ -8579,7 +8625,7 @@ class KeplerianEditor
             this.normal,
             keplerianObject.aop,
             this.aopAngleColor,
-            1,
+            2,
             true
         );
 
@@ -8589,7 +8635,7 @@ class KeplerianEditor
             this.node,
             keplerianObject.inc,
             this.incAngleColor,
-            3,
+            2,
             true
         );
 
@@ -8599,7 +8645,7 @@ class KeplerianEditor
             this.normal,
             keplerianObject.ta,
             this.taAngleColor,
-            3,
+            1.5,
             true
         );
 
@@ -9053,11 +9099,74 @@ class HelperAngle
 
 class VisualTrajectoryModelKeplerian extends __WEBPACK_IMPORTED_MODULE_0__Abstract__["a" /* default */]
 {
-    render(epoch) {
+    render(epoch)
+    {
+        const keplerianObject = this.trajectory.getKeplerianObjectByEpoch(epoch);
+
+        if (keplerianObject.isElliptic) {
+            this.renderEllipse(keplerianObject, epoch);
+        } else {
+            this.renderHyperbola(keplerianObject, epoch);
+        }
+    }
+
+    renderHyperbola(traj, epoch) {
         const endingBrightness = 0.35;
         const pointsNum = 100;
 
-        const traj = this.trajectory.getKeplerianObjectByEpoch(epoch);
+        const orbitQuaternion = this.trajectory.orbitalReferenceFrame.getQuaternionByEpoch(epoch);
+        const curTa = traj.getTrueAnomalyByEpoch(epoch);
+
+        const minTa = -traj.getAsymptoteTa();
+        const maxTa = -minTa;
+        const taStep = (maxTa - minTa) / (pointsNum - 1);
+        const mainColor = new THREE.Color(this.color);
+
+        let points = [];
+        let angs = [];
+        let ta = minTa + taStep;
+        let i = 0;
+
+        while (i < pointsNum) {
+            let coords = traj.getOwnCoordsByTrueAnomaly(ta);
+            points[i] = (new THREE.Vector2()).fromArray([coords[0], coords[1]]);
+            angs[i] = (ta > curTa) ? 0 : ((ta - minTa) / (curTa - minTa));
+            i  += 1;
+            ta += taStep;
+
+            if (ta - taStep < curTa && curTa < ta) {
+                coords = traj.getOwnCoordsByTrueAnomaly(curTa);
+                points[i] = (new THREE.Vector2()).fromArray([coords[0], coords[1]]);
+                angs[i] = 1;
+                i  += 1;
+                points[i] = (new THREE.Vector2()).fromArray([coords[0] + 1e-8, coords[1] + 1e-8]);
+                angs[i] = 0;
+                i  += 1;
+            }
+        }
+
+        this.threeObj.geometry.dispose();
+        this.threeObj.geometry = (new THREE.Path(
+            points
+        )).createPointsGeometry(pointsNum);
+
+        for (let i = 0; i < angs.length; i++) {
+            let curColor = (new THREE.Color()).copy(mainColor);
+            let mult = endingBrightness + (1 - endingBrightness) * angs[i];
+
+            this.threeObj.geometry.colors.push(
+                curColor.multiplyScalar(mult)
+            );
+        }
+
+        this.threeObj.quaternion.copy(orbitQuaternion.toThreejs());
+        this.threeObj.position.fromArray(sim.getVisualCoords(this.trajectory.referenceFrame.getOriginPositionByEpoch(epoch)));
+    }
+
+    renderEllipse(traj, epoch) {
+        const endingBrightness = 0.35;
+        const pointsNum = 100;
+
         const orbitQuaternion = this.trajectory.orbitalReferenceFrame.getQuaternionByEpoch(epoch);
         const cameraPosition = sim.starSystem.getReferenceFrame(__WEBPACK_IMPORTED_MODULE_1__core_ReferenceFrame_Factory__["a" /* RF_BASE */]).transformPositionByEpoch(epoch, sim.camera.lastPosition, this.trajectory.orbitalReferenceFrame);
         const visualOrigin = new __WEBPACK_IMPORTED_MODULE_2__algebra__["c" /* Vector */]([cameraPosition.x, cameraPosition.y, 0]);
@@ -9067,9 +9176,9 @@ class VisualTrajectoryModelKeplerian extends __WEBPACK_IMPORTED_MODULE_0__Abstra
         const sinE = visualOrigin.y / visualOrigin.mag;
         const cosE = visualOrigin.x / visualOrigin.mag;
         const cameraTrueAnomaly = Object(__WEBPACK_IMPORTED_MODULE_2__algebra__["g" /* getAngleBySinCos */])(sinE, cosE);
-        const toClosestPoint = traj.getEllipseCoordsByTrueAnomaly(cameraTrueAnomaly)                // not really closest
+        const toClosestPoint = traj.getOwnCoordsByTrueAnomaly(cameraTrueAnomaly)                // not really closest
             .sub(cameraPosition).mag;
-        const toFarthestPoint = traj.getEllipseCoordsByTrueAnomaly(cameraTrueAnomaly + Math.PI)     // not really farthest
+        const toFarthestPoint = traj.getOwnCoordsByTrueAnomaly(cameraTrueAnomaly + Math.PI)     // not really farthest
             .sub(cameraPosition).mag;
         const cameraAngle = traj.getEccentricAnomalyByTrueAnomaly(cameraTrueAnomaly - ta);
         let ang = Math.acos(
@@ -9180,16 +9289,12 @@ class VisualTrajectoryModelAbstract extends __WEBPACK_IMPORTED_MODULE_0__ModelAb
         this.standardColor = color;
         this.color = color;
 
-        this.threeObj = new __WEBPACK_IMPORTED_MODULE_1__LineObject__["a" /* default */](
+        this.setThreeObj(new __WEBPACK_IMPORTED_MODULE_1__LineObject__["a" /* default */](
             new THREE.Geometry(),
             new THREE.LineBasicMaterial({vertexColors: THREE.VertexColors})
-        );
+        ));
 
         this.threeObj.userData = {trajectory: trajectory};
-    }
-
-    onLoadFinish() {
-        super.onLoadFinish();
         sim.selection.addSelectableObject(this.threeObj);
     }
 
@@ -9199,15 +9304,6 @@ class VisualTrajectoryModelAbstract extends __WEBPACK_IMPORTED_MODULE_0__ModelAb
 
     deselect() {
         this.color = this.standardColor;
-    }
-
-    drop()
-    {
-        this.scene.remove(this.threeObj);
-        this.threeObj.geometry.dispose();
-        this.threeObj.material.dispose();
-        this.threeObj.remove();
-        delete this.threeObj;
     }
 }
 /* harmony export (immutable) */ __webpack_exports__["a"] = VisualTrajectoryModelAbstract;
@@ -9313,14 +9409,14 @@ class VisualStarsModel extends __WEBPACK_IMPORTED_MODULE_1__ModelAbstract__["a" 
             ));
         }
 
-        this.threeObj = new THREE.Points(
+        this.setThreeObj(new THREE.Points(
             threeGeometry,
             new THREE.PointsMaterial({
                 vertexColors: THREE.VertexColors,
                 size: 2,
                 sizeAttenuation: false
             })
-        );
+        ));
 
         this.threeObj.quaternion.copy(new __WEBPACK_IMPORTED_MODULE_0__algebra__["a" /* Quaternion */]([-1, 0, 0], Object(__WEBPACK_IMPORTED_MODULE_0__algebra__["f" /* deg2rad */])(23.4)).toThreejs());
     }
@@ -9342,10 +9438,6 @@ class VisualBodyModelLight extends __WEBPACK_IMPORTED_MODULE_0__Basic__["a" /* d
     constructor(shape, color, texturePath, lightColor, lightIntensity, lightDistance, lightDecay) {
         super(shape, color, texturePath);
         this.light = new THREE.PointLight(lightColor, lightIntensity, lightDistance, lightDecay);
-    }
-
-    onLoadFinish() {
-        super.onLoadFinish();
         this.scene.add(this.light);
     }
 
@@ -9376,18 +9468,12 @@ class VisualBodyModelRings extends __WEBPACK_IMPORTED_MODULE_0__Abstract__["a" /
 {
     constructor(shape, color, texturePath, ringsColorMapPath, ringsAlphaMapPath) {
         super(shape, color);
-        this.texturePath = texturePath;
-        this.ringsColorMapPath = ringsColorMapPath;
-        this.ringsAlphaMapPath = ringsAlphaMapPath;
-    }
 
-    onLoadFinish() {
-        super.onLoadFinish();
         let that = this;
 
-        if (this.texturePath) {
+        if (texturePath) {
             sim.textureLoader.load(
-                __WEBPACK_IMPORTED_MODULE_1__ModelAbstract__["a" /* default */].texturePath + this.texturePath,
+                __WEBPACK_IMPORTED_MODULE_1__ModelAbstract__["a" /* default */].texturePath + texturePath,
                 function(txt) {
                     that.bodyThreeObj.material.dispose();
                     that.bodyThreeObj.material = that.getMaterial({map: txt});
@@ -9399,9 +9485,9 @@ class VisualBodyModelRings extends __WEBPACK_IMPORTED_MODULE_0__Abstract__["a" /
             );
         }
 
-        if (this.ringsColorMapPath) {
+        if (ringsColorMapPath) {
             sim.textureLoader.load(
-                __WEBPACK_IMPORTED_MODULE_1__ModelAbstract__["a" /* default */].texturePath + this.ringsColorMapPath,
+                __WEBPACK_IMPORTED_MODULE_1__ModelAbstract__["a" /* default */].texturePath + ringsColorMapPath,
                 function(txt) {
                     that.ringsColorMap = txt;
                     that.updateRingsMaterial();
@@ -9413,9 +9499,9 @@ class VisualBodyModelRings extends __WEBPACK_IMPORTED_MODULE_0__Abstract__["a" /
             );
         }
 
-        if (this.ringsAlphaMapPath) {
+        if (ringsAlphaMapPath) {
             sim.textureLoader.load(
-                __WEBPACK_IMPORTED_MODULE_1__ModelAbstract__["a" /* default */].texturePath + this.ringsAlphaMapPath,
+                __WEBPACK_IMPORTED_MODULE_1__ModelAbstract__["a" /* default */].texturePath + ringsAlphaMapPath,
                 function(txt) {
                     that.ringsAlphaMap = txt;
                     that.updateRingsMaterial();
