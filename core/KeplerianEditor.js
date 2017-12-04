@@ -3,7 +3,7 @@ class KeplerianEditor
     constructor(trajectory, isEditMode) {
         this.isEditMode = isEditMode;
         this.trajectory = trajectory;
-        if (settings.showAnglesOfSelectedOrbit) {
+        if (sim.ui.showAnglesOfSelectedOrbit) {
             this.init();
         }
         this.raanAngleColor = 0x7FFFD4; //lightblue

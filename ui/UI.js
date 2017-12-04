@@ -10,13 +10,15 @@ class UI
         document.addEventListener(Events.SELECT, this.handleSelect.bind(this));
         document.addEventListener(Events.DESELECT, this.handleDeselect.bind(this));
 
+        this.showAnglesOfSelectedOrbit = true;
+
         $('#showAnglesOfSelectedOrbit').on('change', function() {
-            settings.showAnglesOfSelectedOrbit = this.checked;
-            if (selection.getSelectedObject()) {
+            sim.ui.showAnglesOfSelectedOrbit = this.checked;
+            if (sim.selection.getSelectedObject()) {
                 if (this.checked) {
-                    selection.getSelectedObject().keplerianEditor.init();
+                    sim.selection.getSelectedObject().keplerianEditor.init();
                 } else {
-                    selection.getSelectedObject().keplerianEditor.remove();
+                    sim.selection.getSelectedObject().keplerianEditor.remove();
                 }
             }
         });
