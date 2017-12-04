@@ -1,18 +1,19 @@
 import spice
+import kepler
 import json
 import math
 
-spice.loadKernel('de430.bsp')
-spice.loadKernel('naif0012.tls.pc')
+spice.loadKernel('kernels/de430.bsp')
+spice.loadKernel('naif0012.tls')
 spice.loadKernel('pck00010.tpc')
 spice.loadKernel('gm_de431.tpc')
 
-spice.loadKernel('jup310.bsp')
-spice.loadKernel('mar097.bsp')
-spice.loadKernel('nep081.bsp')
-spice.loadKernel('plu055.bsp')
-spice.loadKernel('sat375.bsp')
-spice.loadKernel('ura111.bsp')
+spice.loadKernel('kernels/jup310.bsp')
+spice.loadKernel('kernels/mar097.bsp')
+spice.loadKernel('kernels/nep081.bsp')
+spice.loadKernel('kernels/plu055.bsp')
+spice.loadKernel('kernels/sat375.bsp')
+spice.loadKernel('kernels/ura111.bsp')
 
 stars = [
     [216.7309, -83.6679, 4.742419852602448],
@@ -1282,6 +1283,6 @@ maxError = 30000
 
 objectsData = getObjects(objects, etStart, etEnd, maxError)
 
-file = open('ssdata.js', 'w')
+file = open('temp/ssdata.js', 'w')
 file.write(json.dumps(objectsData))
 file.close()
