@@ -4,11 +4,74 @@ import {getAngleBySinCos, Vector} from "../../algebra";
 
 export default class VisualTrajectoryModelKeplerian extends VisualTrajectoryModelAbstract
 {
-    render(epoch) {
+    render(epoch)
+    {
+        const keplerianObject = this.trajectory.getKeplerianObjectByEpoch(epoch);
+
+        if (keplerianObject.isElliptic) {
+            this.renderEllipse(keplerianObject, epoch);
+        } else {
+            this.renderHyperbola(keplerianObject, epoch);
+        }
+    }
+
+    renderHyperbola(traj, epoch) {
         const endingBrightness = 0.35;
         const pointsNum = 100;
 
-        const traj = this.trajectory.getKeplerianObjectByEpoch(epoch);
+        const orbitQuaternion = this.trajectory.orbitalReferenceFrame.getQuaternionByEpoch(epoch);
+        const curTa = traj.getTrueAnomalyByEpoch(epoch);
+
+        const minTa = -traj.getAsymptoteTa();
+        const maxTa = -minTa;
+        const taStep = (maxTa - minTa) / (pointsNum - 1);
+        const mainColor = new THREE.Color(this.color);
+
+        let points = [];
+        let angs = [];
+        let ta = minTa + taStep;
+        let i = 0;
+
+        while (i < pointsNum) {
+            let coords = traj.getOwnCoordsByTrueAnomaly(ta);
+            points[i] = (new THREE.Vector2()).fromArray([coords[0], coords[1]]);
+            angs[i] = (ta > curTa) ? 0 : ((ta - minTa) / (curTa - minTa));
+            i  += 1;
+            ta += taStep;
+
+            if (ta - taStep < curTa && curTa < ta) {
+                coords = traj.getOwnCoordsByTrueAnomaly(curTa);
+                points[i] = (new THREE.Vector2()).fromArray([coords[0], coords[1]]);
+                angs[i] = 1;
+                i  += 1;
+                points[i] = (new THREE.Vector2()).fromArray([coords[0] + 1e-8, coords[1] + 1e-8]);
+                angs[i] = 0;
+                i  += 1;
+            }
+        }
+
+        this.threeObj.geometry.dispose();
+        this.threeObj.geometry = (new THREE.Path(
+            points
+        )).createPointsGeometry(pointsNum);
+
+        for (let i = 0; i < angs.length; i++) {
+            let curColor = (new THREE.Color()).copy(mainColor);
+            let mult = endingBrightness + (1 - endingBrightness) * angs[i];
+
+            this.threeObj.geometry.colors.push(
+                curColor.multiplyScalar(mult)
+            );
+        }
+
+        this.threeObj.quaternion.copy(orbitQuaternion.toThreejs());
+        this.threeObj.position.fromArray(sim.getVisualCoords(this.trajectory.referenceFrame.getOriginPositionByEpoch(epoch)));
+    }
+
+    renderEllipse(traj, epoch) {
+        const endingBrightness = 0.35;
+        const pointsNum = 100;
+
         const orbitQuaternion = this.trajectory.orbitalReferenceFrame.getQuaternionByEpoch(epoch);
         const cameraPosition = sim.starSystem.getReferenceFrame(RF_BASE).transformPositionByEpoch(epoch, sim.camera.lastPosition, this.trajectory.orbitalReferenceFrame);
         const visualOrigin = new Vector([cameraPosition.x, cameraPosition.y, 0]);
@@ -18,9 +81,9 @@ export default class VisualTrajectoryModelKeplerian extends VisualTrajectoryMode
         const sinE = visualOrigin.y / visualOrigin.mag;
         const cosE = visualOrigin.x / visualOrigin.mag;
         const cameraTrueAnomaly = getAngleBySinCos(sinE, cosE);
-        const toClosestPoint = traj.getEllipseCoordsByTrueAnomaly(cameraTrueAnomaly)                // not really closest
+        const toClosestPoint = traj.getOwnCoordsByTrueAnomaly(cameraTrueAnomaly)                // not really closest
             .sub(cameraPosition).mag;
-        const toFarthestPoint = traj.getEllipseCoordsByTrueAnomaly(cameraTrueAnomaly + Math.PI)     // not really farthest
+        const toFarthestPoint = traj.getOwnCoordsByTrueAnomaly(cameraTrueAnomaly + Math.PI)     // not really farthest
             .sub(cameraPosition).mag;
         const cameraAngle = traj.getEccentricAnomalyByTrueAnomaly(cameraTrueAnomaly - ta);
         let ang = Math.acos(
