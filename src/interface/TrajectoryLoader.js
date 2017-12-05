@@ -3,27 +3,50 @@ import TrajectoryKeplerianPrecessingArray from "../core/Trajectory/KeplerianPrec
 import TrajectoryKeplerianBasic from "../core/Trajectory/KeplerianBasic";
 import TrajectoryKeplerianPrecessing from "../core/Trajectory/KeplerianPrecessing";
 import KeplerianObject from "../core/KeplerianObject";
+import TrajectoryComposite from "../core/Trajectory/Composite";
 
 export default class TrajectoryLoader
 {
     static create(config) {
         let type = config.type;
+        let result;
 
         if (type === 'keplerian') {
-            return this.createKeplerian(config);
+            result = this.createKeplerian(config);
         }
 
         if (type === 'keplerian_precessing') {
-            return this.createKeplerianPrecessing(config);
+            result = this.createKeplerianPrecessing(config);
         }
 
         if (type === 'keplerian_array') {
-            return this.createKeplerianArray(config);
+            result = this.createKeplerianArray(config);
         }
 
         if (type === 'keplerian_precessing_array') {
-            return this.createKeplerianPrecessingArray(config);
+            result = this.createKeplerianPrecessingArray(config);
         }
+
+        if (type === 'composite') {
+            result = this.createComposite(config);
+        }
+
+        if (config.periodStart !== undefined) {
+            result.minEpoch = config.periodStart;
+        }
+        if (config.periodEnd !== undefined) {
+            result.maxEpoch = config.periodEnd;
+        }
+
+        return result;
+    }
+
+    static createComposite(config) {
+        let traj = new TrajectoryComposite();
+        for (const partConfig of config.data) {
+            traj.addComponent(this.create(partConfig));
+        }
+        return traj;
     }
 
     static createKeplerianArray(config) {

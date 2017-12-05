@@ -6,6 +6,19 @@ export default class VisualTrajectoryModelKeplerian extends VisualTrajectoryMode
 {
     render(epoch)
     {
+        if (this.trajectory.minEpoch !== null && this.trajectory.minEpoch !== false) {
+            if (epoch < this.trajectory.minEpoch) {
+                this.threeObj.visible = false;
+                return;
+            }
+        }
+        if (this.trajectory.maxEpoch !== null && this.trajectory.maxEpoch !== false) {
+            if (epoch > this.trajectory.maxEpoch) {
+                this.threeObj.visible = false;
+                return;
+            }
+        }
+
         const keplerianObject = this.trajectory.getKeplerianObjectByEpoch(epoch);
 
         if (keplerianObject.isElliptic) {
@@ -19,11 +32,18 @@ export default class VisualTrajectoryModelKeplerian extends VisualTrajectoryMode
         const endingBrightness = 0.35;
         const pointsNum = 100;
 
+        let minTa = -traj.getAsymptoteTa();
+        let maxTa = -minTa;
+
+        if (this.trajectory.minEpoch !== null && this.trajectory.minEpoch !== false) {
+            minTa = traj.getTrueAnomalyByEpoch(this.trajectory.minEpoch);
+        }
+        if (this.trajectory.maxEpoch !== null && this.trajectory.maxEpoch !== false) {
+            maxTa = traj.getTrueAnomalyByEpoch(this.trajectory.maxEpoch);
+        }
+
         const orbitQuaternion = this.trajectory.orbitalReferenceFrame.getQuaternionByEpoch(epoch);
         const curTa = traj.getTrueAnomalyByEpoch(epoch);
-
-        const minTa = -traj.getAsymptoteTa();
-        const maxTa = -minTa;
         const taStep = (maxTa - minTa) / (pointsNum - 1);
         const mainColor = new THREE.Color(this.color);
 
@@ -44,12 +64,13 @@ export default class VisualTrajectoryModelKeplerian extends VisualTrajectoryMode
                 points[i] = (new THREE.Vector2()).fromArray([coords[0], coords[1]]);
                 angs[i] = 1;
                 i  += 1;
-                points[i] = (new THREE.Vector2()).fromArray([coords[0] + 1e-8, coords[1] + 1e-8]);
+                points[i] = (new THREE.Vector2()).fromArray([coords[0] + 1e-6, coords[1] + 1e-6]);
                 angs[i] = 0;
                 i  += 1;
             }
         }
 
+        this.threeObj.visible = true;
         this.threeObj.geometry.dispose();
         this.threeObj.geometry = (new THREE.Path(
             points
@@ -110,6 +131,7 @@ export default class VisualTrajectoryModelKeplerian extends VisualTrajectoryMode
             toFarthestPoint / toClosestPoint
         );
 
+        this.threeObj.visible = true;
         this.threeObj.geometry.dispose();
         this.threeObj.geometry = (new THREE.Path(
             ellipsePoints.coords
