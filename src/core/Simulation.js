@@ -22,9 +22,9 @@ export default class Simulation
 
         this.starSystem = new StarSystem(starSystemConfig.id);
 
-        StarSystemLoader.loadFromConfig(this.starSystem, starSystemConfig);
-
         this.time = new TimeLine(TimeLine.getEpochByDate(new Date(1516193355000 + 86400000*30*4)), 86.4 * 0.005, false);
+
+        StarSystemLoader.loadFromConfig(this.starSystem, starSystemConfig);
 
         this.scene.add(new THREE.AmbientLight(0xFFEFD5, 0.15));
 

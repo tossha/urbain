@@ -11,43 +11,63 @@ export default class VisualTrajectoryModelStateArray extends VisualTrajectoryMod
         this.showAhead = false;
         this.showBehind = false;
         this.showBehind = true;
-        this.trailLength = 300000000;
+        this.trailPeriod = 86400 * 250;
         this.minStep = 60;
+
+        this.initVertices();
     }
 
     render(epoch) {
-        const endingBrightness = 0.35;
-        const mainColor = new THREE.Color(this.color);
+        const endingBrightness = 0.4;
         let points = [];
         let colors = [];
 
-        if (epoch > this.trajectory.minEpoch && epoch < this.trajectory.maxEpoch) {
-            const pastPoints = this.getPoints(epoch, this.trajectory.minEpoch, -1, true);
-            for (let i = pastPoints.points.length - 1; i >= 0; --i) {
-                points.push(pastPoints.points[i]);
-                colors.push(pastPoints.colors[i]);
+        if (epoch < this.trajectory.minEpoch) {
+            this.threeObj.visible = false;
+            return;
+        }
+
+        for (let i = 0; i < this.positions.length; ++i) {
+            if (this.epochs[i] < epoch - this.trailPeriod) {
+                if (this.showBehind) {
+                    points.push(this.positions[i]);
+                    colors.push(0);
+                }
+                if (this.epochs[i+1] > epoch - this.trailPeriod) {
+                    points.push((new THREE.Vector3()).fromArray(
+                        this.trajectory.getPositionByEpoch(epoch - this.trailPeriod, this.referenceFrame)
+                    ));
+                    colors.push(0);
+                    if (this.epochs[i+1] >= epoch) {
+                        const pos = (new THREE.Vector3()).fromArray(
+                            this.trajectory.getPositionByEpoch(epoch, this.referenceFrame)
+                        );
+                        points.push(pos);
+                        points.push(pos);
+                        colors.push(1);
+                        colors.push(0);
+                    }
+                }
+            } else if (this.epochs[i] < epoch) {
+                points.push(this.positions[i]);
+                colors.push(1 - (epoch - this.epochs[i]) / this.trailPeriod);
+                if (this.epochs[i+1] >= epoch) {
+                    const pos = (new THREE.Vector3()).fromArray(
+                        this.trajectory.getPositionByEpoch(epoch, this.referenceFrame)
+                    );
+                    points.push(pos);
+                    points.push(pos);
+                    colors.push(1);
+                    colors.push(0);
+                }
+            } else if (this.epochs[i] > epoch && this.showAhead) {
+                points.push(this.positions[i]);
+                colors.push(0);
             }
         }
-        if (epoch > this.trajectory.minEpoch && (epoch < this.trajectory.maxEpoch && this.showAhead)) {
-            const futurePoints = this.getPoints(epoch, this.trajectory.maxEpoch, 1, false);
-            for (let i = 0; i < futurePoints.points.length; ++i) {
-                points.push(futurePoints.points[i]);
-                colors.push(futurePoints.colors[i]);
-            }
-        }
-        this.threeObj.geometry.dispose();
-        this.threeObj.geometry = (new THREE.Geometry()).setFromPoints(points);
-        console.log(points.length);
 
-        this.threeObj.geometry.colors = [];
-        for (let i = 0; i < colors.length; i++) {
-            let curColor = (new THREE.Color()).copy(mainColor);
-            const mult = endingBrightness + (1 - endingBrightness) * colors[i];
-
-            this.threeObj.geometry.colors.push(
-                curColor.multiplyScalar(mult)
-            );
-        }
+        this.threeObj.visible = true;
+        this.updateGeometry(points, colors, endingBrightness);
 
         this.threeObj.quaternion.copy(this.referenceFrame.getQuaternionByEpoch(epoch).toThreejs());
         this.threeObj.position.fromArray(sim.getVisualCoords(
@@ -55,40 +75,60 @@ export default class VisualTrajectoryModelStateArray extends VisualTrajectoryMod
         ));
     }
 
-    getPoints(startEpoch, endEpoch, direction, isTrail) {
+    findPointByEpoch(epoch) {
+        let low  = 0;
+        let high = this.epochs.length - 1;
+        let idx = Math.floor((low + high) / 2);
+
+        do {
+            if (this.epochs[idx] < epoch) {
+                low = idx;
+            } else if (this.epochs[idx] > epoch) {
+                high = idx;
+            } else {
+                return idx;
+            }
+            idx = Math.floor((low + high) / 2)
+        } while (idx != low);
+
+        return (epoch - this.epochs[idx] > this.epochs[idx + 1] - epoch)
+            ? idx + 1
+            : idx;
+    }
+
+    initVertices() {
         const traj = this.trajectory;
-        let step = direction * this.minStep;
-        let isIncreasing = null;
-        let curState = traj.getStateByEpoch(startEpoch, this.referenceFrame);
+        let step = this.minStep;
+        let curEpoch = traj.minEpoch;
+        let curState = traj.getStateByEpoch(curEpoch, this.referenceFrame);
         let curVelocity = curState.velocity.unit_();
-        let curEpoch = startEpoch;
-        let points = [curState.position];
-        let colors = [isTrail ? 1 : 0];
-        let curTrailLength = 0;
+
+        this.positions = [curState.position];
+        this.epochs = [curEpoch];
         let i = 1;
 
-        while (direction > 0 ? (curEpoch < endEpoch) : (curEpoch > endEpoch)) {
+        while (curEpoch < traj.maxEpoch) {
             let lastState;
             let lastEpoch;
             let lastDrMag;
-            isIncreasing = null;
+            let isIncreasing = null;
             let stepsLeft = 20;
             while (true) {
-                const nextEpoch = (direction > 0 ? (curEpoch + step > endEpoch) : (curEpoch + step < endEpoch))
-                    ? endEpoch
+                const nextEpoch = (curEpoch + step > traj.maxEpoch)
+                    ? traj.maxEpoch
                     : curEpoch + step;
                 step = nextEpoch - curEpoch;
                 const newState = traj.getStateByEpoch(nextEpoch, this.referenceFrame);
-                const dr = newState._position.sub(curState._position).mul_(direction);
+                const dr = newState._position.sub(curState._position);
                 const drMag = dr.mag;
                 let angleCos = dr.dot(curVelocity) / drMag;
 
-                if (nextEpoch != endEpoch) {
-                    const nextNextEpoch = (direction > 0 ? (nextEpoch + step > endEpoch) : (nextEpoch + step < endEpoch))
-                        ? endEpoch
+                if (nextEpoch != traj.maxEpoch) {
+                    const nextNextEpoch = (nextEpoch + step > traj.maxEpoch)
+                        ? traj.maxEpoch
                         : nextEpoch + step;
                     const nextNewState = traj.getStateByEpoch(nextNextEpoch, this.referenceFrame);
-                    const nextDr = nextNewState._position.sub(newState._position).mul_(direction);
+                    const nextDr = nextNewState._position.sub(newState._position);
                     angleCos = Math.min(angleCos, dr.dot(nextDr) / drMag / nextDr.mag);
                 }
 
@@ -104,7 +144,7 @@ export default class VisualTrajectoryModelStateArray extends VisualTrajectoryMod
                     lastState = newState;
                     lastEpoch = nextEpoch;
                     lastDrMag = drMag;
-                    if (isIncreasing === false || nextEpoch === endEpoch) {
+                    if (isIncreasing === false || nextEpoch === traj.maxEpoch) {
                         break;
                     }
                     step *= 2;
@@ -122,40 +162,17 @@ export default class VisualTrajectoryModelStateArray extends VisualTrajectoryMod
                 }
             }
 
-            if (isTrail && !this.showBehind
-                && (curTrailLength < this.trailLength)
-                && (curTrailLength + lastDrMag > this.trailLength)
-            ) {
-                points[i] = (new THREE.Vector3()).fromArray(
-                    traj.getStateByEpoch(
-                        curEpoch + (lastEpoch - curEpoch) * (this.trailLength - curTrailLength) / lastDrMag,
-                        this.referenceFrame
-                    ).position
-                );
-                colors[i] = 0;
-                break;
-            }
-
-            curTrailLength += lastDrMag;
-            points[i] = new THREE.Vector3(
+            this.epochs[i] = lastEpoch;
+            this.positions[i] = new THREE.Vector3(
                 lastState._position.x,
                 lastState._position.y,
                 lastState._position.z
             );
-            if (isTrail) {
-                colors[i] = Math.max(0, 1 - curTrailLength / this.trailLength);
-            } else {
-                colors[i] = 0;
-            }
+
             curState = lastState;
             curVelocity = curState.velocity.unit_();
             curEpoch = lastEpoch;
             i++;
         }
-
-        return {
-            points: points,
-            colors: colors
-        };
     }
 }

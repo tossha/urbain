@@ -2,6 +2,7 @@
 import TrajectoryAbstract from "./Abstract";
 import {RF_BASE} from "../ReferenceFrame/Factory";
 import VisualTrajectoryModelStateArray from "../../visual/TrajectoryModel/StateArray";
+import TimeLine from "../TimeLine";
 
 export default class TrajectoryComposite extends TrajectoryAbstract
 {
@@ -9,9 +10,12 @@ export default class TrajectoryComposite extends TrajectoryAbstract
         super(RF_BASE);
         this.components = [];
         this.lastUsedTrajectory = null;
+        this.color = color;
+    }
 
-        if (color) {
-            this.visualModel = new VisualTrajectoryModelStateArray(this, RF_BASE, color);
+    finalize() {
+        if (this.color) {
+            this.visualModel = new VisualTrajectoryModelStateArray(this, RF_BASE, this.color);
         }
     }
 
@@ -59,6 +63,11 @@ export default class TrajectoryComposite extends TrajectoryAbstract
                 return trajectory;
             }
         }
+
+        console.log('Insufficient ephemeris data has been loaded to compute the state of ' +
+            (this.object && this.object.id) + ' (' + (this.object && this.object.name) + ') at the ephemeris epoch ' +
+            epoch + ' (' + TimeLine.getDateByEpoch(epoch) + ').'
+        );
 
         return false;
     }

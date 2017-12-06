@@ -19,6 +19,21 @@ export default class VisualTrajectoryModelAbstract extends VisualModelAbstract
         sim.selection.addSelectableObject(this.threeObj);
     }
 
+    updateGeometry(points, colorMults, endingBrightness) {
+        const mainColor = new THREE.Color(this.color);
+        this.threeObj.geometry.dispose();
+        this.threeObj.geometry = (new THREE.Geometry()).setFromPoints(points);
+
+        for (let i = 0; i < colorMults.length; i++) {
+            let curColor = (new THREE.Color()).copy(mainColor);
+            const mult = endingBrightness + (1 - endingBrightness) * colorMults[i];
+
+            this.threeObj.geometry.colors.push(
+                curColor.multiplyScalar(mult)
+            );
+        }
+    }
+
     select() {
         this.color = 0xFFFFFF;
     }

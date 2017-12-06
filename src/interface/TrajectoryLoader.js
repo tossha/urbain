@@ -46,6 +46,7 @@ export default class TrajectoryLoader
         for (const partConfig of config.data) {
             traj.addComponent(this.create(partConfig));
         }
+        traj.finalize();
         return traj;
     }
 
