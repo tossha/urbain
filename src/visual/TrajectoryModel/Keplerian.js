@@ -106,13 +106,18 @@ export default class VisualTrajectoryModelKeplerian extends VisualTrajectoryMode
             .sub(cameraPosition).mag;
         const toFarthestPoint = traj.getOwnCoordsByTrueAnomaly(cameraTrueAnomaly + Math.PI)     // not really farthest
             .sub(cameraPosition).mag;
-        const cameraAngle = traj.getEccentricAnomalyByTrueAnomaly(cameraTrueAnomaly - ta);
+        let cameraAngle = Math.acos(
+            (traj.e + Math.cos(cameraTrueAnomaly)) / (1 + traj.e * Math.cos(cameraTrueAnomaly))
+        );
         let ang = Math.acos(
             (traj.e + Math.cos(ta)) / (1 + traj.e * Math.cos(ta))
         );
 
         if (ta > Math.PI) {
             ang = 2 * Math.PI - ang;
+        }
+        if (cameraTrueAnomaly > Math.PI) {
+            cameraAngle = 2 * Math.PI - cameraAngle;
         }
 
         const ellipsePoints = this.getEllipsePoints(
@@ -127,7 +132,7 @@ export default class VisualTrajectoryModelKeplerian extends VisualTrajectoryMode
                 0
             ),
             pointsNum,
-            cameraAngle / (2 * Math.PI),
+            ((cameraAngle - ang) / (2 * Math.PI) + 1) % 1,
             toFarthestPoint / toClosestPoint
         );
 
