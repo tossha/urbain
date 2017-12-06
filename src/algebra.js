@@ -79,6 +79,10 @@ export class Vector extends Array
         ]);
     }
 
+    angle(vec) {
+        return Math.acos(this.dot(vec) / this.mag / vec.mag);
+    }
+
     add_(vec) {
         for (let i = 0; i < this.length; ++i) {
             this[i] += vec[i];
@@ -107,6 +111,10 @@ export class Vector extends Array
         return this;
     }
 
+    unit_() {
+        return this.div_(this.mag);
+    }
+
     add(vec) {
         return this.copy().add_(vec);
     }
@@ -123,8 +131,8 @@ export class Vector extends Array
         return this.copy().div_(scalar);
     }
 
-    angle(vec) {
-        return Math.acos(this.dot(vec) / this.mag / vec.mag);
+    unit() {
+        return this.copy().unit_();
     }
 
     rotateX(radians) {

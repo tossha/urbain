@@ -1,13 +1,18 @@
 
 import TrajectoryAbstract from "./Abstract";
 import {RF_BASE} from "../ReferenceFrame/Factory";
+import VisualTrajectoryModelStateArray from "../../visual/TrajectoryModel/StateArray";
 
 export default class TrajectoryComposite extends TrajectoryAbstract
 {
-    constructor() {
+    constructor(color) {
         super(RF_BASE);
         this.components = [];
         this.lastUsedTrajectory = null;
+
+        if (color) {
+            this.visualModel = new VisualTrajectoryModelStateArray(this, RF_BASE, color);
+        }
     }
 
     addComponent(trajectory) {
@@ -40,15 +45,15 @@ export default class TrajectoryComposite extends TrajectoryAbstract
 
     _getTrajectoryByEpoch(epoch) {
         if (this.lastUsedTrajectory
-            && (this.lastUsedTrajectory.minEpoch < epoch || this.lastUsedTrajectory.minEpoch === false)
-            && (this.lastUsedTrajectory.maxEpoch > epoch || this.lastUsedTrajectory.maxEpoch === false)
+            && (this.lastUsedTrajectory.minEpoch <= epoch || this.lastUsedTrajectory.minEpoch === false)
+            && (this.lastUsedTrajectory.maxEpoch >= epoch || this.lastUsedTrajectory.maxEpoch === false)
         ) {
             return this.lastUsedTrajectory;
         }
 
         for (let trajectory of this.components) {
-            if ((trajectory.minEpoch < epoch || trajectory.minEpoch === false)
-                && (trajectory.maxEpoch > epoch || trajectory.maxEpoch === false)
+            if ((trajectory.minEpoch <= epoch || trajectory.minEpoch === false)
+                && (trajectory.maxEpoch >= epoch || trajectory.maxEpoch === false)
             ) {
                 this.lastUsedTrajectory = trajectory;
                 return trajectory;

@@ -42,7 +42,7 @@ export default class TrajectoryLoader
     }
 
     static createComposite(config) {
-        let traj = new TrajectoryComposite();
+        let traj = new TrajectoryComposite(config.color);
         for (const partConfig of config.data) {
             traj.addComponent(this.create(partConfig));
         }

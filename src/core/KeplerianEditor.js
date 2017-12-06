@@ -69,7 +69,7 @@ export default class KeplerianEditor
             originPosition,
             this.periapsis,
             this.normal,
-            keplerianObject.ta,
+            keplerianObject.getTrueAnomalyByEpoch(event.detail.epoch),
             this.taAngleColor,
             1.5,
             true
@@ -101,7 +101,7 @@ export default class KeplerianEditor
         this.incAngle.resize(keplerianObject.inc);
         this.incAngle.rearrange(this.nodePerp, this.node);
 
-        this.taAngle.resize(keplerianObject.ta);
+        this.taAngle.resize(keplerianObject.getTrueAnomalyByEpoch(event.detail.epoch));
         this.taAngle.rearrange(this.periapsis, this.normal);
     }
 
