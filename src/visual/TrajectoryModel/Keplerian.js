@@ -64,7 +64,7 @@ export default class VisualTrajectoryModelKeplerian extends VisualTrajectoryMode
                 points[i] = (new THREE.Vector2()).fromArray([coords[0], coords[1]]);
                 angs[i] = 1;
                 i  += 1;
-                points[i] = (new THREE.Vector2()).fromArray([coords[0] + 1e-6, coords[1] + 1e-6]);
+                points[i] = (new THREE.Vector2()).fromArray([coords[0], coords[1]]);
                 angs[i] = 0;
                 i  += 1;
             }
@@ -72,9 +72,7 @@ export default class VisualTrajectoryModelKeplerian extends VisualTrajectoryMode
 
         this.threeObj.visible = true;
         this.threeObj.geometry.dispose();
-        this.threeObj.geometry = (new THREE.Path(
-            points
-        )).createPointsGeometry(pointsNum);
+        this.threeObj.geometry = (new THREE.Geometry()).setFromPoints(points);
 
         for (let i = 0; i < angs.length; i++) {
             let curColor = (new THREE.Color()).copy(mainColor);
@@ -138,9 +136,7 @@ export default class VisualTrajectoryModelKeplerian extends VisualTrajectoryMode
 
         this.threeObj.visible = true;
         this.threeObj.geometry.dispose();
-        this.threeObj.geometry = (new THREE.Path(
-            ellipsePoints.coords
-        )).createPointsGeometry(pointsNum);
+        this.threeObj.geometry = (new THREE.Geometry()).setFromPoints(ellipsePoints.coords);
 
         for (let i = 0; i < ellipsePoints.angs.length; i++) {
             let curColor = (new THREE.Color()).copy(mainColor);

@@ -8,7 +8,7 @@ export default class VisualReferenceFrame extends VisualModelAbstract
         super();
         
         this.referenceFrame = referenceFrame;
-        this.setThreeObj(new THREE.AxisHelper(1));
+        this.setThreeObj(new THREE.AxesHelper(1));
     }
 
     render(epoch) {
