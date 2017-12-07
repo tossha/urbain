@@ -84,7 +84,7 @@ export default class VisualTrajectoryModelKeplerian extends VisualTrajectoryMode
         }
 
         this.threeObj.quaternion.copy(orbitQuaternion.toThreejs());
-        this.threeObj.position.fromArray(sim.getVisualCoords(this.trajectory.referenceFrame.getOriginPositionByEpoch(epoch)));
+        this.threeObj.position.copy(sim.getVisualCoords(this.trajectory.referenceFrame.getOriginPositionByEpoch(epoch)));
     }
 
     renderEllipse(traj, epoch) {
@@ -148,7 +148,7 @@ export default class VisualTrajectoryModelKeplerian extends VisualTrajectoryMode
         }
 
         this.threeObj.quaternion.copy(orbitQuaternion.toThreejs());
-        this.threeObj.position.fromArray(sim.getVisualCoords(actualVisualOrigin));
+        this.threeObj.position.copy(sim.getVisualCoords(actualVisualOrigin));
     }
 
     getEllipsePoints(curve, pointsNum, densityCenter, proportion) {

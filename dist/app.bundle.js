@@ -3198,7 +3198,7 @@ class TrajectoryAbstract
                 .getInverse(this.matrixWorld)
             );
 
-        for (let i = 0; i < verticesCount; i++) {
+        for (let i = 0; i < verticesCount - 1; i++) {
             const vertex1 = (new THREE.Vector3)
                 .copy(this.geometry.vertices[i]);
 
@@ -3272,6 +3272,7 @@ class TrajectoryAbstract
                 < raycaster.pixelPrecision * raycaster.pixelAngleSize
             )
         ) {
+            console.log(verticesCount);
             bestIntersection.point.applyMatrix4(this.matrixWorld);
             intersects.push(bestIntersection);
         }
@@ -3513,7 +3514,7 @@ class VisualBodyModelAbstract extends __WEBPACK_IMPORTED_MODULE_0__ModelAbstract
     }
 
     render(epoch) {
-        this.threeObj.position.fromArray(sim.getVisualCoords(this.body.getPositionByEpoch(epoch)));
+        this.threeObj.position.copy(sim.getVisualCoords(this.body.getPositionByEpoch(epoch)));
         this.threeObj.quaternion.copy(
             this.body.orientation.getQuaternionByEpoch(epoch).toThreejs()
         );
@@ -8167,8 +8168,8 @@ class Simulation
         this.renderer.render(this.scene, this.camera.threeCamera);
     }
 
-    getVisualCoords(vector) {
-        return vector.sub(this.camera.lastPosition);
+    getVisualCoords(simCoords) {
+        return (new THREE.Vector3()).fromArray(simCoords.sub(this.camera.lastPosition));
     }
 }
 /* harmony export (immutable) */ __webpack_exports__["a"] = Simulation;
@@ -8884,7 +8885,7 @@ class HelperAngle
         this.color = color;
         this.editingCallback = editingCallback;
         this.positionAtEpoch = functionOfEpoch;
-        this.position = (new THREE.Vector3()).fromArray(sim.getVisualCoords(this.positionAtEpoch.evaluate(sim.currentEpoch)));
+        this.position = sim.getVisualCoords(this.positionAtEpoch.evaluate(sim.currentEpoch));
         this.isArcMode = isArcMode;
         this.coefficientOfAxesLengthDecrease = coefficientOfAxesLengthDecrease ? coefficientOfAxesLengthDecrease : 1;
 
@@ -8961,9 +8962,7 @@ class HelperAngle
     }
 
     onRender(event) {
-        this.position = (new THREE.Vector3).fromArray(
-            sim.getVisualCoords(this.positionAtEpoch.evaluate(event.detail.epoch))
-        );
+        this.position = sim.getVisualCoords(this.positionAtEpoch.evaluate(event.detail.epoch));
 
         if (this.isArcMode === true) {
             this.deletePointersGeometries();
@@ -9317,7 +9316,7 @@ class VisualTrajectoryModelKeplerian extends __WEBPACK_IMPORTED_MODULE_0__Abstra
         }
 
         this.threeObj.quaternion.copy(orbitQuaternion.toThreejs());
-        this.threeObj.position.fromArray(sim.getVisualCoords(this.trajectory.referenceFrame.getOriginPositionByEpoch(epoch)));
+        this.threeObj.position.copy(sim.getVisualCoords(this.trajectory.referenceFrame.getOriginPositionByEpoch(epoch)));
     }
 
     renderEllipse(traj, epoch) {
@@ -9381,7 +9380,7 @@ class VisualTrajectoryModelKeplerian extends __WEBPACK_IMPORTED_MODULE_0__Abstra
         }
 
         this.threeObj.quaternion.copy(orbitQuaternion.toThreejs());
-        this.threeObj.position.fromArray(sim.getVisualCoords(actualVisualOrigin));
+        this.threeObj.position.copy(sim.getVisualCoords(actualVisualOrigin));
     }
 
     getEllipsePoints(curve, pointsNum, densityCenter, proportion) {
@@ -9587,7 +9586,7 @@ class TrajectoryComposite extends __WEBPACK_IMPORTED_MODULE_0__Abstract__["a" /*
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
-/* WEBPACK VAR INJECTION */(function(THREE) {/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__Abstract__ = __webpack_require__(23);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__Abstract__ = __webpack_require__(23);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__algebra__ = __webpack_require__(0);
 
 
@@ -9604,12 +9603,14 @@ class VisualTrajectoryModelStateArray extends __WEBPACK_IMPORTED_MODULE_0__Abstr
         this.showBehind = true;
         this.trailPeriod = 86400 * 250;
         this.minStep = 60;
+        this.threeObj.position.set(0, 0, 0);
 
         this.initVertices();
     }
 
     render(epoch) {
         const endingBrightness = 0.4;
+        const originPos = this.referenceFrame.getOriginPositionByEpoch(epoch);
         let points = [];
         let colors = [];
 
@@ -9621,38 +9622,32 @@ class VisualTrajectoryModelStateArray extends __WEBPACK_IMPORTED_MODULE_0__Abstr
         for (let i = 0; i < this.positions.length; ++i) {
             if (this.epochs[i] < epoch - this.trailPeriod) {
                 if (this.showBehind) {
-                    points.push(this.positions[i]);
+                    points.push(sim.getVisualCoords(this.positions[i].add(originPos)));
                     colors.push(0);
                 }
                 if (this.epochs[i+1] > epoch - this.trailPeriod) {
-                    points.push((new THREE.Vector3()).fromArray(
-                        this.trajectory.getPositionByEpoch(epoch - this.trailPeriod, this.referenceFrame)
+                    points.push(sim.getVisualCoords(
+                        this.trajectory.getPositionByEpoch(epoch - this.trailPeriod, this.referenceFrame).add(originPos)
                     ));
                     colors.push(0);
-                    if (this.epochs[i+1] >= epoch) {
-                        const pos = (new THREE.Vector3()).fromArray(
-                            this.trajectory.getPositionByEpoch(epoch, this.referenceFrame)
-                        );
-                        points.push(pos);
-                        points.push(pos);
-                        colors.push(1);
-                        colors.push(0);
-                    }
                 }
             } else if (this.epochs[i] < epoch) {
-                points.push(this.positions[i]);
+                points.push(sim.getVisualCoords(this.positions[i].add(originPos)));
                 colors.push(1 - (epoch - this.epochs[i]) / this.trailPeriod);
-                if (this.epochs[i+1] >= epoch) {
-                    const pos = (new THREE.Vector3()).fromArray(
-                        this.trajectory.getPositionByEpoch(epoch, this.referenceFrame)
-                    );
-                    points.push(pos);
-                    points.push(pos);
-                    colors.push(1);
-                    colors.push(0);
-                }
             } else if (this.epochs[i] > epoch && this.showAhead) {
-                points.push(this.positions[i]);
+                points.push(sim.getVisualCoords(this.positions[i].add(originPos)));
+                colors.push(0);
+            }
+
+            if ((this.epochs[i] < epoch)
+                && (this.epochs[i+1] >= epoch)
+            ) {
+                const pos = sim.getVisualCoords(
+                    this.trajectory.getPositionByEpoch(epoch, this.referenceFrame).add(originPos)
+                );
+                points.push(pos);
+                points.push(pos);
+                colors.push(1);
                 colors.push(0);
             }
         }
@@ -9661,9 +9656,6 @@ class VisualTrajectoryModelStateArray extends __WEBPACK_IMPORTED_MODULE_0__Abstr
         this.updateGeometry(points, colors, endingBrightness);
 
         this.threeObj.quaternion.copy(this.referenceFrame.getQuaternionByEpoch(epoch).toThreejs());
-        this.threeObj.position.fromArray(sim.getVisualCoords(
-            this.referenceFrame.getOriginPositionByEpoch(epoch)
-        ));
     }
 
     findPointByEpoch(epoch) {
@@ -9754,11 +9746,7 @@ class VisualTrajectoryModelStateArray extends __WEBPACK_IMPORTED_MODULE_0__Abstr
             }
 
             this.epochs[i] = lastEpoch;
-            this.positions[i] = new THREE.Vector3(
-                lastState._position.x,
-                lastState._position.y,
-                lastState._position.z
-            );
+            this.positions[i] = lastState.position;
 
             curState = lastState;
             curVelocity = curState.velocity.unit_();
@@ -9769,7 +9757,6 @@ class VisualTrajectoryModelStateArray extends __WEBPACK_IMPORTED_MODULE_0__Abstr
 }
 /* harmony export (immutable) */ __webpack_exports__["a"] = VisualTrajectoryModelStateArray;
 
-/* WEBPACK VAR INJECTION */}.call(__webpack_exports__, __webpack_require__(1)))
 
 /***/ }),
 /* 51 */
@@ -9839,7 +9826,7 @@ class VisualBodyModelLight extends __WEBPACK_IMPORTED_MODULE_0__Basic__["a" /* d
 
     render(epoch) {
         super.render(epoch);
-        this.light.position.fromArray(sim.getVisualCoords(this.body.getPositionByEpoch(epoch)));
+        this.light.position.copy(sim.getVisualCoords(this.body.getPositionByEpoch(epoch)));
     }
 
     getMaterial(parameters) {
@@ -10315,8 +10302,8 @@ class UI
 
     updateTime(date) {
         let string = date.getYear() + 1900;
-        string += '-' + (date.getMonth() + 1);
-        string += '-' + date.getDate();
+        string += '-' + ((date.getMonth() + 1) + '').padStart(2, '0');
+        string += '-' + (date.getDate() + '').padStart(2, '0');
         string += ' ' + (date.getHours() + '').padStart(2, '0');
         string += ':' + (date.getMinutes() + '').padStart(2, '0');
         string += ':' + (date.getSeconds() + '').padStart(2, '0');

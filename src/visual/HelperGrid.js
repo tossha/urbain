@@ -27,7 +27,7 @@ export default class HelperGrid
             32,
             200
         );
-        this.threeGrid.position.fromArray(sim.getVisualCoords(pos));
+        this.threeGrid.position.copy(sim.getVisualCoords(pos));
         this.threeGrid.quaternion.copy(this.referenceFrame.getQuaternionByEpoch(sim.currentEpoch).toThreejs());
         this.threeGrid.rotateX(Math.PI / 2);
 
@@ -36,7 +36,7 @@ export default class HelperGrid
 
     onRender(event) {
         let pos = starSystem.getTrajectory(this.centerObject).getPositionByEpoch(event.detail.epoch, RF_BASE);
-        this.threeGrid.position.fromArray(sim.getVisualCoords(pos));
+        this.threeGrid.position.copy(sim.getVisualCoords(pos));
     }
 
     onZoom() {

@@ -13,12 +13,14 @@ export default class VisualTrajectoryModelStateArray extends VisualTrajectoryMod
         this.showBehind = true;
         this.trailPeriod = 86400 * 250;
         this.minStep = 60;
+        this.threeObj.position.set(0, 0, 0);
 
         this.initVertices();
     }
 
     render(epoch) {
         const endingBrightness = 0.4;
+        const originPos = this.referenceFrame.getOriginPositionByEpoch(epoch);
         let points = [];
         let colors = [];
 
@@ -30,38 +32,32 @@ export default class VisualTrajectoryModelStateArray extends VisualTrajectoryMod
         for (let i = 0; i < this.positions.length; ++i) {
             if (this.epochs[i] < epoch - this.trailPeriod) {
                 if (this.showBehind) {
-                    points.push(this.positions[i]);
+                    points.push(sim.getVisualCoords(this.positions[i].add(originPos)));
                     colors.push(0);
                 }
                 if (this.epochs[i+1] > epoch - this.trailPeriod) {
-                    points.push((new THREE.Vector3()).fromArray(
-                        this.trajectory.getPositionByEpoch(epoch - this.trailPeriod, this.referenceFrame)
+                    points.push(sim.getVisualCoords(
+                        this.trajectory.getPositionByEpoch(epoch - this.trailPeriod, this.referenceFrame).add(originPos)
                     ));
                     colors.push(0);
-                    if (this.epochs[i+1] >= epoch) {
-                        const pos = (new THREE.Vector3()).fromArray(
-                            this.trajectory.getPositionByEpoch(epoch, this.referenceFrame)
-                        );
-                        points.push(pos);
-                        points.push(pos);
-                        colors.push(1);
-                        colors.push(0);
-                    }
                 }
             } else if (this.epochs[i] < epoch) {
-                points.push(this.positions[i]);
+                points.push(sim.getVisualCoords(this.positions[i].add(originPos)));
                 colors.push(1 - (epoch - this.epochs[i]) / this.trailPeriod);
-                if (this.epochs[i+1] >= epoch) {
-                    const pos = (new THREE.Vector3()).fromArray(
-                        this.trajectory.getPositionByEpoch(epoch, this.referenceFrame)
-                    );
-                    points.push(pos);
-                    points.push(pos);
-                    colors.push(1);
-                    colors.push(0);
-                }
             } else if (this.epochs[i] > epoch && this.showAhead) {
-                points.push(this.positions[i]);
+                points.push(sim.getVisualCoords(this.positions[i].add(originPos)));
+                colors.push(0);
+            }
+
+            if ((this.epochs[i] < epoch)
+                && (this.epochs[i+1] >= epoch)
+            ) {
+                const pos = sim.getVisualCoords(
+                    this.trajectory.getPositionByEpoch(epoch, this.referenceFrame).add(originPos)
+                );
+                points.push(pos);
+                points.push(pos);
+                colors.push(1);
                 colors.push(0);
             }
         }
@@ -70,9 +66,6 @@ export default class VisualTrajectoryModelStateArray extends VisualTrajectoryMod
         this.updateGeometry(points, colors, endingBrightness);
 
         this.threeObj.quaternion.copy(this.referenceFrame.getQuaternionByEpoch(epoch).toThreejs());
-        this.threeObj.position.fromArray(sim.getVisualCoords(
-            this.referenceFrame.getOriginPositionByEpoch(epoch)
-        ));
     }
 
     findPointByEpoch(epoch) {
@@ -163,11 +156,7 @@ export default class VisualTrajectoryModelStateArray extends VisualTrajectoryMod
             }
 
             this.epochs[i] = lastEpoch;
-            this.positions[i] = new THREE.Vector3(
-                lastState._position.x,
-                lastState._position.y,
-                lastState._position.z
-            );
+            this.positions[i] = lastState.position;
 
             curState = lastState;
             curVelocity = curState.velocity.unit_();

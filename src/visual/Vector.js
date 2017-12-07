@@ -7,12 +7,12 @@ export default class VisualVector extends VisualModelAbstract
         this.origin = origin;
         this.setThreeObj(new THREE.ArrowHelper(
             (new THREE.Vector3()).fromArray(vector.unit()),
-            (new THREE.Vector3()).fromArray(sim.getVisualCoords(this.origin)),
+            sim.getVisualCoords(this.origin),
             vector.mag
         ));
     }
 
     render(epoch) {
-        this.threeObj.position.fromArray(sim.getVisualCoords(this.origin));
+        this.threeObj.position.copy(sim.getVisualCoords(this.origin));
     }
 }

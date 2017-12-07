@@ -13,12 +13,12 @@ export default class VisualReferenceFrame extends VisualModelAbstract
 
     render(epoch) {
         const position = sim.getVisualCoords(this.referenceFrame.getOriginPositionByEpoch(epoch));
-        const scale = position.mag / 10;
+        const scale = position.length() / 10;
         this.threeObj.position.copy(position);
         this.threeObj.quaternion.copy(
             this.referenceFrame.getQuaternionByEpoch(epoch).toThreejs()
         );
-        this.threeObj.scale.copy(new Vector([scale, scale, scale]));
+        this.threeObj.scale.set(scale, scale, scale);
     }
 
     remove() {

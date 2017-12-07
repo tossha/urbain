@@ -26,10 +26,12 @@ button:hover {
   margin-left: auto;
   margin-right: auto;
   width: 90%;
+  pointer-events: none;
 }
 
 #timeLineCanvas {
   height: 35px;
+  pointer-events: auto;
 }
 
 #metricsPanel {
@@ -61,6 +63,7 @@ button:hover {
   color: white;
   font-family: monospace;
   font-size: 14px;
+  pointer-events: auto;
 }
 
 .panelHeader {

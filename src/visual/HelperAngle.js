@@ -12,7 +12,7 @@ export default class HelperAngle
         this.color = color;
         this.editingCallback = editingCallback;
         this.positionAtEpoch = functionOfEpoch;
-        this.position = (new THREE.Vector3()).fromArray(sim.getVisualCoords(this.positionAtEpoch.evaluate(sim.currentEpoch)));
+        this.position = sim.getVisualCoords(this.positionAtEpoch.evaluate(sim.currentEpoch));
         this.isArcMode = isArcMode;
         this.coefficientOfAxesLengthDecrease = coefficientOfAxesLengthDecrease ? coefficientOfAxesLengthDecrease : 1;
 
@@ -89,9 +89,7 @@ export default class HelperAngle
     }
 
     onRender(event) {
-        this.position = (new THREE.Vector3).fromArray(
-            sim.getVisualCoords(this.positionAtEpoch.evaluate(event.detail.epoch))
-        );
+        this.position = sim.getVisualCoords(this.positionAtEpoch.evaluate(event.detail.epoch));
 
         if (this.isArcMode === true) {
             this.deletePointersGeometries();

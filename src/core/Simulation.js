@@ -78,7 +78,7 @@ export default class Simulation
         this.renderer.render(this.scene, this.camera.threeCamera);
     }
 
-    getVisualCoords(vector) {
-        return vector.sub(this.camera.lastPosition);
+    getVisualCoords(simCoords) {
+        return (new THREE.Vector3()).fromArray(simCoords.sub(this.camera.lastPosition));
     }
 }
