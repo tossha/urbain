@@ -94,7 +94,10 @@ export default class SelectionHandler extends VisualModelAbstract
         }
 
         if (this.bestIntersection) {
-            const currentTraj = this.bestIntersection.object.userData.trajectory;
+            let currentTraj = this.bestIntersection.object.userData.trajectory;
+            while (currentTraj.parent) {
+                currentTraj = currentTraj.parent;
+            }
             if (currentTraj !== wasSelected) {
                 this.select(currentTraj);
             }

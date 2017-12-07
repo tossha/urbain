@@ -46,6 +46,13 @@ export default class StarSystemLoader
         starSystem.addStars(new VisualStarsModel(config.stars));
     }
 
+    static loadObjectByUrl(starSystem, url) {
+        $.getJSON(url, (objectConfig) => {
+            this._loadObject(starSystem, objectConfig);
+            starSystem.addTrajectory(objectConfig.id, TrajectoryLoader.create(objectConfig.trajectory))
+        });
+    }
+
     static _loadObject(starSystem, config) {
         let object;
 

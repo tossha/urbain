@@ -84,7 +84,6 @@ export default class LineObject extends THREE.Line {
                 < raycaster.pixelPrecision * raycaster.pixelAngleSize
             )
         ) {
-            console.log(verticesCount);
             bestIntersection.point.applyMatrix4(this.matrixWorld);
             intersects.push(bestIntersection);
         }

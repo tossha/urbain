@@ -2,9 +2,8 @@ import TrajectoryKeplerianArray from "./KeplerianArray";
 
 export default class TrajectoryKeplerianPrecessingArray extends TrajectoryKeplerianArray
 {
-    constructor(referenceFrameId, r, j2, color) {
-        super(referenceFrameId, color);
-
+    constructor(referenceFrameId, r, j2) {
+        super(referenceFrameId);
         this.r = r;
         this.j2 = j2;
     }

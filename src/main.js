@@ -1,4 +1,5 @@
 import Simulation from "./core/Simulation";
+import StarSystemLoader from "./interface/StarSystemLoader";
 
 function init() {
     statistics = new Stats();
@@ -13,6 +14,10 @@ function init() {
     window.sim = new Simulation();
     window.sim.init('viewport', starSystemConfig);
     starSystemConfig = undefined;
+
+    StarSystemLoader.loadObjectByUrl(sim.starSystem, '/spacecraft/voyager1.json');
+    StarSystemLoader.loadObjectByUrl(sim.starSystem, '/spacecraft/voyager2.json');
+    // StarSystemLoader.loadObjectByUrl(sim.starSystem, '/spacecraft/lro.json');
 }
 
 function firstRender(curTime) {

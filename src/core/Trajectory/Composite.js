@@ -1,26 +1,20 @@
 
 import TrajectoryAbstract from "./Abstract";
 import {RF_BASE} from "../ReferenceFrame/Factory";
-import VisualTrajectoryModelStateArray from "../../visual/TrajectoryModel/StateArray";
 import TimeLine from "../TimeLine";
 
 export default class TrajectoryComposite extends TrajectoryAbstract
 {
-    constructor(color) {
+    constructor() {
         super(RF_BASE);
         this.components = [];
         this.lastUsedTrajectory = null;
-        this.color = color;
-    }
-
-    finalize() {
-        if (this.color) {
-            this.visualModel = new VisualTrajectoryModelStateArray(this, RF_BASE, this.color);
-        }
     }
 
     addComponent(trajectory) {
         this.components.push(trajectory);
+        trajectory.setParent(this);
+
         if (this.minEpoch === null
             || (trajectory.minEpoch !== null
                 && trajectory.minEpoch !== false
@@ -37,6 +31,16 @@ export default class TrajectoryComposite extends TrajectoryAbstract
         ) {
             this.maxEpoch = trajectory.maxEpoch;
         }
+    }
+
+    select() {
+        super.select();
+        this.components.map(traj => traj.select());
+    }
+
+    deselect() {
+        super.deselect();
+        this.components.map(traj => traj.deselect());
     }
 
     getStateInOwnFrameByEpoch(epoch) {

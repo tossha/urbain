@@ -2,13 +2,12 @@ import TrajectoryAbstract from "./Abstract";
 import FunctionOfEpochCustom from "../FunctionOfEpoch/Custom";
 import ReferenceFrameInertialDynamic from "../ReferenceFrame/InertialDynamic";
 import KeplerianEditor from "../KeplerianEditor";
-import VisualTrajectoryModelKeplerian from "../../visual/TrajectoryModel/Keplerian";
 
 export default class TrajectoryKeplerianAbstract extends TrajectoryAbstract
 {
     getKeplerianObjectByEpoch(epoch) {}
 
-    constructor(referenceFrameId, color) {
+    constructor(referenceFrameId) {
         super(referenceFrameId);
 
         let that = this;
@@ -22,10 +21,6 @@ export default class TrajectoryKeplerianAbstract extends TrajectoryAbstract
                 );
             })
         );
-
-        if (color) {
-            this.visualModel = new VisualTrajectoryModelKeplerian(this, color);
-        }
     }
 
     select() {

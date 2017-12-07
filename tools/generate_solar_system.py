@@ -1,18 +1,19 @@
 import spice
 import json
 import math
+import kepler
 
-spice.loadKernel('de430.bsp')
-spice.loadKernel('naif0012.tls.pc')
+spice.loadKernel('kernels/de430.bsp')
+spice.loadKernel('naif0012.tls')
 spice.loadKernel('pck00010.tpc')
 spice.loadKernel('gm_de431.tpc')
 
-spice.loadKernel('jup310.bsp')
-spice.loadKernel('mar097.bsp')
-spice.loadKernel('nep081.bsp')
-spice.loadKernel('plu055.bsp')
-spice.loadKernel('sat375.bsp')
-spice.loadKernel('ura111.bsp')
+spice.loadKernel('kernels/jup310.bsp')
+spice.loadKernel('kernels/mar097.bsp')
+spice.loadKernel('kernels/nep081.bsp')
+spice.loadKernel('kernels/plu055.bsp')
+spice.loadKernel('kernels/sat375.bsp')
+spice.loadKernel('kernels/ura111.bsp')
 
 stars = [
     [216.7309, -83.6679, 4.742419852602448],
@@ -1059,6 +1060,48 @@ objects = [
 		'color': 'rosybrown',
 		'pair': '999'
 	},
+	{
+		'id': '1',
+		'parent': '199',
+		'name': 'Mercury barycenter',
+		'position': [0,0,0]
+	},
+	{
+		'id': '2',
+		'parent': '299',
+		'name': 'Venus barycenter',
+		'position': [0,0,0]
+	},
+	{
+		'id': '4',
+		'parent': '499',
+		'name': 'Mars barycenter',
+		'position': [0,0,0]
+	},
+	{
+		'id': '5',
+		'parent': '599',
+		'name': 'Jupiter barycenter',
+		'position': [0,0,0]
+	},
+	{
+		'id': '6',
+		'parent': '699',
+		'name': 'Saturn barycenter',
+		'position': [0,0,0]
+	},
+	{
+		'id': '7',
+		'parent': '799',
+		'name': 'Uranus barycenter',
+		'position': [0,0,0]
+	},
+	{
+		'id': '8',
+		'parent': '899',
+		'name': 'Neptune barycenter',
+		'position': [0,0,0]
+	},
 ]
 
 referenceFrames = [
@@ -1091,11 +1134,11 @@ def approximateOrbit(object1, object2, epoch):
 		approximateNumber(object1.sma, object2.sma, proportion),
 		approximateAngle(object1.aop, object2.aop, proportion),
 		approximateAngle(object1.inc, object2.inc, proportion),
-		epoch,
-		approximateNumber(object1.mu, object2.mu, proportion),
-		False,
 		approximateAngle(object1.loan, object2.loan, proportion),
-		approximateAngle(object1.getMeanAnomalyByEpoch(epoch), object2.getMeanAnomalyByEpoch(epoch), proportion)
+		approximateAngle(object1.getMeanAnomalyByEpoch(epoch), object2.getMeanAnomalyByEpoch(epoch), proportion),
+        epoch,
+        approximateNumber(object1.mu, object2.mu, proportion),
+        False
 	);
 
 def getStateFromSpice(parent, body, epoch):
@@ -1133,11 +1176,11 @@ def getNextElements(parent, body, currentElements, step, maxError, maxEpoch):
 		approximatedState = approximatedElements.getStateByEpoch(approximatedEpoch)
 		realState = getStateFromSpice(parent, body, approximatedEpoch)
 
-		error = realState.position.sub(approximatedState.position).mag()
-		errorVel = realState.velocity.sub(approximatedState.velocity).mag()
+		error = realState.position.sub(approximatedState.position).mag
+		errorVel = realState.velocity.sub(approximatedState.velocity).mag
 		i += 1
 
-		if error < maxError and errorVel / realState.velocity.mag() < 0.05:
+		if error < maxError and errorVel / realState.velocity.mag < 0.05:
 			if direction == -1 or (nextEpoch == maxEpoch):
 				break
 			else:
@@ -1168,7 +1211,6 @@ def getObjectTrajectory(body, parent, parentMu, etFrom, etTo, maxError, color):
 		lastOrbit.loan,
 		lastOrbit.m0,
 		lastOrbit.epoch,
-		lastOrbit.mu,
 	)]
 
 	step = 86400 * 30
@@ -1185,7 +1227,6 @@ def getObjectTrajectory(body, parent, parentMu, etFrom, etTo, maxError, color):
 			orbit.loan, 	# raan
 			orbit.m0, 		# mean anomaly
 			orbit.epoch, 	# epoch
-			orbit.mu, 		# mu
 		))
 
 		step = orbit.epoch - lastOrbit.epoch
@@ -1201,29 +1242,52 @@ def getObjectTrajectory(body, parent, parentMu, etFrom, etTo, maxError, color):
 		'type': 'keplerian_array',
 		'periodStart': etFrom,
 		'periodEnd': etTo,
-		'color': color,
+		'rendering': {
+			'color': color,
+			'keplerianModel': True
+		},
 		'data': {
-			'referenceFrame': 1000000 + int(parent) * 1000,
+			'referenceFrame': int(parent) * 100000 + 1000,
+			'mu': parentMu,
 			'elementsArray': trajectory
 		}
 	}
 
-def getBodyData(body, name, color, texture, parent, pairing, etFrom, etTo, maxError):
+def getStaticTrajectory(body, parent, etFrom, etTo, position):
+	return {
+		'type': 'static',
+		'periodStart': etFrom,
+		'periodEnd': etTo,
+		'data': {
+			'referenceFrame': int(parent) * 100000 + 1000,
+			'position': position
+		}
+	}
 
-	parentMu = spice.bodvrd(parent, "GM", 1)[1][0] if parent != '0' else 319.77790837966666
+def getBodyData(body, name, color, texture, parent, pairing, etFrom, etTo, maxError, staticPosition):
+	try:
+		parentMu = spice.bodvrd(parent, "GM", 1)[1][0] if parent != '0' else 319.77790837966666
+	except:
+		parentMu = 0
+
 	if pairing:
 		pairingMu = spice.bodvrd(pairing, "GM", 1)[1][0]
 		parentMu = pairingMu**3 / parentMu**2
+
+	if staticPosition:
+		trajectory = getStaticTrajectory(body, parent, etFrom, etTo, staticPosition)
+		print(0)
+	else:
+		trajectory = getObjectTrajectory(body, parent, parentMu, etFrom, etTo, maxError, color)
+		print(len(trajectory['data']['elementsArray']))
 	
 	objectData = {
 		'id': body,
 		'name': name,
-		'trajectory': getObjectTrajectory(body, parent, parentMu, etFrom, etTo, maxError, color),	
+		'trajectory': trajectory
 	}
 
-	print(len(objectData['trajectory']['data']['elementsArray']))
-
-	if spice.bodfnd(int(body), "POLE_RA"):
+	if color and spice.bodfnd(int(body), "POLE_RA"):
 		orientation = (
 			list(spice.bodvrd(body, "POLE_RA", 3)[1]),
 			list(spice.bodvrd(body, "POLE_DEC", 3)[1]),
@@ -1265,13 +1329,14 @@ def getObjects(objects, etStart, etEnd, maxError):
 		data.append(getBodyData(
 			body = body['id'],
 			name = body['name'],
-			color = body['color'],
+			color = body['color'] if 'color' in body else False,
 			texture = body['texture'] if 'texture' in body else False,
 			parent = parent,
 			pairing = body['pair'] if 'pair' in body else False,
 			etFrom = etStart,
 			etTo = etEnd,
 			maxError = maxError if body['name'] != 'Neptune' else maxError * 10,
+			staticPosition = body['position'] if 'position' in body else False,
 		))
 
 	return data
@@ -1282,6 +1347,6 @@ maxError = 30000
 
 objectsData = getObjects(objects, etStart, etEnd, maxError)
 
-file = open('ssdata.js', 'w')
+file = open('solar_system.js', 'w')
 file.write(json.dumps(objectsData))
 file.close()

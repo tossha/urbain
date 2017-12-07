@@ -1,14 +1,14 @@
 import TrajectoryKeplerianAbstract from "./KeplerianAbstract";
 import {approximateAngle, approximateNumber} from "../../algebra";
 import KeplerianObject from "../KeplerianObject";
+import StateVector from "../StateVector";
+import {Vector} from "../../algebra";
 
 export default class TrajectoryKeplerianArray extends TrajectoryKeplerianAbstract
 {
-    constructor(referenceFrameId, color) {
-        super(referenceFrameId, color);
-
+    constructor(referenceFrameId) {
+        super(referenceFrameId);
         this.keplerianObjects = []; // array of class KeplerianObject
-        this.color = color;
     }
 
     addState(keplerianObject) {
@@ -45,6 +45,9 @@ export default class TrajectoryKeplerianArray extends TrajectoryKeplerianAbstrac
         let searchDirection = this.keplerianObjects[nextIdx].epoch > epoch ? -1 : 1;
 
         while ((nextIdx < this.keplerianObjects.length) && (nextIdx > 0)) {
+            if (this.keplerianObjects[nextIdx].epoch == epoch) {
+                return this.keplerianObjects[nextIdx];
+            }
             if ((this.keplerianObjects[nextIdx].epoch > epoch)
                 && (this.keplerianObjects[nextIdx - 1].epoch < epoch)
             ) {
@@ -66,6 +69,23 @@ export default class TrajectoryKeplerianArray extends TrajectoryKeplerianAbstrac
 
     approximateKeplerianObject(object1, object2, epoch) {
         const proportion = (epoch - object1.epoch) / (object2.epoch - object1.epoch);
+
+        if ((0.98 < object1.e && object1.e < 1.02)
+            || (0.98 < object2.e && object2.e < 1.02)
+            || (object1.isElliptic !== object2.isElliptic)
+        ) {
+            const state1 = object1.getStateByEpoch(epoch);
+            const state2 = object2.getStateByEpoch(epoch);
+            return KeplerianObject.createFromState(
+                new StateVector(
+                    state1.position.mul_(proportion).add_(state2.position.mul_(1 - proportion)),
+                    state1.velocity.mul_(proportion).add_(state2.velocity.mul_(1 - proportion)),
+                ),
+                approximateNumber(object1.mu, object2.mu, proportion),
+                epoch
+            );
+        }
+
         const ma = object1.isElliptic
             ? approximateAngle(object1.getMeanAnomalyByEpoch(epoch), object2.getMeanAnomalyByEpoch(epoch), proportion)
             : approximateNumber(object1.getMeanAnomalyByEpoch(epoch), object2.getMeanAnomalyByEpoch(epoch), proportion);

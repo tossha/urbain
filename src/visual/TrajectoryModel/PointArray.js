@@ -1,18 +1,18 @@
 import VisualTrajectoryModelAbstract from "./Abstract";
 import {deg2rad} from "../../algebra";
 
-export default class VisualTrajectoryModelStateArray extends VisualTrajectoryModelAbstract
+export default class VisualTrajectoryModelPointArray extends VisualTrajectoryModelAbstract
 {
-    constructor(trajectory, referenceFrameId, color) {
+    constructor(trajectory, color, modelParams) {
         super(trajectory, color);
-        this.minCos = Math.cos(deg2rad(1));
-        this.referenceFrame = sim.starSystem.getReferenceFrame(referenceFrameId);
-        this.showAhead = true;
-        this.showAhead = false;
-        this.showBehind = false;
-        this.showBehind = true;
-        this.trailPeriod = 86400 * 250;
-        this.minStep = 60;
+
+        this.referenceFrame = sim.starSystem.getReferenceFrame(modelParams.referenceFrame);
+        this.showAhead = modelParams.showAhead;
+        this.showBehind = modelParams.showBehind;
+        this.trailPeriod = modelParams.trailPeriod;
+
+        this.minCos = Math.cos(deg2rad(2));
+        this.minStep = 180;
         this.threeObj.position.set(0, 0, 0);
 
         this.initVertices();
@@ -146,6 +146,7 @@ export default class VisualTrajectoryModelStateArray extends VisualTrajectoryMod
 
                 --stepsLeft;
                 if (stepsLeft === 0 || Math.abs(step) < this.minStep) {
+                    step = this.minStep * Math.sign(step);
                     if (lastState === undefined) {
                         lastState = newState;
                         lastEpoch = nextEpoch;

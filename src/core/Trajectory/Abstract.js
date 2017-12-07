@@ -13,8 +13,18 @@ export default class TrajectoryAbstract
         this.visualModel = null;
         this.object = null;
 
+        this.parent = null;
+
         this.referenceFrameId = referenceFrameId;
         this.referenceFrame = sim.starSystem.getReferenceFrame(referenceFrameId);
+    }
+
+    setVisualModel(visualModel) {
+        this.visualModel = visualModel;
+    }
+
+    setParent(parent) {
+        this.parent = parent;
     }
 
     setObject(object) {
