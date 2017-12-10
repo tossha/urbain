@@ -942,29 +942,34 @@ objects = [
 		'id': '10',
 		'parent': '0',
 		'name': 'Sun',
+		'maxError': 30000,
 		'color': 'yellow',
 		'texture': 'SunTexture.jpg'
 	},
 	{
 		'id': '199',
 		'name': 'Mercury',
+		'maxError': 30000,
 		'color': 'azure',
 		'texture': 'MercuryTexture.jpg'
 	},
 	{
 		'id': '299',
 		'name': 'Venus',
+		'maxError': 30000,
 		'color': 'orange',
 		'texture': 'VenusTexture.jpg'
 	},
 	{
 		'id': '3',
 		'name': 'Earth-Moon barycenter',
+		'maxError': 30000,
 		'color': 'lightblue'
 	},
 	{
 		'id': '399',
 		'name': 'Earth',
+		'maxError': 30000,
 		'color': 'blue',
 		'texture': 'EarthTexture.jpg',
 		'parent': '3',
@@ -973,6 +978,7 @@ objects = [
 	{
 		'id': '301',
 		'name': 'Moon',
+		'maxError': 30000,
 		'color': 'white',
 		'texture': 'MoonTexture.jpg',
 		'parent': '3',
@@ -981,75 +987,89 @@ objects = [
 	{
 		'id': '499',
 		'name': 'Mars',
+		'maxError': 30000,
 		'color': 'red',
 		'texture': 'MarsTexture.jpg'
 	},
 	{
 		'id': '599',
 		'name': 'Jupiter',
+		'maxError': 30000,
 		'color': 'burlywood',
 		'texture': 'JupiterTexture.jpg'
 	},
 	{
 		'id': '501',
 		'name': 'Io',
+		'maxError': 30000,
 		'color': 'burlywood',
 	},
 	{
 		'id': '502',
 		'name': 'Europa',
+		'maxError': 30000,
 		'color': 'burlywood',
 	},
 	{
 		'id': '503',
 		'name': 'Ganymede',
+		'maxError': 30000,
 		'color': 'burlywood',
 	},
 	{
 		'id': '504',
 		'name': 'Callisto',
+		'maxError': 30000,
 		'color': 'burlywood',
 	},
 	{
 		'id': '699',
 		'name': 'Saturn',
+		'maxError': 30000,
 		'color': 'sandybrown',
 		'texture': 'SaturnTexture.jpg&ringsColorMap.jpg&ringsAlphaMap.jpg'
 	},
 	{
 		'id': '601',
 		'name': 'Mimas',
+		'maxError': 30000,
 		'color': 'sandybrown',
 	},
 	{
 		'id': '602',
 		'name': 'Enceladus',
+		'maxError': 30000,
 		'color': 'sandybrown',
 	},
 	{
 		'id': '606',
 		'name': 'Titan',
+		'maxError': 30000,
 		'color': 'sandybrown',
 	},
 	{
 		'id': '799',
 		'name': 'Uranus',
+		'maxError': 30000,
 		'color': 'lightskyblue'
 	},
 	{
 		'id': '899',
 		'name': 'Neptune',
+		'maxError': 30000,
 		'color': 'steelblue'
 	},
 	{
 		'id': '9',
 		'name': 'Pluto-Charon barycenter',
+		'maxError': 30000,
 		'color': 'tan'
 	},
 	{
 		'id': '999',
 		'parent': '9',
 		'name': 'Pluto',
+		'maxError': 30000,
 		'color': 'tan',
 		'pair': '901'
 	},
@@ -1057,6 +1077,7 @@ objects = [
 		'id': '901',
 		'parent': '9',
 		'name': 'Charon',
+		'maxError': 30000,
 		'color': 'rosybrown',
 		'pair': '999'
 	},
@@ -1213,6 +1234,8 @@ def getObjectTrajectory(body, parent, parentMu, etFrom, etTo, maxError, color):
 		lastOrbit.epoch,
 	)]
 
+	# maxError = lastOrbit.sma * 0.0005
+
 	step = 86400 * 30
 	i = 0
 
@@ -1264,6 +1287,64 @@ def getStaticTrajectory(body, parent, etFrom, etTo, position):
 		}
 	}
 
+def getVsopTrajectory(body, color):
+	version = 'VSOP87A'
+	if body == '10':
+		bodyFile = 'sun'
+		version = 'VSOP87E'
+	elif body == '199':
+		bodyFile = 'mer'
+	elif body == '299':
+		bodyFile = 'ven'
+	elif body == '3':
+		bodyFile = 'emb'
+	elif body == '399':
+		bodyFile = 'ear'
+	elif body == '499':
+		bodyFile = 'mar'
+	elif body == '599':
+		bodyFile = 'jup'
+	elif body == '699':
+		bodyFile = 'sat'
+	elif body == '799':
+		bodyFile = 'ura'
+	elif body == '899':
+		bodyFile = 'nep'
+	fileName = 'vsop87/' + version + '/' + version + '.' + bodyFile
+
+	data = []
+
+	with open(fileName) as file:
+		for line in file:
+			if line[1:7] == 'VSOP87':
+				continue
+			varNum  = int(line[3])
+			degree  = int(line[4])
+
+			if len(data) < varNum:
+				data.append([])
+
+			if len(data[varNum - 1]) <= degree:
+				data[varNum - 1].append([])
+
+			A = float(line[ 80: 97].strip())
+			B = float(line[ 98:111].strip())
+			C = float(line[112:131].strip())
+
+			data[varNum - 1][degree].append((A,B,C)) 
+
+	return {
+		'type': 'vsop87',
+		'rendering': {
+			'color': color,
+			'keplerianModel': True
+		},
+		'data': {
+			'body': body,
+			'coefficients': data
+		}
+	}
+
 def getBodyData(body, name, color, texture, parent, pairing, etFrom, etTo, maxError, staticPosition):
 	try:
 		parentMu = spice.bodvrd(parent, "GM", 1)[1][0] if parent != '0' else 319.77790837966666
@@ -1277,6 +1358,9 @@ def getBodyData(body, name, color, texture, parent, pairing, etFrom, etTo, maxEr
 	if staticPosition:
 		trajectory = getStaticTrajectory(body, parent, etFrom, etTo, staticPosition)
 		print(0)
+	elif body in ('3', '199','299','399','499','599','699','799','899'):
+		trajectory = getVsopTrajectory(body, color)
+		print('HZ')
 	else:
 		trajectory = getObjectTrajectory(body, parent, parentMu, etFrom, etTo, maxError, color)
 		print(len(trajectory['data']['elementsArray']))
@@ -1312,7 +1396,7 @@ def getBodyData(body, name, color, texture, parent, pairing, etFrom, etTo, maxEr
 
 	return objectData
 
-def getObjects(objects, etStart, etEnd, maxError):
+def getObjects(objects, etStart, etEnd):
 	global referenceFrames
 
 	data = [];
@@ -1335,7 +1419,7 @@ def getObjects(objects, etStart, etEnd, maxError):
 			pairing = body['pair'] if 'pair' in body else False,
 			etFrom = etStart,
 			etTo = etEnd,
-			maxError = maxError if body['name'] != 'Neptune' else maxError * 10,
+			maxError = body['maxError'] if 'maxError' in body else False,
 			staticPosition = body['position'] if 'position' in body else False,
 		))
 
@@ -1343,10 +1427,17 @@ def getObjects(objects, etStart, etEnd, maxError):
 
 etStart = spice.str2et('1950 Jan 1 12:00:00 TDB')
 etEnd = spice.str2et('2050 Jan 1 12:00:00 TDB')
-maxError = 30000
 
-objectsData = getObjects(objects, etStart, etEnd, maxError)
+objectsData = getObjects(objects, etStart, etEnd)
 
-file = open('solar_system.js', 'w')
-file.write(json.dumps(objectsData))
+file = open('./../dist/star_systems/solar_system.json', 'w')
+file.write(json.dumps({
+	'id': 1,
+	'name': 'Solar System',
+	'directory': 'solar_system',
+	'mainObject': 399,
+	'referenceFrames': referenceFrames,
+	'objects': objectsData,
+	'stars': stars
+}))
 file.close()

@@ -46,6 +46,11 @@ export default class Simulation
         this.raycaster = new VisualRaycaster(this.renderer.domElement, this.camera.threeCamera, 7);
 
         this.ui = new UI(5, this.starSystem.getObjectNames());
+
+        // StarSystemLoader.loadObjectByUrl(sim.starSystem, '/spacecraft/voyager1.json');
+        StarSystemLoader.loadObjectByUrl(sim.starSystem, '/spacecraft/voyager2.json');
+        // StarSystemLoader.loadObjectByUrl(sim.starSystem, '/spacecraft/lro.json');
+        // StarSystemLoader.loadObjectByUrl(sim.starSystem, '/spacecraft/lro2.json');
     }
 
     get currentEpoch() {

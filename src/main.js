@@ -1,5 +1,4 @@
 import Simulation from "./core/Simulation";
-import StarSystemLoader from "./interface/StarSystemLoader";
 
 function init() {
     statistics = new Stats();
@@ -12,12 +11,11 @@ function init() {
     });
 
     window.sim = new Simulation();
-    window.sim.init('viewport', starSystemConfig);
-    starSystemConfig = undefined;
 
-    StarSystemLoader.loadObjectByUrl(sim.starSystem, '/spacecraft/voyager1.json');
-    StarSystemLoader.loadObjectByUrl(sim.starSystem, '/spacecraft/voyager2.json');
-    // StarSystemLoader.loadObjectByUrl(sim.starSystem, '/spacecraft/lro.json');
+    $.getJSON('/star_systems/solar_system.json', starSystemConfig => {
+        sim.init('viewport', starSystemConfig);
+        requestAnimationFrame(firstRender);
+    });
 }
 
 function firstRender(curTime) {
@@ -39,5 +37,4 @@ let globalTime;
 
 $(() => {
     init();
-    requestAnimationFrame(firstRender);
 });

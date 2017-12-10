@@ -383,14 +383,14 @@ lroTraj = (
 	{
 		'parent': 	'301',
 		'from': 	'2009 JUN 18 22:17:06.185',
-		'to':   	'2010 JAN 01 00:01:06.183',
-		'error': 	15,
+		'to':   	'2009 JUN 23 00:01:06.183',
+		'error': 	30,
 		'step':     600
 	},
 )
 
 lroRendering = {
-	'color': 'green',
+	'color': 'white',
 	'pointArrayModel': {
 		'showAhead': False,
 		'showBehind': True,

@@ -8,6 +8,7 @@ import VisualTrajectoryModelPointArray from "../visual/TrajectoryModel/PointArra
 import VisualTrajectoryModelKeplerian from "../visual/TrajectoryModel/Keplerian";
 import TrajectoryStaticPosition from "../core/Trajectory/StaticPosition";
 import {Vector} from "../algebra";
+import TrajectoryVSOP87 from "../core/Trajectory/VSOP87";
 
 export default class TrajectoryLoader
 {
@@ -38,6 +39,10 @@ export default class TrajectoryLoader
 
         if (type === 'static') {
             trajectory = this.createStatic(config);
+        }
+
+        if (type === 'vsop87') {
+            trajectory = this.createVSOP87(config);
         }
 
         if (config.periodStart !== undefined) {
@@ -105,6 +110,15 @@ export default class TrajectoryLoader
         );
     }
 
+    static createKeplerianPrecessing(config) {
+        return new TrajectoryKeplerianPrecessing(
+            config.data.referenceFrame,
+            this.createKeplerianObject(config.data.elements),
+            config.data.radius,
+            config.data.j2
+        );
+    }
+
     static createStatic(config) {
         return new TrajectoryStaticPosition(
             config.data.referenceFrame,
@@ -112,12 +126,10 @@ export default class TrajectoryLoader
         );
     }
 
-    static createKeplerianPrecessing(config) {
-        return new TrajectoryKeplerianPrecessing(
-            config.data.referenceFrame,
-            this.createKeplerianObject(config.data.elements),
-            config.data.radius,
-            config.data.j2
+    static createVSOP87(config) {
+        return new TrajectoryVSOP87(
+            config.data.body,
+            config.data.coefficients
         );
     }
 
