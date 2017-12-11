@@ -4,6 +4,8 @@ import json
 import math
 import sys
 
+from matplotlib import pyplot as plt
+
 # spice.loadKernel('kernels/de430.bsp')
 spice.loadKernel('naif0012.tls')
 spice.loadKernel('pck00010.tpc')
@@ -14,6 +16,7 @@ spice.loadKernel('gm_de431.tpc')
 # spice.loadKernel('kernels/spacecraft/voyager/voyager_2.ST+1992_m05208u.merged.bsp')
 
 spice.loadKernel('kernels/spacecraft/lro/lrorg_2009169_2010001_v01.bsp')
+spice.loadKernel('kernels/spacecraft/lro/lroevnt_2009173_2009180_v01.bes')
 spice.loadKernel('kernels/spacecraft/lro/de421.bsp')
 
 TWO_PI = 2 * math.pi
@@ -38,7 +41,7 @@ def approximateOrbit(object1, object2, epoch):
 	else:
 		proportion = (epoch - object1.epoch) / (object2.epoch - object1.epoch)
 
-	if (0.98 < object1.ecc and object1.ecc < 1.02) or (0.98 < object2.ecc and object2.ecc < 1.02) or object1.isElliptic != object2.isElliptic:
+	if (0.95 < object1.ecc and object1.ecc < 1.05) or (0.95 < object2.ecc and object2.ecc < 1.05) or object1.isElliptic != object2.isElliptic:
 		state1 = object1.getStateByEpoch(epoch)
 		state2 = object2.getStateByEpoch(epoch)
 		return kepler.createOrbitByState(
@@ -80,10 +83,33 @@ def approximateOrbit(object1, object2, epoch):
 	);
 
 def getStateFromSpice(parent, body, epoch):
+	global linearPoints
 	state = list(spice.spkezr(body, epoch, 'ECLIPJ2000', 'NONE', parent)[0])
+	velocity = kepler.Vector3(state[3], state[4], state[5])
+
+	for record in linearPoints:
+		if epoch > record[0][0] and epoch < record[0][1]:
+			i = 1
+			while i < len(record[1][0]):
+				if epoch < record[1][0][i]:
+					break
+				i += 1
+			state1 = record[1][1][i-1]
+			state2 = record[1][1][i]
+			ratio = (epoch - record[1][0][i-1]) / (record[1][0][i] - record[1][0][i-1])
+
+			velocity = state1.velocity.mul(1 - ratio).add(state2.velocity.mul(ratio))
+			break
+
+	if epoch == 299024951.06256104:
+		print(kepler.StateVector(
+			kepler.Vector3(state[0], state[1], state[2]),
+			velocity
+		))
+
 	return kepler.StateVector(
 		kepler.Vector3(state[0], state[1], state[2]),
-		kepler.Vector3(state[3], state[4], state[5])
+		velocity
 	)
 
 def getOrbitFromSpice(parent, body, epoch, parentMu):
@@ -98,6 +124,7 @@ def getNextElements(parent, body, currentElements, step, maxError, maxEpoch):
 	prevElements = False
 	i = 0
 
+	# print(' ')
 	while True:
 		i += 1
 		if currentElements.epoch + step > maxEpoch:
@@ -120,13 +147,17 @@ def getNextElements(parent, body, currentElements, step, maxError, maxEpoch):
 		# print(currentElements)
 		# print(approximatedElements)
 		# print(nextElements)
-		# print(realState)
-		# print(approximatedState)
+		# print(parent, body, nextEpoch, currentElements.mu)
+		# print('\t', currentElements.epoch, approximatedEpoch, nextEpoch)
+		# print('\t', realState.velocity.mag)
+		# print('\t\t', approximatedState.velocity.mag)
+		# print('\t\t', approximatedElements.ecc)
 		# print(nextEpoch - currentElements.epoch, error, errorVel)
+
 		# if step < 1:
 		# 	print(getOrbitFromSpice(parent, body, approximatedEpoch, currentElements.mu))
 
-		if error < maxError and errorVel / realState.velocity.mag < 0.01:
+		if error < maxError and errorVel / realState.velocity.mag < 0.002:
 			if direction == -1 or (nextEpoch == maxEpoch):
 				# print(' breaking')
 				break
@@ -150,6 +181,63 @@ def getNextElements(parent, body, currentElements, step, maxError, maxEpoch):
 		prevElements = nextElements
 
 	return nextElements
+
+def findLinearPoints(body, parent, etFrom, etTo):
+	et = etFrom - 1000
+	prevVelMag = False
+	prevdVelMag = False
+	step = 1
+
+	x = []
+	y = []
+	while et < etTo+500:
+		state = getStateFromSpice(parent, body, et)
+
+		# x.append(et)
+		# y.append(state.velocity.mag)
+		if prevVelMag != False:
+			if prevdVelMag != False:
+				x.append(et - step)
+				y.append(state.velocity.mag - prevVelMag - prevdVelMag)
+			prevdVelMag = state.velocity.mag - prevVelMag
+
+		prevVelMag = state.velocity.mag
+		et += step
+
+	dSumm = 0
+	dSamples = 0
+	spikes = {}
+	for i in range(len(y)-2):
+		if dSamples > 0 and (y[i+1] - y[i]) * (y[i+2] - y[i+1]) < 0 and (abs(y[i+1] - y[i]) > dSumm / dSamples * 2 or abs(y[i+2] - y[i+1]) > dSumm / dSamples * 2):
+			et = int(x[i+1])
+			if not et-1 in spikes and not et+1 in spikes:
+				spikes[et] = abs(y[i+1])
+		dSumm += abs(y[i+1] - y[i])
+		dSamples += 1
+
+	return list(sorted(spikes, key=spikes.get, reverse=True)[0:4])
+
+def getManeuverTimes():
+	query = 'SELECT EVT_TIME, DESCRIPTION FROM LRO_EVENTS WHERE DESCRIPTION LIKE "*DELTAV*" ORDER BY EVT_TIME'
+
+	resultsCnt = spice.ekfind(query, 1000000)[0]
+	results = []
+
+	for i in range(resultsCnt - 1):
+		row = (spice.ekgd(0, i, 0)[0], spice.ekgc(1, i, 0, 1000)[0])
+		if 'to DELTAV' in row[1]:
+			results.append((row[0], spice.ekgd(0, i+1, 0)[0]))
+
+	return results
+
+def handleManeuvers(body, parent):
+	global linearPoints
+	for maneuver in getManeuverTimes():
+		points = findLinearPoints('-85', '301', maneuver[0], maneuver[1])
+		points.sort()
+		data = ((min(points), max(points)), [points, []])
+		data[1][1] = [getStateFromSpice(parent, body, et) for et in data[1][0]]
+		linearPoints.append(data)
 
 def getObjectTrajectory(body, parent, etFrom, etTo, maxError, renderingConfig, initialStep):
 	parentMu = spice.bodvrd(parent, "GM", 1)[1][0]
@@ -183,7 +271,7 @@ def getObjectTrajectory(body, parent, etFrom, etTo, maxError, renderingConfig, i
 		))
 
 		# print(str((lastOrbit.epoch - etFrom) / (etTo - etFrom) * 100)[0:6] + '%', end='\t')
-		# print(orbit)
+		# print(orbit.ecc)
 
 		step = orbit.epoch - lastOrbit.epoch
 
@@ -249,11 +337,16 @@ def dumpJson(fileName, data):
 		file.write(json.dumps(data))
 
 def createSpacecraftFile(fileName, id, name, renderingConfig, trajectoryParts):
+	if id == '-85':
+		handleManeuvers(id, '301')
+
 	dumpJson(fileName, {
 		'id': id,
 		'name': name,
 		'trajectory': createCompositeTrajectory(id, renderingConfig, trajectoryParts)
 	})
+
+linearPoints = []
 
 voyager1traj = (
 	{
@@ -381,11 +474,31 @@ voyagerRendering = {
 
 lroTraj = (
 	{
-		'parent': 	'301',
+		'parent': 	'399',
 		'from': 	'2009 JUN 18 22:17:06.185',
-		'to':   	'2009 JUN 23 00:01:06.183',
+		'to':   	'2009 JUN 22 21:00:00.000',
 		'error': 	30,
-		'step':     600
+		'step':     600,
+		'rendering':{
+			'color': 'white',
+			'pointArrayModel': {
+				'showAhead': False,
+				'showBehind': True,
+				'trailPeriod': 86400 * 3,
+				'referenceFrame': 39901000,
+			}
+		}
+	},
+	{
+		'parent': 	'301',
+		'from': 	'2009 JUN 22 21:00:00.000',
+		'to':   	'2009 DEC 31 23:01:06.183',
+		'error': 	30,
+		'step':     600,
+		'rendering':{
+			'color': 'white',
+			'keplerianModel': True
+		}
 	},
 )
 
@@ -402,4 +515,35 @@ lroRendering = {
 # createSpacecraftFile('voyager1.json', '-31', 'Voyager 1', voyagerRendering, voyager1traj)
 # createSpacecraftFile('voyager2.json', '-32', 'Voyager 2', voyagerRendering, voyager2traj)
 
-createSpacecraftFile('./../dist/spacecraft/lro.json', '-85', 'LRO', lroRendering, lroTraj)
+# handleManeuvers('-85', '301')
+# print(getOrbitFromSpice('301', '-85', 299024951.06256104, 4902.80006616))
+# print(getOrbitFromSpice('301', '-85', 299024951.06256104, spice.bodvrd('301', "GM", 1)[1][0]))
+
+# prevVel = False
+# x = []
+# y1 = []
+# y2 = []
+# y3 = []
+# et = 299110000
+# while et < 299112000:
+# 	state1 = getStateFromSpice('301', '-85', et)
+# 	state2 = list(spice.spkezr('-85', et, 'ECLIPJ2000', 'NONE', '301')[0])
+# 	vel2 = kepler.Vector3(state2[3], state2[4], state2[5]).mag
+# 	# if prevVel != False:
+# 	x.append(et)
+# 		# y3.append(vel2 - prevVel)
+# 	prevVel = vel2
+# 	y1.append(state1.velocity.mag)
+# 	y2.append(vel2)
+# 	et += 1
+
+# if len(y1):
+# 	plt.plot(x,y1,label='my')
+# if len(y2):
+# 	plt.plot(x,y2,label='DE')
+# if len(y3):
+# 	plt.plot(x,y3)
+
+# plt.legend()
+# plt.show()
+createSpacecraftFile('./../dist/spacecraft/lro.json', '-85', 'LRO', False, lroTraj)

@@ -960,12 +960,12 @@ objects = [
 		'color': 'orange',
 		'texture': 'VenusTexture.jpg'
 	},
-	{
-		'id': '3',
-		'name': 'Earth-Moon barycenter',
-		'maxError': 30000,
-		'color': 'lightblue'
-	},
+	# {
+	# 	'id': '3',
+	# 	'name': 'Earth-Moon barycenter',
+	# 	'maxError': 30000,
+	# 	'color': 'lightblue'
+	# },
 	{
 		'id': '399',
 		'name': 'Earth',
@@ -1057,6 +1057,12 @@ objects = [
 		'id': '899',
 		'name': 'Neptune',
 		'maxError': 30000,
+		'color': 'steelblue'
+	},
+	{
+		'id': '801',
+		'name': 'Triton',
+		'maxError': 10000,
 		'color': 'steelblue'
 	},
 	{
@@ -1287,7 +1293,7 @@ def getStaticTrajectory(body, parent, etFrom, etTo, position):
 		}
 	}
 
-def getVsopTrajectory(body, color):
+def getVsopTrajectory(body, color, cutKm):
 	version = 'VSOP87A'
 	if body == '10':
 		bodyFile = 'sun'
@@ -1331,7 +1337,8 @@ def getVsopTrajectory(body, color):
 			B = float(line[ 98:111].strip())
 			C = float(line[112:131].strip())
 
-			data[varNum - 1][degree].append((A,B,C)) 
+			if A > cutKm / 149597870.7:
+				data[varNum - 1][degree].append((A,B,C)) 
 
 	return {
 		'type': 'vsop87',
@@ -1345,7 +1352,58 @@ def getVsopTrajectory(body, color):
 		}
 	}
 
+def getELP2000Trajectory(color):
+	_files = []
+	for i in range(36):
+		_files.append([])
+		with open('ELP 2000-82B/data/ELP' + str(i+1)) as file:
+			isFirstLine = True
+			for line in file:
+				if isFirstLine:
+					isFirstLine = False
+					continue
+
+				koeffs = [
+					int(line[0:3]),
+					int(line[3:6]),
+					int(line[6:9]),
+					int(line[9:12])
+				]
+
+				if i < 3:
+					koeffs.append(float(line[14:27])) # A
+				elif i < 9:
+					koeffs.append(int  (line[12:15])) # i5
+					koeffs.append(float(line[16:25])) # ph
+					koeffs.append(float(line[26:35])) # A
+				elif i < 21:
+					koeffs.append(int  (line[12:15])) # i5
+					koeffs.append(int  (line[15:18])) # i6
+					koeffs.append(int  (line[18:21])) # i7
+					koeffs.append(int  (line[21:24])) # i8
+					koeffs.append(int  (line[24:27])) # i9
+					koeffs.append(int  (line[27:30])) # i10
+					koeffs.append(int  (line[30:33])) # i11
+					koeffs.append(float(line[34:43])) # ph
+					koeffs.append(float(line[44:53])) # A
+				else:
+					koeffs.append(int  (line[12:15])) # i5
+					koeffs.append(float(line[16:25])) # ph
+					koeffs.append(float(line[26:35])) # A
+
+				_files[i].append(koeffs)
+
+	return {
+		'type': 'elp2000',
+		'rendering': {
+			'color': color,
+			'keplerianModel': True
+		},
+		'data': _files
+	}
+
 def getBodyData(body, name, color, texture, parent, pairing, etFrom, etTo, maxError, staticPosition):
+	global vsopTotal
 	try:
 		parentMu = spice.bodvrd(parent, "GM", 1)[1][0] if parent != '0' else 319.77790837966666
 	except:
@@ -1358,8 +1416,13 @@ def getBodyData(body, name, color, texture, parent, pairing, etFrom, etTo, maxEr
 	if staticPosition:
 		trajectory = getStaticTrajectory(body, parent, etFrom, etTo, staticPosition)
 		print(0)
-	elif body in ('3', '199','299','399','499','599','699','799','899'):
-		trajectory = getVsopTrajectory(body, color)
+	elif body in ('199','299','399','499','599','699','799','899'):
+		trajectory = getVsopTrajectory(body, color, 50)
+		termsCnt = sum([sum([len(deg) for deg in v]) for v in trajectory['data']['coefficients']])
+		vsopTotal += termsCnt
+		print(termsCnt)
+	elif body == '301':
+		trajectory = getELP2000Trajectory(color)
 		print('HZ')
 	else:
 		trajectory = getObjectTrajectory(body, parent, parentMu, etFrom, etTo, maxError, color)
@@ -1428,6 +1491,8 @@ def getObjects(objects, etStart, etEnd):
 etStart = spice.str2et('1950 Jan 1 12:00:00 TDB')
 etEnd = spice.str2et('2050 Jan 1 12:00:00 TDB')
 
+vsopTotal = 0
+
 objectsData = getObjects(objects, etStart, etEnd)
 
 file = open('./../dist/star_systems/solar_system.json', 'w')
@@ -1441,3 +1506,5 @@ file.write(json.dumps({
 	'stars': stars
 }))
 file.close()
+
+print('\nVSOP terms total: ', vsopTotal)

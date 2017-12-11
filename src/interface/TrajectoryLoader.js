@@ -9,6 +9,7 @@ import VisualTrajectoryModelKeplerian from "../visual/TrajectoryModel/Keplerian"
 import TrajectoryStaticPosition from "../core/Trajectory/StaticPosition";
 import {Vector} from "../algebra";
 import TrajectoryVSOP87 from "../core/Trajectory/VSOP87";
+import TrajectoryELP2000 from "../core/Trajectory/ELP2000";
 
 export default class TrajectoryLoader
 {
@@ -43,6 +44,10 @@ export default class TrajectoryLoader
 
         if (type === 'vsop87') {
             trajectory = this.createVSOP87(config);
+        }
+
+        if (type === 'elp2000') {
+            trajectory = this.createELP2000(config);
         }
 
         if (config.periodStart !== undefined) {
@@ -130,6 +135,12 @@ export default class TrajectoryLoader
         return new TrajectoryVSOP87(
             config.data.body,
             config.data.coefficients
+        );
+    }
+
+    static createELP2000(config) {
+        return new TrajectoryELP2000(
+            config.data
         );
     }
 

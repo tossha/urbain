@@ -3227,16 +3227,16 @@ class TrajectoryKeplerianArray extends __WEBPACK_IMPORTED_MODULE_0__KeplerianAbs
     approximateKeplerianObject(object1, object2, epoch) {
         const proportion = (epoch - object1.epoch) / (object2.epoch - object1.epoch);
 
-        if ((0.98 < object1.e && object1.e < 1.02)
-            || (0.98 < object2.e && object2.e < 1.02)
+        if ((0.95 < object1.e && object1.e < 1.05)
+            || (0.95 < object2.e && object2.e < 1.05)
             || (object1.isElliptic !== object2.isElliptic)
         ) {
             const state1 = object1.getStateByEpoch(epoch);
             const state2 = object2.getStateByEpoch(epoch);
             return __WEBPACK_IMPORTED_MODULE_2__KeplerianObject__["a" /* default */].createFromState(
                 new __WEBPACK_IMPORTED_MODULE_3__StateVector__["a" /* default */](
-                    state1.position.mul_(proportion).add_(state2.position.mul_(1 - proportion)),
-                    state1.velocity.mul_(proportion).add_(state2.velocity.mul_(1 - proportion)),
+                    state1.position.mul_(1 - proportion).add_(state2.position.mul_(proportion)),
+                    state1.velocity.mul_(1 - proportion).add_(state2.velocity.mul_(proportion)),
                 ),
                 Object(__WEBPACK_IMPORTED_MODULE_1__algebra__["e" /* approximateNumber */])(object1.mu, object2.mu, proportion),
                 epoch
@@ -8280,10 +8280,9 @@ class Simulation
 
         this.ui = new __WEBPACK_IMPORTED_MODULE_8__ui_UI__["a" /* default */](5, this.starSystem.getObjectNames());
 
-        // StarSystemLoader.loadObjectByUrl(sim.starSystem, '/spacecraft/voyager1.json');
+        __WEBPACK_IMPORTED_MODULE_5__interface_StarSystemLoader__["a" /* default */].loadObjectByUrl(sim.starSystem, '/spacecraft/voyager1.json');
         __WEBPACK_IMPORTED_MODULE_5__interface_StarSystemLoader__["a" /* default */].loadObjectByUrl(sim.starSystem, '/spacecraft/voyager2.json');
-        // StarSystemLoader.loadObjectByUrl(sim.starSystem, '/spacecraft/lro.json');
-        // StarSystemLoader.loadObjectByUrl(sim.starSystem, '/spacecraft/lro2.json');
+        __WEBPACK_IMPORTED_MODULE_5__interface_StarSystemLoader__["a" /* default */].loadObjectByUrl(sim.starSystem, '/spacecraft/lro.json');
     }
 
     get currentEpoch() {
@@ -8609,6 +8608,8 @@ class PhysicalBodyModel
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_8__core_Trajectory_StaticPosition__ = __webpack_require__(51);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_9__algebra__ = __webpack_require__(0);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_10__core_Trajectory_VSOP87__ = __webpack_require__(61);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_11__core_Trajectory_ELP2000__ = __webpack_require__(62);
+
 
 
 
@@ -8654,6 +8655,10 @@ class TrajectoryLoader
 
         if (type === 'vsop87') {
             trajectory = this.createVSOP87(config);
+        }
+
+        if (type === 'elp2000') {
+            trajectory = this.createELP2000(config);
         }
 
         if (config.periodStart !== undefined) {
@@ -8741,6 +8746,12 @@ class TrajectoryLoader
         return new __WEBPACK_IMPORTED_MODULE_10__core_Trajectory_VSOP87__["a" /* default */](
             config.data.body,
             config.data.coefficients
+        );
+    }
+
+    static createELP2000(config) {
+        return new __WEBPACK_IMPORTED_MODULE_11__core_Trajectory_ELP2000__["a" /* default */](
+            config.data
         );
     }
 
@@ -10623,6 +10634,280 @@ class TrajectoryVSOP87 extends __WEBPACK_IMPORTED_MODULE_2__KeplerianAbstract__[
     }
 }
 /* harmony export (immutable) */ __webpack_exports__["a"] = TrajectoryVSOP87;
+
+
+/***/ }),
+/* 62 */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__KeplerianAbstract__ = __webpack_require__(22);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__ReferenceFrame_Factory__ = __webpack_require__(2);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__solar_system__ = __webpack_require__(15);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__algebra__ = __webpack_require__(0);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_4__StateVector__ = __webpack_require__(3);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_5__KeplerianObject__ = __webpack_require__(6);
+
+
+
+
+
+
+
+
+
+class TrajectoryELP2000 extends __WEBPACK_IMPORTED_MODULE_0__KeplerianAbstract__["a" /* default */]
+{
+    constructor(coefficients) {
+        super(__WEBPACK_IMPORTED_MODULE_1__ReferenceFrame_Factory__["c" /* default */].buildId(__WEBPACK_IMPORTED_MODULE_2__solar_system__["a" /* EARTH */], __WEBPACK_IMPORTED_MODULE_1__ReferenceFrame_Factory__["b" /* ReferenceFrame */].INERTIAL_ECLIPTIC));
+        this.coefficients = coefficients;
+        this.mu = sim.starSystem.getObject(__WEBPACK_IMPORTED_MODULE_2__solar_system__["a" /* EARTH */]).physicalModel.mu;
+        this._p = 5029.0966;
+    }
+
+    getKeplerianObjectByEpoch(epoch) {
+        return __WEBPACK_IMPORTED_MODULE_5__KeplerianObject__["a" /* default */].createFromState(this.getStateInOwnFrameByEpoch(epoch), this.mu, epoch);
+    }
+
+    getStateInOwnFrameByEpoch(epoch) {
+        const model = this._calcAll(epoch / 86400 / 36525);
+        const sinLon = Math.sin(model.lon);
+        const sinLat = Math.sin(model.lat);
+        const cosLon = Math.cos(model.lon);
+        const cosLat = Math.cos(model.lat);
+
+        return new __WEBPACK_IMPORTED_MODULE_4__StateVector__["a" /* default */](
+            new __WEBPACK_IMPORTED_MODULE_3__algebra__["c" /* Vector */]([
+                model.r * cosLon * cosLat,
+                model.r * sinLon * cosLat,
+                model.r * sinLat
+            ]),
+            new __WEBPACK_IMPORTED_MODULE_3__algebra__["c" /* Vector */]([
+                (model.dr * cosLon * cosLat - model.r * sinLon * cosLat * model.dlon - model.r * cosLon * sinLat * model.dlat) / 36525 / 86400,
+                (model.dr * sinLon * cosLat + model.r * cosLon * cosLat * model.dlon - model.r * sinLon * sinLat * model.dlat) / 36525 / 86400,
+                (model.dr * sinLat + model.r * cosLat * model.dlat) / 36525 / 86400
+            ])
+        );
+    }
+
+    _calc1_3(fileIdx, t, t2, t3, t4) {
+        const D  = 297 * 3600 + 51 * 60 +  0.73512 + 1602961601.4603 * t -  5.8681 * t2 + 0.006595 * t3 - 0.00003184 * t4;
+        const dD = 1602961601.4603 - 5.8681 * 2 * t + 0.006595 * 3 * t2 - 0.00003184 * 4 * t3;
+        const l_ = 357 * 3600 + 31 * 60 + 44.79306 +  129596581.0474 * t -  0.5529 * t2 + 0.000147 * t3;
+        const dl_= 129596581.0474 - 0.5529 * 2 * t + 0.000147 * 3 * t2;
+        const l  = 134 * 3600 + 57 * 60 + 48.28096 + 1717915923.4728 * t + 32.3893 * t2 + 0.051651 * t3 - 0.00024471 * t4;
+        const dl = 1717915923.4728 + 32.3893 * 2 * t + 0.051651 * 3 * t2 - 0.00024471 * 4 * t3;
+        const F  =  93 * 3600 + 16 * 60 + 19.55755 + 1739527263.0983 * t - 12.2505 * t2 - 0.001021 * t3 + 0.00000417 * t4;
+        const dF = 1739527263.0983 - 12.2505 * 2 * t - 0.001021 * 3 * t2 + 0.00000417 * 4 * t3;
+
+        let value = 0;
+        let derivative = 0;
+
+        for (let k of this.coefficients[fileIdx]) {
+            const arg = Object(__WEBPACK_IMPORTED_MODULE_3__algebra__["f" /* deg2rad */])((k[0] * D + k[1] * l_ + k[2] * l + k[3] * F) / 3600);
+            const dArg = k[0] * dD + k[1] * dl_ + k[2] * dl + k[3] * dF;
+            const sin = Math.sin(arg);
+            const cos = Math.cos(arg);
+            value += k[4] * (fileIdx == 2 ? cos : sin);
+            derivative += k[4] * (fileIdx == 2 ? -sin : cos) * Object(__WEBPACK_IMPORTED_MODULE_3__algebra__["f" /* deg2rad */])(dArg / 3600);
+        }
+
+        return [value, derivative];
+    }
+    
+    _calc4_9(fileIdx, t, t2, t3, t4) {
+        const D  = 297 * 3600 + 51 * 60 +  0.73512 + 1602961601.4603  * t;
+        const dD = 1602961601.4603;
+        const l_ = 357 * 3600 + 31 * 60 + 44.79306 +  129596581.0474  * t;
+        const dl_= 129596581.0474;
+        const l  = 134 * 3600 + 57 * 60 + 48.28096 + 1717915923.4728  * t;
+        const dl = 1717915923.4728;
+        const F  =  93 * 3600 + 16 * 60 + 19.55755 + 1739527263.0983  * t;
+        const dF = 1739527263.0983;
+        const W1 = 218 * 3600 + 18 * 60 + 59.95571 + 1732559343.73604 * t -  5.8883 * t2 + 0.006604 * t3 - 0.00003169 * t4;
+        const dW1= 1732559343.73604 - 5.8883 * 2 * t + 0.006604 * 3 * t2 - 0.00003169 * 4 * t3;
+        const z = W1 + this._p * t;
+        const dz = dW1 + this._p;
+
+        let value = 0;
+        let derivative = 0;
+
+        for (let k of this.coefficients[fileIdx]) {
+            const arg = (k[0] * z + k[1] * D + k[2] * l_ + k[3] * l + k[4] * F) / 3600 + k[5];
+            const dArg = k[0] * dz + k[1] * dD + k[2] * dl_ + k[3] * dl + k[4] * dF;
+            value += k[6] * Math.sin(Object(__WEBPACK_IMPORTED_MODULE_3__algebra__["f" /* deg2rad */])(arg));
+            derivative += k[6] * Math.cos(Object(__WEBPACK_IMPORTED_MODULE_3__algebra__["f" /* deg2rad */])(arg)) * Object(__WEBPACK_IMPORTED_MODULE_3__algebra__["f" /* deg2rad */])(dArg / 3600);
+        }
+
+        return [value, derivative];
+    }
+
+    _calc10_15(fileIdx, t, t2, t3, t4) {
+        const D  = 297 * 3600 + 51 * 60 +  0.73512 + 1602961601.4603 * t;
+        const dD = 1602961601.4603;
+        const l  = 134 * 3600 + 57 * 60 + 48.28096 + 1717915923.4728 * t;
+        const dl = 1717915923.4728;
+        const F  =  93 * 3600 + 16 * 60 + 19.55755 + 1739527263.0983 * t;
+        const dF = 1739527263.0983;
+        const T  = 100 * 3600 + 27 * 60 + 59.22059 +  129597742.2758 * t;
+        const dT =  129597742.2758;
+        const Me = 252 * 3600 + 15 * 60 +  3.25986 + 538101628.68898 * t;
+        const dMe= 538101628.68898;
+        const V  = 181 * 3600 + 58 * 60 + 47.28305 + 210664136.43355 * t;
+        const dV = 210664136.43355;
+        const Ma = 355 * 3600 + 25 * 60 + 59.78866 +  68905077.59284 * t;
+        const dMa=  68905077.59284;
+        const J  =  34 * 3600 + 21 * 60 +  5.34212 +  10925660.42861 * t;
+        const dJ =  10925660.42861;
+        const S  =  50 * 3600 +  4 * 60 + 38.89694 +   4399609.65932 * t;
+        const dS =   4399609.65932;
+        const U  = 314 * 3600 +  3 * 60 + 18.01841 +   1542481.19393 * t;
+        const dU =   1542481.19393;
+        const N  = 304 * 3600 + 20 + 60 + 55.19575 +    786550.32074 * t;
+        const dN =    786550.32074;
+
+        let value = 0;
+        let derivative = 0;
+
+        for (let k of this.coefficients[fileIdx]) {
+            const arg = (k[0] * Me + k[1] * V + k[2] * T + k[3] * Ma + k[4] * J + k[5] * S + k[6] * U + k[7] * N + k[8] * D + k[9] * l + k[10] * F) / 3600 + k[11];
+            const dArg = k[0] * dMe + k[1] * dV + k[2] * dT + k[3] * dMa + k[4] * dJ + k[5] * dS + k[6] * dU + k[7] * dN + k[8] * dD + k[9] * dl + k[10] * dF;
+            value += k[12] * Math.sin(Object(__WEBPACK_IMPORTED_MODULE_3__algebra__["f" /* deg2rad */])(arg));
+            derivative += k[12] * Math.cos(Object(__WEBPACK_IMPORTED_MODULE_3__algebra__["f" /* deg2rad */])(arg)) * Object(__WEBPACK_IMPORTED_MODULE_3__algebra__["f" /* deg2rad */])(dArg / 3600);
+        }
+
+        return [value, derivative];
+    }
+
+    _calc16_21(fileIdx, t, t2, t3, t4) {
+        const D  = 297 * 3600 + 51 * 60 +  0.73512 + 1602961601.4603 * t;
+        const dD = 1602961601.4603;
+        const l_ = 357 * 3600 + 31 * 60 + 44.79306 +  129596581.0474 * t;
+        const dl_=  129596581.0474;
+        const l  = 134 * 3600 + 57 * 60 + 48.28096 + 1717915923.4728 * t;
+        const dl = 1717915923.4728;
+        const F  =  93 * 3600 + 16 * 60 + 19.55755 + 1739527263.0983 * t;
+        const dF = 1739527263.0983;
+        const T  = 100 * 3600 + 27 * 60 + 59.22059 +  129597742.2758 * t;
+        const dT =  129597742.2758;
+        const Me = 252 * 3600 + 15 * 60 +  3.25986 + 538101628.68898 * t;
+        const dMe= 538101628.68898;
+        const V  = 181 * 3600 + 58 * 60 + 47.28305 + 210664136.43355 * t;
+        const dV = 210664136.43355;
+        const Ma = 355 * 3600 + 25 * 60 + 59.78866 +  68905077.59284 * t;
+        const dMa=  68905077.59284;
+        const J  =  34 * 3600 + 21 * 60 +  5.34212 +  10925660.42861 * t;
+        const dJ =  10925660.42861;
+        const S  =  50 * 3600 +  4 * 60 + 38.89694 +   4399609.65932 * t;
+        const dS =   4399609.65932;
+        const U  = 314 * 3600 +  3 * 60 + 18.01841 +   1542481.19393 * t;
+        const dU =   1542481.19393;
+
+        let value = 0;
+        let derivative = 0;
+
+        for (let k of this.coefficients[fileIdx]) {
+            const arg = (k[0] * Me + k[1] * V + k[2] * T + k[3] * Ma + k[4] * J + k[5] * S + k[6] * U + k[7] * D + k[8] * l_ + k[9] * l + k[10] * F) / 3600 + k[11];
+            const dArg = k[0] * dMe + k[1] * dV + k[2] * dT + k[3] * dMa + k[4] * dJ + k[5] * dS + k[6] * dU + k[7] * dD + k[8] * dl_ + k[9] * dl + k[10] * dF;
+            value += k[12] * Math.sin(Object(__WEBPACK_IMPORTED_MODULE_3__algebra__["f" /* deg2rad */])(arg));
+            derivative += k[12] * Math.cos(Object(__WEBPACK_IMPORTED_MODULE_3__algebra__["f" /* deg2rad */])(arg)) * Object(__WEBPACK_IMPORTED_MODULE_3__algebra__["f" /* deg2rad */])(dArg / 3600);
+        }
+
+        return [value, derivative];
+    }
+
+    _calc22_36(fileIdx, t, t2, t3, t4) {
+        const D = 297 * 3600 + 51 * 60 + 0.73512 + 1602961601.4603 * t;
+        const dD = 1602961601.4603;
+        const l_ = 357 * 3600 + 31 * 60 + 44.79306 + 129596581.0474 * t;
+        const dl_ = 129596581.0474;
+        const l = 134 * 3600 + 57 * 60 + 48.28096 + 1717915923.4728 * t;
+        const dl = 1717915923.4728;
+        const F = 93 * 3600 + 16 * 60 + 19.55755 + 1739527263.0983 * t;
+        const dF = 1739527263.0983;
+
+        let value = 0;
+        let derivative = 0;
+
+        for (let k of this.coefficients[fileIdx]) {
+            const arg = (k[1] * D + k[2] * l_ + k[3] * l + k[4] * F) / 3600 + k[5];
+            const dArg = k[1] * dD + k[2] * dl_ + k[3] * dl + k[4] * dF;
+            value += k[6] * Math.sin(Object(__WEBPACK_IMPORTED_MODULE_3__algebra__["f" /* deg2rad */])(arg));
+            derivative += k[6] * Math.cos(Object(__WEBPACK_IMPORTED_MODULE_3__algebra__["f" /* deg2rad */])(arg)) * Object(__WEBPACK_IMPORTED_MODULE_3__algebra__["f" /* deg2rad */])(dArg / 3600);
+        }
+
+        return [value, derivative];
+    }
+
+    _calcFile(fileIdx, t, t2, t3, t4) {
+        if (fileIdx < 3) {
+            return this._calc1_3(fileIdx, t, t2, t3, t4);
+        } else if (fileIdx < 6) {
+            return this._calc4_9(fileIdx, t, t2, t3, t4);
+        } else if (fileIdx < 9) {
+            const res = this._calc4_9(fileIdx, t, t2, t3, t4);
+            return [res[0] * t, res[1] * t + res[0]];
+        } else if (fileIdx < 12) {
+            return this._calc10_15(fileIdx, t, t2, t3, t4);
+        } else if (fileIdx < 15) {
+            const res = this._calc10_15(fileIdx, t, t2, t3, t4);
+            return [res[0] * t, res[1] * t + res[0]];
+        } else if (fileIdx < 18) {
+            return this._calc16_21(fileIdx, t, t2, t3, t4);
+        } else if (fileIdx < 21) {
+            const res = this._calc16_21(fileIdx, t, t2, t3, t4);
+            return [res[0] * t, res[1] * t + res[0]];
+        } else if (fileIdx < 24) {
+            return this._calc22_36(fileIdx, t, t2, t3, t4);
+        } else if (fileIdx < 27) {
+            const res = this._calc22_36(fileIdx, t, t2, t3, t4);
+            return [res[0] * t, res[1] * t + res[0]];
+        } else if (fileIdx < 33) {
+            return this._calc22_36(fileIdx, t, t2, t3, t4);
+        } else if (fileIdx < 36) {
+            const res = this._calc22_36(fileIdx, t, t2, t3, t4);
+            return [res[0] * t2, res[1] * t2 + res[0] * 2 * t];
+        }
+        return null;
+    }
+
+    _calcAll(t) {
+        let lon  = 0;
+        let dlon = 0;
+        let lat  = 0;
+        let dlat = 0;
+        let r    = 0;
+        let dr   = 0;
+        const t2 = t *t;
+        const t3 = t2*t;
+        const t4 = t3*t;
+
+        const W1  = 218 * 3600 + 18 * 60 + 59.95571 + 1732559343.73604 * t - 5.8883 * t2 + 0.006604 * t3 - 0.00003169 * t4;
+        const dW1 = 1732559343.73604 - 5.8883 * 2 * t + 0.006604 * 3 * t2 - 0.00003169 * 4 * t3;
+
+        for (let i = 0; i < 12; ++i) {
+            const f1 = this._calcFile(i * 3    , t, t2, t3, t4);
+            const f2 = this._calcFile(i * 3 + 1, t, t2, t3, t4);
+            const f3 = this._calcFile(i * 3 + 2, t, t2, t3, t4);
+            lon  += f1[0];
+            dlon += f1[1];
+            lat  += f2[0];
+            dlat += f2[1];
+            r    += f3[0];
+            dr   += f3[1];
+        }
+
+        return {
+            'lon':  Object(__WEBPACK_IMPORTED_MODULE_3__algebra__["f" /* deg2rad */])(( lon +  W1) / 3600),
+            'dlon': Object(__WEBPACK_IMPORTED_MODULE_3__algebra__["f" /* deg2rad */])((dlon + dW1) / 3600),
+            'lat':  Object(__WEBPACK_IMPORTED_MODULE_3__algebra__["f" /* deg2rad */])( lat / 3600),
+            'dlat': Object(__WEBPACK_IMPORTED_MODULE_3__algebra__["f" /* deg2rad */])(dlat / 3600),
+            'r':    r,
+            'dr':   dr
+        }
+	}
+}
+/* harmony export (immutable) */ __webpack_exports__["a"] = TrajectoryELP2000;
 
 
 /***/ })
