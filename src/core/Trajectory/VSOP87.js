@@ -9,31 +9,6 @@ import StateVector from "../StateVector";
 
 export default class TrajectoryVSOP87 extends TrajectoryKeplerianAbstract
 {
-    /**
-     * @param body
-     * @param coefficients
-     * [
-     *      // x
-     *      [
-     *          // degree 0
-     *          [
-     *              [A,B,C],
-     *              [A,B,C],
-     *              ...
-     *          ],
-     *          // degree 1
-     *          [
-     *              ...
-     *          ],
-     *          ...
-     *      ],
-     *      // y
-     *      [
-     *          ...
-     *      ],
-     *      ...
-     * ]
-     */
     constructor(body, coefficients) {
         super(ReferenceFrameFactory.buildId((body == SUN) ? 0 : SUN, ReferenceFrame.INERTIAL_ECLIPTIC));
         this.coefficients = coefficients;

@@ -1,5 +1,6 @@
 import StateVector from "../StateVector";
 import {RF_BASE} from "../ReferenceFrame/Factory";
+import KeplerianObject from "../KeplerianObject";
 
 export default class TrajectoryAbstract
 {
@@ -17,6 +18,18 @@ export default class TrajectoryAbstract
 
         this.referenceFrameId = referenceFrameId;
         this.referenceFrame = sim.starSystem.getReferenceFrame(referenceFrameId);
+    }
+
+    getReferenceFrameByEpoch(epoch) {
+        return this.referenceFrame;
+    }
+
+    getKeplerianObjectByEpoch(epoch) {
+        const rf = this.getReferenceFrameByEpoch(epoch);
+        if (!rf || !rf.mu) {
+            return null;
+        }
+        return KeplerianObject.createFromState(this.getStateInOwnFrameByEpoch(epoch), rf.mu, epoch);
     }
 
     setVisualModel(visualModel) {

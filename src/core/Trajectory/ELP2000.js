@@ -5,7 +5,6 @@ import {ReferenceFrame} from "../ReferenceFrame/Factory";
 import {EARTH} from "../../solar_system";
 import {deg2rad, Vector} from "../../algebra";
 import StateVector from "../StateVector";
-import KeplerianObject from "../KeplerianObject";
 
 export default class TrajectoryELP2000 extends TrajectoryKeplerianAbstract
 {
@@ -14,10 +13,6 @@ export default class TrajectoryELP2000 extends TrajectoryKeplerianAbstract
         this.coefficients = coefficients;
         this.mu = sim.starSystem.getObject(EARTH).physicalModel.mu;
         this._p = 5029.0966;
-    }
-
-    getKeplerianObjectByEpoch(epoch) {
-        return KeplerianObject.createFromState(this.getStateInOwnFrameByEpoch(epoch), this.mu, epoch);
     }
 
     getStateInOwnFrameByEpoch(epoch) {
@@ -148,7 +143,7 @@ export default class TrajectoryELP2000 extends TrajectoryKeplerianAbstract
         return [value, derivative];
     }
 
-    _calcFile(fileIdx, t) {
+    _calcFile(fileIdx, t, t2) {
         if (fileIdx < 3) {
             return this._calc1_3(fileIdx);
         } else if (fileIdx < 6) {
@@ -204,9 +199,9 @@ export default class TrajectoryELP2000 extends TrajectoryKeplerianAbstract
         this.dW1 = 1732559343.73604 - 5.8883 * 2 * t + 0.006604 * 3 * t2 - 0.00003169 * 4 * t3;
 
         for (let i = 0; i < 12; ++i) {
-            const f1 = this._calcFile(i * 3    , t);
-            const f2 = this._calcFile(i * 3 + 1, t);
-            const f3 = this._calcFile(i * 3 + 2, t);
+            const f1 = this._calcFile(i * 3    , t, t2);
+            const f2 = this._calcFile(i * 3 + 1, t, t2);
+            const f3 = this._calcFile(i * 3 + 2, t, t2);
             lon  += f1[0];
             dlon += f1[1];
             lat  += f2[0];

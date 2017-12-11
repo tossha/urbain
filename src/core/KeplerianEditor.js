@@ -78,9 +78,28 @@ export default class KeplerianEditor
         document.removeEventListener(Events.RENDER, this.initAnglesListener);
         this.updateAnglesListener = this.updateAngles.bind(this);
         document.addEventListener(Events.RENDER, this.updateAnglesListener);
+
+        if ((this.trajectory.minEpoch !== null && this.trajectory.minEpoch !== false && event.detail.epoch < this.trajectory.minEpoch)
+            || (this.trajectory.maxEpoch !== null && this.trajectory.maxEpoch !== false && event.detail.epoch > this.trajectory.maxEpoch)
+        ) {
+            this.raanAngle.hide();
+            this.aopAngle.hide();
+            this.incAngle.hide();
+            this.taAngle.hide();
+        }
     }
 
     updateAngles(event) {
+        if ((this.trajectory.minEpoch !== null && this.trajectory.minEpoch !== false && event.detail.epoch < this.trajectory.minEpoch)
+            || (this.trajectory.maxEpoch !== null && this.trajectory.maxEpoch !== false && event.detail.epoch > this.trajectory.maxEpoch)
+        ) {
+            this.raanAngle.hide();
+            this.aopAngle.hide();
+            this.incAngle.hide();
+            this.taAngle.hide();
+            return;
+        }
+
         const keplerianObject = this.trajectory.getKeplerianObjectByEpoch(event.detail.epoch);
         this.calculateAdditionalParameters(keplerianObject);
 
@@ -103,6 +122,10 @@ export default class KeplerianEditor
 
         this.taAngle.resize(keplerianObject.getTrueAnomalyByEpoch(event.detail.epoch));
         this.taAngle.rearrange(this.periapsis, this.normal);
+        this.raanAngle.show();
+        this.aopAngle.show();
+        this.incAngle.show();
+        this.taAngle.show();
     }
 
     remove() {

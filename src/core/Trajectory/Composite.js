@@ -11,6 +11,22 @@ export default class TrajectoryComposite extends TrajectoryAbstract
         this.lastUsedTrajectory = null;
     }
 
+    getReferenceFrameByEpoch(epoch) {
+        const traj = this._getTrajectoryByEpoch(epoch);
+        if (!traj) {
+            return null;
+        }
+        return traj.getReferenceFrameByEpoch(epoch);
+    }
+
+    getKeplerianObjectByEpoch(epoch) {
+        const traj = this._getTrajectoryByEpoch(epoch);
+        if (!traj) {
+            return null;
+        }
+        return traj.getKeplerianObjectByEpoch(epoch);
+    }
+
     addComponent(trajectory) {
         this.components.push(trajectory);
         trajectory.setParent(this);
@@ -73,6 +89,6 @@ export default class TrajectoryComposite extends TrajectoryAbstract
             epoch + ' (' + TimeLine.getDateByEpoch(epoch) + ').'
         );
 
-        return false;
+        return null;
     }
 }

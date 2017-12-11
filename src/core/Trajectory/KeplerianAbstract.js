@@ -5,8 +5,6 @@ import KeplerianEditor from "../KeplerianEditor";
 
 export default class TrajectoryKeplerianAbstract extends TrajectoryAbstract
 {
-    getKeplerianObjectByEpoch(epoch) {}
-
     constructor(referenceFrameId) {
         super(referenceFrameId);
 

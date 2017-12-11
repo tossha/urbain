@@ -32,8 +32,8 @@ export default class VisualTrajectoryModelKeplerian extends VisualTrajectoryMode
         const endingBrightness = 0.35;
         const pointsNum = 100;
 
-        let minTa = -traj.getAsymptoteTa();
-        let maxTa = -minTa;
+        let maxTa = traj.getAsymptoteTa();
+        let minTa = -maxTa;
 
         if (this.trajectory.minEpoch !== null && this.trajectory.minEpoch !== false) {
             minTa = traj.getTrueAnomalyByEpoch(this.trajectory.minEpoch);
@@ -44,22 +44,28 @@ export default class VisualTrajectoryModelKeplerian extends VisualTrajectoryMode
 
         const orbitQuaternion = this.trajectory.orbitalReferenceFrame.getQuaternionByEpoch(epoch);
         const curTa = traj.getTrueAnomalyByEpoch(epoch);
-        const taStep = (maxTa - minTa) / (pointsNum - 1);
-        const mainColor = new THREE.Color(this.color);
+        const taCut = (maxTa - minTa) / (pointsNum + 1);
 
         let points = [];
         let angs = [];
-        let ta = minTa + taStep;
+        let ta = minTa + taCut;
         let i = 0;
 
-        while (i < pointsNum) {
+        if (ta > (minTa + curTa) / 2) {
+            ta = (minTa + curTa) / 2;
+        }
+
+        const taStep = (Math.max(maxTa - taCut, curTa) - ta) / (pointsNum - 1);
+        let extraPoints = 0;
+
+        while (i < pointsNum + extraPoints) {
             let coords = traj.getOwnCoordsByTrueAnomaly(ta);
             points[i] = (new THREE.Vector2()).fromArray([coords[0], coords[1]]);
             angs[i] = (ta > curTa) ? 0 : ((ta - minTa) / (curTa - minTa));
             i  += 1;
             ta += taStep;
 
-            if (ta - taStep < curTa && curTa < ta) {
+            if (ta - taStep <= curTa && curTa < ta) {
                 coords = traj.getOwnCoordsByTrueAnomaly(curTa);
                 points[i] = (new THREE.Vector2()).fromArray([coords[0], coords[1]]);
                 angs[i] = 1;
@@ -67,21 +73,12 @@ export default class VisualTrajectoryModelKeplerian extends VisualTrajectoryMode
                 points[i] = (new THREE.Vector2()).fromArray([coords[0], coords[1]]);
                 angs[i] = 0;
                 i  += 1;
+                extraPoints += 2;
             }
         }
 
         this.threeObj.visible = true;
-        this.threeObj.geometry.dispose();
-        this.threeObj.geometry = (new THREE.Geometry()).setFromPoints(points);
-
-        for (let i = 0; i < angs.length; i++) {
-            let curColor = (new THREE.Color()).copy(mainColor);
-            let mult = endingBrightness + (1 - endingBrightness) * angs[i];
-
-            this.threeObj.geometry.colors.push(
-                curColor.multiplyScalar(mult)
-            );
-        }
+        this.updateGeometry(points, angs, endingBrightness);
 
         this.threeObj.quaternion.copy(orbitQuaternion.toThreejs());
         this.threeObj.position.copy(sim.getVisualCoords(this.trajectory.referenceFrame.getOriginPositionByEpoch(epoch)));
@@ -133,19 +130,8 @@ export default class VisualTrajectoryModelKeplerian extends VisualTrajectoryMode
             ((cameraAngle - ang) / (2 * Math.PI) + 1) % 1,
             toFarthestPoint / toClosestPoint
         );
-
         this.threeObj.visible = true;
-        this.threeObj.geometry.dispose();
-        this.threeObj.geometry = (new THREE.Geometry()).setFromPoints(ellipsePoints.coords);
-
-        for (let i = 0; i < ellipsePoints.angs.length; i++) {
-            let curColor = (new THREE.Color()).copy(mainColor);
-            let mult = endingBrightness + (1 - endingBrightness) * ellipsePoints.angs[i];
-
-            this.threeObj.geometry.colors.push(
-                curColor.multiplyScalar(mult)
-            );
-        }
+        this.updateGeometry(ellipsePoints.coords, ellipsePoints.angs, endingBrightness);
 
         this.threeObj.quaternion.copy(orbitQuaternion.toThreejs());
         this.threeObj.position.copy(sim.getVisualCoords(actualVisualOrigin));

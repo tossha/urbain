@@ -22,7 +22,7 @@ export default class Simulation
 
         this.starSystem = new StarSystem(starSystemConfig.id);
 
-        this.time = new TimeLine(TimeLine.getEpochByDate(new Date(1516193355000 + 86400000*30*4)), 86.4 * 0.005, false);
+        this.time = new TimeLine(TimeLine.getEpochByDate(new Date()), 0.001, true);
 
         StarSystemLoader.loadFromConfig(this.starSystem, starSystemConfig);
 
@@ -32,7 +32,7 @@ export default class Simulation
 
         this.domElement = document.getElementById(domElementId);
         this.domElement.appendChild(this.renderer.domElement);
-        this.domElement.addEventListener('resize', this.onWindowResize.bind(this));
+        window.addEventListener('resize', this.onWindowResize.bind(this));
 
         this.camera = new Camera(
             this.renderer.domElement,
@@ -65,7 +65,7 @@ export default class Simulation
     }
 
     onWindowResize() {
-        this.renderer.setSize(this.domElement.innerWidth, this.domElement.innerHeight);
+        this.renderer.setSize(window.innerWidth, window.innerHeight);
         this.camera.onResize();
     }
 

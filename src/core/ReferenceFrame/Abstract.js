@@ -11,6 +11,16 @@ export default class ReferenceFrameAbstract
         return this;
     }
 
+    get mu() {
+        if (this._mu === undefined) {
+            const obj = sim.starSystem.getObject(this.originId);
+            this._mu = obj.physicalModel
+                ? obj.physicalModel.mu
+                : null;
+        }
+        return this._mu;
+    }
+
     getQuaternionByEpoch(epoch) {
         return new Quaternion();
     }

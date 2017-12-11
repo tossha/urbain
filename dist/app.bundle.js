@@ -1652,6 +1652,7 @@ const Events = {
     RENDER: 'urb_render',
     SELECT: 'urb_select',
     DESELECT: 'urb_deselect',
+    CAMERA_RF_CHANGED: 'urb_camera_rf_change',
 };
 /* harmony export (immutable) */ __webpack_exports__["a"] = Events;
 
@@ -2072,6 +2073,16 @@ class ReferenceFrameAbstract
         return this;
     }
 
+    get mu() {
+        if (this._mu === undefined) {
+            const obj = sim.starSystem.getObject(this.originId);
+            this._mu = obj.physicalModel
+                ? obj.physicalModel.mu
+                : null;
+        }
+        return this._mu;
+    }
+
     getQuaternionByEpoch(epoch) {
         return new __WEBPACK_IMPORTED_MODULE_0__algebra__["a" /* Quaternion */]();
     }
@@ -2181,6 +2192,8 @@ class EphemerisObject
 "use strict";
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__StateVector__ = __webpack_require__(3);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__ReferenceFrame_Factory__ = __webpack_require__(2);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__KeplerianObject__ = __webpack_require__(6);
+
 
 
 
@@ -2200,6 +2213,18 @@ class TrajectoryAbstract
 
         this.referenceFrameId = referenceFrameId;
         this.referenceFrame = sim.starSystem.getReferenceFrame(referenceFrameId);
+    }
+
+    getReferenceFrameByEpoch(epoch) {
+        return this.referenceFrame;
+    }
+
+    getKeplerianObjectByEpoch(epoch) {
+        const rf = this.getReferenceFrameByEpoch(epoch);
+        if (!rf || !rf.mu) {
+            return null;
+        }
+        return __WEBPACK_IMPORTED_MODULE_2__KeplerianObject__["a" /* default */].createFromState(this.getStateInOwnFrameByEpoch(epoch), rf.mu, epoch);
     }
 
     setVisualModel(visualModel) {
@@ -2650,7 +2675,7 @@ class TimeLine
             rightButton: false
         };
 
-        this.span = timeScale * 86400;
+        this.span = timeScale * 86400 * 5;
 
         this.markDistance = 300;
         this.scaleType = "month";
@@ -3279,8 +3304,6 @@ class TrajectoryKeplerianArray extends __WEBPACK_IMPORTED_MODULE_0__KeplerianAbs
 
 class TrajectoryKeplerianAbstract extends __WEBPACK_IMPORTED_MODULE_0__Abstract__["a" /* default */]
 {
-    getKeplerianObjectByEpoch(epoch) {}
-
     constructor(referenceFrameId) {
         super(referenceFrameId);
 
@@ -3672,6 +3695,8 @@ class VisualBodyModelAbstract extends __WEBPACK_IMPORTED_MODULE_0__ModelAbstract
 "use strict";
 /* WEBPACK VAR INJECTION */(function(THREE) {/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__algebra__ = __webpack_require__(0);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__ReferenceFrame_Factory__ = __webpack_require__(2);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__Events__ = __webpack_require__(4);
+
 
 
 
@@ -3762,7 +3787,6 @@ class Camera
         this.zoomingAside = 0;
         this.orbitingPoint = newFrame.originId;
         this.frameType = newFrame.type;
-        sim.ui.updateFrameType(this.frameType);
 
         if (animate) {
             this.startAnimation(newFrame);
@@ -3770,9 +3794,12 @@ class Camera
             this.quaternion = this._getQuaternionByPosition(this.position);
         }
 
-        this.referenceFrame = newFrame;
+        document.dispatchEvent(new CustomEvent(
+            __WEBPACK_IMPORTED_MODULE_2__Events__["a" /* Events */].CAMERA_RF_CHANGED,
+            {detail: {old: this.referenceFrame, new: newFrame}}
+        ));
 
-        sim.ui.updateTarget(this.referenceFrame.originId);
+        this.referenceFrame = newFrame;
     }
 
     startAnimation(newFrame) {
@@ -8255,7 +8282,7 @@ class Simulation
 
         this.starSystem = new __WEBPACK_IMPORTED_MODULE_9__StarSystem__["a" /* default */](starSystemConfig.id);
 
-        this.time = new __WEBPACK_IMPORTED_MODULE_4__TimeLine__["a" /* default */](__WEBPACK_IMPORTED_MODULE_4__TimeLine__["a" /* default */].getEpochByDate(new Date(1516193355000 + 86400000*30*4)), 86.4 * 0.005, false);
+        this.time = new __WEBPACK_IMPORTED_MODULE_4__TimeLine__["a" /* default */](__WEBPACK_IMPORTED_MODULE_4__TimeLine__["a" /* default */].getEpochByDate(new Date()), 0.001, true);
 
         __WEBPACK_IMPORTED_MODULE_5__interface_StarSystemLoader__["a" /* default */].loadFromConfig(this.starSystem, starSystemConfig);
 
@@ -8265,7 +8292,7 @@ class Simulation
 
         this.domElement = document.getElementById(domElementId);
         this.domElement.appendChild(this.renderer.domElement);
-        this.domElement.addEventListener('resize', this.onWindowResize.bind(this));
+        window.addEventListener('resize', this.onWindowResize.bind(this));
 
         this.camera = new __WEBPACK_IMPORTED_MODULE_10__Camera__["a" /* default */](
             this.renderer.domElement,
@@ -8298,7 +8325,7 @@ class Simulation
     }
 
     onWindowResize() {
-        this.renderer.setSize(this.domElement.innerWidth, this.domElement.innerHeight);
+        this.renderer.setSize(window.innerWidth, window.innerHeight);
         this.camera.onResize();
     }
 
@@ -8861,9 +8888,28 @@ class KeplerianEditor
         document.removeEventListener(__WEBPACK_IMPORTED_MODULE_0__Events__["a" /* Events */].RENDER, this.initAnglesListener);
         this.updateAnglesListener = this.updateAngles.bind(this);
         document.addEventListener(__WEBPACK_IMPORTED_MODULE_0__Events__["a" /* Events */].RENDER, this.updateAnglesListener);
+
+        if ((this.trajectory.minEpoch !== null && this.trajectory.minEpoch !== false && event.detail.epoch < this.trajectory.minEpoch)
+            || (this.trajectory.maxEpoch !== null && this.trajectory.maxEpoch !== false && event.detail.epoch > this.trajectory.maxEpoch)
+        ) {
+            this.raanAngle.hide();
+            this.aopAngle.hide();
+            this.incAngle.hide();
+            this.taAngle.hide();
+        }
     }
 
     updateAngles(event) {
+        if ((this.trajectory.minEpoch !== null && this.trajectory.minEpoch !== false && event.detail.epoch < this.trajectory.minEpoch)
+            || (this.trajectory.maxEpoch !== null && this.trajectory.maxEpoch !== false && event.detail.epoch > this.trajectory.maxEpoch)
+        ) {
+            this.raanAngle.hide();
+            this.aopAngle.hide();
+            this.incAngle.hide();
+            this.taAngle.hide();
+            return;
+        }
+
         const keplerianObject = this.trajectory.getKeplerianObjectByEpoch(event.detail.epoch);
         this.calculateAdditionalParameters(keplerianObject);
 
@@ -8886,6 +8932,10 @@ class KeplerianEditor
 
         this.taAngle.resize(keplerianObject.getTrueAnomalyByEpoch(event.detail.epoch));
         this.taAngle.rearrange(this.periapsis, this.normal);
+        this.raanAngle.show();
+        this.aopAngle.show();
+        this.incAngle.show();
+        this.taAngle.show();
     }
 
     remove() {
@@ -9031,7 +9081,23 @@ class HelperAngle
         sim.scene.add(this.threeDirection);
     }
 
+    hide() {
+        this.threeAngle.visible = false;
+        this.threeMainAxis.visible = false;
+        this.threeDirection.visible = false;
+    }
+
+    show() {
+        this.threeAngle.visible = true;
+        this.threeMainAxis.visible = true;
+        this.threeDirection.visible = true;
+    }
+
     onRender(event) {
+        if (this.threeAngle.visible == false) {
+            return;
+        }
+
         this.position = sim.getVisualCoords(this.positionAtEpoch.evaluate(event.detail.epoch));
 
         if (this.isArcMode === true) {
@@ -9209,7 +9275,7 @@ class HelperAngle
             this.threeAngle = {}
         }
 
-        this.threeAngle.geometry = (new THREE.Path(
+        this.threeAngle.geometry = (new THREE.Geometry()).setFromPoints(
             (new THREE.EllipseCurve(
                 0, 0,
                 this.sizeParam / (3 * this.coefficientOfAxesLengthDecrease), this.sizeParam / (3 * this.coefficientOfAxesLengthDecrease),
@@ -9217,7 +9283,7 @@ class HelperAngle
                 false,
                 0
             )).getPoints(100)
-        )).createPointsGeometry(100);
+        );
     }
 
     createSectorModeAngleGeometry() {
@@ -9377,6 +9443,22 @@ class TrajectoryComposite extends __WEBPACK_IMPORTED_MODULE_0__Abstract__["a" /*
         this.lastUsedTrajectory = null;
     }
 
+    getReferenceFrameByEpoch(epoch) {
+        const traj = this._getTrajectoryByEpoch(epoch);
+        if (!traj) {
+            return null;
+        }
+        return traj.getReferenceFrameByEpoch(epoch);
+    }
+
+    getKeplerianObjectByEpoch(epoch) {
+        const traj = this._getTrajectoryByEpoch(epoch);
+        if (!traj) {
+            return null;
+        }
+        return traj.getKeplerianObjectByEpoch(epoch);
+    }
+
     addComponent(trajectory) {
         this.components.push(trajectory);
         trajectory.setParent(this);
@@ -9439,7 +9521,7 @@ class TrajectoryComposite extends __WEBPACK_IMPORTED_MODULE_0__Abstract__["a" /*
             epoch + ' (' + __WEBPACK_IMPORTED_MODULE_2__TimeLine__["a" /* default */].getDateByEpoch(epoch) + ').'
         );
 
-        return false;
+        return null;
     }
 }
 /* harmony export (immutable) */ __webpack_exports__["a"] = TrajectoryComposite;
@@ -9665,8 +9747,8 @@ class VisualTrajectoryModelKeplerian extends __WEBPACK_IMPORTED_MODULE_0__Abstra
         const endingBrightness = 0.35;
         const pointsNum = 100;
 
-        let minTa = -traj.getAsymptoteTa();
-        let maxTa = -minTa;
+        let maxTa = traj.getAsymptoteTa();
+        let minTa = -maxTa;
 
         if (this.trajectory.minEpoch !== null && this.trajectory.minEpoch !== false) {
             minTa = traj.getTrueAnomalyByEpoch(this.trajectory.minEpoch);
@@ -9677,22 +9759,28 @@ class VisualTrajectoryModelKeplerian extends __WEBPACK_IMPORTED_MODULE_0__Abstra
 
         const orbitQuaternion = this.trajectory.orbitalReferenceFrame.getQuaternionByEpoch(epoch);
         const curTa = traj.getTrueAnomalyByEpoch(epoch);
-        const taStep = (maxTa - minTa) / (pointsNum - 1);
-        const mainColor = new THREE.Color(this.color);
+        const taCut = (maxTa - minTa) / (pointsNum + 1);
 
         let points = [];
         let angs = [];
-        let ta = minTa + taStep;
+        let ta = minTa + taCut;
         let i = 0;
 
-        while (i < pointsNum) {
+        if (ta > (minTa + curTa) / 2) {
+            ta = (minTa + curTa) / 2;
+        }
+
+        const taStep = (Math.max(maxTa - taCut, curTa) - ta) / (pointsNum - 1);
+        let extraPoints = 0;
+
+        while (i < pointsNum + extraPoints) {
             let coords = traj.getOwnCoordsByTrueAnomaly(ta);
             points[i] = (new THREE.Vector2()).fromArray([coords[0], coords[1]]);
             angs[i] = (ta > curTa) ? 0 : ((ta - minTa) / (curTa - minTa));
             i  += 1;
             ta += taStep;
 
-            if (ta - taStep < curTa && curTa < ta) {
+            if (ta - taStep <= curTa && curTa < ta) {
                 coords = traj.getOwnCoordsByTrueAnomaly(curTa);
                 points[i] = (new THREE.Vector2()).fromArray([coords[0], coords[1]]);
                 angs[i] = 1;
@@ -9700,21 +9788,12 @@ class VisualTrajectoryModelKeplerian extends __WEBPACK_IMPORTED_MODULE_0__Abstra
                 points[i] = (new THREE.Vector2()).fromArray([coords[0], coords[1]]);
                 angs[i] = 0;
                 i  += 1;
+                extraPoints += 2;
             }
         }
 
         this.threeObj.visible = true;
-        this.threeObj.geometry.dispose();
-        this.threeObj.geometry = (new THREE.Geometry()).setFromPoints(points);
-
-        for (let i = 0; i < angs.length; i++) {
-            let curColor = (new THREE.Color()).copy(mainColor);
-            let mult = endingBrightness + (1 - endingBrightness) * angs[i];
-
-            this.threeObj.geometry.colors.push(
-                curColor.multiplyScalar(mult)
-            );
-        }
+        this.updateGeometry(points, angs, endingBrightness);
 
         this.threeObj.quaternion.copy(orbitQuaternion.toThreejs());
         this.threeObj.position.copy(sim.getVisualCoords(this.trajectory.referenceFrame.getOriginPositionByEpoch(epoch)));
@@ -9766,19 +9845,8 @@ class VisualTrajectoryModelKeplerian extends __WEBPACK_IMPORTED_MODULE_0__Abstra
             ((cameraAngle - ang) / (2 * Math.PI) + 1) % 1,
             toFarthestPoint / toClosestPoint
         );
-
         this.threeObj.visible = true;
-        this.threeObj.geometry.dispose();
-        this.threeObj.geometry = (new THREE.Geometry()).setFromPoints(ellipsePoints.coords);
-
-        for (let i = 0; i < ellipsePoints.angs.length; i++) {
-            let curColor = (new THREE.Color()).copy(mainColor);
-            let mult = endingBrightness + (1 - endingBrightness) * ellipsePoints.angs[i];
-
-            this.threeObj.geometry.colors.push(
-                curColor.multiplyScalar(mult)
-            );
-        }
+        this.updateGeometry(ellipsePoints.coords, ellipsePoints.angs, endingBrightness);
 
         this.threeObj.quaternion.copy(orbitQuaternion.toThreejs());
         this.threeObj.position.copy(sim.getVisualCoords(actualVisualOrigin));
@@ -10300,12 +10368,16 @@ class UI
     constructor(precision, objectsForTracking) {
         this.precision = precision;
 
-        $('#timeScaleSlider').val(Math.log(sim.time.timeScale * 1000) / Math.log(984362.83) / 1.2).on('input change', this.handleTimeScaleChange.bind(this));
+        $('#timeScaleSlider').val(0.001).on('input change', this.handleTimeScaleChange.bind(this));
         $('#pauseButton').on('click', () => sim.time.togglePause());
 
         this.renderHandler = this.handleRender.bind(this);
         document.addEventListener(__WEBPACK_IMPORTED_MODULE_0__core_Events__["a" /* Events */].SELECT, this.handleSelect.bind(this));
         document.addEventListener(__WEBPACK_IMPORTED_MODULE_0__core_Events__["a" /* Events */].DESELECT, this.handleDeselect.bind(this));
+        document.addEventListener(__WEBPACK_IMPORTED_MODULE_0__core_Events__["a" /* Events */].CAMERA_RF_CHANGED, (event) => {
+            this.updateTarget(event.detail.new.originId);
+            this.updateFrameType(event.detail.new.type);
+        });
 
         this.showAnglesOfSelectedOrbit = true;
 
@@ -10344,6 +10416,7 @@ class UI
         this.handleTimeScaleChange();
         this.handleDeselect();
         this.handleRender();
+        this.togglePause();
     }
 
     changeVisibility(name) {
@@ -10370,6 +10443,11 @@ class UI
             return;
         }
 
+        const referenceFrame = selectedObject.getReferenceFrameByEpoch(sim.currentEpoch);
+        if (referenceFrame) {
+            $('#relativeTo').html(sim.starSystem.getObject(referenceFrame.originId).name);
+        }
+
         this.updateCartesian(selectedObject);
         this.updateKeplerian(selectedObject);
     }
@@ -10379,7 +10457,6 @@ class UI
 
         const object = sim.selection.getSelectedObject().object;
         if (object) {
-            // $('#relativeTo').html(object.trajectory.referenceFrame.name);
             $('#metricsOf').html(object.name);
         } else {
             $('#relativeTo,#metricsOf').html('');
@@ -10574,31 +10651,6 @@ class StarSystem
 
 class TrajectoryVSOP87 extends __WEBPACK_IMPORTED_MODULE_2__KeplerianAbstract__["a" /* default */]
 {
-    /**
-     * @param body
-     * @param coefficients
-     * [
-     *      // x
-     *      [
-     *          // degree 0
-     *          [
-     *              [A,B,C],
-     *              [A,B,C],
-     *              ...
-     *          ],
-     *          // degree 1
-     *          [
-     *              ...
-     *          ],
-     *          ...
-     *      ],
-     *      // y
-     *      [
-     *          ...
-     *      ],
-     *      ...
-     * ]
-     */
     constructor(body, coefficients) {
         super(__WEBPACK_IMPORTED_MODULE_0__ReferenceFrame_Factory__["c" /* default */].buildId((body == __WEBPACK_IMPORTED_MODULE_1__solar_system__["c" /* SUN */]) ? 0 : __WEBPACK_IMPORTED_MODULE_1__solar_system__["c" /* SUN */], __WEBPACK_IMPORTED_MODULE_0__ReferenceFrame_Factory__["b" /* ReferenceFrame */].INERTIAL_ECLIPTIC));
         this.coefficients = coefficients;
@@ -10646,8 +10698,6 @@ class TrajectoryVSOP87 extends __WEBPACK_IMPORTED_MODULE_2__KeplerianAbstract__[
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__solar_system__ = __webpack_require__(15);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__algebra__ = __webpack_require__(0);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_4__StateVector__ = __webpack_require__(3);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_5__KeplerianObject__ = __webpack_require__(6);
-
 
 
 
@@ -10663,10 +10713,6 @@ class TrajectoryELP2000 extends __WEBPACK_IMPORTED_MODULE_0__KeplerianAbstract__
         this.coefficients = coefficients;
         this.mu = sim.starSystem.getObject(__WEBPACK_IMPORTED_MODULE_2__solar_system__["a" /* EARTH */]).physicalModel.mu;
         this._p = 5029.0966;
-    }
-
-    getKeplerianObjectByEpoch(epoch) {
-        return __WEBPACK_IMPORTED_MODULE_5__KeplerianObject__["a" /* default */].createFromState(this.getStateInOwnFrameByEpoch(epoch), this.mu, epoch);
     }
 
     getStateInOwnFrameByEpoch(epoch) {
@@ -10797,7 +10843,7 @@ class TrajectoryELP2000 extends __WEBPACK_IMPORTED_MODULE_0__KeplerianAbstract__
         return [value, derivative];
     }
 
-    _calcFile(fileIdx, t) {
+    _calcFile(fileIdx, t, t2) {
         if (fileIdx < 3) {
             return this._calc1_3(fileIdx);
         } else if (fileIdx < 6) {
@@ -10853,9 +10899,9 @@ class TrajectoryELP2000 extends __WEBPACK_IMPORTED_MODULE_0__KeplerianAbstract__
         this.dW1 = 1732559343.73604 - 5.8883 * 2 * t + 0.006604 * 3 * t2 - 0.00003169 * 4 * t3;
 
         for (let i = 0; i < 12; ++i) {
-            const f1 = this._calcFile(i * 3    , t);
-            const f2 = this._calcFile(i * 3 + 1, t);
-            const f3 = this._calcFile(i * 3 + 2, t);
+            const f1 = this._calcFile(i * 3    , t, t2);
+            const f2 = this._calcFile(i * 3 + 1, t, t2);
+            const f3 = this._calcFile(i * 3 + 2, t, t2);
             lon  += f1[0];
             dlon += f1[1];
             lat  += f2[0];
