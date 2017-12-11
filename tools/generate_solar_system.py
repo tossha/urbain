@@ -1352,9 +1352,13 @@ def getVsopTrajectory(body, color, cutKm):
 		}
 	}
 
-def getELP2000Trajectory(color):
+def getELP2000Trajectory(color, cutKm):
+	distancePrec = cutKm
+	anglePrec = (cutKm / 384000) / math.pi * 180 * 3600
+
 	_files = []
 	for i in range(36):
+		prec = distancePrec if (i % 3 == 2) else anglePrec
 		_files.append([])
 		with open('ELP 2000-82B/data/ELP' + str(i+1)) as file:
 			isFirstLine = True
@@ -1371,12 +1375,18 @@ def getELP2000Trajectory(color):
 				]
 
 				if i < 3:
+					if abs(float(line[14:27])) < prec:
+						continue
 					koeffs.append(float(line[14:27])) # A
 				elif i < 9:
+					if abs(float(line[26:35])) < prec:
+						continue
 					koeffs.append(int  (line[12:15])) # i5
 					koeffs.append(float(line[16:25])) # ph
 					koeffs.append(float(line[26:35])) # A
 				elif i < 21:
+					if abs(float(line[44:53])) < prec:
+						continue
 					koeffs.append(int  (line[12:15])) # i5
 					koeffs.append(int  (line[15:18])) # i6
 					koeffs.append(int  (line[18:21])) # i7
@@ -1387,6 +1397,8 @@ def getELP2000Trajectory(color):
 					koeffs.append(float(line[34:43])) # ph
 					koeffs.append(float(line[44:53])) # A
 				else:
+					if abs(float(line[26:35])) < prec:
+						continue
 					koeffs.append(int  (line[12:15])) # i5
 					koeffs.append(float(line[16:25])) # ph
 					koeffs.append(float(line[26:35])) # A
@@ -1422,8 +1434,8 @@ def getBodyData(body, name, color, texture, parent, pairing, etFrom, etTo, maxEr
 		vsopTotal += termsCnt
 		print(termsCnt)
 	elif body == '301':
-		trajectory = getELP2000Trajectory(color)
-		print('HZ')
+		trajectory = getELP2000Trajectory(color, 0.1)
+		print(sum([len(fileTerms) for fileTerms in trajectory['data']]))
 	else:
 		trajectory = getObjectTrajectory(body, parent, parentMu, etFrom, etTo, maxError, color)
 		print(len(trajectory['data']['elementsArray']))
