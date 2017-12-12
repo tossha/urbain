@@ -6,6 +6,19 @@ export default class VisualTrajectoryModelKeplerian extends VisualTrajectoryMode
 {
     render(epoch)
     {
+        if (this.trajectory.minEpoch !== null && this.trajectory.minEpoch !== false) {
+            if (epoch < this.trajectory.minEpoch) {
+                this.threeObj.visible = false;
+                return;
+            }
+        }
+        if (this.trajectory.maxEpoch !== null && this.trajectory.maxEpoch !== false) {
+            if (epoch > this.trajectory.maxEpoch) {
+                this.threeObj.visible = false;
+                return;
+            }
+        }
+
         const keplerianObject = this.trajectory.getKeplerianObjectByEpoch(epoch);
 
         if (keplerianObject.isElliptic) {
@@ -19,53 +32,56 @@ export default class VisualTrajectoryModelKeplerian extends VisualTrajectoryMode
         const endingBrightness = 0.35;
         const pointsNum = 100;
 
+        let maxTa = traj.getAsymptoteTa();
+        let minTa = -maxTa;
+
+        if (this.trajectory.minEpoch !== null && this.trajectory.minEpoch !== false) {
+            minTa = traj.getTrueAnomalyByEpoch(this.trajectory.minEpoch);
+        }
+        if (this.trajectory.maxEpoch !== null && this.trajectory.maxEpoch !== false) {
+            maxTa = traj.getTrueAnomalyByEpoch(this.trajectory.maxEpoch);
+        }
+
         const orbitQuaternion = this.trajectory.orbitalReferenceFrame.getQuaternionByEpoch(epoch);
         const curTa = traj.getTrueAnomalyByEpoch(epoch);
-
-        const minTa = -traj.getAsymptoteTa();
-        const maxTa = -minTa;
-        const taStep = (maxTa - minTa) / (pointsNum - 1);
-        const mainColor = new THREE.Color(this.color);
+        const taCut = (maxTa - minTa) / (pointsNum + 1);
 
         let points = [];
         let angs = [];
-        let ta = minTa + taStep;
+        let ta = minTa + taCut;
         let i = 0;
 
-        while (i < pointsNum) {
+        if (ta > (minTa + curTa) / 2) {
+            ta = (minTa + curTa) / 2;
+        }
+
+        const taStep = (Math.max(maxTa - taCut, curTa) - ta) / (pointsNum - 1);
+        let extraPoints = 0;
+
+        while (i < pointsNum + extraPoints) {
             let coords = traj.getOwnCoordsByTrueAnomaly(ta);
             points[i] = (new THREE.Vector2()).fromArray([coords[0], coords[1]]);
             angs[i] = (ta > curTa) ? 0 : ((ta - minTa) / (curTa - minTa));
             i  += 1;
             ta += taStep;
 
-            if (ta - taStep < curTa && curTa < ta) {
+            if (ta - taStep <= curTa && curTa < ta) {
                 coords = traj.getOwnCoordsByTrueAnomaly(curTa);
                 points[i] = (new THREE.Vector2()).fromArray([coords[0], coords[1]]);
                 angs[i] = 1;
                 i  += 1;
-                points[i] = (new THREE.Vector2()).fromArray([coords[0] + 1e-8, coords[1] + 1e-8]);
+                points[i] = (new THREE.Vector2()).fromArray([coords[0], coords[1]]);
                 angs[i] = 0;
                 i  += 1;
+                extraPoints += 2;
             }
         }
 
-        this.threeObj.geometry.dispose();
-        this.threeObj.geometry = (new THREE.Path(
-            points
-        )).createPointsGeometry(pointsNum);
-
-        for (let i = 0; i < angs.length; i++) {
-            let curColor = (new THREE.Color()).copy(mainColor);
-            let mult = endingBrightness + (1 - endingBrightness) * angs[i];
-
-            this.threeObj.geometry.colors.push(
-                curColor.multiplyScalar(mult)
-            );
-        }
+        this.threeObj.visible = true;
+        this.updateGeometry(points, angs, endingBrightness);
 
         this.threeObj.quaternion.copy(orbitQuaternion.toThreejs());
-        this.threeObj.position.fromArray(sim.getVisualCoords(this.trajectory.referenceFrame.getOriginPositionByEpoch(epoch)));
+        this.threeObj.position.copy(sim.getVisualCoords(this.trajectory.referenceFrame.getOriginPositionByEpoch(epoch)));
     }
 
     renderEllipse(traj, epoch) {
@@ -85,13 +101,18 @@ export default class VisualTrajectoryModelKeplerian extends VisualTrajectoryMode
             .sub(cameraPosition).mag;
         const toFarthestPoint = traj.getOwnCoordsByTrueAnomaly(cameraTrueAnomaly + Math.PI)     // not really farthest
             .sub(cameraPosition).mag;
-        const cameraAngle = traj.getEccentricAnomalyByTrueAnomaly(cameraTrueAnomaly - ta);
+        let cameraAngle = Math.acos(
+            (traj.e + Math.cos(cameraTrueAnomaly)) / (1 + traj.e * Math.cos(cameraTrueAnomaly))
+        );
         let ang = Math.acos(
             (traj.e + Math.cos(ta)) / (1 + traj.e * Math.cos(ta))
         );
 
         if (ta > Math.PI) {
             ang = 2 * Math.PI - ang;
+        }
+        if (cameraTrueAnomaly > Math.PI) {
+            cameraAngle = 2 * Math.PI - cameraAngle;
         }
 
         const ellipsePoints = this.getEllipsePoints(
@@ -106,26 +127,14 @@ export default class VisualTrajectoryModelKeplerian extends VisualTrajectoryMode
                 0
             ),
             pointsNum,
-            cameraAngle / (2 * Math.PI),
+            ((cameraAngle - ang) / (2 * Math.PI) + 1) % 1,
             toFarthestPoint / toClosestPoint
         );
-
-        this.threeObj.geometry.dispose();
-        this.threeObj.geometry = (new THREE.Path(
-            ellipsePoints.coords
-        )).createPointsGeometry(pointsNum);
-
-        for (let i = 0; i < ellipsePoints.angs.length; i++) {
-            let curColor = (new THREE.Color()).copy(mainColor);
-            let mult = endingBrightness + (1 - endingBrightness) * ellipsePoints.angs[i];
-
-            this.threeObj.geometry.colors.push(
-                curColor.multiplyScalar(mult)
-            );
-        }
+        this.threeObj.visible = true;
+        this.updateGeometry(ellipsePoints.coords, ellipsePoints.angs, endingBrightness);
 
         this.threeObj.quaternion.copy(orbitQuaternion.toThreejs());
-        this.threeObj.position.fromArray(sim.getVisualCoords(actualVisualOrigin));
+        this.threeObj.position.copy(sim.getVisualCoords(actualVisualOrigin));
     }
 
     getEllipsePoints(curve, pointsNum, densityCenter, proportion) {

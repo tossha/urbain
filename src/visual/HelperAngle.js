@@ -12,7 +12,7 @@ export default class HelperAngle
         this.color = color;
         this.editingCallback = editingCallback;
         this.positionAtEpoch = functionOfEpoch;
-        this.position = (new THREE.Vector3()).fromArray(sim.getVisualCoords(this.positionAtEpoch.evaluate(sim.currentEpoch)));
+        this.position = sim.getVisualCoords(this.positionAtEpoch.evaluate(sim.currentEpoch));
         this.isArcMode = isArcMode;
         this.coefficientOfAxesLengthDecrease = coefficientOfAxesLengthDecrease ? coefficientOfAxesLengthDecrease : 1;
 
@@ -88,10 +88,24 @@ export default class HelperAngle
         sim.scene.add(this.threeDirection);
     }
 
+    hide() {
+        this.threeAngle.visible = false;
+        this.threeMainAxis.visible = false;
+        this.threeDirection.visible = false;
+    }
+
+    show() {
+        this.threeAngle.visible = true;
+        this.threeMainAxis.visible = true;
+        this.threeDirection.visible = true;
+    }
+
     onRender(event) {
-        this.position = (new THREE.Vector3).fromArray(
-            sim.getVisualCoords(this.positionAtEpoch.evaluate(event.detail.epoch))
-        );
+        if (this.threeAngle.visible == false) {
+            return;
+        }
+
+        this.position = sim.getVisualCoords(this.positionAtEpoch.evaluate(event.detail.epoch));
 
         if (this.isArcMode === true) {
             this.deletePointersGeometries();
@@ -268,7 +282,7 @@ export default class HelperAngle
             this.threeAngle = {}
         }
 
-        this.threeAngle.geometry = (new THREE.Path(
+        this.threeAngle.geometry = (new THREE.Geometry()).setFromPoints(
             (new THREE.EllipseCurve(
                 0, 0,
                 this.sizeParam / (3 * this.coefficientOfAxesLengthDecrease), this.sizeParam / (3 * this.coefficientOfAxesLengthDecrease),
@@ -276,7 +290,7 @@ export default class HelperAngle
                 false,
                 0
             )).getPoints(100)
-        )).createPointsGeometry(100);
+        );
     }
 
     createSectorModeAngleGeometry() {

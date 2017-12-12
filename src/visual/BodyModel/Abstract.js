@@ -10,7 +10,7 @@ export default class VisualBodyModelAbstract extends VisualModelAbstract
         this.body = null; // class Body
 
         this.setThreeObj(this.getThreeObj());
-        this.threeObj.add(new THREE.AxisHelper(shape.radius * 2));
+        this.threeObj.add(new THREE.AxesHelper(shape.radius * 2));
     }
 
     getThreeObj() {
@@ -25,7 +25,7 @@ export default class VisualBodyModelAbstract extends VisualModelAbstract
     }
 
     render(epoch) {
-        this.threeObj.position.fromArray(sim.getVisualCoords(this.body.getPositionByEpoch(epoch)));
+        this.threeObj.position.copy(sim.getVisualCoords(this.body.getPositionByEpoch(epoch)));
         this.threeObj.quaternion.copy(
             this.body.orientation.getQuaternionByEpoch(epoch).toThreejs()
         );

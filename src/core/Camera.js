@@ -1,5 +1,6 @@
 import {Quaternion, Vector} from "../algebra";
 import {ReferenceFrame, RF_BASE} from "./ReferenceFrame/Factory";
+import {Events} from "./Events";
 
 export default class Camera
 {
@@ -88,7 +89,6 @@ export default class Camera
         this.zoomingAside = 0;
         this.orbitingPoint = newFrame.originId;
         this.frameType = newFrame.type;
-        sim.ui.updateFrameType(this.frameType);
 
         if (animate) {
             this.startAnimation(newFrame);
@@ -96,9 +96,12 @@ export default class Camera
             this.quaternion = this._getQuaternionByPosition(this.position);
         }
 
-        this.referenceFrame = newFrame;
+        document.dispatchEvent(new CustomEvent(
+            Events.CAMERA_RF_CHANGED,
+            {detail: {old: this.referenceFrame, new: newFrame}}
+        ));
 
-        sim.ui.updateTarget(this.referenceFrame.originId);
+        this.referenceFrame = newFrame;
     }
 
     startAnimation(newFrame) {

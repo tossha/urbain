@@ -14,10 +14,10 @@ export default class SelectionHandler extends VisualModelAbstract
         this.selectionMouseButton = 0;
         this.pointSize = 5;
 
-        this.threeObj = new THREE.Mesh(
+        this.setThreeObj(new THREE.Mesh(
             new THREE.SphereGeometry(1, 10, 10),
             new THREE.MeshBasicMaterial({color: 0xFFFF00})
-        );
+        ));
 
         sim.addEventListener('click', this.onMouseClick.bind(this), 1);
         sim.addEventListener('mousedown', this.onMouseDown.bind(this), 1);
@@ -94,7 +94,10 @@ export default class SelectionHandler extends VisualModelAbstract
         }
 
         if (this.bestIntersection) {
-            const currentTraj = this.bestIntersection.object.userData.trajectory;
+            let currentTraj = this.bestIntersection.object.userData.trajectory;
+            while (currentTraj.parent) {
+                currentTraj = currentTraj.parent;
+            }
             if (currentTraj !== wasSelected) {
                 this.select(currentTraj);
             }

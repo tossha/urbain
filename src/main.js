@@ -11,8 +11,11 @@ function init() {
     });
 
     window.sim = new Simulation();
-    window.sim.init('viewport', starSystemConfig);
-    starSystemConfig = undefined;
+
+    $.getJSON('/star_systems/solar_system.json', starSystemConfig => {
+        sim.init('viewport', starSystemConfig);
+        requestAnimationFrame(firstRender);
+    });
 }
 
 function firstRender(curTime) {
@@ -34,5 +37,4 @@ let globalTime;
 
 $(() => {
     init();
-    requestAnimationFrame(firstRender);
 });

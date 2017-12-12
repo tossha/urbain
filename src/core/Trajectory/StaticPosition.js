@@ -5,7 +5,6 @@ export default class TrajectoryStaticPosition extends TrajectoryAbstract
 {
     constructor(referenceFrameId, pos) {
         super(referenceFrameId);
-
         this.pos = pos;
     }
 

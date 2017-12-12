@@ -3,8 +3,8 @@ import KeplerianObject from "../KeplerianObject";
 
 export default class TrajectoryKeplerianBasic extends TrajectoryKeplerianAbstract
 {
-    constructor(referenceFrameId, keplerianObject, color) {
-        super(referenceFrameId, color);
+    constructor(referenceFrameId, keplerianObject) {
+        super(referenceFrameId);
         this.keplerianObject = keplerianObject;
     }
 

@@ -10,7 +10,7 @@ export default class LineObject extends THREE.Line {
                 .getInverse(this.matrixWorld)
             );
 
-        for (let i = 0; i < verticesCount; i++) {
+        for (let i = 0; i < verticesCount - 1; i++) {
             const vertex1 = (new THREE.Vector3)
                 .copy(this.geometry.vertices[i]);
 

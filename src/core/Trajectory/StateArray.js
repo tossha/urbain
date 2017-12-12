@@ -2,17 +2,12 @@ import TrajectoryAbstract from "./Abstract";
 
 export default class TrajectoryStateArray extends TrajectoryAbstract
 {
-    constructor(referenceFrameId, color) {
+    constructor(referenceFrameId) {
         super(referenceFrameId);
 
         this.states = []; // array of {epoch: epoch, state: class StateVector}
         this.minEpoch = null;
         this.maxEpoch = null;
-        this.color = color;
-
-        if (color) {
-            this.visualModel = new VisualTrajectoryModelStateArray(this, color);
-        }
     }
 
     addState(epoch, state) {

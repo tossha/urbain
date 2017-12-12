@@ -3,37 +3,94 @@ import TrajectoryKeplerianPrecessingArray from "../core/Trajectory/KeplerianPrec
 import TrajectoryKeplerianBasic from "../core/Trajectory/KeplerianBasic";
 import TrajectoryKeplerianPrecessing from "../core/Trajectory/KeplerianPrecessing";
 import KeplerianObject from "../core/KeplerianObject";
+import TrajectoryComposite from "../core/Trajectory/Composite";
+import VisualTrajectoryModelPointArray from "../visual/TrajectoryModel/PointArray";
+import VisualTrajectoryModelKeplerian from "../visual/TrajectoryModel/Keplerian";
+import TrajectoryStaticPosition from "../core/Trajectory/StaticPosition";
+import {Vector} from "../algebra";
+import TrajectoryVSOP87 from "../core/Trajectory/VSOP87";
+import TrajectoryELP2000 from "../core/Trajectory/ELP2000";
 
 export default class TrajectoryLoader
 {
     static create(config) {
         let type = config.type;
+        let trajectory;
+        let visualModel;
 
         if (type === 'keplerian') {
-            return this.createKeplerian(config);
+            trajectory = this.createKeplerian(config);
         }
 
         if (type === 'keplerian_precessing') {
-            return this.createKeplerianPrecessing(config);
+            trajectory = this.createKeplerianPrecessing(config);
         }
 
         if (type === 'keplerian_array') {
-            return this.createKeplerianArray(config);
+            trajectory = this.createKeplerianArray(config);
         }
 
         if (type === 'keplerian_precessing_array') {
-            return this.createKeplerianPrecessingArray(config);
+            trajectory = this.createKeplerianPrecessingArray(config);
         }
+
+        if (type === 'composite') {
+            trajectory = this.createComposite(config);
+        }
+
+        if (type === 'static') {
+            trajectory = this.createStatic(config);
+        }
+
+        if (type === 'vsop87') {
+            trajectory = this.createVSOP87(config);
+        }
+
+        if (type === 'elp2000') {
+            trajectory = this.createELP2000(config);
+        }
+
+        if (config.periodStart !== undefined) {
+            trajectory.minEpoch = config.periodStart;
+        }
+        if (config.periodEnd !== undefined) {
+            trajectory.maxEpoch = config.periodEnd;
+        }
+
+        if (config.rendering !== undefined) {
+            if (config.rendering.keplerianModel) {
+                visualModel = new VisualTrajectoryModelKeplerian(trajectory, config.rendering.color);
+            } else if (config.rendering.pointArrayModel) {
+                visualModel = new VisualTrajectoryModelPointArray(
+                    trajectory,
+                    config.rendering.color,
+                    config.rendering.pointArrayModel
+                );
+            }
+        }
+
+        if (visualModel) {
+            trajectory.setVisualModel(visualModel);
+        }
+
+        return trajectory;
+    }
+
+    static createComposite(config) {
+        let traj = new TrajectoryComposite();
+        for (const partConfig of config.data) {
+            traj.addComponent(this.create(partConfig));
+        }
+        return traj;
     }
 
     static createKeplerianArray(config) {
         let traj = new TrajectoryKeplerianArray(
-            config.data.referenceFrame,
-            config.color
+            config.data.referenceFrame
         );
 
         for (const entry of config.data.elementsArray) {
-            traj.addState(this.createKeplerianObject(entry));
+            traj.addState(this.createKeplerianObject(entry, config.data.mu));
         }
         return traj;
     }
@@ -42,12 +99,11 @@ export default class TrajectoryLoader
         let traj = new TrajectoryKeplerianPrecessingArray(
             config.data.referenceFrame,
             config.data.radius,
-            config.data.j2,
-            config.color
+            config.data.j2
         );
 
         for (const entry of config.data.elementsArray) {
-            traj.addState(this.createKeplerianObject(entry));
+            traj.addState(this.createKeplerianObject(entry, config.data.mu));
         }
         return traj;
     }
@@ -55,8 +111,7 @@ export default class TrajectoryLoader
     static createKeplerian(config) {
         return new TrajectoryKeplerianBasic(
             config.data.referenceFrame,
-            this.createKeplerianObject(config.data.elements),
-            config.color
+            this.createKeplerianObject(config.data.elements)
         );
     }
 
@@ -65,12 +120,31 @@ export default class TrajectoryLoader
             config.data.referenceFrame,
             this.createKeplerianObject(config.data.elements),
             config.data.radius,
-            config.data.j2,
-            config.color
+            config.data.j2
         );
     }
 
-    static createKeplerianObject(elements) {
+    static createStatic(config) {
+        return new TrajectoryStaticPosition(
+            config.data.referenceFrame,
+            new Vector(config.data.position)
+        );
+    }
+
+    static createVSOP87(config) {
+        return new TrajectoryVSOP87(
+            config.data.body,
+            config.data.coefficients
+        );
+    }
+
+    static createELP2000(config) {
+        return new TrajectoryELP2000(
+            config.data
+        );
+    }
+
+    static createKeplerianObject(elements, mu) {
         return new KeplerianObject(
             elements[0], // ecc
             elements[1] / (1 - elements[0]), // sma = Rper / (1 - ecc)
@@ -79,7 +153,7 @@ export default class TrajectoryLoader
             elements[4], // raan
             elements[5], // mean anomaly
             elements[6], // epoch
-            elements[7], // mu
+            mu ? mu : elements[7], // mu
             false
         );
     }

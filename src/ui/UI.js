@@ -7,12 +7,16 @@ export default class UI
     constructor(precision, objectsForTracking) {
         this.precision = precision;
 
-        $('#timeScaleSlider').val(Math.log(sim.time.timeScale * 1000) / Math.log(984362.83) / 1.2).on('input change', this.handleTimeScaleChange.bind(this));
+        $('#timeScaleSlider').val(0.001).on('input change', this.handleTimeScaleChange.bind(this));
         $('#pauseButton').on('click', () => sim.time.togglePause());
 
         this.renderHandler = this.handleRender.bind(this);
         document.addEventListener(Events.SELECT, this.handleSelect.bind(this));
         document.addEventListener(Events.DESELECT, this.handleDeselect.bind(this));
+        document.addEventListener(Events.CAMERA_RF_CHANGED, (event) => {
+            this.updateTarget(event.detail.new.originId);
+            this.updateFrameType(event.detail.new.type);
+        });
 
         this.showAnglesOfSelectedOrbit = true;
 
@@ -51,6 +55,7 @@ export default class UI
         this.handleTimeScaleChange();
         this.handleDeselect();
         this.handleRender();
+        this.togglePause();
     }
 
     changeVisibility(name) {
@@ -77,6 +82,11 @@ export default class UI
             return;
         }
 
+        const referenceFrame = selectedObject.getReferenceFrameByEpoch(sim.currentEpoch);
+        if (referenceFrame) {
+            $('#relativeTo').html(sim.starSystem.getObject(referenceFrame.originId).name);
+        }
+
         this.updateCartesian(selectedObject);
         this.updateKeplerian(selectedObject);
     }
@@ -86,7 +96,6 @@ export default class UI
 
         const object = sim.selection.getSelectedObject().object;
         if (object) {
-            // $('#relativeTo').html(object.trajectory.referenceFrame.name);
             $('#metricsOf').html(object.name);
         } else {
             $('#relativeTo,#metricsOf').html('');
@@ -109,8 +118,8 @@ export default class UI
 
     updateTime(date) {
         let string = date.getYear() + 1900;
-        string += '-' + (date.getMonth() + 1);
-        string += '-' + date.getDate();
+        string += '-' + ((date.getMonth() + 1) + '').padStart(2, '0');
+        string += '-' + (date.getDate() + '').padStart(2, '0');
         string += ' ' + (date.getHours() + '').padStart(2, '0');
         string += ':' + (date.getMinutes() + '').padStart(2, '0');
         string += ':' + (date.getSeconds() + '').padStart(2, '0');

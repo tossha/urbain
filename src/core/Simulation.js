@@ -22,9 +22,9 @@ export default class Simulation
 
         this.starSystem = new StarSystem(starSystemConfig.id);
 
-        StarSystemLoader.loadFromConfig(this.starSystem, starSystemConfig);
+        this.time = new TimeLine(TimeLine.getEpochByDate(new Date()), 0.001, true);
 
-        this.time = new TimeLine(TimeLine.getEpochByDate(new Date(1516193355000 + 86400000*30*4)), 86.4 * 0.005, false);
+        StarSystemLoader.loadFromConfig(this.starSystem, starSystemConfig);
 
         this.scene.add(new THREE.AmbientLight(0xFFEFD5, 0.15));
 
@@ -32,7 +32,7 @@ export default class Simulation
 
         this.domElement = document.getElementById(domElementId);
         this.domElement.appendChild(this.renderer.domElement);
-        this.domElement.addEventListener('resize', this.onWindowResize.bind(this));
+        window.addEventListener('resize', this.onWindowResize.bind(this));
 
         this.camera = new Camera(
             this.renderer.domElement,
@@ -46,6 +46,10 @@ export default class Simulation
         this.raycaster = new VisualRaycaster(this.renderer.domElement, this.camera.threeCamera, 7);
 
         this.ui = new UI(5, this.starSystem.getObjectNames());
+
+        StarSystemLoader.loadObjectByUrl(sim.starSystem, '/spacecraft/voyager1.json');
+        StarSystemLoader.loadObjectByUrl(sim.starSystem, '/spacecraft/voyager2.json');
+        StarSystemLoader.loadObjectByUrl(sim.starSystem, '/spacecraft/lro.json');
     }
 
     get currentEpoch() {
@@ -61,7 +65,7 @@ export default class Simulation
     }
 
     onWindowResize() {
-        this.renderer.setSize(this.domElement.innerWidth, this.domElement.innerHeight);
+        this.renderer.setSize(window.innerWidth, window.innerHeight);
         this.camera.onResize();
     }
 
@@ -78,7 +82,7 @@ export default class Simulation
         this.renderer.render(this.scene, this.camera.threeCamera);
     }
 
-    getVisualCoords(vector) {
-        return vector.sub(this.camera.lastPosition);
+    getVisualCoords(simCoords) {
+        return (new THREE.Vector3()).fromArray(simCoords.sub(this.camera.lastPosition));
     }
 }

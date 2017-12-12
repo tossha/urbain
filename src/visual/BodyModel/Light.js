@@ -10,7 +10,7 @@ export default class VisualBodyModelLight extends VisualBodyModelBasic
 
     render(epoch) {
         super.render(epoch);
-        this.light.position.fromArray(sim.getVisualCoords(this.body.getPositionByEpoch(epoch)));
+        this.light.position.copy(sim.getVisualCoords(this.body.getPositionByEpoch(epoch)));
     }
 
     getMaterial(parameters) {

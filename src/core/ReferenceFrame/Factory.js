@@ -104,6 +104,19 @@ export default class ReferenceFrameFactory
         return null;
     }
 
+    static buildId(origin, type) {
+        if ((type === ReferenceFrame.INERTIAL_ECLIPTIC)
+            || (type === ReferenceFrame.INERTIAL_BODY_EQUATORIAL)
+            || (type === ReferenceFrame.INERTIAL_BODY_FIXED)
+            || (type === ReferenceFrame.ICRF)
+            || (type === ReferenceFrame.BODY_FIXED)
+        ) {
+            return origin * 100000 + type * 1000;
+        }
+
+        return null;
+    }
+
     static getTypeNames() {
         return {
             [ReferenceFrame.INERTIAL_ECLIPTIC]: 'Ecliptic',
