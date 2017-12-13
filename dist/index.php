@@ -5,7 +5,7 @@ require 'functions.php';
 <html>
 <head>
     <link rel="stylesheet" href="./ui.css"/>
-    <script src="app.bundle.js"></script>
+    <script src="<?= addTime('app.bundle.js') ?>"></script>
     <style type="text/css">
         html {
             width: 100%;
