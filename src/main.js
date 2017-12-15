@@ -12,7 +12,7 @@ function init() {
 
     window.sim = new Simulation();
 
-    $.getJSON('/star_systems/solar_system.json', starSystemConfig => {
+    $.getJSON('./star_systems/solar_system.json', starSystemConfig => {
         sim.init('viewport', starSystemConfig);
         requestAnimationFrame(firstRender);
     });
