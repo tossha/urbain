@@ -93,7 +93,6 @@ export default class VisualTrajectoryModelKeplerian extends VisualTrajectoryMode
         const visualOrigin = new Vector([cameraPosition.x, cameraPosition.y, 0]);
         const actualVisualOrigin = this.trajectory.orbitalReferenceFrame.transformPositionByEpoch(epoch, visualOrigin, RF_BASE);
         const ta = traj.getTrueAnomalyByEpoch(epoch);
-        const mainColor = new THREE.Color(this.color);
         const sinE = visualOrigin.y / visualOrigin.mag;
         const cosE = visualOrigin.x / visualOrigin.mag;
         const cameraTrueAnomaly = getAngleBySinCos(sinE, cosE);

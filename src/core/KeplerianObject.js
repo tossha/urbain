@@ -22,7 +22,7 @@ export default class KeplerianObject
     }
 
     copy() {
-        return new KeplerianObject(this._e, this._sma, this._aop, this._raan, this.m0, this._epoch, this._mu, false);
+        return new KeplerianObject(this._e, this._sma, this._aop, this._inc, this._raan, this.m0, this._epoch, this._mu, false);
     }
 
     updateMeanMotion() {
@@ -103,10 +103,14 @@ export default class KeplerianObject
         this._epoch = value;
     }
 
-    addPrecession(r, j2, epoch) {
+    getNodalPrecessionByEpoch(r, j2, epoch) {
         const rate = -3/2 * r * r * j2 * Math.cos(this.inc) * this.meanMotion / Math.pow(this.sma * (1 - this.e * this.e), 2);
+        return rate * (epoch - this._epoch);
+    }
+
+    addPrecession(r, j2, epoch) {
         this.m0 = this.getMeanAnomalyByEpoch(epoch);
-        this.raan += rate * (epoch - this._epoch);
+        this._raan += this.getNodalPrecessionByEpoch(r, j2, epoch);
         this._epoch = epoch;
         return this;
     }
