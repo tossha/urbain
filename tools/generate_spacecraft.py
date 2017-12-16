@@ -251,7 +251,6 @@ def getObjectTrajectory(body, parent, etFrom, etTo, maxError, renderingConfig, i
 		lastOrbit.loan,
 		lastOrbit.m0,
 		lastOrbit.epoch,
-		lastOrbit.mu,
 	)]
 
 	step = initialStep

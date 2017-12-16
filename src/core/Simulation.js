@@ -50,6 +50,8 @@ export default class Simulation
         StarSystemLoader.loadObjectByUrl(sim.starSystem, '/spacecraft/voyager1.json');
         StarSystemLoader.loadObjectByUrl(sim.starSystem, '/spacecraft/voyager2.json');
         StarSystemLoader.loadObjectByUrl(sim.starSystem, '/spacecraft/lro.json');
+        StarSystemLoader.loadObjectByUrl(sim.starSystem, '/spacecraft/ISS.json');
+        StarSystemLoader.loadObjectByUrl(sim.starSystem, '/spacecraft/hubble.json');
     }
 
     get currentEpoch() {
