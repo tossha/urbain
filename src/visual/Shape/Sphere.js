@@ -16,4 +16,8 @@ export default class VisualShapeSphere extends VisualShapeAbstract
 
         return this.threeGeometry;
     }
+
+    getMaxDimension() {
+        return this.radius * 2;
+    }
 }

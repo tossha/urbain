@@ -3481,14 +3481,28 @@ class VisualBodyModelBasic extends __WEBPACK_IMPORTED_MODULE_0__Abstract__["a" /
     constructor(shape, color, texturePath) {
         super(shape, color);
 
-        if (texturePath) {
-            let that = this;
+        this.texturePath = texturePath;
+        this.isTextureRequested = false;
+    }
 
+    getMaterial(parameters) {
+        parameters.metalness = 0;
+        parameters.roughness = 1;
+        return new THREE.MeshStandardMaterial(parameters);
+    }
+
+    render(epoch) {
+        super.render(epoch);
+        if (!this.isTextureRequested
+            && this.texturePath
+            && this.shape.getMaxDimension() / this.threeObj.position.length() > sim.raycaster.getPixelAngleSize()
+        ) {
+            this.isTextureRequested = true;
             sim.textureLoader.load(
-                __WEBPACK_IMPORTED_MODULE_1__ModelAbstract__["a" /* default */].texturePath + texturePath,
-                function(txt) {
-                    that.threeObj.material.dispose();
-                    that.threeObj.material = that.getMaterial({map: txt});
+                __WEBPACK_IMPORTED_MODULE_1__ModelAbstract__["a" /* default */].texturePath + this.texturePath,
+                (txt) => {
+                    this.threeObj.material.dispose();
+                    this.threeObj.material = this.getMaterial({map: txt});
                 },
                 undefined,
                 function(err) {
@@ -3496,12 +3510,6 @@ class VisualBodyModelBasic extends __WEBPACK_IMPORTED_MODULE_0__Abstract__["a" /
                 }
             );
         }
-    }
-
-    getMaterial(parameters) {
-        parameters.metalness = 0;
-        parameters.roughness = 1;
-        return new THREE.MeshStandardMaterial(parameters);
     }
 }
 /* harmony export (immutable) */ __webpack_exports__["a"] = VisualBodyModelBasic;
@@ -10320,49 +10328,10 @@ class VisualBodyModelRings extends __WEBPACK_IMPORTED_MODULE_0__Abstract__["a" /
     constructor(shape, color, texturePath, ringsColorMapPath, ringsAlphaMapPath) {
         super(shape, color);
 
-        let that = this;
-
-        if (texturePath) {
-            sim.textureLoader.load(
-                __WEBPACK_IMPORTED_MODULE_1__ModelAbstract__["a" /* default */].texturePath + texturePath,
-                function(txt) {
-                    that.bodyThreeObj.material.dispose();
-                    that.bodyThreeObj.material = that.getMaterial({map: txt});
-                },
-                undefined,
-                function(err) {
-                    console.log(err);
-                }
-            );
-        }
-
-        if (ringsColorMapPath) {
-            sim.textureLoader.load(
-                __WEBPACK_IMPORTED_MODULE_1__ModelAbstract__["a" /* default */].texturePath + ringsColorMapPath,
-                function(txt) {
-                    that.ringsColorMap = txt;
-                    that.updateRingsMaterial();
-                },
-                undefined,
-                function(err) {
-                    console.log(err);
-                }
-            );
-        }
-
-        if (ringsAlphaMapPath) {
-            sim.textureLoader.load(
-                __WEBPACK_IMPORTED_MODULE_1__ModelAbstract__["a" /* default */].texturePath + ringsAlphaMapPath,
-                function(txt) {
-                    that.ringsAlphaMap = txt;
-                    that.updateRingsMaterial();
-                },
-                undefined,
-                function(err) {
-                    console.log(err);
-                }
-            );
-        }        
+        this.texturePath = texturePath;
+        this.ringsColorMapPath = ringsColorMapPath;
+        this.ringsAlphaMapPath = ringsAlphaMapPath;
+        this.isTextureRequested = false;
     }
 
     getThreeObj() {
@@ -10401,6 +10370,49 @@ class VisualBodyModelRings extends __WEBPACK_IMPORTED_MODULE_0__Abstract__["a" /
         parameters.roughness = 1;
         return new THREE.MeshStandardMaterial(parameters);
     }
+
+    render(epoch) {
+        super.render(epoch);
+        if (!this.isTextureRequested
+            && this.texturePath
+            && this.shape.getMaxDimension() / this.bodyThreeObj.position.length() > sim.raycaster.getPixelAngleSize()
+        ) {
+            this.isTextureRequested = true;
+            sim.textureLoader.load(
+                __WEBPACK_IMPORTED_MODULE_1__ModelAbstract__["a" /* default */].texturePath + this.texturePath,
+                (txt) => {
+                    this.bodyThreeObj.material.dispose();
+                    this.bodyThreeObj.material = this.getMaterial({map: txt});
+                },
+                undefined,
+                function(err) {
+                    console.log(err);
+                }
+            );
+            sim.textureLoader.load(
+                __WEBPACK_IMPORTED_MODULE_1__ModelAbstract__["a" /* default */].texturePath + this.ringsColorMapPath,
+                (txt) => {
+                    this.ringsColorMap = txt;
+                    this.updateRingsMaterial();
+                },
+                undefined,
+                function(err) {
+                    console.log(err);
+                }
+            );
+            sim.textureLoader.load(
+                __WEBPACK_IMPORTED_MODULE_1__ModelAbstract__["a" /* default */].texturePath + this.ringsAlphaMapPath,
+                (txt) => {
+                    this.ringsAlphaMap = txt;
+                    this.updateRingsMaterial();
+                },
+                undefined,
+                function(err) {
+                    console.log(err);
+                }
+            );
+        }
+    }
 }
 /* harmony export (immutable) */ __webpack_exports__["a"] = VisualBodyModelRings;
 
@@ -10430,6 +10442,10 @@ class VisualShapeSphere extends __WEBPACK_IMPORTED_MODULE_0__Abstract__["a" /* d
 
         return this.threeGeometry;
     }
+
+    getMaxDimension() {
+        return this.radius * 2;
+    }
 }
 /* harmony export (immutable) */ __webpack_exports__["a"] = VisualShapeSphere;
 
@@ -10443,6 +10459,8 @@ class VisualShapeSphere extends __WEBPACK_IMPORTED_MODULE_0__Abstract__["a" /* d
 class VisualShapeAbstract
 {
     getThreeGeometry() {}
+
+    getMaxDimension() {}
 }
 /* harmony export (immutable) */ __webpack_exports__["a"] = VisualShapeAbstract;
 

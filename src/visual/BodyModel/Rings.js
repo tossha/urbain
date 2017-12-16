@@ -6,49 +6,10 @@ export default class VisualBodyModelRings extends VisualBodyModelAbstract
     constructor(shape, color, texturePath, ringsColorMapPath, ringsAlphaMapPath) {
         super(shape, color);
 
-        let that = this;
-
-        if (texturePath) {
-            sim.textureLoader.load(
-                VisualModelAbstract.texturePath + texturePath,
-                function(txt) {
-                    that.bodyThreeObj.material.dispose();
-                    that.bodyThreeObj.material = that.getMaterial({map: txt});
-                },
-                undefined,
-                function(err) {
-                    console.log(err);
-                }
-            );
-        }
-
-        if (ringsColorMapPath) {
-            sim.textureLoader.load(
-                VisualModelAbstract.texturePath + ringsColorMapPath,
-                function(txt) {
-                    that.ringsColorMap = txt;
-                    that.updateRingsMaterial();
-                },
-                undefined,
-                function(err) {
-                    console.log(err);
-                }
-            );
-        }
-
-        if (ringsAlphaMapPath) {
-            sim.textureLoader.load(
-                VisualModelAbstract.texturePath + ringsAlphaMapPath,
-                function(txt) {
-                    that.ringsAlphaMap = txt;
-                    that.updateRingsMaterial();
-                },
-                undefined,
-                function(err) {
-                    console.log(err);
-                }
-            );
-        }        
+        this.texturePath = texturePath;
+        this.ringsColorMapPath = ringsColorMapPath;
+        this.ringsAlphaMapPath = ringsAlphaMapPath;
+        this.isTextureRequested = false;
     }
 
     getThreeObj() {
@@ -86,5 +47,48 @@ export default class VisualBodyModelRings extends VisualBodyModelAbstract
         parameters.metalness = 0;
         parameters.roughness = 1;
         return new THREE.MeshStandardMaterial(parameters);
+    }
+
+    render(epoch) {
+        super.render(epoch);
+        if (!this.isTextureRequested
+            && this.texturePath
+            && this.shape.getMaxDimension() / this.bodyThreeObj.position.length() > sim.raycaster.getPixelAngleSize()
+        ) {
+            this.isTextureRequested = true;
+            sim.textureLoader.load(
+                VisualModelAbstract.texturePath + this.texturePath,
+                (txt) => {
+                    this.bodyThreeObj.material.dispose();
+                    this.bodyThreeObj.material = this.getMaterial({map: txt});
+                },
+                undefined,
+                function(err) {
+                    console.log(err);
+                }
+            );
+            sim.textureLoader.load(
+                VisualModelAbstract.texturePath + this.ringsColorMapPath,
+                (txt) => {
+                    this.ringsColorMap = txt;
+                    this.updateRingsMaterial();
+                },
+                undefined,
+                function(err) {
+                    console.log(err);
+                }
+            );
+            sim.textureLoader.load(
+                VisualModelAbstract.texturePath + this.ringsAlphaMapPath,
+                (txt) => {
+                    this.ringsAlphaMap = txt;
+                    this.updateRingsMaterial();
+                },
+                undefined,
+                function(err) {
+                    console.log(err);
+                }
+            );
+        }
     }
 }
