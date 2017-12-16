@@ -1360,7 +1360,7 @@ def getELP2000Trajectory(color, cutKm):
 	for i in range(36):
 		prec = distancePrec if (i % 3 == 2) else anglePrec
 		_files.append([])
-		with open('ELP 2000-82B/data/ELP' + str(i+1)) as file:
+		with open('elp2000/data/ELP' + str(i+1)) as file:
 			isFirstLine = True
 			for line in file:
 				if isFirstLine:
