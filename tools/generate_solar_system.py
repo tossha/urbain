@@ -1002,90 +1002,101 @@ objects = [
 		'id': '501',
 		'name': 'Io',
 		'maxError': 30000,
-		'color': 'burlywood',
-	},
-	{
-		'id': '502',
-		'name': 'Europa',
-		'maxError': 30000,
-		'color': 'burlywood',
-	},
-	{
-		'id': '503',
-		'name': 'Ganymede',
-		'maxError': 30000,
-		'color': 'burlywood',
-	},
-	{
-		'id': '504',
-		'name': 'Callisto',
-		'maxError': 30000,
-		'color': 'burlywood',
-	},
-	{
-		'id': '699',
-		'name': 'Saturn',
-		'maxError': 30000,
-		'color': 'sandybrown',
-		'texture': 'SaturnTexture.jpg&ringsColorMap.jpg&ringsAlphaMap.jpg'
-	},
-	{
-		'id': '601',
-		'name': 'Mimas',
-		'maxError': 30000,
-		'color': 'sandybrown',
-	},
-	{
-		'id': '602',
-		'name': 'Enceladus',
-		'maxError': 30000,
-		'color': 'sandybrown',
-	},
-	{
-		'id': '606',
-		'name': 'Titan',
-		'maxError': 30000,
-		'color': 'sandybrown',
-	},
-	{
-		'id': '799',
-		'name': 'Uranus',
-		'maxError': 30000,
-		'color': 'lightskyblue'
-	},
-	{
-		'id': '899',
-		'name': 'Neptune',
-		'maxError': 30000,
-		'color': 'steelblue'
-	},
-	{
-		'id': '801',
-		'name': 'Triton',
-		'maxError': 10000,
-		'color': 'steelblue'
-	},
-	{
-		'id': '9',
-		'name': 'Pluto-Charon barycenter',
-		'maxError': 30000,
-		'color': 'tan'
-	},
-	{
-		'id': '999',
-		'parent': '9',
-		'name': 'Pluto',
-		'maxError': 30000,
-		'color': 'tan',
-		'pair': '901'
-	},
-	{
-		'id': '901',
-		'parent': '9',
-		'name': 'Charon',
-		'maxError': 30000,
-		'color': 'rosybrown',
-		'pair': '999'
+        'color': 'burlywood',
+        'texture': 'Io.jpg',
+    },
+    {
+        'id': '502',
+        'name': 'Europa',
+        'maxError': 30000,
+        'color': 'burlywood',
+        'texture': 'Europa.jpg',
+    },
+    {
+        'id': '503',
+        'name': 'Ganymede',
+        'maxError': 30000,
+        'color': 'burlywood',
+        'texture': 'Ganymede.jpg',
+    },
+    {
+        'id': '504',
+        'name': 'Callisto',
+        'maxError': 30000,
+        'color': 'burlywood',
+        'texture': 'Callisto.jpg',
+    },
+    {
+        'id': '699',
+        'name': 'Saturn',
+        'maxError': 30000,
+        'color': 'sandybrown',
+        'texture': 'SaturnTexture.jpg&ringsColorMap.jpg&ringsAlphaMap.jpg'
+    },
+    {
+        'id': '601',
+        'name': 'Mimas',
+        'maxError': 30000,
+        'color': 'sandybrown',
+        'texture': 'Mimas.jpg',
+    },
+    {
+        'id': '602',
+        'name': 'Enceladus',
+        'maxError': 30000,
+        'color': 'sandybrown',
+        'texture': 'Enceladus.jpg',
+    },
+    {
+        'id': '606',
+        'name': 'Titan',
+        'maxError': 30000,
+        'color': 'sandybrown',
+        'texture': 'Titan.jpg',
+    },
+    {
+        'id': '799',
+        'name': 'Uranus',
+        'maxError': 30000,
+        'color': 'lightskyblue',
+        'texture': 'Uranus.jpg'
+    },
+    {
+        'id': '899',
+        'name': 'Neptune',
+        'maxError': 30000,
+        'color': 'steelblue',
+        'texture': 'Neptune.jpg'
+    },
+    {
+        'id': '801',
+        'name': 'Triton',
+        'maxError': 10000,
+        'color': 'steelblue'
+    },
+    {
+        'id': '9',
+        'name': 'Pluto-Charon barycenter',
+        'maxError': 30000,
+        'color': 'tan'
+    },
+    {
+        'id': '999',
+        'parent': '9',
+        'name': 'Pluto',
+        'maxError': 30000,
+        'color': 'tan',
+        'pair': '901',
+        'texture': 'Pluto.jpg'
+    },
+    {
+        'id': '901',
+        'parent': '9',
+        'name': 'Charon',
+        'maxError': 30000,
+        'color': 'rosybrown',
+        'pair': '999',
+		'texture': 'Charon.jpg'
 	},
 	{
 		'id': '1',
