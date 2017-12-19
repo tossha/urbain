@@ -68,7 +68,8 @@
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
-/* WEBPACK VAR INJECTION */(function(THREE) {/* harmony export (immutable) */ __webpack_exports__["f"] = deg2rad;
+/* WEBPACK VAR INJECTION */(function(THREE) {/* unused harmony export newtonSolve */
+/* harmony export (immutable) */ __webpack_exports__["f"] = deg2rad;
 /* harmony export (immutable) */ __webpack_exports__["i"] = rad2deg;
 /* harmony export (immutable) */ __webpack_exports__["g"] = getAngleBySinCos;
 /* harmony export (immutable) */ __webpack_exports__["d"] = approximateAngle;
@@ -480,6 +481,23 @@ class Quaternion
 const TWO_PI = 2 * Math.PI;
 /* harmony export (immutable) */ __webpack_exports__["b"] = TWO_PI;
 
+
+function newtonSolve(func, start, d, maxError, maxSteps) {
+    let step = 0;
+    let val = start;
+    let error;
+
+    do {
+        const v1 = func(val);
+        const v2 = func(val + d);
+        const diff = (v2 - v1) / d;
+        error = Math.abs(v1);
+        val -= v1 / diff;
+        step += 1;
+    } while (error > maxError && step < maxSteps);
+
+    return (error > maxError) ? false : val;
+}
 
 function deg2rad(degrees) {
     return degrees / 180 * Math.PI;
@@ -10607,11 +10625,14 @@ class SelectionHandler extends __WEBPACK_IMPORTED_MODULE_0__ModelAbstract__["a" 
         if (event.button === this.selectionMouseButton) {
             document.addEventListener('mousemove', this.mouseMoveListener);
             this.hasMouseMoved = false;
+            this.mouseClickStart = [event.clientX, event.clientY];
         }
     }
 
-    onMouseMove() {
-        this.hasMouseMoved = true;
+    onMouseMove(event) {
+        if (this.mouseClickStart[0] !== event.clientX || this.mouseClickStart[1] !== event.clientY) {
+            this.hasMouseMoved = true;
+        }
     }
 
     onMouseClick(event) {
