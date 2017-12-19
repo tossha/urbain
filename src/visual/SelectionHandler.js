@@ -69,11 +69,14 @@ export default class SelectionHandler extends VisualModelAbstract
         if (event.button === this.selectionMouseButton) {
             document.addEventListener('mousemove', this.mouseMoveListener);
             this.hasMouseMoved = false;
+            this.mouseClickStart = [event.clientX, event.clientY];
         }
     }
 
-    onMouseMove() {
-        this.hasMouseMoved = true;
+    onMouseMove(event) {
+        if (this.mouseClickStart[0] !== event.clientX || this.mouseClickStart[1] !== event.clientY) {
+            this.hasMouseMoved = true;
+        }
     }
 
     onMouseClick(event) {

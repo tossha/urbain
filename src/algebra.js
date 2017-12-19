@@ -399,6 +399,23 @@ export class Quaternion
 
 export const TWO_PI = 2 * Math.PI;
 
+export function newtonSolve(func, start, d, maxError, maxSteps) {
+    let step = 0;
+    let val = start;
+    let error;
+
+    do {
+        const v1 = func(val);
+        const v2 = func(val + d);
+        const diff = (v2 - v1) / d;
+        error = Math.abs(v1);
+        val -= v1 / diff;
+        step += 1;
+    } while (error > maxError && step < maxSteps);
+
+    return (error > maxError) ? false : val;
+}
+
 export function deg2rad(degrees) {
     return degrees / 180 * Math.PI;
 }
