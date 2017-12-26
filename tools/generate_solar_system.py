@@ -1523,7 +1523,7 @@ file.write(json.dumps({
 	'id': 1,
 	'name': 'Solar System',
 	'directory': 'solar_system',
-    'mainStars': [10],
+	'mainStars': [10],
 	'mainObject': 399,
 	'referenceFrames': referenceFrames,
 	'objects': objectsData,
