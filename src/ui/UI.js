@@ -140,6 +140,7 @@ export default class UI
         $('#aopValue' ).html('' + rad2deg( keplerianObject.aop ).toPrecision(this.precision));
         $('#raanValue').html('' + rad2deg( keplerianObject.raan).toPrecision(this.precision));
         $('#taValue'  ).html('' + rad2deg( keplerianObject.getTrueAnomalyByEpoch(sim.currentEpoch)  ).toPrecision(this.precision));
+        $('#periodValue').html('' + (keplerianObject.period / 86400).toPrecision(this.precision));
     }
 
     updateVector(state, vec) {

@@ -32,29 +32,27 @@ export default class VisualTrajectoryModelPointArray extends VisualTrajectoryMod
         for (let i = 0; i < this.positions.length; ++i) {
             if (this.epochs[i] < epoch - this.trailPeriod) {
                 if (this.showBehind) {
-                    points.push(sim.getVisualCoords(this.positions[i].add(originPos)));
+                    points.push(this.positions[i]);
                     colors.push(0);
                 }
                 if (this.epochs[i+1] > epoch - this.trailPeriod) {
-                    points.push(sim.getVisualCoords(
-                        this.trajectory.getPositionByEpoch(epoch - this.trailPeriod, this.referenceFrame).add(originPos)
-                    ));
+                    points.push(
+                        this.trajectory.getPositionByEpoch(epoch - this.trailPeriod, this.referenceFrame)
+                    );
                     colors.push(0);
                 }
             } else if (this.epochs[i] < epoch) {
-                points.push(sim.getVisualCoords(this.positions[i].add(originPos)));
+                points.push(this.positions[i]);
                 colors.push(1 - (epoch - this.epochs[i]) / this.trailPeriod);
             } else if (this.epochs[i] > epoch && this.showAhead) {
-                points.push(sim.getVisualCoords(this.positions[i].add(originPos)));
+                points.push(this.positions[i]);
                 colors.push(0);
             }
 
             if ((this.epochs[i] < epoch)
                 && (this.epochs[i+1] >= epoch)
             ) {
-                const pos = sim.getVisualCoords(
-                    this.trajectory.getPositionByEpoch(epoch, this.referenceFrame).add(originPos)
-                );
+                const pos = this.trajectory.getPositionByEpoch(epoch, this.referenceFrame);
                 points.push(pos);
                 points.push(pos);
                 colors.push(1);
@@ -65,6 +63,7 @@ export default class VisualTrajectoryModelPointArray extends VisualTrajectoryMod
         this.threeObj.visible = true;
         this.updateGeometry(points, colors, endingBrightness);
 
+        this.threeObj.position.copy(sim.getVisualCoords(originPos));
         this.threeObj.quaternion.copy(this.referenceFrame.getQuaternionByEpoch(epoch).toThreejs());
     }
 

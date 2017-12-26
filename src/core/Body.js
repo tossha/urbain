@@ -9,6 +9,8 @@ export default class Body extends EphemerisObject
         this.physicalModel = physicalModel;  // class PhysicalBodyModel
         this.orientation   = orientation;    // class OrientationAbstract
 
-        this.visualModel.body = this;
+        if (this.visualModel) {
+            this.visualModel.body = this;
+        }
     }
 }

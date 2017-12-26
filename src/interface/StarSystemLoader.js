@@ -55,6 +55,9 @@ export default class StarSystemLoader
 
     static _loadObject(starSystem, config) {
         let object;
+        let visualModel = null;
+        let physicalModel = null;
+        let orientation = null;
 
         if (config.visual) {
             let visualShape = new VisualShapeSphere(
@@ -62,7 +65,7 @@ export default class StarSystemLoader
                 config.visual.texture ? 32 : 12
             );
 
-            let visualModel = (config.id == SUN)
+            visualModel = (config.id == SUN)
                 ? new VisualBodyModelLight(
                     visualShape,
                     config.visual.color,
@@ -86,22 +89,31 @@ export default class StarSystemLoader
                             config.visual.texture
                         )
                 );
-            let orientation = config.orientation
+        }
+
+        if (config.orientation) {
+            orientation = config.orientation
                 ? new OrientationIAUModel(
                     config.orientation[0], // right ascension
                     config.orientation[1], // declination
                     config.orientation[2]  // prime meridian
                 )
                 : new OrientationConstantAxis([0, 0, 1e-10]);
+        }
 
+        if (config.physical) {
+            physicalModel = new PhysicalBodyModel(
+                config.physical.mu,
+                config.physical.radius
+            );
+        }
+
+        if (visualModel || physicalModel || orientation) {
             object = new Body(
                 config.id,
                 config.name,
                 visualModel,
-                new PhysicalBodyModel(
-                    config.physical.mu,
-                    config.physical.radius
-                ),
+                physicalModel,
                 orientation
             );
         } else {

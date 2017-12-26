@@ -1787,6 +1787,13 @@ class KeplerianObject
         this._epoch = value;
     }
 
+    get period() {
+        if (!this.isElliptic) {
+            return 0;
+        }
+        return 2 * Math.PI * Math.sqrt(this._sma * this._sma * this._sma / this._mu);
+    }
+
     getNodalPrecessionByEpoch(r, j2, epoch) {
         const rate = -3/2 * r * r * j2 * Math.cos(this.inc) * this.meanMotion / Math.pow(this.sma * (1 - this.e * this.e), 2);
         return rate * (epoch - this._epoch);
@@ -2007,13 +2014,13 @@ class VisualModelAbstract
     constructor() {
         this.threeObj = null;
         this.scene = sim.scene;
-        this.renderListener = this._onRender.bind(this);
-        document.addEventListener(__WEBPACK_IMPORTED_MODULE_0__core_Events__["a" /* Events */].RENDER, this.renderListener);
     }
 
     setThreeObj(obj) {
         this.threeObj = obj;
         this.scene.add(this.threeObj);
+        this.renderListener = this._onRender.bind(this);
+        document.addEventListener(__WEBPACK_IMPORTED_MODULE_0__core_Events__["a" /* Events */].RENDER, this.renderListener);
     }
 
     _onRender(event) {
@@ -2433,7 +2440,9 @@ class Body extends __WEBPACK_IMPORTED_MODULE_0__EphemerisObject__["a" /* default
         this.physicalModel = physicalModel;  // class PhysicalBodyModel
         this.orientation   = orientation;    // class OrientationAbstract
 
-        this.visualModel.body = this;
+        if (this.visualModel) {
+            this.visualModel.body = this;
+        }
     }
 }
 /* harmony export (immutable) */ __webpack_exports__["a"] = Body;
@@ -8142,10 +8151,10 @@ module.exports = __webpack_amd_options__;
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__ReferenceFrame_Factory__ = __webpack_require__(2);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_4__TimeLine__ = __webpack_require__(19);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_5__interface_StarSystemLoader__ = __webpack_require__(38);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_6__visual_VisualRaycaster__ = __webpack_require__(59);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_7__visual_SelectionHandler__ = __webpack_require__(60);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_8__ui_UI__ = __webpack_require__(61);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_9__StarSystem__ = __webpack_require__(62);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_6__visual_VisualRaycaster__ = __webpack_require__(60);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_7__visual_SelectionHandler__ = __webpack_require__(61);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_8__ui_UI__ = __webpack_require__(62);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_9__StarSystem__ = __webpack_require__(63);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_10__Camera__ = __webpack_require__(27);
 
 
@@ -8430,11 +8439,11 @@ class ReferenceFrameTopocentric extends __WEBPACK_IMPORTED_MODULE_0__BodyFixed__
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_5__core_PhysicalBodyModel__ = __webpack_require__(41);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_6__core_EphemerisObject__ = __webpack_require__(13);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_7__TrajectoryLoader__ = __webpack_require__(42);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_8__visual_StarsModel__ = __webpack_require__(54);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_9__visual_BodyModel_Light__ = __webpack_require__(55);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_10__visual_BodyModel_Rings__ = __webpack_require__(56);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_8__visual_StarsModel__ = __webpack_require__(55);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_9__visual_BodyModel_Light__ = __webpack_require__(56);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_10__visual_BodyModel_Rings__ = __webpack_require__(57);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_11__visual_BodyModel_Basic__ = __webpack_require__(25);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_12__visual_Shape_Sphere__ = __webpack_require__(57);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_12__visual_Shape_Sphere__ = __webpack_require__(58);
 
 
 
@@ -8492,6 +8501,9 @@ class StarSystemLoader
 
     static _loadObject(starSystem, config) {
         let object;
+        let visualModel = null;
+        let physicalModel = null;
+        let orientation = null;
 
         if (config.visual) {
             let visualShape = new __WEBPACK_IMPORTED_MODULE_12__visual_Shape_Sphere__["a" /* default */](
@@ -8499,7 +8511,7 @@ class StarSystemLoader
                 config.visual.texture ? 32 : 12
             );
 
-            let visualModel = (config.id == __WEBPACK_IMPORTED_MODULE_1__solar_system__["c" /* SUN */])
+            visualModel = (config.id == __WEBPACK_IMPORTED_MODULE_1__solar_system__["c" /* SUN */])
                 ? new __WEBPACK_IMPORTED_MODULE_9__visual_BodyModel_Light__["a" /* default */](
                     visualShape,
                     config.visual.color,
@@ -8523,22 +8535,31 @@ class StarSystemLoader
                             config.visual.texture
                         )
                 );
-            let orientation = config.orientation
+        }
+
+        if (config.orientation) {
+            orientation = config.orientation
                 ? new __WEBPACK_IMPORTED_MODULE_3__core_Orientation_IAUModel__["a" /* default */](
                     config.orientation[0], // right ascension
                     config.orientation[1], // declination
                     config.orientation[2]  // prime meridian
                 )
                 : new __WEBPACK_IMPORTED_MODULE_4__core_Orientation_ConstantAxis__["a" /* default */]([0, 0, 1e-10]);
+        }
 
+        if (config.physical) {
+            physicalModel = new __WEBPACK_IMPORTED_MODULE_5__core_PhysicalBodyModel__["a" /* default */](
+                config.physical.mu,
+                config.physical.radius
+            );
+        }
+
+        if (visualModel || physicalModel || orientation) {
             object = new __WEBPACK_IMPORTED_MODULE_2__core_Body__["a" /* default */](
                 config.id,
                 config.name,
                 visualModel,
-                new __WEBPACK_IMPORTED_MODULE_5__core_PhysicalBodyModel__["a" /* default */](
-                    config.physical.mu,
-                    config.physical.radius
-                ),
+                physicalModel,
                 orientation
             );
         } else {
@@ -8657,17 +8678,17 @@ class PhysicalBodyModel
 
 "use strict";
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__core_Trajectory_KeplerianArray__ = __webpack_require__(21);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__core_Trajectory_KeplerianPrecessingArray__ = __webpack_require__(46);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__core_Trajectory_KeplerianPrecessingArray__ = __webpack_require__(47);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__core_Trajectory_KeplerianBasic__ = __webpack_require__(23);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__core_Trajectory_KeplerianPrecessing__ = __webpack_require__(47);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__core_Trajectory_KeplerianPrecessing__ = __webpack_require__(48);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_4__core_KeplerianObject__ = __webpack_require__(5);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_5__core_Trajectory_Composite__ = __webpack_require__(48);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_6__visual_TrajectoryModel_PointArray__ = __webpack_require__(49);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_7__visual_TrajectoryModel_Keplerian__ = __webpack_require__(50);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_8__core_Trajectory_StaticPosition__ = __webpack_require__(51);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_5__core_Trajectory_Composite__ = __webpack_require__(49);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_6__visual_TrajectoryModel_PointArray__ = __webpack_require__(50);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_7__visual_TrajectoryModel_Keplerian__ = __webpack_require__(51);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_8__core_Trajectory_StaticPosition__ = __webpack_require__(52);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_9__algebra__ = __webpack_require__(0);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_10__core_Trajectory_VSOP87__ = __webpack_require__(52);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_11__core_Trajectory_ELP2000__ = __webpack_require__(53);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_10__core_Trajectory_VSOP87__ = __webpack_require__(53);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_11__core_Trajectory_ELP2000__ = __webpack_require__(54);
 
 
 
@@ -9391,7 +9412,8 @@ class HelperAngle
 /* WEBPACK VAR INJECTION */}.call(__webpack_exports__, __webpack_require__(1)))
 
 /***/ }),
-/* 46 */
+/* 46 */,
+/* 47 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -9422,7 +9444,7 @@ class TrajectoryKeplerianPrecessingArray extends __WEBPACK_IMPORTED_MODULE_0__Ke
 
 
 /***/ }),
-/* 47 */
+/* 48 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -9459,7 +9481,7 @@ class TrajectoryKeplerianPrecessing extends __WEBPACK_IMPORTED_MODULE_0__Kepleri
 
 
 /***/ }),
-/* 48 */
+/* 49 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -9564,7 +9586,7 @@ class TrajectoryComposite extends __WEBPACK_IMPORTED_MODULE_0__Abstract__["a" /*
 
 
 /***/ }),
-/* 49 */
+/* 50 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -9604,29 +9626,27 @@ class VisualTrajectoryModelPointArray extends __WEBPACK_IMPORTED_MODULE_0__Abstr
         for (let i = 0; i < this.positions.length; ++i) {
             if (this.epochs[i] < epoch - this.trailPeriod) {
                 if (this.showBehind) {
-                    points.push(sim.getVisualCoords(this.positions[i].add(originPos)));
+                    points.push(this.positions[i]);
                     colors.push(0);
                 }
                 if (this.epochs[i+1] > epoch - this.trailPeriod) {
-                    points.push(sim.getVisualCoords(
-                        this.trajectory.getPositionByEpoch(epoch - this.trailPeriod, this.referenceFrame).add(originPos)
-                    ));
+                    points.push(
+                        this.trajectory.getPositionByEpoch(epoch - this.trailPeriod, this.referenceFrame)
+                    );
                     colors.push(0);
                 }
             } else if (this.epochs[i] < epoch) {
-                points.push(sim.getVisualCoords(this.positions[i].add(originPos)));
+                points.push(this.positions[i]);
                 colors.push(1 - (epoch - this.epochs[i]) / this.trailPeriod);
             } else if (this.epochs[i] > epoch && this.showAhead) {
-                points.push(sim.getVisualCoords(this.positions[i].add(originPos)));
+                points.push(this.positions[i]);
                 colors.push(0);
             }
 
             if ((this.epochs[i] < epoch)
                 && (this.epochs[i+1] >= epoch)
             ) {
-                const pos = sim.getVisualCoords(
-                    this.trajectory.getPositionByEpoch(epoch, this.referenceFrame).add(originPos)
-                );
+                const pos = this.trajectory.getPositionByEpoch(epoch, this.referenceFrame);
                 points.push(pos);
                 points.push(pos);
                 colors.push(1);
@@ -9637,6 +9657,7 @@ class VisualTrajectoryModelPointArray extends __WEBPACK_IMPORTED_MODULE_0__Abstr
         this.threeObj.visible = true;
         this.updateGeometry(points, colors, endingBrightness);
 
+        this.threeObj.position.copy(sim.getVisualCoords(originPos));
         this.threeObj.quaternion.copy(this.referenceFrame.getQuaternionByEpoch(epoch).toThreejs());
     }
 
@@ -9742,7 +9763,7 @@ class VisualTrajectoryModelPointArray extends __WEBPACK_IMPORTED_MODULE_0__Abstr
 
 
 /***/ }),
-/* 50 */
+/* 51 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -9935,7 +9956,7 @@ class VisualTrajectoryModelKeplerian extends __WEBPACK_IMPORTED_MODULE_0__Abstra
 /* WEBPACK VAR INJECTION */}.call(__webpack_exports__, __webpack_require__(1)))
 
 /***/ }),
-/* 51 */
+/* 52 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -9959,7 +9980,7 @@ class TrajectoryStaticPosition extends __WEBPACK_IMPORTED_MODULE_0__Abstract__["
 
 
 /***/ }),
-/* 52 */
+/* 53 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -10018,7 +10039,7 @@ class TrajectoryVSOP87 extends __WEBPACK_IMPORTED_MODULE_2__KeplerianAbstract__[
 
 
 /***/ }),
-/* 53 */
+/* 54 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -10253,7 +10274,7 @@ class TrajectoryELP2000 extends __WEBPACK_IMPORTED_MODULE_0__KeplerianAbstract__
 
 
 /***/ }),
-/* 54 */
+/* 55 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -10303,7 +10324,7 @@ class VisualStarsModel extends __WEBPACK_IMPORTED_MODULE_1__ModelAbstract__["a" 
 /* WEBPACK VAR INJECTION */}.call(__webpack_exports__, __webpack_require__(1)))
 
 /***/ }),
-/* 55 */
+/* 56 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -10332,7 +10353,7 @@ class VisualBodyModelLight extends __WEBPACK_IMPORTED_MODULE_0__Basic__["a" /* d
 /* WEBPACK VAR INJECTION */}.call(__webpack_exports__, __webpack_require__(1)))
 
 /***/ }),
-/* 56 */
+/* 57 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -10437,11 +10458,11 @@ class VisualBodyModelRings extends __WEBPACK_IMPORTED_MODULE_0__Abstract__["a" /
 /* WEBPACK VAR INJECTION */}.call(__webpack_exports__, __webpack_require__(1)))
 
 /***/ }),
-/* 57 */
+/* 58 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
-/* WEBPACK VAR INJECTION */(function(THREE) {/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__Abstract__ = __webpack_require__(58);
+/* WEBPACK VAR INJECTION */(function(THREE) {/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__Abstract__ = __webpack_require__(59);
 
 
 class VisualShapeSphere extends __WEBPACK_IMPORTED_MODULE_0__Abstract__["a" /* default */]
@@ -10470,7 +10491,7 @@ class VisualShapeSphere extends __WEBPACK_IMPORTED_MODULE_0__Abstract__["a" /* d
 /* WEBPACK VAR INJECTION */}.call(__webpack_exports__, __webpack_require__(1)))
 
 /***/ }),
-/* 58 */
+/* 59 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -10484,7 +10505,7 @@ class VisualShapeAbstract
 
 
 /***/ }),
-/* 59 */
+/* 60 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -10548,7 +10569,7 @@ class VisualRaycaster
 /* WEBPACK VAR INJECTION */}.call(__webpack_exports__, __webpack_require__(1)))
 
 /***/ }),
-/* 60 */
+/* 61 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -10694,7 +10715,7 @@ class SelectionHandler extends __WEBPACK_IMPORTED_MODULE_0__ModelAbstract__["a" 
 /* WEBPACK VAR INJECTION */}.call(__webpack_exports__, __webpack_require__(1)))
 
 /***/ }),
-/* 61 */
+/* 62 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -10843,6 +10864,7 @@ class UI
         $('#aopValue' ).html('' + Object(__WEBPACK_IMPORTED_MODULE_1__algebra__["i" /* rad2deg */])( keplerianObject.aop ).toPrecision(this.precision));
         $('#raanValue').html('' + Object(__WEBPACK_IMPORTED_MODULE_1__algebra__["i" /* rad2deg */])( keplerianObject.raan).toPrecision(this.precision));
         $('#taValue'  ).html('' + Object(__WEBPACK_IMPORTED_MODULE_1__algebra__["i" /* rad2deg */])( keplerianObject.getTrueAnomalyByEpoch(sim.currentEpoch)  ).toPrecision(this.precision));
+        $('#periodValue').html('' + (keplerianObject.period / 86400).toPrecision(this.precision));
     }
 
     updateVector(state, vec) {
@@ -10867,7 +10889,7 @@ class UI
 /* WEBPACK VAR INJECTION */}.call(__webpack_exports__, __webpack_require__(9)))
 
 /***/ }),
-/* 62 */
+/* 63 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";

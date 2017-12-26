@@ -5,13 +5,13 @@ export default class VisualModelAbstract
     constructor() {
         this.threeObj = null;
         this.scene = sim.scene;
-        this.renderListener = this._onRender.bind(this);
-        document.addEventListener(Events.RENDER, this.renderListener);
     }
 
     setThreeObj(obj) {
         this.threeObj = obj;
         this.scene.add(this.threeObj);
+        this.renderListener = this._onRender.bind(this);
+        document.addEventListener(Events.RENDER, this.renderListener);
     }
 
     _onRender(event) {
