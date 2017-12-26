@@ -47,6 +47,8 @@ export default class Simulation
 
         this.ui = new UI(5, this.starSystem.getObjectNames());
 
+        document.dispatchEvent(new CustomEvent(Events.INIT_DONE));
+
         StarSystemLoader.loadObjectByUrl(sim.starSystem, '/spacecraft/voyager1.json');
         StarSystemLoader.loadObjectByUrl(sim.starSystem, '/spacecraft/voyager2.json');
         StarSystemLoader.loadObjectByUrl(sim.starSystem, '/spacecraft/lro.json');

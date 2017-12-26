@@ -21,6 +21,8 @@ export default class StarSystemLoader
         // Loading main object
         starSystem.mainObject = config.mainObject;
 
+        starSystem.setMainStars(config.mainStars);
+
         // Loading objects
         for (const objectConfig of config.objects) {
             this._loadObject(starSystem, objectConfig);
