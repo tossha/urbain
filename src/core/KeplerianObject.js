@@ -103,6 +103,13 @@ export default class KeplerianObject
         this._epoch = value;
     }
 
+    get period() {
+        if (!this.isElliptic) {
+            return 0;
+        }
+        return 2 * Math.PI * Math.sqrt(this._sma * this._sma * this._sma / this._mu);
+    }
+
     getNodalPrecessionByEpoch(r, j2, epoch) {
         const rate = -3/2 * r * r * j2 * Math.cos(this.inc) * this.meanMotion / Math.pow(this.sma * (1 - this.e * this.e), 2);
         return rate * (epoch - this._epoch);

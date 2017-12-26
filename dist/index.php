@@ -78,6 +78,7 @@ require 'functions.php';
                            ['AoP', 'deg.'],
                            ['RAAN', 'deg.'],
                            ['TA', 'deg.'],
+                           ['Period', 'days'],
                        ] as $param) { ?>
         <tr>
             <td style="width: 60px"><?= $param[0] ?></td>

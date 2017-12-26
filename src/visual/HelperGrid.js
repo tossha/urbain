@@ -1,59 +1,64 @@
-import {Events} from "../core/Events";
-import {RF_BASE} from "../core/ReferenceFrame/Factory";
+import VisualModelAbstract from "./ModelAbstract";
 
-export default class HelperGrid
+export default class HelperGrid extends VisualModelAbstract
 {
     constructor(referenceFrame) {
+        super();
+
         this.referenceFrame = referenceFrame;
-        this.centerObject = referenceFrame.origin;
 
         this.gridSizeParameter = this.getCurrentGridSizeParameter();
 
-        this.onRenderListener = this.onRender.bind(this);
-        document.addEventListener(Events.RENDER, this.onRenderListener);
+        this.zoomListener = this.onZoom.bind(this);
+        document.addEventListener('wheel', this.zoomListener);
 
-        this.ZoomListener = this.onZoom.bind(this);
-        document.addEventListener('wheel', this.ZoomListener);
-
-        this.init();
-    }
-
-    init() {
-        let pos = starSystem.getTrajectory(this.centerObject).getPositionByEpoch(sim.currentEpoch, RF_BASE);
-
-        this.threeGrid = new THREE.PolarGridHelper(
+        let threeGrid = new THREE.PolarGridHelper(
             Math.pow(2, this.gridSizeParameter),
-            32,
-            32,
+            12,
+            12,
             200
         );
-        this.threeGrid.position.copy(sim.getVisualCoords(pos));
-        this.threeGrid.quaternion.copy(this.referenceFrame.getQuaternionByEpoch(sim.currentEpoch).toThreejs());
-        this.threeGrid.rotateX(Math.PI / 2);
+        threeGrid.geometry.rotateX(Math.PI / 2);
 
-        sim.scene.add(this.threeGrid);
+        this.setThreeObj(threeGrid);
     }
 
-    onRender(event) {
-        let pos = starSystem.getTrajectory(this.centerObject).getPositionByEpoch(event.detail.epoch, RF_BASE);
-        this.threeGrid.position.copy(sim.getVisualCoords(pos));
+    hide() {
+        this.threeObj.visible = false;
+    }
+
+    show() {
+        this.threeObj.visible = true;
+    }
+
+    render(epoch) {
+        let pos = this.referenceFrame.getOriginPositionByEpoch(epoch);
+        this.threeObj.position.copy(sim.getVisualCoords(pos));
+        this.threeObj.quaternion.copy(this.referenceFrame.getQuaternionByEpoch(epoch).toThreejs())
     }
 
     onZoom() {
         let pow = this.getCurrentGridSizeParameter();
         if (pow != this.gridSizeParameter) {
-            sim.scene.remove(this.threeGrid);
+            this.drop();
 
             this.gridSizeParameter = pow;
 
-            this.init();
+            let threeGrid = new THREE.PolarGridHelper(
+                Math.pow(2, this.gridSizeParameter),
+                12,
+                12,
+                200
+            );
+            threeGrid.geometry.rotateX(Math.PI / 2);
+
+            this.setThreeObj(threeGrid);
         }
     }
 
     remove() {
-        sim.scene.remove(this.threeGrid);
-        document.removeEventListener('wheel', this.ZoomListener);
-        document.removeEventListener(Events.RENDER, this.onRenderListener);
+        this.drop();
+        document.removeEventListener('wheel', this.zoomListener);
     }
 
     getCurrentGridSizeParameter() {
