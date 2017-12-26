@@ -1668,6 +1668,7 @@ class StateVector
 "use strict";
 const Events = {
     RENDER: 'urb_render',
+    INIT_DONE: 'urb_init_done',
     SELECT: 'urb_select',
     DESELECT: 'urb_deselect',
     CAMERA_RF_CHANGED: 'urb_camera_rf_change',
@@ -2464,12 +2465,25 @@ class EphemerisObject
     }
 
     setTrajectory(trajectory) {
-        this.trajectory = trajectory;     // class TrajectoryAbstract
+        this.trajectory = trajectory;
         this.trajectory.setObject(this);
     }
 
+    getParentObjectIdByEpoch(epoch) {
+        if (!this.trajectory) {
+            return null;
+        }
+
+        const rf = this.trajectory.getReferenceFrameByEpoch(epoch);
+        if (!rf) {
+            return null;
+        }
+
+        return sim.starSystem.getReferenceFrameIdObject(rf.id);
+    }
+
     getPositionByEpoch(epoch, referenceFrame) {
-        return this.trajectory.getPositionByEpoch(epoch, referenceFrame ? referenceFrame : __WEBPACK_IMPORTED_MODULE_0__ReferenceFrame_Factory__["a" /* RF_BASE */]);
+        return this.trajectory.getPositionByEpoch(epoch, referenceFrame || __WEBPACK_IMPORTED_MODULE_0__ReferenceFrame_Factory__["a" /* RF_BASE */]);
     }
 }
 /* harmony export (immutable) */ __webpack_exports__["a"] = EphemerisObject;
@@ -8205,6 +8219,8 @@ class Simulation
 
         this.ui = new __WEBPACK_IMPORTED_MODULE_8__ui_UI__["a" /* default */](5, this.starSystem.getObjectNames());
 
+        document.dispatchEvent(new CustomEvent(__WEBPACK_IMPORTED_MODULE_2__Events__["a" /* Events */].INIT_DONE));
+
         __WEBPACK_IMPORTED_MODULE_5__interface_StarSystemLoader__["a" /* default */].loadObjectByUrl(sim.starSystem, '/spacecraft/voyager1.json');
         __WEBPACK_IMPORTED_MODULE_5__interface_StarSystemLoader__["a" /* default */].loadObjectByUrl(sim.starSystem, '/spacecraft/voyager2.json');
         __WEBPACK_IMPORTED_MODULE_5__interface_StarSystemLoader__["a" /* default */].loadObjectByUrl(sim.starSystem, '/spacecraft/lro.json');
@@ -8466,6 +8482,8 @@ class StarSystemLoader
 
         // Loading main object
         starSystem.mainObject = config.mainObject;
+
+        starSystem.setMainStars(config.mainStars);
 
         // Loading objects
         for (const objectConfig of config.objects) {
@@ -10900,12 +10918,17 @@ class UI
 
 
 
+const STAR_SYSTEM_BARYCENTER = 0;
+/* unused harmony export STAR_SYSTEM_BARYCENTER */
+
+
 class StarSystem
 {
     constructor(id) {
         this.id = id;
         this.name = null;
         this.stars = null;
+        this.mainStars = [];
         this.mainObject = null;
         this.referenceFrames = {};
         this.trajectories = {};
@@ -10914,6 +10937,16 @@ class StarSystem
 
     addStars(stars) {
         this.stars = stars;
+        return this;
+    }
+
+    setMainStars(objectIds) {
+        this.mainStars = objectIds;
+        return this;
+    }
+
+    getMainStars() {
+        return this.mainStars;
     }
 
     addReferenceFrame(frame) {

@@ -2,12 +2,15 @@ import ReferenceFrameFactory from "./ReferenceFrame/Factory";
 import EphemerisObject from "./EphemerisObject";
 import Body from "./Body";
 
+export const STAR_SYSTEM_BARYCENTER = 0;
+
 export default class StarSystem
 {
     constructor(id) {
         this.id = id;
         this.name = null;
         this.stars = null;
+        this.mainStars = [];
         this.mainObject = null;
         this.referenceFrames = {};
         this.trajectories = {};
@@ -16,6 +19,16 @@ export default class StarSystem
 
     addStars(stars) {
         this.stars = stars;
+        return this;
+    }
+
+    setMainStars(objectIds) {
+        this.mainStars = objectIds;
+        return this;
+    }
+
+    getMainStars() {
+        return this.mainStars;
     }
 
     addReferenceFrame(frame) {
