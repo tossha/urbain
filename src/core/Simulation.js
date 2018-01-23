@@ -9,34 +9,37 @@ import SelectionHandler from "../visual/SelectionHandler";
 import UI from "../ui/UI";
 import StarSystem from "./StarSystem";
 import Camera from "./Camera";
+import ReferenceFrameFactory from "./ReferenceFrame/Factory";
 
 export default class Simulation
 {
     init(domElementId, starSystemConfig) {
+        this.initSettings();
+
         this.scene = new THREE.Scene();
+        this.scene.add(new THREE.AmbientLight(0xFFEFD5, 0.15));
+
         this.textureLoader = new THREE.TextureLoader();
+
         this.renderer = new THREE.WebGLRenderer({antialias: true});
+        this.renderer.setSize(window.innerWidth, window.innerHeight);
+        this.domElement = document.getElementById(domElementId);
+        this.domElement.appendChild(this.renderer.domElement);
+        window.addEventListener('resize', this.onWindowResize.bind(this));
+
         this.rendererEvents = new EventHandler(this.renderer.domElement);
 
         this.selection = new SelectionHandler();
 
         this.starSystem = new StarSystem(starSystemConfig.id);
 
-        this.time = new TimeLine(TimeLine.getEpochByDate(new Date()), 0.001, true);
+        this.time = new TimeLine(TimeLine.getEpochByDate(new Date()), 1, true);
 
         StarSystemLoader.loadFromConfig(this.starSystem, starSystemConfig);
 
-        this.scene.add(new THREE.AmbientLight(0xFFEFD5, 0.15));
-
-        this.renderer.setSize(window.innerWidth, window.innerHeight);
-
-        this.domElement = document.getElementById(domElementId);
-        this.domElement.appendChild(this.renderer.domElement);
-        window.addEventListener('resize', this.onWindowResize.bind(this));
-
         this.camera = new Camera(
             this.renderer.domElement,
-            this.starSystem.getObjectReferenceFrameId(
+            ReferenceFrameFactory.buildId(
                 this.starSystem.mainObject,
                 ReferenceFrame.INERTIAL_BODY_EQUATORIAL
             ),
@@ -45,7 +48,7 @@ export default class Simulation
 
         this.raycaster = new VisualRaycaster(this.renderer.domElement, this.camera.threeCamera, 7);
 
-        this.ui = new UI(5, this.starSystem.getObjectNames());
+        this.ui = new UI();
 
         document.dispatchEvent(new CustomEvent(Events.INIT_DONE));
 
@@ -58,6 +61,14 @@ export default class Simulation
 
     get currentEpoch() {
         return this.time.epoch;
+    }
+
+    initSettings() {
+        this.settings = {
+            ui: {
+                showAnglesOfSelectedOrbit: true
+            }
+        }
     }
 
     addEventListener(eventName, listener, priority) {

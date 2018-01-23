@@ -1,6 +1,7 @@
 import ReferenceFrameFactory from "./ReferenceFrame/Factory";
 import EphemerisObject from "./EphemerisObject";
 import Body from "./Body";
+import {Events} from "./Events";
 
 export const STAR_SYSTEM_BARYCENTER = 0;
 
@@ -35,18 +36,6 @@ export default class StarSystem
         this.referenceFrames[frame.id] = frame;
     }
 
-    getObjectReferenceFrameId(objectId, referenceFrameType) {
-        return objectId * 100000 + referenceFrameType * 1000;
-    }
-
-    getReferenceFrameIdObject(referenceFrameId) {
-        return Math.floor(referenceFrameId / 100000);
-    }
-
-    getReferenceFrameIdType(referenceFrameId) {
-        return Math.floor((referenceFrameId % 100000)/ 1000);
-    }
-
     getReferenceFrame(id) {
         if (this.referenceFrames[id] === undefined) {
             this.referenceFrames[id] = ReferenceFrameFactory.createById(id);
@@ -78,6 +67,13 @@ export default class StarSystem
         return this.objects[id];
     }
 
+    isBody(objectId) {
+        if (this.objects[objectId] === undefined) {
+            return null;
+        }
+        return this.objects[objectId] instanceof Body;
+    }
+
     getObjectNames() {
         let names = {};
         for (const object of Object.values(this.objects)) {
@@ -98,6 +94,10 @@ export default class StarSystem
 
     addObject(id, body) {
         this.objects[id] = body;
+        document.dispatchEvent(new CustomEvent(
+            Events.OBJECT_ADDED,
+            {detail: {object: body}}
+        ));
     }
 
     deleteObject(id) {

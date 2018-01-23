@@ -22,7 +22,7 @@ export default class EphemerisObject
             return null;
         }
 
-        return sim.starSystem.getReferenceFrameIdObject(rf.id);
+        return rf.originId;
     }
 
     getPositionByEpoch(epoch, referenceFrame) {

@@ -24,7 +24,7 @@ function firstRender(curTime) {
 }
 
 function render(curTime) {
-    sim.tick(curTime - globalTime);
+    sim.tick((curTime - globalTime) / 1000);
 
     globalTime = curTime;
     statistics.update();

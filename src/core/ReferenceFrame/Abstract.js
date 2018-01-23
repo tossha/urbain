@@ -1,13 +1,14 @@
 import {Quaternion, Vector} from "../../algebra";
 import StateVector from "../StateVector";
 import {RF_BASE} from "./Factory";
+import ReferenceFrameFactory from "./Factory";
 
 export default class ReferenceFrameAbstract
 {
     setId(id) {
         this.id = id;
-        this.originId = sim.starSystem.getReferenceFrameIdObject(id);
-        this.type = sim.starSystem.getReferenceFrameIdType(id);
+        this.originId = ReferenceFrameFactory.getOriginIdByReferenceFrameId(id);
+        this.type = ReferenceFrameFactory.getTypeByReferenceFrameId(id);
         return this;
     }
 

@@ -1,83 +1,84 @@
 button {
-  float: right;
-  background-color: #666;
-  border: 1px solid #999;
+    float: right;
+    background-color: #666;
+    border: 1px solid #999;
 }
 
 button:hover {
-  background-color: #999;
+    background-color: #999;
 }
 
 #leftPanel {
-  position: absolute;
-  left: 0;
-  top: 0;
-  margin-right: auto;
-  margin-bottom: auto;
-  background-color: black;
-  opacity: 1;
-  font: 13px/1.231 "Lucida Grande", Lucida, Verdana, sans-serif;
+    position: absolute;
+    left: 0;
+    top: 0;
+    margin-right: auto;
+    margin-bottom: auto;
+    background-color: black;
+    opacity: 1;
+    font: 13px/1.231 "Lucida Grande", Lucida, Verdana, sans-serif;
 }
 
 #bottomPanel {
-  position: absolute;
-  bottom: 0;
-  left: 5%;
-  margin-left: auto;
-  margin-right: auto;
-  width: 90%;
-  pointer-events: none;
+    position: absolute;
+    bottom: 0;
+    left: 5%;
+    margin-left: auto;
+    margin-right: auto;
+    width: 90%;
+    pointer-events: none;
 }
 
 #timeLineCanvas {
-  height: 35px;
-  pointer-events: auto;
+    height: 35px;
+    pointer-events: auto;
 }
 
 #metricsPanel {
-  position: absolute;
-  top: 0;
-  right: 0;
+    position: absolute;
+    top: 0;
+    right: 0;
 }
 
 #metricsHeader {
-  width: 280px;
+    min-width: 280px;
 }
 
 #timeBoxHeader {
-  width: 300px;
+    min-width: 300px;
 }
 
 #cameraBoxHeader {
-  width: 235px;
+    min-width: 235px;
 }
 
 #pauseButton {
-  width: 65px;
+    width: 65px;
 }
 
 .panel {
-  display: inline-block;
-  border: 1px solid black;
-  background-color: #1a1a1a;
-  color: white;
-  font-family: monospace;
-  font-size: 14px;
-  pointer-events: auto;
+    display: inline-block;
+    border: 1px solid black;
+    background-color: #1a1a1a;
+    color: white;
+    font-family: monospace;
+    font-size: 14px;
+    pointer-events: auto;
 }
 
 .panelHeader {
-  font-weight: bold;
+    font-weight: bold;
+    width: 100%;
 }
 
 .panelHeader td {
-  text-align: center;
+    text-align: center;
 }
 
 .metrics {
-  width: 100%;
+    width: 100%;
 }
 
-.toggleButton {
-  width: 49px;
+.collapseButton {
+    width: 49px;
 }

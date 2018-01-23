@@ -1,6 +1,7 @@
 import {Quaternion, Vector} from "../algebra";
 import {ReferenceFrame, RF_BASE} from "./ReferenceFrame/Factory";
 import {Events} from "./Events";
+import ReferenceFrameFactory from "./ReferenceFrame/Factory";
 
 export default class Camera
 {
@@ -63,26 +64,41 @@ export default class Camera
         return rollQuaternion.mul(directionQuaternion);
     }
 
+    getAvailableFrameTypes(orbitingPoint) {
+        const isBody = sim.starSystem.isBody((orbitingPoint === undefined) ? this.orbitingPoint : orbitingPoint);
+
+        if (isBody === null) {
+            return [];
+        }
+
+        if (isBody) {
+            return [
+                ReferenceFrame.INERTIAL_ECLIPTIC,
+                ReferenceFrame.INERTIAL_BODY_EQUATORIAL,
+                ReferenceFrame.INERTIAL_BODY_FIXED
+            ];
+        } else {
+            return [
+                ReferenceFrame.INERTIAL_ECLIPTIC,
+                ReferenceFrame.INERTIAL_PARENT_BODY_EQUATORIAL
+            ];
+        }
+    }
+
     changeReferenceFrameType(newType) {
-        this.changeReferenceFrame(sim.starSystem.getObjectReferenceFrameId(this.orbitingPoint, newType), true);
+        this.changeReferenceFrame(ReferenceFrameFactory.buildId(this.orbitingPoint, newType), true);
     }
 
     changeOrigin(newObjectId) {
-        this.changeReferenceFrame(sim.starSystem.getObjectReferenceFrameId(newObjectId, this.frameType), true);
+        const newFrameTypes = this.getAvailableFrameTypes(newObjectId);
+        let newFrameType = (newFrameTypes.indexOf(this.frameType) !== -1)
+            ? this.frameType
+            : ReferenceFrame.INERTIAL_ECLIPTIC;
+        this.changeReferenceFrame(ReferenceFrameFactory.buildId(newObjectId, newFrameType), true);
     }
 
     changeReferenceFrame(newFrameId, animate) {
-        let newFrame = sim.starSystem.getReferenceFrame(newFrameId);
-
-        if (newFrame === null) {
-            newFrame = sim.starSystem.getReferenceFrame(
-                sim.starSystem.getObjectReferenceFrameId(
-                    sim.starSystem.getReferenceFrameIdObject(newFrameId),
-                    ReferenceFrame.INERTIAL_ECLIPTIC
-                )
-            );
-
-        }
+        const newFrame = sim.starSystem.getReferenceFrame(newFrameId);
 
         this.position = this.referenceFrame.transformPositionByEpoch(sim.currentEpoch, this.position, newFrame);
         this.isLookingAside = false;
@@ -256,9 +272,3 @@ export default class Camera
         this.lastPosition = this.referenceFrame.transformPositionByEpoch(epoch, this.position, RF_BASE);
     }
 }
-
-Camera.selectableReferenceFrameTypes = {
-    [ReferenceFrame.INERTIAL_ECLIPTIC]: 'Ecliptic',
-    [ReferenceFrame.INERTIAL_BODY_EQUATORIAL]: 'Equatorial',
-    [ReferenceFrame.INERTIAL_BODY_FIXED]: 'Body fixed',
-};
