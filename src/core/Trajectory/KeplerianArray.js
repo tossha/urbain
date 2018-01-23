@@ -13,31 +13,13 @@ export default class TrajectoryKeplerianArray extends TrajectoryKeplerianAbstrac
 
     addState(keplerianObject) {
         this.keplerianObjects.push(keplerianObject);
-
-        if ((this.minEpoch === null)
-            || (keplerianObject.epoch < this.minEpoch)
-        ) {
-            this.minEpoch = keplerianObject.epoch;
-        }
-
-        if ((this.maxEpoch === null)
-            || (keplerianObject.epoch > this.maxEpoch)
-        ) {
-            this.maxEpoch = keplerianObject.epoch;
-        }
     }
 
     getKeplerianObjectByEpoch(epoch) {
-        if ((this.minEpoch === null)
-            || (this.maxEpoch === null)
-        ) {
-            return null;
-        }
-
-        if (epoch <= this.minEpoch) {
+        if ((this.minEpoch === null) || (epoch <= this.minEpoch)) {
             return this.keplerianObjects[0];
         }
-        if (epoch >= this.maxEpoch) {
+        if ((this.maxEpoch === null) || (epoch >= this.maxEpoch)) {
             return this.keplerianObjects[this.keplerianObjects.length - 1];
         }
 

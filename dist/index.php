@@ -34,17 +34,17 @@ require 'functions.php';
 <body>
 <div id="leftPanel"></div>
 <div id="viewport"></div>
-<div id="metricsPanel" class="panel">
+<div id="metricsPanel" class="panel" data-panel-name="metrics">
     <table id="metricsHeader" class="panelHeader">
         <tr>
             <td>
                 Metrics
-                <?= generateToggleButton('metrics') ?>
+                <button class="collapseButton" data-panel-name="metrics"></button>
             </td>
         </tr>
     </table>
 
-    <table class="metrics">
+    <table class="panelContent" data-panel-name="metrics">
         <tr>
             <td style="width: 80px"><b>of</b></td>
             <td id="metricsOf"></td>
@@ -55,7 +55,7 @@ require 'functions.php';
         </tr>
     </table>
 
-    <table class="metrics">
+    <table class="panelContent" data-panel-name="metrics">
         <tr>
             <td colspan="3">
                 <label for="showAnglesOfSelectedOrbit">Show angles of selected orbit</label>
@@ -72,63 +72,82 @@ require 'functions.php';
         </tr>
 
         <?php foreach ([
-                           ['Ecc', ''],
-                           ['SMA', 'km'],
-                           ['Inc', 'deg.'],
-                           ['AoP', 'deg.'],
-                           ['RAAN', 'deg.'],
-                           ['TA', 'deg.'],
-                           ['Period', 'days'],
-                       ] as $param) { ?>
+               ['Ecc', ''],
+               ['SMA', 'km'],
+               ['Inc', 'deg.'],
+               ['AoP', 'deg.'],
+               ['RAAN', 'deg.'],
+               ['TA', 'deg.'],
+               ['Period', 'days'],
+           ] as $param) { ?>
         <tr>
             <td style="width: 60px"><?= $param[0] ?></td>
-            <td id="<?= strtolower($param[0]) ?>Value" align="right"></td>
+            <td id="elements-<?= strtolower($param[0]) ?>" align="right"></td>
             <td style="width: 60px"><?= $param[1] ?></td>
         </tr>
         <?php } ?>
     </table>
 
-    <table class="metrics">
+    <table class="panelContent" data-panel-name="metrics">
         <tr>
             <td colspan="6">Cartesian</td>
         </tr>
-
-        <?php foreach ([
-                           ['Position', 'km'],
-                           ['Velocity', 'km/s']
-                       ] as $type) { ?>
-        <tr>
-            <td style="width: 65px"><?= $type[0] ?></td>
-            <td id="<?= strtolower($type[0]) ?>Mag" align="right"></td>
-            <td style="width: 60px"><?= $type[1] ?></td>
-            <td style="width: 49px">
-                <?= generateToggleButton(strtolower($type[0]) . "Coordinate") ?>
-            </td>
-        </tr>
-
-        <?php foreach (['x', 'y', 'z'] as $coord) { ?>
-        <tr class="<?= strtolower($type[0]) ?>Coordinate trajectoryParameter">
-            <td><?= $coord ?></td>
-            <td id="<?= strtolower($type[0]) . strtoupper($coord) ?>" align="right"></td>
-            <td><?= $type[1] ?></td>
-            <td></td>
-        </tr>
-        <?php } ?>
-        <?php } ?>
     </table>
+
+    <div class="panelContent" data-panel-name="metrics">
+        <table data-panel-name="position_vector" width="100%">
+            <tr>
+                <td style="width: 65px">Position</td>
+                <td class="vec-magnitude" align="right"></td>
+                <td style="width: 60px">km</td>
+                <td style="width: 49px">
+                    <button class="collapseButton" data-panel-name="position_vector"></button>
+                </td>
+            </tr>
+
+            <?php foreach (['x', 'y', 'z'] as $coord) { ?>
+            <tr class="panelContent" data-panel-name="position_vector">
+                <td><?= $coord ?></td>
+                <td class="vec-<?= $coord ?>" align="right"></td>
+                <td>km</td>
+            </tr>
+            <?php } ?>
+        </table>
+    </div>
+
+    <div class="panelContent" data-panel-name="metrics">
+        <table data-panel-name="velocity_vector" width="100%">
+            <tr>
+                <td style="width: 65px">Velocity</td>
+                <td class="vec-magnitude" align="right"></td>
+                <td style="width: 60px">km/s</td>
+                <td style="width: 49px">
+                    <button class="collapseButton" data-panel-name="velocity_vector"></button>
+                </td>
+            </tr>
+
+            <?php foreach (['x', 'y', 'z'] as $coord) { ?>
+            <tr class="panelContent" data-panel-name="velocity_vector">
+                <td><?= $coord ?></td>
+                <td class="vec-<?= $coord ?>" align="right"></td>
+                <td>km/s</td>
+            </tr>
+            <?php } ?>
+        </table>
+    </div>
 </div>
 <div id="bottomPanel">
-    <div class="panel">
+    <div class="panel" id="timePanel" data-panel-name="time">
         <table id="timeBoxHeader" class="panelHeader">
             <tr>
                 <td>
                     Time
-                    <?= generateToggleButton('timeBox') ?>
+                    <button class="collapseButton" data-panel-name="time"></button>
                 </td>
             </tr>
         </table>
 
-        <table class="timeBox" style="width: 100%">
+        <table class="panelContent"  data-panel-name="time" style="width: 100%">
 
             <tr>
                 <td style="width: 65px"><b>Current:</b></td>
@@ -136,7 +155,7 @@ require 'functions.php';
                 <td id="currentDateValue">01.01.2000 12:00:00</td>
 
                 <td style="width: 70px">
-                    <button onclick="sim.time.useCurrentTime()">Now</button>
+                    <button id="useCurrentTime">Now</button>
                 </td>
             </tr>
 
@@ -144,7 +163,7 @@ require 'functions.php';
                 <td><b>Rate:</b></td>
                 <td id="timeScaleValue"></td>
                 <td>
-                    <button onclick="sim.ui.useRealTimeScale()">Real</button>
+                    <button id="setRealTimeScale">Real</button>
                 </td>
             </tr>
 
@@ -155,23 +174,23 @@ require 'functions.php';
                 </td>
 
                 <td>
-                    <button id="pauseButton">Pause</button>
+                    <button id="pauseButton" tabindex="-1">Pause</button>
                 </td>
             </tr>
         </table>
     </div>
 
-    <div class="panel">
+    <div class="panel" id="cameraPanel" data-panel-name="camera">
         <table id="cameraBoxHeader" class="panelHeader">
             <tr>
                 <td>
                     Camera
-                    <?= generateToggleButton('cameraBox') ?>
+                    <button class="collapseButton" data-panel-name="camera"></button>
                 </td>
             </tr>
         </table>
 
-        <table class="cameraBox">
+        <table class="panelContent" data-panel-name="camera">
             <tr>
                 <td><b>Target:</b></td>
                 <td colspan="2">

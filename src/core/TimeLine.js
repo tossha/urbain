@@ -1,3 +1,5 @@
+import {Events} from "./Events";
+
 export const J2000_TIMESTAMP = 946728000;
 
 export default class TimeLine
@@ -44,12 +46,18 @@ export default class TimeLine
     }
 
     setTimeScale(newScale) {
+        document.dispatchEvent(new CustomEvent(
+            Events.TIME_SCALE_CHANGED,
+            {detail: {old: this.timeScale, new: newScale}}
+        ));
         this.timeScale = newScale;
     }
 
     togglePause() {
         this.isTimeRunning = !this.isTimeRunning;
-        sim.ui.togglePause();
+        document.dispatchEvent(new CustomEvent(
+            this.isTimeRunning ? Events.TIME_UNPAUSED : Events.TIME_PAUSED
+        ));
     }
 
     tick(timePassed) {
@@ -66,7 +74,14 @@ export default class TimeLine
             this.epoch += this.timeScale * timePassed;
         }
 
-        sim.ui.updateTime(new Date((J2000_TIMESTAMP + this.epoch) * 1000));
+        document.dispatchEvent(new CustomEvent(
+            Events.EPOCH_CHANGED,
+            {detail: {
+                epoch: this.epoch,
+                date: new Date((J2000_TIMESTAMP + this.epoch) * 1000)
+            }}
+        ));
+
         this.redraw();
     }
 
@@ -76,7 +91,7 @@ export default class TimeLine
     }
 
     useCurrentTime() {
-        this.forceEpoch(TimeLine.getEpochByDate(new Date));
+        this.forceEpoch(TimeLine.getEpochByDate(new Date()));
     }
 
     redraw() {
@@ -262,36 +277,6 @@ export default class TimeLine
             return (date.getYear() + 1900) + '';
         }
         return date.toString();
-    }
-
-    formatRate(rate, precision) {
-        const prefix = (rate < 0) ? '-' : '';
-        const abs = Math.abs(rate);
-        if (abs === 0) {
-            return '0';
-        }
-
-        if (abs < 60) {
-            return prefix + abs.toPrecision(precision) + ' s/s';
-        }
-
-        if (abs < 3600) {
-            return prefix + (abs / 60).toPrecision(precision) + ' min/s';
-        }
-
-        if (abs < 86400) {
-            return prefix + (abs / 3600).toPrecision(precision) + ' h/s';
-        }
-
-        if (abs < 2592000) {
-            return prefix + (abs / 86400).toPrecision(precision) + ' days/s';
-        }
-
-        if (abs < 31557600) {
-            return prefix + (abs / 2592000).toPrecision(precision) + ' months/s';
-        }
-
-        return prefix + (abs / 31557600).toPrecision(precision) + ' years/s';
     }
 
     onMouseDown(e) {

@@ -34,6 +34,24 @@ export default class ReferenceFrameFactory
             } else {
                 res = null;
             }
+        } else if (type == ReferenceFrame.INERTIAL_PARENT_BODY_EQUATORIAL) {
+            res = new ReferenceFrameInertialDynamic(
+                new FunctionOfEpochObjectState(config.origin, RF_BASE),
+                new FunctionOfEpochCustom((epoch) => {
+                    const parentId = sim.starSystem.getObject(config.origin).getParentObjectIdByEpoch(epoch);
+                    const parent = sim.starSystem.getObject(parentId);
+
+                    if (parent instanceof Body) {
+                        const z = parent.orientation.getQuaternionByEpoch(epoch).rotate_(new Vector([0, 0, 1]));
+                        const equinox = z.cross(new Vector([0, 0, 1]));
+                        return Quaternion.transfer(new Vector([0, 0, 1]), z).mul(
+                            Quaternion.transfer(new Vector([1, 0, 0]), equinox)
+                        );
+                    } else {
+                        return new Quaternion();
+                    }
+                })
+            );
         } else if (type == ReferenceFrame.INERTIAL_BODY_FIXED) {
             if (sim.starSystem.getObject(config.origin) instanceof Body) {
                 res = new ReferenceFrameBodyFixed(
@@ -88,17 +106,25 @@ export default class ReferenceFrameFactory
         return res ? res.setId(id) : null;
     }
 
+    static getOriginIdByReferenceFrameId(referenceFrameId) {
+        return Math.sign(referenceFrameId) * Math.floor(Math.abs(referenceFrameId) / 100000);
+    }
+
+    static getTypeByReferenceFrameId(referenceFrameId) {
+        return Math.floor((Math.abs(referenceFrameId) % 100000) / 1000);
+    }
+
     static createById(id) {
-        const type = Math.floor(id / 1000) % 100;
-        const origin = Math.floor(id / 100000);
+        const type = this.getTypeByReferenceFrameId(id);
 
         if ((type === ReferenceFrame.INERTIAL_ECLIPTIC)
             || (type === ReferenceFrame.INERTIAL_BODY_EQUATORIAL)
             || (type === ReferenceFrame.INERTIAL_BODY_FIXED)
             || (type === ReferenceFrame.ICRF)
             || (type === ReferenceFrame.BODY_FIXED)
+            || (type === ReferenceFrame.INERTIAL_PARENT_BODY_EQUATORIAL)
         ) {
-            return this.create(id, type, {origin: origin});
+            return this.create(id, type, {origin: this.getOriginIdByReferenceFrameId(id)});
         }
 
         return null;
@@ -110,23 +136,12 @@ export default class ReferenceFrameFactory
             || (type === ReferenceFrame.INERTIAL_BODY_FIXED)
             || (type === ReferenceFrame.ICRF)
             || (type === ReferenceFrame.BODY_FIXED)
+            || (type === ReferenceFrame.INERTIAL_PARENT_BODY_EQUATORIAL)
         ) {
-            return origin * 100000 + type * 1000;
+            return Math.sign(origin) * (Math.abs(origin) * 100000 + type * 1000);
         }
 
         return null;
-    }
-
-    static getTypeNames() {
-        return {
-            [ReferenceFrame.INERTIAL_ECLIPTIC]: 'Ecliptic',
-            [ReferenceFrame.INERTIAL_BODY_EQUATORIAL]: 'Ecliptic',
-            [ReferenceFrame.INERTIAL_BODY_FIXED]: 'Ecliptic',
-            [ReferenceFrame.INERTIAL_ECLIPTIC]: 'Ecliptic',
-            [ReferenceFrame.INERTIAL_ECLIPTIC]: 'Ecliptic',
-            [ReferenceFrame.INERTIAL_ECLIPTIC]: 'Ecliptic',
-            [ReferenceFrame.INERTIAL_ECLIPTIC]: 'Ecliptic',
-        }
     }
 }
 
@@ -141,4 +156,5 @@ export const ReferenceFrame = {
     ICRF: 5,
     BODY_FIXED: 6,
     TOPOCENTRIC: 7,
+    INERTIAL_PARENT_BODY_EQUATORIAL: 8,
 };
