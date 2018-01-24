@@ -1,7 +1,7 @@
 import {Quaternion, Vector} from "../algebra";
-import {ReferenceFrame, RF_BASE} from "./ReferenceFrame/Factory";
-import {Events} from "./Events";
-import ReferenceFrameFactory from "./ReferenceFrame/Factory";
+import {ReferenceFrame, RF_BASE} from "../core/ReferenceFrame/Factory";
+import {Events} from "../core/Events";
+import ReferenceFrameFactory from "../core/ReferenceFrame/Factory";
 
 export default class Camera
 {
@@ -61,17 +61,23 @@ export default class Camera
             Math.acos(newUp.dot(neededUp) / neededUp.mag)
         );
 
-        return rollQuaternion.mul(directionQuaternion);
+        return rollQuaternion.mul_(directionQuaternion);
     }
 
     getAvailableFrameTypes(orbitingPoint) {
-        const isBody = sim.starSystem.isBody((orbitingPoint === undefined) ? this.orbitingPoint : orbitingPoint);
+        if (orbitingPoint === undefined) {
+            orbitingPoint = this.orbitingPoint;
+        }
+
+        if (orbitingPoint == 0) {
+            return [ReferenceFrame.INERTIAL_ECLIPTIC];
+        }
+
+        const isBody = sim.starSystem.isBody(orbitingPoint);
 
         if (isBody === null) {
             return [];
-        }
-
-        if (isBody) {
+        } else if (isBody) {
             return [
                 ReferenceFrame.INERTIAL_ECLIPTIC,
                 ReferenceFrame.INERTIAL_BODY_EQUATORIAL,
@@ -123,7 +129,7 @@ export default class Camera
     startAnimation(newFrame) {
         if (newFrame) {
             let transferQuaternion = this.referenceFrame.getQuaternionByEpoch(sim.currentEpoch).invert_().mul_(newFrame.getQuaternionByEpoch(sim.currentEpoch));
-            this.quaternion = transferQuaternion.invert_().mul(this.quaternion);
+            this.quaternion = transferQuaternion.invert_().mul_(this.quaternion);
         }
 
         this.animationStartingTime = (new Date()).getTime();
@@ -244,12 +250,16 @@ export default class Camera
         this.threeCamera.updateProjectionMatrix();
     }
 
+    getTopDirection(epoch) {
+        return this.referenceFrame.getQuaternionByEpoch(epoch).mul_(this.quaternion).rotate_(new Vector([0,1,0]));
+    }
+
     update(epoch) {
         const rfQuaternion = this.referenceFrame.getQuaternionByEpoch(epoch);
         let mouseShift = this.currentMousePos.sub(this.accountedMousePos);
 
         if (this.isAnimnating) {
-            this.animate()
+            this.animate();
         }
 
         if (mouseShift[0] || mouseShift[1]) {
@@ -262,7 +272,7 @@ export default class Camera
                 : this.position.cross(pole);
 
             let verticalQuaternion = new Quaternion(verticalRotationAxis, Math.min(Math.max(mouseShift[1] * sensitivity, poleAngle - Math.PI + polarConstraint), poleAngle - polarConstraint));
-            let mainQuaternion = (new Quaternion()).setAxisAngle(pole, -mouseShift[0] * sensitivity).mul_(verticalQuaternion);
+            let mainQuaternion = (new Quaternion(pole, -mouseShift[0] * sensitivity)).mul_(verticalQuaternion);
 
             if (!this.rightButtonDown) {
                 mainQuaternion.rotate_(this.position);

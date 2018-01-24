@@ -1,4 +1,4 @@
-import VisualModelAbstract from "./ModelAbstract";
+import VisualModelAbstract from "../visual/ModelAbstract";
 import {Events} from "../core/Events";
 
 export default class SelectionHandler extends VisualModelAbstract

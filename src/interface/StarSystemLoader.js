@@ -21,7 +21,7 @@ export default class StarSystemLoader
         // Loading main object
         starSystem.mainObject = config.mainObject;
 
-        starSystem.setMainStars(config.mainStars);
+        starSystem.addObject(0, new EphemerisObject(0, EphemerisObject.TYPE_POINT, 'Star system barycenter'));
 
         // Loading objects
         for (const objectConfig of config.objects) {
@@ -113,6 +113,7 @@ export default class StarSystemLoader
         if (visualModel || physicalModel || orientation) {
             object = new Body(
                 config.id,
+                config.type || EphemerisObject.TYPE_UNKNOWN,
                 config.name,
                 visualModel,
                 physicalModel,
@@ -121,6 +122,7 @@ export default class StarSystemLoader
         } else {
             object = new EphemerisObject(
                 config.id,
+                config.type || EphemerisObject.TYPE_UNKNOWN,
                 config.name
             );
         }

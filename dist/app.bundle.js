@@ -276,7 +276,7 @@ class Quaternion
     }
 
     static mul(q1, q2) {
-        return q1.copy().mul(q2);
+        return q1.copy().mul_(q2);
     }
 
     static transfer(fromVector, toVector) {
@@ -365,8 +365,7 @@ class Quaternion
     }
 
     invert() {
-        return this.invert_();
-        // return this.copy().invert_();
+        return this.copy().invert_();
     }
 
     normalize_() {
@@ -377,8 +376,7 @@ class Quaternion
     }
 
     normalize() {
-        return this.normalize_();
-        // return this.copy().normalize_();
+        return this.copy().normalize_();
     }
 
     rotate_(vector) {
@@ -413,7 +411,7 @@ class Quaternion
     }
 
     mul(quat) {
-        return this.mul_(quat);
+        return this.copy().mul_(quat);
     }
 
     setAxisAngle(axis, angle) {
@@ -615,7 +613,7 @@ class ReferenceFrameFactory
                     new __WEBPACK_IMPORTED_MODULE_2__FunctionOfEpoch_Custom__["a" /* default */]((epoch) => {
                         const z = sim.starSystem.getObject(config.origin).orientation.getQuaternionByEpoch(epoch).rotate_(new __WEBPACK_IMPORTED_MODULE_1__algebra__["c" /* Vector */]([0, 0, 1]));
                         const equinox = z.cross(new __WEBPACK_IMPORTED_MODULE_1__algebra__["c" /* Vector */]([0, 0, 1]));
-                        return __WEBPACK_IMPORTED_MODULE_1__algebra__["a" /* Quaternion */].transfer(new __WEBPACK_IMPORTED_MODULE_1__algebra__["c" /* Vector */]([0, 0, 1]), z).mul(
+                        return __WEBPACK_IMPORTED_MODULE_1__algebra__["a" /* Quaternion */].transfer(new __WEBPACK_IMPORTED_MODULE_1__algebra__["c" /* Vector */]([0, 0, 1]), z).mul_(
                             __WEBPACK_IMPORTED_MODULE_1__algebra__["a" /* Quaternion */].transfer(new __WEBPACK_IMPORTED_MODULE_1__algebra__["c" /* Vector */]([1, 0, 0]), equinox)
                         );
                     })
@@ -633,7 +631,7 @@ class ReferenceFrameFactory
                     if (parent instanceof __WEBPACK_IMPORTED_MODULE_8__Body__["a" /* default */]) {
                         const z = parent.orientation.getQuaternionByEpoch(epoch).rotate_(new __WEBPACK_IMPORTED_MODULE_1__algebra__["c" /* Vector */]([0, 0, 1]));
                         const equinox = z.cross(new __WEBPACK_IMPORTED_MODULE_1__algebra__["c" /* Vector */]([0, 0, 1]));
-                        return __WEBPACK_IMPORTED_MODULE_1__algebra__["a" /* Quaternion */].transfer(new __WEBPACK_IMPORTED_MODULE_1__algebra__["c" /* Vector */]([0, 0, 1]), z).mul(
+                        return __WEBPACK_IMPORTED_MODULE_1__algebra__["a" /* Quaternion */].transfer(new __WEBPACK_IMPORTED_MODULE_1__algebra__["c" /* Vector */]([0, 0, 1]), z).mul_(
                             __WEBPACK_IMPORTED_MODULE_1__algebra__["a" /* Quaternion */].transfer(new __WEBPACK_IMPORTED_MODULE_1__algebra__["c" /* Vector */]([1, 0, 0]), equinox)
                         );
                     } else {
@@ -727,7 +725,7 @@ class ReferenceFrameFactory
             || (type === ReferenceFrame.BODY_FIXED)
             || (type === ReferenceFrame.INERTIAL_PARENT_BODY_EQUATORIAL)
         ) {
-            return Math.sign(origin) * (Math.abs(origin) * 100000 + type * 1000);
+            return (origin ? Math.sign(origin) : 1) * (Math.abs(origin) * 100000 + type * 1000);
         }
 
         return null;
@@ -2008,8 +2006,8 @@ class KeplerianObject
 
     getOrbitalFrameQuaternion() {
         return (new __WEBPACK_IMPORTED_MODULE_0__algebra__["a" /* Quaternion */](new __WEBPACK_IMPORTED_MODULE_0__algebra__["c" /* Vector */]([0, 0, 1]), this._raan))
-            .mul(new __WEBPACK_IMPORTED_MODULE_0__algebra__["a" /* Quaternion */](new __WEBPACK_IMPORTED_MODULE_0__algebra__["c" /* Vector */]([1, 0, 0]), this._inc))
-            .mul(new __WEBPACK_IMPORTED_MODULE_0__algebra__["a" /* Quaternion */](new __WEBPACK_IMPORTED_MODULE_0__algebra__["c" /* Vector */]([0, 0, 1]), this._aop))
+            .mul_(new __WEBPACK_IMPORTED_MODULE_0__algebra__["a" /* Quaternion */](new __WEBPACK_IMPORTED_MODULE_0__algebra__["c" /* Vector */]([1, 0, 0]), this._inc))
+            .mul_(new __WEBPACK_IMPORTED_MODULE_0__algebra__["a" /* Quaternion */](new __WEBPACK_IMPORTED_MODULE_0__algebra__["c" /* Vector */]([0, 0, 1]), this._aop))
         ;
     }
 
@@ -2378,7 +2376,7 @@ class TrajectoryKeplerianAbstract extends __WEBPACK_IMPORTED_MODULE_0__Abstract_
                 return that.referenceFrame.getOriginStateByEpoch(epoch);
             }),
             new __WEBPACK_IMPORTED_MODULE_1__FunctionOfEpoch_Custom__["a" /* default */]((epoch) => {
-                return that.referenceFrame.getQuaternionByEpoch(epoch).mul(
+                return that.referenceFrame.getQuaternionByEpoch(epoch).mul_(
                     that.getKeplerianObjectByEpoch(epoch).getOrbitalFrameQuaternion()
                 );
             })
@@ -2544,8 +2542,8 @@ class ReferenceFrameAbstract
 
 class Body extends __WEBPACK_IMPORTED_MODULE_0__EphemerisObject__["a" /* default */]
 {
-    constructor(bodyId, name, visualModel, physicalModel, orientation) {
-        super(bodyId, name);
+    constructor(bodyId, type, name, visualModel, physicalModel, orientation) {
+        super(bodyId, type, name);
 
         this.visualModel   = visualModel;    // class VisualBodyModelBasic
         this.physicalModel = physicalModel;  // class PhysicalBodyModel
@@ -2569,8 +2567,9 @@ class Body extends __WEBPACK_IMPORTED_MODULE_0__EphemerisObject__["a" /* default
 
 class EphemerisObject
 {
-    constructor(bodyId, name) {
+    constructor(bodyId, type, name) {
         this.id   = bodyId;
+        this.type = type;
         this.name = name;
     }
 
@@ -2597,6 +2596,17 @@ class EphemerisObject
     }
 }
 /* harmony export (immutable) */ __webpack_exports__["a"] = EphemerisObject;
+
+
+EphemerisObject.TYPE_UNKNOWN    = 0;
+EphemerisObject.TYPE_STAR       = 1;
+EphemerisObject.TYPE_PLANET     = 2;
+EphemerisObject.TYPE_PLANETOID  = 3;
+EphemerisObject.TYPE_SATELLITE  = 4;
+EphemerisObject.TYPE_ASTEROID   = 5;
+EphemerisObject.TYPE_COMET      = 6;
+EphemerisObject.TYPE_SPACECRAFT = 7;
+EphemerisObject.TYPE_POINT      = 8;
 
 
 /***/ }),
@@ -2844,7 +2854,7 @@ class ReferenceFrameBodyFixed extends __WEBPACK_IMPORTED_MODULE_0__Abstract__["a
 
     stateVectorFromBaseReferenceFrameByEpoch(epoch, state) {
         const originState = this.getOriginStateByEpoch(epoch);
-        const rotation = this.getQuaternionByEpoch(epoch).invert();
+        const rotation = this.getQuaternionByEpoch(epoch).invert_();
 
         const destPos = rotation.rotate(state.position.sub_(originState.position));
         let destVel = rotation.rotate(state.velocity.sub_(originState.velocity));
@@ -2910,7 +2920,7 @@ class ReferenceFrameInertialAbstract extends __WEBPACK_IMPORTED_MODULE_0__Abstra
 
     stateVectorFromBaseReferenceFrameByEpoch(epoch, state) {
         const originState = this.stateOfEpoch.evaluate(epoch);
-        const rotation = this.getQuaternionByEpoch(epoch).invert();
+        const rotation = this.getQuaternionByEpoch(epoch).invert_();
 
         return new __WEBPACK_IMPORTED_MODULE_1__StateVector__["a" /* default */](
             rotation.rotate(state.position.sub_(originState.position)),
@@ -2955,357 +2965,7 @@ class ReferenceFrameInertialDynamic extends __WEBPACK_IMPORTED_MODULE_0__Inertia
 
 
 /***/ }),
-/* 21 */
-/***/ (function(module, __webpack_exports__, __webpack_require__) {
-
-"use strict";
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__Events__ = __webpack_require__(3);
-
-
-const J2000_TIMESTAMP = 946728000;
-/* unused harmony export J2000_TIMESTAMP */
-
-
-class TimeLine
-{
-    constructor(epoch, timeScale, isTimeRunning) {
-        this.epoch = epoch;
-        this.timeScale = timeScale;
-        this.isTimeRunning = isTimeRunning;
-
-        this.mouseState = {
-            x: 0,
-            y: 0,
-            leftButton: false,
-            rightButton: false
-        };
-
-        this.span = timeScale * 86400 * 5;
-
-        this.markDistance = 300;
-        this.scaleType = "month";
-
-        this.domElement = document.getElementById("timeLineCanvas");
-        this.canvasContext = this.domElement.getContext("2d");
-        this.canvasRect = {};
-        this.updateCanvasStyle();
-
-        this.leftEpoch = this.epoch - this.span / 2;
-
-        this.updateScaleType();
-
-        this.domElement.addEventListener("mousedown",  this.onMouseDown  .bind(this));
-        window         .addEventListener("mouseup",    this.onMouseUp    .bind(this));
-        window         .addEventListener("mousemove",  this.onMouseMove  .bind(this));
-        this.domElement.addEventListener("mousewheel", this.onMouseWheel .bind(this));
-
-        window.addEventListener('keypress', e => {
-            if (e.key === ' ') {
-                this.togglePause();
-            }
-        });
-
-        window.addEventListener("resize", this.updateCanvasStyle.bind(this));
-        window.oncontextmenu = () => false;
-    }
-
-    setTimeScale(newScale) {
-        document.dispatchEvent(new CustomEvent(
-            __WEBPACK_IMPORTED_MODULE_0__Events__["a" /* Events */].TIME_SCALE_CHANGED,
-            {detail: {old: this.timeScale, new: newScale}}
-        ));
-        this.timeScale = newScale;
-    }
-
-    togglePause() {
-        this.isTimeRunning = !this.isTimeRunning;
-        document.dispatchEvent(new CustomEvent(
-            this.isTimeRunning ? __WEBPACK_IMPORTED_MODULE_0__Events__["a" /* Events */].TIME_UNPAUSED : __WEBPACK_IMPORTED_MODULE_0__Events__["a" /* Events */].TIME_PAUSED
-        ));
-    }
-
-    tick(timePassed) {
-        if (this.mouseState.leftButton) {
-            this.epoch = this.leftEpoch + (this.mouseState.x
-                - this.canvasRect.left) * this.span / this.domElement.width;
-        } else if (this.isTimeRunning) {
-            if ((this.leftEpoch < this.epoch)
-                && (this.epoch < this.leftEpoch + this.span)
-            ) {
-                this.leftEpoch += this.timeScale * timePassed;
-            }
-
-            this.epoch += this.timeScale * timePassed;
-        }
-
-        document.dispatchEvent(new CustomEvent(
-            __WEBPACK_IMPORTED_MODULE_0__Events__["a" /* Events */].EPOCH_CHANGED,
-            {detail: {
-                epoch: this.epoch,
-                date: new Date((J2000_TIMESTAMP + this.epoch) * 1000)
-            }}
-        ));
-
-        this.redraw();
-    }
-
-    forceEpoch(newEpoch) {
-        this.epoch = newEpoch;
-        this.tick(0);
-    }
-
-    useCurrentTime() {
-        this.forceEpoch(TimeLine.getEpochByDate(new Date()));
-    }
-
-    redraw() {
-        this.canvasContext.fillStyle = "#222";
-        this.canvasContext.fillRect(0, 0, this.domElement.width, this.domElement.height);
-
-        this.canvasContext.fillStyle = "#2FA1D6";
-        this.drawCurrentTimeMark();
-
-        this.canvasContext.strokeStyle = "#fff";
-        this.canvasContext.fillStyle   = "#fff";
-        this.canvasContext.font        = "11pt sans-serif";
-
-        let markDate = this.roundDateUp(TimeLine.getDateByEpoch(this.leftEpoch));
-        let markEpoch = TimeLine.getEpochByDate(markDate);
-
-        while (markEpoch < this.leftEpoch + this.span) {
-            this.drawMark(this.getCanvasPositionByEpoch(markEpoch), this.formatDate(markDate));
-            markDate = this.nextRenderingDate(markDate);
-            markEpoch = TimeLine.getEpochByDate(markDate);
-        }
-    }
-
-    static getDateByEpoch(epoch) {
-        return new Date((J2000_TIMESTAMP + epoch) * 1000);
-    }
-
-    static getEpochByDate(date) {
-        return date / 1000 - J2000_TIMESTAMP;
-    }
-
-    getCanvasPositionByEpoch(epoch) {
-        return (epoch - this.leftEpoch) * this.domElement.width / this.span;
-    }
-
-    updateCanvasStyle() {
-        this.canvasRect = this.domElement.getBoundingClientRect();
-        this.domElement.width  = this.canvasRect.right  - this.canvasRect.left;
-        this.domElement.height = this.canvasRect.bottom - this.canvasRect.top;
-    }
-
-    updateScaleType() {
-        const secondsPerPeriod = this.markDistance * this.span / this.domElement.width;
-        let bestScale = false;
-
-        for (const scale in TimeLine.scales) {
-            if (!bestScale) {
-                bestScale = scale;
-                continue;
-            }
-
-            if (Math.abs(TimeLine.scales[bestScale] / secondsPerPeriod - 1)
-                > Math.abs(TimeLine.scales[scale] / secondsPerPeriod - 1)
-            ) {
-                bestScale = scale;
-            }
-        }
-
-        this.scaleType = bestScale;
-    }
-
-    drawMark(x, text) {
-        this.canvasContext.beginPath();
-        this.canvasContext.moveTo(x, 0);
-        this.canvasContext.lineTo(x, this.domElement.height / 2);
-        this.canvasContext.stroke();
-        this.canvasContext.fillText(
-            text,
-            x - this.canvasContext.measureText(text).width / 2,
-            this.domElement.height - 2
-        );
-    }
-
-    drawCurrentTimeMark() {
-        this.canvasContext.fillRect(0, 0, this.getCanvasPositionByEpoch(this.epoch), this.domElement.height);
-    }
-
-    roundDateUp(date) {
-        const d = new Date(date);
-        if (this.scaleType === "minute") {
-            d.setSeconds(60, 0);
-        } else if (this.scaleType === "fiveMinutes") {
-            d.setMinutes(5 + d.getMinutes() - d.getMinutes() % 5, 0, 0);
-        } else if (this.scaleType === "tenMinutes") {
-            d.setMinutes(10 + d.getMinutes() - d.getMinutes() % 10, 0, 0);
-        } else if (this.scaleType === "thirtyMinutes") {
-            d.setMinutes(30 + d.getMinutes() - d.getMinutes() % 30, 0, 0);
-        } else if (this.scaleType === "hour") {
-            d.setMinutes(60, 0, 0);
-        } else if (this.scaleType === "threeHours") {
-            d.setHours(3 + d.getHours() - d.getHours() % 3, 0, 0, 0);
-        } else if (this.scaleType === "sixHours") {
-            d.setHours(6 + d.getHours() - d.getHours() % 6, 0, 0, 0);
-        } else if (this.scaleType === "day") {
-            d.setHours(24, 0, 0, 0);
-        } else if (this.scaleType === "week") {
-            d.setHours(0, 0, 0, 0);
-            d.setDate(7 + d.getDate() - d.getDay());
-        } else if (this.scaleType === "month") {
-            d.setHours(0, 0, 0, 0);
-            d.setDate(1);
-            d.setMonth(d.getMonth() + 1);
-        } else if (this.scaleType === "threeMonths") {
-            d.setHours(0, 0, 0, 0);
-            d.setDate(1);
-            d.setMonth(3 + d.getMonth() - d.getMonth() % 3);
-        } else if (this.scaleType === "year") {
-            d.setHours(0, 0, 0, 0);
-            d.setMonth(0, 1);
-        } else if (this.scaleType === "fiveYears") {
-            d.setHours(0, 0, 0, 0);
-            d.setFullYear(5 + d.getFullYear() - d.getFullYear() % 5, 0, 1);
-        } else {
-            return;
-        }
-        return d;
-    }
-
-    nextRenderingDate(date) {
-        const d = new Date(date);
-        if (this.scaleType === "minute") {
-            d.setMinutes(d.getMinutes() + 1);
-        } else if (this.scaleType === "fiveMinutes") {
-            d.setMinutes(d.getMinutes() + 5);
-        } else if (this.scaleType === "tenMinutes") {
-            d.setMinutes(d.getMinutes() + 10);
-        } else if (this.scaleType === "thirtyMinutes") {
-            d.setMinutes(d.getMinutes() + 30);
-        } else if (this.scaleType === "hour") {
-            d.setHours(d.getHours() + 1);
-        } else if (this.scaleType === "threeHours") {
-            d.setHours(d.getHours() + 3);
-        } else if (this.scaleType === "sixHours") {
-            d.setHours(d.getHours() + 6);
-        } else if (this.scaleType === "day") {
-            d.setDate(d.getDate() + 1);
-        } else if (this.scaleType === "week") {
-            d.setDate(d.getDate() + 7);
-        } else if (this.scaleType === "month") {
-            d.setMonth(d.getMonth() + 1);
-        } else if (this.scaleType === "threeMonths") {
-            d.setMonth(d.getMonth() + 3);
-        } else if (this.scaleType === "year") {
-            d.setFullYear(d.getFullYear() + 1, d.getMonth(), d.getDate());
-        } else if (this.scaleType === "fiveYears") {
-            d.setFullYear(d.getFullYear() + 5, d.getMonth(), d.getDate());
-        } else {
-            return;
-        }
-        return d;
-    }
-
-    formatDate(date) {
-        if ((this.scaleType === "minute")
-            || (this.scaleType === "fiveMinutes")
-            || (this.scaleType === "tenMinutes")
-            || (this.scaleType === "thirtyMinutes")
-            || (this.scaleType === "hour")
-            || (this.scaleType === "threeHours")
-            || (this.scaleType === "sixHours")
-        ) {
-            let string = date.getYear() + 1900;
-            string += '-' + ((date.getMonth() + 1) + '').padStart(2, '0');
-            string += '-' + (date.getDate() + '').padStart(2, '0');
-            string += ' ' + (date.getHours() + '').padStart(2, '0');
-            string += ':' + (date.getMinutes() + '').padStart(2, '0');
-            return string;
-        } else if ((this.scaleType === "day")
-            || (this.scaleType === "week")
-        ) {
-            let string = date.getYear() + 1900;
-            string += '-' + ((date.getMonth() + 1) + '').padStart(2, '0');
-            string += '-' + (date.getDate() + '').padStart(2, '0');
-            return string;
-        } else if ((this.scaleType === "month")
-            || (this.scaleType === "threeMonths")
-        ) {
-            const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
-            return months[date.getMonth()] + ' ' + (date.getYear() + 1900);
-        } else if ((this.scaleType === "year")
-            || (this.scaleType === "fiveYears")
-        ) {
-            return (date.getYear() + 1900) + '';
-        }
-        return date.toString();
-    }
-
-    onMouseDown(e) {
-        if (e.button === 0) {
-            this.mouseState.leftButton = true;
-        } else if (e.button === 2) {
-            this.mouseState.rightButton = true;
-        }
-        return false;
-    }
-
-    onMouseUp(e) {
-        if (e.button === 0) {
-            this.mouseState.leftButton = false;
-        } else if (e.button === 2) {
-            this.mouseState.rightButton = false;
-        }
-        return false;
-    }
-
-    onMouseMove(e) {
-        if (this.mouseState.rightButton) {
-            this.leftEpoch += (this.mouseState.x - e.x) * this.span / this.domElement.width;
-        }
-
-        this.mouseState.x = e.x;
-        this.mouseState.y = e.y;
-        return false;
-    }
-
-    onMouseWheel(e) {
-        const stepMult = 1.3;
-        const mult = (e.deltaY > 0) ? stepMult : (1 / stepMult);
-        const newSpan = Math.min(Math.max(this.span * mult,
-            (this.canvasRect.right - this.canvasRect.left) / this.markDistance * TimeLine.scales.minute),
-            (this.canvasRect.right - this.canvasRect.left) / this.markDistance * TimeLine.scales.fiveYears);
-        this.leftEpoch += (this.mouseState.x - this.canvasRect.left)
-            * (this.span - newSpan) / (this.canvasRect.right - this.canvasRect.left);
-        this.span = newSpan;
-
-        this.updateScaleType();
-        return false;
-    }
-}
-/* harmony export (immutable) */ __webpack_exports__["a"] = TimeLine;
-
-
-TimeLine.scales = {
-    minute: 60,
-    fiveMinutes: 300,
-    tenMinutes: 600,
-    thirtyMinutes: 1800,
-    hour: 3600,
-    threeHours: 10800,
-    sixHours: 21600,
-    day: 86400,
-    week: 604800,
-    month: 2592000,
-    threeMonths: 7776000,
-    year: 31557600,
-    fiveYears: 157788000,
-};
-
-
-/***/ }),
+/* 21 */,
 /* 22 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
@@ -4110,6 +3770,8 @@ class LambertSolver
 "use strict";
 /* WEBPACK VAR INJECTION */(function(THREE) {/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__ModelAbstract__ = __webpack_require__(7);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__algebra__ = __webpack_require__(0);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__core_ReferenceFrame_Factory__ = __webpack_require__(1);
+
 
 
 
@@ -4117,6 +3779,9 @@ class VisualVector extends __WEBPACK_IMPORTED_MODULE_0__ModelAbstract__["a" /* d
 {
     constructor(vector, referenceFrameId) {
         super();
+        if (referenceFrameId === undefined) {
+            referenceFrameId = __WEBPACK_IMPORTED_MODULE_2__core_ReferenceFrame_Factory__["a" /* RF_BASE */];
+        }
         this.referenceFrame = sim.starSystem.getReferenceFrame(referenceFrameId);
         this.quaternion = __WEBPACK_IMPORTED_MODULE_1__algebra__["a" /* Quaternion */].transfer(new __WEBPACK_IMPORTED_MODULE_1__algebra__["c" /* Vector */]([0,1,0]), vector);
         this.setThreeObj(new THREE.ArrowHelper(
@@ -4127,7 +3792,7 @@ class VisualVector extends __WEBPACK_IMPORTED_MODULE_0__ModelAbstract__["a" /* d
     }
 
     render(epoch) {
-        this.threeObj.quaternion.copy(__WEBPACK_IMPORTED_MODULE_1__algebra__["a" /* Quaternion */].mul(this.quaternion, this.referenceFrame.getQuaternionByEpoch(epoch)).toThreejs());
+        this.threeObj.quaternion.copy(this.quaternion.mul(this.referenceFrame.getQuaternionByEpoch(epoch)).toThreejs());
         this.threeObj.position.copy(sim.getVisualCoords(this.referenceFrame.getOriginPositionByEpoch(epoch)));
     }
 }
@@ -8422,13 +8087,13 @@ module.exports = __webpack_amd_options__;
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__algebra__ = __webpack_require__(0);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__Events__ = __webpack_require__(3);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__ReferenceFrame_Factory__ = __webpack_require__(1);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_4__TimeLine__ = __webpack_require__(21);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_4__ui_TimeLine__ = __webpack_require__(74);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_5__interface_StarSystemLoader__ = __webpack_require__(41);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_6__visual_VisualRaycaster__ = __webpack_require__(61);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_7__visual_SelectionHandler__ = __webpack_require__(62);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_6__visual_Raycaster__ = __webpack_require__(71);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_7__ui_SelectionHandler__ = __webpack_require__(72);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_8__ui_UI__ = __webpack_require__(63);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_9__StarSystem__ = __webpack_require__(69);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_10__Camera__ = __webpack_require__(70);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_10__ui_Camera__ = __webpack_require__(73);
 
 
 
@@ -8460,15 +8125,15 @@ class Simulation
 
         this.rendererEvents = new __WEBPACK_IMPORTED_MODULE_0__EventHandler__["a" /* default */](this.renderer.domElement);
 
-        this.selection = new __WEBPACK_IMPORTED_MODULE_7__visual_SelectionHandler__["a" /* default */]();
+        this.selection = new __WEBPACK_IMPORTED_MODULE_7__ui_SelectionHandler__["a" /* default */]();
 
         this.starSystem = new __WEBPACK_IMPORTED_MODULE_9__StarSystem__["a" /* default */](starSystemConfig.id);
 
-        this.time = new __WEBPACK_IMPORTED_MODULE_4__TimeLine__["a" /* default */](__WEBPACK_IMPORTED_MODULE_4__TimeLine__["a" /* default */].getEpochByDate(new Date()), 1, true);
+        this.time = new __WEBPACK_IMPORTED_MODULE_4__ui_TimeLine__["a" /* default */](__WEBPACK_IMPORTED_MODULE_4__ui_TimeLine__["a" /* default */].getEpochByDate(new Date()), 1, true);
 
         __WEBPACK_IMPORTED_MODULE_5__interface_StarSystemLoader__["a" /* default */].loadFromConfig(this.starSystem, starSystemConfig);
 
-        this.camera = new __WEBPACK_IMPORTED_MODULE_10__Camera__["a" /* default */](
+        this.camera = new __WEBPACK_IMPORTED_MODULE_10__ui_Camera__["a" /* default */](
             this.renderer.domElement,
             __WEBPACK_IMPORTED_MODULE_3__ReferenceFrame_Factory__["c" /* default */].buildId(
                 this.starSystem.mainObject,
@@ -8477,7 +8142,7 @@ class Simulation
             new __WEBPACK_IMPORTED_MODULE_1__algebra__["c" /* Vector */]([30000, 30000, 10000])
         );
 
-        this.raycaster = new __WEBPACK_IMPORTED_MODULE_6__visual_VisualRaycaster__["a" /* default */](this.renderer.domElement, this.camera.threeCamera, 7);
+        this.raycaster = new __WEBPACK_IMPORTED_MODULE_6__visual_Raycaster__["a" /* default */](this.renderer.domElement, this.camera.threeCamera, 7);
 
         this.ui = new __WEBPACK_IMPORTED_MODULE_8__ui_UI__["a" /* default */]();
 
@@ -8495,7 +8160,7 @@ class Simulation
     }
 
     get currentDate() {
-        return __WEBPACK_IMPORTED_MODULE_4__TimeLine__["a" /* default */].getDateByEpoch(this.time.epoch);
+        return __WEBPACK_IMPORTED_MODULE_4__ui_TimeLine__["a" /* default */].getDateByEpoch(this.time.epoch);
     }
 
     initSettings() {
@@ -8691,11 +8356,11 @@ class ReferenceFrameTopocentric extends __WEBPACK_IMPORTED_MODULE_0__BodyFixed__
     }
 
     getQuaternionByEpoch(epoch) {
-        return this.body.orientation.getQuaternionByEpoch(epoch).mul(this.bodyFixedQuaternion)
+        return this.body.orientation.getQuaternionByEpoch(epoch).mul_(this.bodyFixedQuaternion)
     }
 
     getRotationVelocityByEpoch(epoch) {
-        return __WEBPACK_IMPORTED_MODULE_1__algebra__["a" /* Quaternion */].invert(this.bodyFixedQuaternion).rotate(
+        return this.bodyFixedQuaternion.invert().rotate(
             new __WEBPACK_IMPORTED_MODULE_1__algebra__["c" /* Vector */]([0, 0, this.body.orientation.angularVel])
         );
     }
@@ -8761,7 +8426,7 @@ class StarSystemLoader
         // Loading main object
         starSystem.mainObject = config.mainObject;
 
-        starSystem.setMainStars(config.mainStars);
+        starSystem.addObject(0, new __WEBPACK_IMPORTED_MODULE_6__core_EphemerisObject__["a" /* default */](0, __WEBPACK_IMPORTED_MODULE_6__core_EphemerisObject__["a" /* default */].TYPE_POINT, 'Star system barycenter'));
 
         // Loading objects
         for (const objectConfig of config.objects) {
@@ -8853,6 +8518,7 @@ class StarSystemLoader
         if (visualModel || physicalModel || orientation) {
             object = new __WEBPACK_IMPORTED_MODULE_2__core_Body__["a" /* default */](
                 config.id,
+                config.type || __WEBPACK_IMPORTED_MODULE_6__core_EphemerisObject__["a" /* default */].TYPE_UNKNOWN,
                 config.name,
                 visualModel,
                 physicalModel,
@@ -8861,6 +8527,7 @@ class StarSystemLoader
         } else {
             object = new __WEBPACK_IMPORTED_MODULE_6__core_EphemerisObject__["a" /* default */](
                 config.id,
+                config.type || __WEBPACK_IMPORTED_MODULE_6__core_EphemerisObject__["a" /* default */].TYPE_UNKNOWN,
                 config.name
             );
         }
@@ -8910,8 +8577,7 @@ class OrientationIAUModel extends __WEBPACK_IMPORTED_MODULE_0__Abstract__["a" /*
             days * this.rotation[1] +
             days * days * this.rotation[2];
 
-        return __WEBPACK_IMPORTED_MODULE_1__algebra__["a" /* Quaternion */].mul(
-            this.ICRFQuaternion,
+        return this.ICRFQuaternion.mul(
             (new __WEBPACK_IMPORTED_MODULE_1__algebra__["a" /* Quaternion */]())
                 .setFromEuler(Object(__WEBPACK_IMPORTED_MODULE_1__algebra__["f" /* deg2rad */])(rightAscension), Object(__WEBPACK_IMPORTED_MODULE_1__algebra__["f" /* deg2rad */])(declination), Object(__WEBPACK_IMPORTED_MODULE_1__algebra__["f" /* deg2rad */])(rotation), 'ZXZ')
         );
@@ -8941,8 +8607,7 @@ class OrientationConstantAxis extends __WEBPACK_IMPORTED_MODULE_0__Abstract__["a
     }
 
     getQuaternionByEpoch(epoch) {
-        return __WEBPACK_IMPORTED_MODULE_1__algebra__["a" /* Quaternion */].mul(
-            this.axisQuaternion,
+        return this.axisQuaternion.mul(
             new __WEBPACK_IMPORTED_MODULE_1__algebra__["a" /* Quaternion */](
                 [0, 0, 1],
                 this.initialAngle + (epoch - this.initialEpoch) * this.angularSpeed
@@ -9303,7 +8968,7 @@ class KeplerianEditor
         this.normal = (new __WEBPACK_IMPORTED_MODULE_2__algebra__["a" /* Quaternion */](this.node, keplerianObject.inc)).rotate(new __WEBPACK_IMPORTED_MODULE_2__algebra__["c" /* Vector */]([0, 0, 1]));
         this.aopQuaternion = new __WEBPACK_IMPORTED_MODULE_2__algebra__["a" /* Quaternion */](this.normal, keplerianObject.aop);
 
-        this.periapsis = __WEBPACK_IMPORTED_MODULE_2__algebra__["a" /* Quaternion */].mul(this.aopQuaternion, this.nodeQuaternion).rotate(new __WEBPACK_IMPORTED_MODULE_2__algebra__["c" /* Vector */]([1, 0, 0]));
+        this.periapsis = this.aopQuaternion.mul(this.nodeQuaternion).rotate(new __WEBPACK_IMPORTED_MODULE_2__algebra__["c" /* Vector */]([1, 0, 0]));
         this.nodePerp = this.nodeQuaternion.rotate(
             new __WEBPACK_IMPORTED_MODULE_2__algebra__["c" /* Vector */]([1, 0, 0])
                 .rotateZ(Math.PI / 2)
@@ -9782,7 +9447,7 @@ class TrajectoryKeplerianPrecessing extends __WEBPACK_IMPORTED_MODULE_0__Kepleri
 "use strict";
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__Abstract__ = __webpack_require__(16);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__ReferenceFrame_Factory__ = __webpack_require__(1);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__TimeLine__ = __webpack_require__(21);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__ui_TimeLine__ = __webpack_require__(74);
 
 
 
@@ -9871,7 +9536,7 @@ class TrajectoryComposite extends __WEBPACK_IMPORTED_MODULE_0__Abstract__["a" /*
 
         console.log('Insufficient ephemeris data has been loaded to compute the state of ' +
             (this.object && this.object.id) + ' (' + (this.object && this.object.name) + ') at the ephemeris epoch ' +
-            epoch + ' (' + __WEBPACK_IMPORTED_MODULE_2__TimeLine__["a" /* default */].getDateByEpoch(epoch) + ').'
+            epoch + ' (' + __WEBPACK_IMPORTED_MODULE_2__ui_TimeLine__["a" /* default */].getDateByEpoch(epoch) + ').'
         );
 
         return null;
@@ -10607,217 +10272,8 @@ class VisualShapeAbstract
 
 
 /***/ }),
-/* 61 */
-/***/ (function(module, __webpack_exports__, __webpack_require__) {
-
-"use strict";
-/* WEBPACK VAR INJECTION */(function(THREE) {/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__algebra__ = __webpack_require__(0);
-
-
-class VisualRaycaster
-{
-    constructor(domElement, threeCamera, pixelPrecision) {
-        this.raycaster = new THREE.Raycaster();
-        this.mouse = new THREE.Vector2();
-        this.camera = threeCamera;
-        this.domElement = domElement;
-
-        this.setPixelPrecision(pixelPrecision);
-        this.updatePixelAngleSize();
-
-        this.domElement.addEventListener('mousemove', this.onMouseMove.bind(this));
-        this.domElement.addEventListener('resize', this.updatePixelAngleSize.bind(this));
-    }
-
-    onMouseMove(event) {
-        this.mouse.x = (event.clientX / this.domElement.width) * 2 - 1;
-        this.mouse.y = -(event.clientY / this.domElement.height) * 2 + 1;
-    }
-
-    setPixelPrecision(value) {
-        this.raycaster.pixelPrecision = value;
-    }
-    
-    updatePixelAngleSize() {
-        this.raycaster.pixelAngleSize = Object(__WEBPACK_IMPORTED_MODULE_0__algebra__["f" /* deg2rad */])(this.camera.fov) / this.domElement.height;
-    }
-
-    getPixelAngleSize() {
-        return this.raycaster.pixelAngleSize;
-    }
-
-    intersectObjects(threeObjects) {
-        this.raycaster.setFromCamera(this.mouse, this.camera);
-        return this.raycaster.intersectObjects(threeObjects);
-    }
-
-    getPixelDistance(point) {
-        this.raycaster.setFromCamera(this.mouse, this.camera);
-
-        const pointDirection = (new THREE.Vector3).subVectors(
-            point,
-            sim.camera.lastPosition
-        );
-
-        const angle = Math.acos(
-            this.raycaster.ray.direction.dot(pointDirection) / pointDirection.length()
-        );
-
-        return angle / this.raycaster.pixelAngleSize;
-    }
-}
-/* harmony export (immutable) */ __webpack_exports__["a"] = VisualRaycaster;
-
-/* WEBPACK VAR INJECTION */}.call(__webpack_exports__, __webpack_require__(2)))
-
-/***/ }),
-/* 62 */
-/***/ (function(module, __webpack_exports__, __webpack_require__) {
-
-"use strict";
-/* WEBPACK VAR INJECTION */(function(THREE) {/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__ModelAbstract__ = __webpack_require__(7);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__core_Events__ = __webpack_require__(3);
-
-
-
-class SelectionHandler extends __WEBPACK_IMPORTED_MODULE_0__ModelAbstract__["a" /* default */]
-{
-    constructor() {
-        super();
-
-        this.selectableObjects = [];
-
-        this.selectedObject = null;
-        this.bestIntersection = null;
-
-        this.selectionMouseButton = 0;
-        this.pointSize = 5;
-
-        this.setThreeObj(new THREE.Mesh(
-            new THREE.SphereGeometry(1, 10, 10),
-            new THREE.MeshBasicMaterial({color: 0xFFFF00})
-        ));
-
-        sim.addEventListener('click', this.onMouseClick.bind(this), 1);
-        sim.addEventListener('mousedown', this.onMouseDown.bind(this), 1);
-
-        this.mouseMoveListener = this.onMouseMove.bind(this);
-    }
-
-    addSelectableObject(object) {
-        this.selectableObjects.push(object);
-    }
-
-    removeSelectableObject(object) {
-        for (let i in this.selectableObjects) {
-            if (this.selectableObjects[i] === object) {
-                delete this.selectableObjects[i];
-                break;
-            }
-        }
-        this.selectableObjects = this.selectableObjects.filter(val => val);
-    }
-
-    render() {
-        const intersections = sim.raycaster.intersectObjects(this.selectableObjects);
-
-        if (intersections.length > 0) {
-            this.bestIntersection = intersections[0];
-
-            for(var i = 1; i < intersections.length; i++) { 
-                if (intersections[i].distance < this.bestIntersection.distance) {
-                    this.bestIntersection = intersections[i];
-                }
-            }
-
-            this.threeObj.visible = true;
-            this.threeObj.position.copy(this.bestIntersection.point);
-
-            const scaleKoeff = this.pointSize * this.bestIntersection.point.length() * sim.raycaster.getPixelAngleSize();
-
-            this.threeObj.scale.x = scaleKoeff;
-            this.threeObj.scale.y = scaleKoeff;
-            this.threeObj.scale.z = scaleKoeff;
-        }
-        else {
-            this.threeObj.visible = false;
-            this.bestIntersection = null;
-        }
-    }
-
-    onMouseDown(event) {
-        if (event.button === this.selectionMouseButton) {
-            document.addEventListener('mousemove', this.mouseMoveListener);
-            this.hasMouseMoved = false;
-            this.mouseClickStart = [event.clientX, event.clientY];
-        }
-    }
-
-    onMouseMove(event) {
-        if (this.mouseClickStart[0] !== event.clientX || this.mouseClickStart[1] !== event.clientY) {
-            this.hasMouseMoved = true;
-        }
-    }
-
-    onMouseClick(event) {
-        const wasSelected = this.selectedObject;
-
-        if (event.button !== this.selectionMouseButton) {
-            return;
-        }
-
-        document.removeEventListener('mousemove', this.mouseMoveListener);
-
-        if (this.hasMouseMoved) {
-            return;
-        }
-
-        if (this.selectedObject) {
-            this.deselect();
-        }
-
-        if (this.bestIntersection) {
-            let currentTraj = this.bestIntersection.object.userData.trajectory;
-            while (currentTraj.parent) {
-                currentTraj = currentTraj.parent;
-            }
-            if (currentTraj !== wasSelected) {
-                this.select(currentTraj);
-            }
-        }
-    }
-
-    getSelectedObject() {
-        return this.selectedObject;
-    }
-
-    select(object) {
-        this.selectedObject = object;
-        this.selectedObject.select();
-
-        document.dispatchEvent(new CustomEvent(
-            __WEBPACK_IMPORTED_MODULE_1__core_Events__["a" /* Events */].SELECT,
-            {detail: {trajectory: this.selectedObject}}
-        ));
-
-    }
-
-    deselect() {
-        document.dispatchEvent(new CustomEvent(
-            __WEBPACK_IMPORTED_MODULE_1__core_Events__["a" /* Events */].DESELECT,
-            {detail: {trajectory: this.selectedObject}}
-        ));
-
-        this.selectedObject.deselect();
-        this.selectedObject = null;
-    }
-}
-/* harmony export (immutable) */ __webpack_exports__["a"] = SelectionHandler;
-
-
-/* WEBPACK VAR INJECTION */}.call(__webpack_exports__, __webpack_require__(2)))
-
-/***/ }),
+/* 61 */,
+/* 62 */,
 /* 63 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
@@ -11242,7 +10698,7 @@ class UIPanelLambert extends __WEBPACK_IMPORTED_MODULE_0__Panel__["a" /* default
 
         const transfer = __WEBPACK_IMPORTED_MODULE_1__core_LambertSolver__["a" /* default */].solve(state1, state2, this.departureTime, this.transferTime, mu);
         const trajectory = new __WEBPACK_IMPORTED_MODULE_2__core_Trajectory_KeplerianBasic__["a" /* default */](referenceFrameId, transfer);
-        trajectory.setObject(new __WEBPACK_IMPORTED_MODULE_6__core_EphemerisObject__["a" /* default */](-1, origin.name + '->' + target.name + ' transfer'));
+        trajectory.setObject(new __WEBPACK_IMPORTED_MODULE_6__core_EphemerisObject__["a" /* default */](-1, __WEBPACK_IMPORTED_MODULE_6__core_EphemerisObject__["a" /* default */].TYPE_UNKNOWN, origin.name + '->' + target.name + ' transfer'));
 
         if (this.visualModel) {
             this.visualModel.drop();
@@ -11394,7 +10850,6 @@ class StarSystem
         this.id = id;
         this.name = null;
         this.stars = null;
-        this.mainStars = [];
         this.mainObject = null;
         this.referenceFrames = {};
         this.trajectories = {};
@@ -11404,15 +10859,6 @@ class StarSystem
     addStars(stars) {
         this.stars = stars;
         return this;
-    }
-
-    setMainStars(objectIds) {
-        this.mainStars = objectIds;
-        return this;
-    }
-
-    getMainStars() {
-        return this.mainStars;
     }
 
     addReferenceFrame(frame) {
@@ -11445,7 +10891,7 @@ class StarSystem
 
     getObject(id) {
         if (this.objects[id] === undefined) {
-            this.objects[id] = new __WEBPACK_IMPORTED_MODULE_1__EphemerisObject__["a" /* default */](id, 'Unknown #' + id);
+            this.objects[id] = new __WEBPACK_IMPORTED_MODULE_1__EphemerisObject__["a" /* default */](id, __WEBPACK_IMPORTED_MODULE_1__EphemerisObject__["a" /* default */].TYPE_UNKNOWN, 'Unknown #' + id);
         }
         return this.objects[id];
     }
@@ -11515,13 +10961,225 @@ class StarSystem
 
 
 /***/ }),
-/* 70 */
+/* 70 */,
+/* 71 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
 /* WEBPACK VAR INJECTION */(function(THREE) {/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__algebra__ = __webpack_require__(0);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__ReferenceFrame_Factory__ = __webpack_require__(1);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__Events__ = __webpack_require__(3);
+
+
+class VisualRaycaster
+{
+    constructor(domElement, threeCamera, pixelPrecision) {
+        this.raycaster = new THREE.Raycaster();
+        this.mouse = new THREE.Vector2();
+        this.camera = threeCamera;
+        this.domElement = domElement;
+
+        this.setPixelPrecision(pixelPrecision);
+        this.updatePixelAngleSize();
+
+        this.domElement.addEventListener('mousemove', this.onMouseMove.bind(this));
+        this.domElement.addEventListener('resize', this.updatePixelAngleSize.bind(this));
+    }
+
+    onMouseMove(event) {
+        this.mouse.x = (event.clientX / this.domElement.width) * 2 - 1;
+        this.mouse.y = -(event.clientY / this.domElement.height) * 2 + 1;
+    }
+
+    setPixelPrecision(value) {
+        this.raycaster.pixelPrecision = value;
+    }
+    
+    updatePixelAngleSize() {
+        this.raycaster.pixelAngleSize = Object(__WEBPACK_IMPORTED_MODULE_0__algebra__["f" /* deg2rad */])(this.camera.fov) / this.domElement.height;
+    }
+
+    getPixelAngleSize() {
+        return this.raycaster.pixelAngleSize;
+    }
+
+    intersectObjects(threeObjects) {
+        this.raycaster.setFromCamera(this.mouse, this.camera);
+        return this.raycaster.intersectObjects(threeObjects);
+    }
+
+    getPixelDistance(point) {
+        this.raycaster.setFromCamera(this.mouse, this.camera);
+
+        const pointDirection = (new THREE.Vector3).subVectors(
+            point,
+            sim.camera.lastPosition
+        );
+
+        const angle = Math.acos(
+            this.raycaster.ray.direction.dot(pointDirection) / pointDirection.length()
+        );
+
+        return angle / this.raycaster.pixelAngleSize;
+    }
+}
+/* harmony export (immutable) */ __webpack_exports__["a"] = VisualRaycaster;
+
+/* WEBPACK VAR INJECTION */}.call(__webpack_exports__, __webpack_require__(2)))
+
+/***/ }),
+/* 72 */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+/* WEBPACK VAR INJECTION */(function(THREE) {/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__visual_ModelAbstract__ = __webpack_require__(7);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__core_Events__ = __webpack_require__(3);
+
+
+
+class SelectionHandler extends __WEBPACK_IMPORTED_MODULE_0__visual_ModelAbstract__["a" /* default */]
+{
+    constructor() {
+        super();
+
+        this.selectableObjects = [];
+
+        this.selectedObject = null;
+        this.bestIntersection = null;
+
+        this.selectionMouseButton = 0;
+        this.pointSize = 5;
+
+        this.setThreeObj(new THREE.Mesh(
+            new THREE.SphereGeometry(1, 10, 10),
+            new THREE.MeshBasicMaterial({color: 0xFFFF00})
+        ));
+
+        sim.addEventListener('click', this.onMouseClick.bind(this), 1);
+        sim.addEventListener('mousedown', this.onMouseDown.bind(this), 1);
+
+        this.mouseMoveListener = this.onMouseMove.bind(this);
+    }
+
+    addSelectableObject(object) {
+        this.selectableObjects.push(object);
+    }
+
+    removeSelectableObject(object) {
+        for (let i in this.selectableObjects) {
+            if (this.selectableObjects[i] === object) {
+                delete this.selectableObjects[i];
+                break;
+            }
+        }
+        this.selectableObjects = this.selectableObjects.filter(val => val);
+    }
+
+    render() {
+        const intersections = sim.raycaster.intersectObjects(this.selectableObjects);
+
+        if (intersections.length > 0) {
+            this.bestIntersection = intersections[0];
+
+            for(var i = 1; i < intersections.length; i++) { 
+                if (intersections[i].distance < this.bestIntersection.distance) {
+                    this.bestIntersection = intersections[i];
+                }
+            }
+
+            this.threeObj.visible = true;
+            this.threeObj.position.copy(this.bestIntersection.point);
+
+            const scaleKoeff = this.pointSize * this.bestIntersection.point.length() * sim.raycaster.getPixelAngleSize();
+
+            this.threeObj.scale.x = scaleKoeff;
+            this.threeObj.scale.y = scaleKoeff;
+            this.threeObj.scale.z = scaleKoeff;
+        }
+        else {
+            this.threeObj.visible = false;
+            this.bestIntersection = null;
+        }
+    }
+
+    onMouseDown(event) {
+        if (event.button === this.selectionMouseButton) {
+            document.addEventListener('mousemove', this.mouseMoveListener);
+            this.hasMouseMoved = false;
+            this.mouseClickStart = [event.clientX, event.clientY];
+        }
+    }
+
+    onMouseMove(event) {
+        if (this.mouseClickStart[0] !== event.clientX || this.mouseClickStart[1] !== event.clientY) {
+            this.hasMouseMoved = true;
+        }
+    }
+
+    onMouseClick(event) {
+        const wasSelected = this.selectedObject;
+
+        if (event.button !== this.selectionMouseButton) {
+            return;
+        }
+
+        document.removeEventListener('mousemove', this.mouseMoveListener);
+
+        if (this.hasMouseMoved) {
+            return;
+        }
+
+        if (this.selectedObject) {
+            this.deselect();
+        }
+
+        if (this.bestIntersection) {
+            let currentTraj = this.bestIntersection.object.userData.trajectory;
+            while (currentTraj.parent) {
+                currentTraj = currentTraj.parent;
+            }
+            if (currentTraj !== wasSelected) {
+                this.select(currentTraj);
+            }
+        }
+    }
+
+    getSelectedObject() {
+        return this.selectedObject;
+    }
+
+    select(object) {
+        this.selectedObject = object;
+        this.selectedObject.select();
+
+        document.dispatchEvent(new CustomEvent(
+            __WEBPACK_IMPORTED_MODULE_1__core_Events__["a" /* Events */].SELECT,
+            {detail: {trajectory: this.selectedObject}}
+        ));
+
+    }
+
+    deselect() {
+        document.dispatchEvent(new CustomEvent(
+            __WEBPACK_IMPORTED_MODULE_1__core_Events__["a" /* Events */].DESELECT,
+            {detail: {trajectory: this.selectedObject}}
+        ));
+
+        this.selectedObject.deselect();
+        this.selectedObject = null;
+    }
+}
+/* harmony export (immutable) */ __webpack_exports__["a"] = SelectionHandler;
+
+
+/* WEBPACK VAR INJECTION */}.call(__webpack_exports__, __webpack_require__(2)))
+
+/***/ }),
+/* 73 */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+/* WEBPACK VAR INJECTION */(function(THREE) {/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__algebra__ = __webpack_require__(0);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__core_ReferenceFrame_Factory__ = __webpack_require__(1);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__core_Events__ = __webpack_require__(3);
 
 
 
@@ -11544,7 +11202,7 @@ class Camera
         this.frameType = this.referenceFrame.type;
         this.quaternion = this._getQuaternionByPosition(this.position);
 
-        this.lastPosition = this.referenceFrame.transformPositionByEpoch(sim.currentEpoch, this.position, __WEBPACK_IMPORTED_MODULE_1__ReferenceFrame_Factory__["a" /* RF_BASE */]);
+        this.lastPosition = this.referenceFrame.transformPositionByEpoch(sim.currentEpoch, this.position, __WEBPACK_IMPORTED_MODULE_1__core_ReferenceFrame_Factory__["a" /* RF_BASE */]);
 
         this.currentMousePos = new __WEBPACK_IMPORTED_MODULE_0__algebra__["c" /* Vector */]([0, 0]);
         this.accountedMousePos = new __WEBPACK_IMPORTED_MODULE_0__algebra__["c" /* Vector */]([0, 0]);
@@ -11585,40 +11243,46 @@ class Camera
             Math.acos(newUp.dot(neededUp) / neededUp.mag)
         );
 
-        return rollQuaternion.mul(directionQuaternion);
+        return rollQuaternion.mul_(directionQuaternion);
     }
 
     getAvailableFrameTypes(orbitingPoint) {
-        const isBody = sim.starSystem.isBody((orbitingPoint === undefined) ? this.orbitingPoint : orbitingPoint);
+        if (orbitingPoint === undefined) {
+            orbitingPoint = this.orbitingPoint;
+        }
+
+        if (orbitingPoint == 0) {
+            return [__WEBPACK_IMPORTED_MODULE_1__core_ReferenceFrame_Factory__["b" /* ReferenceFrame */].INERTIAL_ECLIPTIC];
+        }
+
+        const isBody = sim.starSystem.isBody(orbitingPoint);
 
         if (isBody === null) {
             return [];
-        }
-
-        if (isBody) {
+        } else if (isBody) {
             return [
-                __WEBPACK_IMPORTED_MODULE_1__ReferenceFrame_Factory__["b" /* ReferenceFrame */].INERTIAL_ECLIPTIC,
-                __WEBPACK_IMPORTED_MODULE_1__ReferenceFrame_Factory__["b" /* ReferenceFrame */].INERTIAL_BODY_EQUATORIAL,
-                __WEBPACK_IMPORTED_MODULE_1__ReferenceFrame_Factory__["b" /* ReferenceFrame */].INERTIAL_BODY_FIXED
+                __WEBPACK_IMPORTED_MODULE_1__core_ReferenceFrame_Factory__["b" /* ReferenceFrame */].INERTIAL_ECLIPTIC,
+                __WEBPACK_IMPORTED_MODULE_1__core_ReferenceFrame_Factory__["b" /* ReferenceFrame */].INERTIAL_BODY_EQUATORIAL,
+                __WEBPACK_IMPORTED_MODULE_1__core_ReferenceFrame_Factory__["b" /* ReferenceFrame */].INERTIAL_BODY_FIXED
             ];
         } else {
             return [
-                __WEBPACK_IMPORTED_MODULE_1__ReferenceFrame_Factory__["b" /* ReferenceFrame */].INERTIAL_ECLIPTIC,
-                __WEBPACK_IMPORTED_MODULE_1__ReferenceFrame_Factory__["b" /* ReferenceFrame */].INERTIAL_PARENT_BODY_EQUATORIAL
+                __WEBPACK_IMPORTED_MODULE_1__core_ReferenceFrame_Factory__["b" /* ReferenceFrame */].INERTIAL_ECLIPTIC,
+                __WEBPACK_IMPORTED_MODULE_1__core_ReferenceFrame_Factory__["b" /* ReferenceFrame */].INERTIAL_PARENT_BODY_EQUATORIAL
             ];
         }
     }
 
     changeReferenceFrameType(newType) {
-        this.changeReferenceFrame(__WEBPACK_IMPORTED_MODULE_1__ReferenceFrame_Factory__["c" /* default */].buildId(this.orbitingPoint, newType), true);
+        this.changeReferenceFrame(__WEBPACK_IMPORTED_MODULE_1__core_ReferenceFrame_Factory__["c" /* default */].buildId(this.orbitingPoint, newType), true);
     }
 
     changeOrigin(newObjectId) {
         const newFrameTypes = this.getAvailableFrameTypes(newObjectId);
         let newFrameType = (newFrameTypes.indexOf(this.frameType) !== -1)
             ? this.frameType
-            : __WEBPACK_IMPORTED_MODULE_1__ReferenceFrame_Factory__["b" /* ReferenceFrame */].INERTIAL_ECLIPTIC;
-        this.changeReferenceFrame(__WEBPACK_IMPORTED_MODULE_1__ReferenceFrame_Factory__["c" /* default */].buildId(newObjectId, newFrameType), true);
+            : __WEBPACK_IMPORTED_MODULE_1__core_ReferenceFrame_Factory__["b" /* ReferenceFrame */].INERTIAL_ECLIPTIC;
+        this.changeReferenceFrame(__WEBPACK_IMPORTED_MODULE_1__core_ReferenceFrame_Factory__["c" /* default */].buildId(newObjectId, newFrameType), true);
     }
 
     changeReferenceFrame(newFrameId, animate) {
@@ -11637,7 +11301,7 @@ class Camera
         }
 
         document.dispatchEvent(new CustomEvent(
-            __WEBPACK_IMPORTED_MODULE_2__Events__["a" /* Events */].CAMERA_RF_CHANGED,
+            __WEBPACK_IMPORTED_MODULE_2__core_Events__["a" /* Events */].CAMERA_RF_CHANGED,
             {detail: {old: this.referenceFrame, new: newFrame}}
         ));
 
@@ -11647,7 +11311,7 @@ class Camera
     startAnimation(newFrame) {
         if (newFrame) {
             let transferQuaternion = this.referenceFrame.getQuaternionByEpoch(sim.currentEpoch).invert_().mul_(newFrame.getQuaternionByEpoch(sim.currentEpoch));
-            this.quaternion = transferQuaternion.invert_().mul(this.quaternion);
+            this.quaternion = transferQuaternion.invert_().mul_(this.quaternion);
         }
 
         this.animationStartingTime = (new Date()).getTime();
@@ -11676,7 +11340,7 @@ class Camera
         let biggestObject = false;
         for (const body of sim.starSystem.getBodies()) {
             const dist = sim.raycaster.getPixelDistance(
-                body.getPositionByEpoch(sim.currentEpoch, __WEBPACK_IMPORTED_MODULE_1__ReferenceFrame_Factory__["a" /* RF_BASE */])
+                body.getPositionByEpoch(sim.currentEpoch, __WEBPACK_IMPORTED_MODULE_1__core_ReferenceFrame_Factory__["a" /* RF_BASE */])
             );
             if (dist < this.settings.pixelsToObjectUnderMouse) {
                 if (biggestObject === false) {
@@ -11768,12 +11432,16 @@ class Camera
         this.threeCamera.updateProjectionMatrix();
     }
 
+    getTopDirection(epoch) {
+        return this.referenceFrame.getQuaternionByEpoch(epoch).mul_(this.quaternion).rotate_(new __WEBPACK_IMPORTED_MODULE_0__algebra__["c" /* Vector */]([0,1,0]));
+    }
+
     update(epoch) {
         const rfQuaternion = this.referenceFrame.getQuaternionByEpoch(epoch);
         let mouseShift = this.currentMousePos.sub(this.accountedMousePos);
 
         if (this.isAnimnating) {
-            this.animate()
+            this.animate();
         }
 
         if (mouseShift[0] || mouseShift[1]) {
@@ -11786,7 +11454,7 @@ class Camera
                 : this.position.cross(pole);
 
             let verticalQuaternion = new __WEBPACK_IMPORTED_MODULE_0__algebra__["a" /* Quaternion */](verticalRotationAxis, Math.min(Math.max(mouseShift[1] * sensitivity, poleAngle - Math.PI + polarConstraint), poleAngle - polarConstraint));
-            let mainQuaternion = (new __WEBPACK_IMPORTED_MODULE_0__algebra__["a" /* Quaternion */]()).setAxisAngle(pole, -mouseShift[0] * sensitivity).mul_(verticalQuaternion);
+            let mainQuaternion = (new __WEBPACK_IMPORTED_MODULE_0__algebra__["a" /* Quaternion */](pole, -mouseShift[0] * sensitivity)).mul_(verticalQuaternion);
 
             if (!this.rightButtonDown) {
                 mainQuaternion.rotate_(this.position);
@@ -11796,13 +11464,364 @@ class Camera
             this.accountedMousePos = this.currentMousePos.copy();
         }
         this.threeCamera.quaternion.copy(rfQuaternion.mul_(this.quaternion).toThreejs());
-        this.lastPosition = this.referenceFrame.transformPositionByEpoch(epoch, this.position, __WEBPACK_IMPORTED_MODULE_1__ReferenceFrame_Factory__["a" /* RF_BASE */]);
+        this.lastPosition = this.referenceFrame.transformPositionByEpoch(epoch, this.position, __WEBPACK_IMPORTED_MODULE_1__core_ReferenceFrame_Factory__["a" /* RF_BASE */]);
     }
 }
 /* harmony export (immutable) */ __webpack_exports__["a"] = Camera;
 
 
 /* WEBPACK VAR INJECTION */}.call(__webpack_exports__, __webpack_require__(2)))
+
+/***/ }),
+/* 74 */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__core_Events__ = __webpack_require__(3);
+
+
+const J2000_TIMESTAMP = 946728000;
+/* unused harmony export J2000_TIMESTAMP */
+
+
+class TimeLine
+{
+    constructor(epoch, timeScale, isTimeRunning) {
+        this.epoch = epoch;
+        this.timeScale = timeScale;
+        this.isTimeRunning = isTimeRunning;
+
+        this.mouseState = {
+            x: 0,
+            y: 0,
+            leftButton: false,
+            rightButton: false
+        };
+
+        this.span = timeScale * 86400 * 5;
+
+        this.markDistance = 300;
+        this.scaleType = "month";
+
+        this.domElement = document.getElementById("timeLineCanvas");
+        this.canvasContext = this.domElement.getContext("2d");
+        this.canvasRect = {};
+        this.updateCanvasStyle();
+
+        this.leftEpoch = this.epoch - this.span / 2;
+
+        this.updateScaleType();
+
+        this.domElement.addEventListener("mousedown",  this.onMouseDown  .bind(this));
+        window         .addEventListener("mouseup",    this.onMouseUp    .bind(this));
+        window         .addEventListener("mousemove",  this.onMouseMove  .bind(this));
+        this.domElement.addEventListener("mousewheel", this.onMouseWheel .bind(this));
+
+        window.addEventListener('keypress', e => {
+            if (e.key === ' ') {
+                this.togglePause();
+            }
+        });
+
+        window.addEventListener("resize", this.updateCanvasStyle.bind(this));
+        window.oncontextmenu = () => false;
+    }
+
+    setTimeScale(newScale) {
+        document.dispatchEvent(new CustomEvent(
+            __WEBPACK_IMPORTED_MODULE_0__core_Events__["a" /* Events */].TIME_SCALE_CHANGED,
+            {detail: {old: this.timeScale, new: newScale}}
+        ));
+        this.timeScale = newScale;
+    }
+
+    togglePause() {
+        this.isTimeRunning = !this.isTimeRunning;
+        document.dispatchEvent(new CustomEvent(
+            this.isTimeRunning ? __WEBPACK_IMPORTED_MODULE_0__core_Events__["a" /* Events */].TIME_UNPAUSED : __WEBPACK_IMPORTED_MODULE_0__core_Events__["a" /* Events */].TIME_PAUSED
+        ));
+    }
+
+    tick(timePassed) {
+        if (this.mouseState.leftButton) {
+            this.epoch = this.leftEpoch + (this.mouseState.x
+                - this.canvasRect.left) * this.span / this.domElement.width;
+        } else if (this.isTimeRunning) {
+            if ((this.leftEpoch < this.epoch)
+                && (this.epoch < this.leftEpoch + this.span)
+            ) {
+                this.leftEpoch += this.timeScale * timePassed;
+            }
+
+            this.epoch += this.timeScale * timePassed;
+        }
+
+        document.dispatchEvent(new CustomEvent(
+            __WEBPACK_IMPORTED_MODULE_0__core_Events__["a" /* Events */].EPOCH_CHANGED,
+            {detail: {
+                epoch: this.epoch,
+                date: new Date((J2000_TIMESTAMP + this.epoch) * 1000)
+            }}
+        ));
+
+        this.redraw();
+    }
+
+    forceEpoch(newEpoch) {
+        this.epoch = newEpoch;
+        this.tick(0);
+    }
+
+    useCurrentTime() {
+        this.forceEpoch(TimeLine.getEpochByDate(new Date()));
+    }
+
+    redraw() {
+        this.canvasContext.fillStyle = "#222";
+        this.canvasContext.fillRect(0, 0, this.domElement.width, this.domElement.height);
+
+        this.canvasContext.fillStyle = "#2FA1D6";
+        this.drawCurrentTimeMark();
+
+        this.canvasContext.strokeStyle = "#fff";
+        this.canvasContext.fillStyle   = "#fff";
+        this.canvasContext.font        = "11pt sans-serif";
+
+        let markDate = this.roundDateUp(TimeLine.getDateByEpoch(this.leftEpoch));
+        let markEpoch = TimeLine.getEpochByDate(markDate);
+
+        while (markEpoch < this.leftEpoch + this.span) {
+            this.drawMark(this.getCanvasPositionByEpoch(markEpoch), this.formatDate(markDate));
+            markDate = this.nextRenderingDate(markDate);
+            markEpoch = TimeLine.getEpochByDate(markDate);
+        }
+    }
+
+    static getDateByEpoch(epoch) {
+        return new Date((J2000_TIMESTAMP + epoch) * 1000);
+    }
+
+    static getEpochByDate(date) {
+        return date / 1000 - J2000_TIMESTAMP;
+    }
+
+    getCanvasPositionByEpoch(epoch) {
+        return (epoch - this.leftEpoch) * this.domElement.width / this.span;
+    }
+
+    updateCanvasStyle() {
+        this.canvasRect = this.domElement.getBoundingClientRect();
+        this.domElement.width  = this.canvasRect.right  - this.canvasRect.left;
+        this.domElement.height = this.canvasRect.bottom - this.canvasRect.top;
+    }
+
+    updateScaleType() {
+        const secondsPerPeriod = this.markDistance * this.span / this.domElement.width;
+        let bestScale = false;
+
+        for (const scale in TimeLine.scales) {
+            if (!bestScale) {
+                bestScale = scale;
+                continue;
+            }
+
+            if (Math.abs(TimeLine.scales[bestScale] / secondsPerPeriod - 1)
+                > Math.abs(TimeLine.scales[scale] / secondsPerPeriod - 1)
+            ) {
+                bestScale = scale;
+            }
+        }
+
+        this.scaleType = bestScale;
+    }
+
+    drawMark(x, text) {
+        this.canvasContext.beginPath();
+        this.canvasContext.moveTo(x, 0);
+        this.canvasContext.lineTo(x, this.domElement.height / 2);
+        this.canvasContext.stroke();
+        this.canvasContext.fillText(
+            text,
+            x - this.canvasContext.measureText(text).width / 2,
+            this.domElement.height - 2
+        );
+    }
+
+    drawCurrentTimeMark() {
+        this.canvasContext.fillRect(0, 0, this.getCanvasPositionByEpoch(this.epoch), this.domElement.height);
+    }
+
+    roundDateUp(date) {
+        const d = new Date(date);
+        if (this.scaleType === "minute") {
+            d.setSeconds(60, 0);
+        } else if (this.scaleType === "fiveMinutes") {
+            d.setMinutes(5 + d.getMinutes() - d.getMinutes() % 5, 0, 0);
+        } else if (this.scaleType === "tenMinutes") {
+            d.setMinutes(10 + d.getMinutes() - d.getMinutes() % 10, 0, 0);
+        } else if (this.scaleType === "thirtyMinutes") {
+            d.setMinutes(30 + d.getMinutes() - d.getMinutes() % 30, 0, 0);
+        } else if (this.scaleType === "hour") {
+            d.setMinutes(60, 0, 0);
+        } else if (this.scaleType === "threeHours") {
+            d.setHours(3 + d.getHours() - d.getHours() % 3, 0, 0, 0);
+        } else if (this.scaleType === "sixHours") {
+            d.setHours(6 + d.getHours() - d.getHours() % 6, 0, 0, 0);
+        } else if (this.scaleType === "day") {
+            d.setHours(24, 0, 0, 0);
+        } else if (this.scaleType === "week") {
+            d.setHours(0, 0, 0, 0);
+            d.setDate(7 + d.getDate() - d.getDay());
+        } else if (this.scaleType === "month") {
+            d.setHours(0, 0, 0, 0);
+            d.setDate(1);
+            d.setMonth(d.getMonth() + 1);
+        } else if (this.scaleType === "threeMonths") {
+            d.setHours(0, 0, 0, 0);
+            d.setDate(1);
+            d.setMonth(3 + d.getMonth() - d.getMonth() % 3);
+        } else if (this.scaleType === "year") {
+            d.setHours(0, 0, 0, 0);
+            d.setMonth(0, 1);
+        } else if (this.scaleType === "fiveYears") {
+            d.setHours(0, 0, 0, 0);
+            d.setFullYear(5 + d.getFullYear() - d.getFullYear() % 5, 0, 1);
+        } else {
+            return;
+        }
+        return d;
+    }
+
+    nextRenderingDate(date) {
+        const d = new Date(date);
+        if (this.scaleType === "minute") {
+            d.setMinutes(d.getMinutes() + 1);
+        } else if (this.scaleType === "fiveMinutes") {
+            d.setMinutes(d.getMinutes() + 5);
+        } else if (this.scaleType === "tenMinutes") {
+            d.setMinutes(d.getMinutes() + 10);
+        } else if (this.scaleType === "thirtyMinutes") {
+            d.setMinutes(d.getMinutes() + 30);
+        } else if (this.scaleType === "hour") {
+            d.setHours(d.getHours() + 1);
+        } else if (this.scaleType === "threeHours") {
+            d.setHours(d.getHours() + 3);
+        } else if (this.scaleType === "sixHours") {
+            d.setHours(d.getHours() + 6);
+        } else if (this.scaleType === "day") {
+            d.setDate(d.getDate() + 1);
+        } else if (this.scaleType === "week") {
+            d.setDate(d.getDate() + 7);
+        } else if (this.scaleType === "month") {
+            d.setMonth(d.getMonth() + 1);
+        } else if (this.scaleType === "threeMonths") {
+            d.setMonth(d.getMonth() + 3);
+        } else if (this.scaleType === "year") {
+            d.setFullYear(d.getFullYear() + 1, d.getMonth(), d.getDate());
+        } else if (this.scaleType === "fiveYears") {
+            d.setFullYear(d.getFullYear() + 5, d.getMonth(), d.getDate());
+        } else {
+            return;
+        }
+        return d;
+    }
+
+    formatDate(date) {
+        if ((this.scaleType === "minute")
+            || (this.scaleType === "fiveMinutes")
+            || (this.scaleType === "tenMinutes")
+            || (this.scaleType === "thirtyMinutes")
+            || (this.scaleType === "hour")
+            || (this.scaleType === "threeHours")
+            || (this.scaleType === "sixHours")
+        ) {
+            let string = date.getYear() + 1900;
+            string += '-' + ((date.getMonth() + 1) + '').padStart(2, '0');
+            string += '-' + (date.getDate() + '').padStart(2, '0');
+            string += ' ' + (date.getHours() + '').padStart(2, '0');
+            string += ':' + (date.getMinutes() + '').padStart(2, '0');
+            return string;
+        } else if ((this.scaleType === "day")
+            || (this.scaleType === "week")
+        ) {
+            let string = date.getYear() + 1900;
+            string += '-' + ((date.getMonth() + 1) + '').padStart(2, '0');
+            string += '-' + (date.getDate() + '').padStart(2, '0');
+            return string;
+        } else if ((this.scaleType === "month")
+            || (this.scaleType === "threeMonths")
+        ) {
+            const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+            return months[date.getMonth()] + ' ' + (date.getYear() + 1900);
+        } else if ((this.scaleType === "year")
+            || (this.scaleType === "fiveYears")
+        ) {
+            return (date.getYear() + 1900) + '';
+        }
+        return date.toString();
+    }
+
+    onMouseDown(e) {
+        if (e.button === 0) {
+            this.mouseState.leftButton = true;
+        } else if (e.button === 2) {
+            this.mouseState.rightButton = true;
+        }
+        return false;
+    }
+
+    onMouseUp(e) {
+        if (e.button === 0) {
+            this.mouseState.leftButton = false;
+        } else if (e.button === 2) {
+            this.mouseState.rightButton = false;
+        }
+        return false;
+    }
+
+    onMouseMove(e) {
+        if (this.mouseState.rightButton) {
+            this.leftEpoch += (this.mouseState.x - e.x) * this.span / this.domElement.width;
+        }
+
+        this.mouseState.x = e.x;
+        this.mouseState.y = e.y;
+        return false;
+    }
+
+    onMouseWheel(e) {
+        const stepMult = 1.3;
+        const mult = (e.deltaY > 0) ? stepMult : (1 / stepMult);
+        const newSpan = Math.min(Math.max(this.span * mult,
+            (this.canvasRect.right - this.canvasRect.left) / this.markDistance * TimeLine.scales.minute),
+            (this.canvasRect.right - this.canvasRect.left) / this.markDistance * TimeLine.scales.fiveYears);
+        this.leftEpoch += (this.mouseState.x - this.canvasRect.left)
+            * (this.span - newSpan) / (this.canvasRect.right - this.canvasRect.left);
+        this.span = newSpan;
+
+        this.updateScaleType();
+        return false;
+    }
+}
+/* harmony export (immutable) */ __webpack_exports__["a"] = TimeLine;
+
+
+TimeLine.scales = {
+    minute: 60,
+    fiveMinutes: 300,
+    tenMinutes: 600,
+    thirtyMinutes: 1800,
+    hour: 3600,
+    threeHours: 10800,
+    sixHours: 21600,
+    day: 86400,
+    week: 604800,
+    month: 2592000,
+    threeMonths: 7776000,
+    year: 31557600,
+    fiveYears: 157788000,
+};
+
 
 /***/ })
 /******/ ]);

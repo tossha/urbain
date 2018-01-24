@@ -45,7 +45,7 @@ export default class UIPanelLambert extends UIPanel
 
         const transfer = LambertSolver.solve(state1, state2, this.departureTime, this.transferTime, mu);
         const trajectory = new TrajectoryKeplerianBasic(referenceFrameId, transfer);
-        trajectory.setObject(new EphemerisObject(-1, origin.name + '->' + target.name + ' transfer'));
+        trajectory.setObject(new EphemerisObject(-1, EphemerisObject.TYPE_UNKNOWN, origin.name + '->' + target.name + ' transfer'));
 
         if (this.visualModel) {
             this.visualModel.drop();

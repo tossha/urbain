@@ -30,7 +30,7 @@ export default class ReferenceFrameBodyFixed extends ReferenceFrameAbstract
 
     stateVectorFromBaseReferenceFrameByEpoch(epoch, state) {
         const originState = this.getOriginStateByEpoch(epoch);
-        const rotation = this.getQuaternionByEpoch(epoch).invert();
+        const rotation = this.getQuaternionByEpoch(epoch).invert_();
 
         const destPos = rotation.rotate(state.position.sub_(originState.position));
         let destVel = rotation.rotate(state.velocity.sub_(originState.velocity));

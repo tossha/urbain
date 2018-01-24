@@ -1,4 +1,4 @@
-import {Events} from "./Events";
+import {Events} from "../core/Events";
 
 export const J2000_TIMESTAMP = 946728000;
 

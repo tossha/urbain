@@ -1,7 +1,7 @@
 
 import TrajectoryAbstract from "./Abstract";
 import {RF_BASE} from "../ReferenceFrame/Factory";
-import TimeLine from "../TimeLine";
+import TimeLine from "../../ui/TimeLine";
 
 export default class TrajectoryComposite extends TrajectoryAbstract
 {

@@ -1,10 +1,14 @@
 import VisualModelAbstract from "./ModelAbstract";
 import {Quaternion, Vector} from "../algebra";
+import {RF_BASE} from "../core/ReferenceFrame/Factory";
 
 export default class VisualVector extends VisualModelAbstract
 {
     constructor(vector, referenceFrameId) {
         super();
+        if (referenceFrameId === undefined) {
+            referenceFrameId = RF_BASE;
+        }
         this.referenceFrame = sim.starSystem.getReferenceFrame(referenceFrameId);
         this.quaternion = Quaternion.transfer(new Vector([0,1,0]), vector);
         this.setThreeObj(new THREE.ArrowHelper(
@@ -15,7 +19,7 @@ export default class VisualVector extends VisualModelAbstract
     }
 
     render(epoch) {
-        this.threeObj.quaternion.copy(Quaternion.mul(this.quaternion, this.referenceFrame.getQuaternionByEpoch(epoch)).toThreejs());
+        this.threeObj.quaternion.copy(this.quaternion.mul(this.referenceFrame.getQuaternionByEpoch(epoch)).toThreejs());
         this.threeObj.position.copy(sim.getVisualCoords(this.referenceFrame.getOriginPositionByEpoch(epoch)));
     }
 }

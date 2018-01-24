@@ -1,5 +1,6 @@
 import {deg2rad} from "../algebra";
-import TimeLine from "./TimeLine";
+import TimeLine from "../ui/TimeLine";
+import {EARTH} from "../solar_system";
 
 export default class TLE
 {
@@ -34,7 +35,7 @@ export default class TLE
 
     getSma() {
         //sma^3 = mu[earth] / (2PI * Frequency)^2
-        return Math.cbrt(starSystem.getObject(EARTH).physicalModel.mu / Math.pow(2 * Math.PI * (this.getMeanMotion()), 2));
+        return Math.cbrt(sim.starSystem.getObject(EARTH).physicalModel.mu / Math.pow(2 * Math.PI * (this.getMeanMotion()), 2));
     }
 
     getEpoch() {

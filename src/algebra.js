@@ -197,7 +197,7 @@ export class Quaternion
     }
 
     static mul(q1, q2) {
-        return q1.copy().mul(q2);
+        return q1.copy().mul_(q2);
     }
 
     static transfer(fromVector, toVector) {
@@ -286,8 +286,7 @@ export class Quaternion
     }
 
     invert() {
-        return this.invert_();
-        // return this.copy().invert_();
+        return this.copy().invert_();
     }
 
     normalize_() {
@@ -298,8 +297,7 @@ export class Quaternion
     }
 
     normalize() {
-        return this.normalize_();
-        // return this.copy().normalize_();
+        return this.copy().normalize_();
     }
 
     rotate_(vector) {
@@ -334,7 +332,7 @@ export class Quaternion
     }
 
     mul(quat) {
-        return this.mul_(quat);
+        return this.copy().mul_(quat);
     }
 
     setAxisAngle(axis, angle) {

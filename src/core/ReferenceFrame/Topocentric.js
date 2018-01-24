@@ -12,11 +12,11 @@ export default class ReferenceFrameTopocentric extends ReferenceFrameBodyFixed
     }
 
     getQuaternionByEpoch(epoch) {
-        return this.body.orientation.getQuaternionByEpoch(epoch).mul(this.bodyFixedQuaternion)
+        return this.body.orientation.getQuaternionByEpoch(epoch).mul_(this.bodyFixedQuaternion)
     }
 
     getRotationVelocityByEpoch(epoch) {
-        return Quaternion.invert(this.bodyFixedQuaternion).rotate(
+        return this.bodyFixedQuaternion.invert().rotate(
             new Vector([0, 0, this.body.orientation.angularVel])
         );
     }
