@@ -41,4 +41,9 @@ export default class VisualTrajectoryModelAbstract extends VisualModelAbstract
     deselect() {
         this.color = this.standardColor;
     }
+
+    drop() {
+        sim.selection.removeSelectableObject(this.threeObj);
+        super.drop();
+    }
 }

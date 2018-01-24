@@ -44,9 +44,9 @@ require 'functions.php';
         </tr>
     </table>
 
-    <table class="panelContent" data-panel-name="metrics">
+    <table width="100%" style="border-bottom: blue solid 1px" class="panelContent" data-panel-name="metrics">
         <tr>
-            <td style="width: 80px"><b>of</b></td>
+            <td style="width: 110px"><b>of</b></td>
             <td id="metricsOf"></td>
         </tr>
         <tr>
@@ -55,16 +55,18 @@ require 'functions.php';
         </tr>
     </table>
 
-    <table class="panelContent" data-panel-name="metrics">
+    <table width="100%" style="border-bottom: blue solid 1px" class="panelContent" data-panel-name="metrics">
         <tr>
-            <td colspan="3">
+            <td>
                 <label for="showAnglesOfSelectedOrbit">Show angles of selected orbit</label>
             </td>
-            <td></td>
             <td>
                 <input type="checkbox" id="showAnglesOfSelectedOrbit" checked>
             </td>
         </tr>
+    </table>
+
+    <table width="100%" style="border-bottom: blue solid 1px" class="panelContent" data-panel-name="metrics">
         <tr>
             <td colspan="3">
                 Keplerian
@@ -205,30 +207,95 @@ require 'functions.php';
                     </select>
                 </td>
             </tr>
-
-            <!--<tr>
-                <td><b>Mode:</b></td>
-                <td>
-                    <input id="inputModeOrbit" type="radio" name="inputMode">
-                    <label for="inputModeOrbit" style="vertical-align: top;">Orbit</label>
-                    <input id="inputModeFree" type="radio" name="inputMode">
-                    <label for="inputModeFree" style="vertical-align: top;">Free</label>
-                </td>
-                <td>
-                    <input type="number" value="60.0" step="0.1" min="0.0" max="360.0">
-                </td>
-            </tr>-->
-
-            <!--<tr>
-                <td><b>Zoom:</b></td>
-                <td colspan="2">
-                    <input id="zoomSlider" type="range" style="width: 100%">
-                </td>
-            </tr>-->
         </table>
     </div>
 
     <canvas id="timeLineCanvas"></canvas>
 </div>
+
+<div class="panel" id="lambertPanel" data-panel-name="lambert">
+    <table id="lambertHeader" class="panelHeader">
+        <tr>
+            <td>
+                Transfer calculation
+                <button class="collapseButton" data-panel-name="lambert"></button>
+            </td>
+        </tr>
+    </table>
+
+    <table class="panelContent" data-panel-name="lambert" width="100%" style="border-bottom: blue solid 1px">
+        <tr>
+            <td><b>Origin:</b></td>
+            <td>
+                <select id="originSelect">
+                </select>
+            </td>
+        </tr>
+        <tr>
+            <td><b>Target:</b></td>
+            <td>
+                <select id="targetSelect">
+                </select>
+            </td>
+        </tr>
+        <tr>
+            <td><b>Transfer type:</b></td>
+            <td>
+                Ballistic
+            </td>
+        </tr>
+    </table>
+
+    <table class="panelContent"  data-panel-name="lambert" style="width: 100%; border-bottom: blue solid 1px">
+
+        <tr>
+            <td><b>Departure:</b></td>
+
+            <td id="departureDateValue">01.01.2000 12:00:00</td>
+
+            <td>
+                <button id="useCurrentTime">Now</button>
+            </td>
+        </tr>
+
+        <tr>
+            <td><b>Transfer time:</b></td>
+            <td id="transferTimeValue"></td>
+            <td>
+                <!--<button id="optimalTransferTime">Optimal</button>-->
+            </td>
+        </tr>
+
+        <tr>
+            <td colspan="3">
+                <input id="transferTimeSlider" type="range" min="0" max="1" step="0.001" value="0.5"
+                       style="width: 100%">
+            </td>
+        </tr>
+
+    </table>
+
+    <table class="panelContent" data-panel-name="lambert">
+        <tr>
+            <td><b>Ejection Delta-V:</b></td>
+            <td id="deltaVEjection"></td>
+        </tr>
+        <tr>
+            <td><b>Insertion Delta-V:</b></td>
+            <td id="deltaVInsertion"></td>
+        </tr>
+        <tr>
+            <td><b>Total Delta-V:</b></td>
+            <td id="deltaVTotal"></td>
+        </tr>
+    </table>
+
+</div>
+
+
+<div id="dialogLambertResults" title="Lambert solver results" style="position: absolute; top: 500px; left: 0px; z-index: 10000">
+    <canvas width="300" height="300" id="lambertCanvas"></canvas>
+</div>
+
 </body>
 </html>

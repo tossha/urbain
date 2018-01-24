@@ -67,6 +67,29 @@ export default class StarSystem
         return this.objects[id];
     }
 
+    getCommonParentObject(object1, object2, epoch1, epoch2) {
+        if (epoch2 === undefined) {
+            epoch2 = epoch1;
+        }
+
+        let chain1 = [object1];
+        let parent;
+
+        while (parent = this.getObject(chain1[chain1.length-1]).getParentObjectIdByEpoch(epoch1)) {
+            chain1.push(parent);
+        }
+        chain1.push(0);
+
+        parent = object2;
+        while ((parent = this.getObject(parent).getParentObjectIdByEpoch(epoch2)) !== null) {
+            if (chain1.indexOf(parent) !== -1) {
+                return this.getObject(parent);
+            }
+        }
+
+        return null;
+    }
+
     isBody(objectId) {
         if (this.objects[objectId] === undefined) {
             return null;

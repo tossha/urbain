@@ -64,6 +64,11 @@ export default class TrajectoryAbstract
 
     getStateByEpoch(epoch, referenceFrame) {
         let state;
+
+        if (referenceFrame === undefined) {
+            referenceFrame = RF_BASE;
+        }
+
         if (referenceFrame === RF_BASE && epoch === this.cachedEpoch) {
             state = this.cachedState;
         } else {

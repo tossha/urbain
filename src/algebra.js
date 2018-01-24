@@ -80,7 +80,14 @@ export class Vector extends Array
     }
 
     angle(vec) {
-        return Math.acos(this.dot(vec) / this.mag / vec.mag);
+        const cos = this.dot(vec) / this.mag / vec.mag;
+        if (cos <= -1) {
+            return Math.PI;
+        }
+        if (cos >= 1) {
+            return 0;
+        }
+        return Math.acos(cos);
     }
 
     add_(vec) {
@@ -111,6 +118,10 @@ export class Vector extends Array
         return this;
     }
 
+    rotate_(axis, angle) {
+        return (new Quaternion(axis, angle)).rotate_(this);
+    }
+
     unit_() {
         return this.div_(this.mag);
     }
@@ -133,6 +144,10 @@ export class Vector extends Array
 
     unit() {
         return this.copy().unit_();
+    }
+
+    rotate(axis, angle) {
+        return this.copy().rotate_(axis, angle);
     }
 
     rotateX(radians) {

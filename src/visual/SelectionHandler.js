@@ -36,6 +36,7 @@ export default class SelectionHandler extends VisualModelAbstract
                 break;
             }
         }
+        this.selectableObjects = this.selectableObjects.filter(val => val);
     }
 
     render() {
