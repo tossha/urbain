@@ -292,10 +292,5 @@ require 'functions.php';
 
 </div>
 
-
-<div id="dialogLambertResults" title="Lambert solver results" style="position: absolute; top: 500px; left: 0px; z-index: 10000">
-    <canvas width="300" height="300" id="lambertCanvas"></canvas>
-</div>
-
 </body>
 </html>
