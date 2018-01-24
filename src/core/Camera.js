@@ -9,7 +9,6 @@ export default class Camera
         this.settings = {
             fov: 60,
             animationDuration: 200,
-            zoomFactor: 1.5,
             pixelsToObjectUnderMouse: 20
         };
 
@@ -30,6 +29,7 @@ export default class Camera
         this.threeCamera.position.fromArray([0, 0, 0]);
 
         this.isMouseDown = false;
+        this.isShiftDown = false;
         this.rightButtonDown = false;
         this.isLookingAside = false;
         this.zoomingAside = 0;
@@ -173,9 +173,10 @@ export default class Camera
             return;
         }
 
+        const defaultFactor = event.shiftKey ? (1 + (sim.settings.ui.camera.zoomFactor - 1) / 10) : sim.settings.ui.camera.zoomFactor;
         const factor = event.deltaY < 0
-            ? 1 / this.settings.zoomFactor
-            : this.settings.zoomFactor;
+            ? 1 / defaultFactor
+            : defaultFactor;
         let objectToZoomTo = this.findObjectUnderMouse();
         let zoomingTo = this.orbitingPoint;
 
@@ -228,6 +229,7 @@ export default class Camera
 
     onMouseMove(event) {
         if (this.isMouseDown) {
+            this.isShiftDown = !!event.shiftKey;
             this.currentMousePos.set(event.clientX, event.clientY);
         }
     }
@@ -252,14 +254,15 @@ export default class Camera
 
         if (mouseShift[0] || mouseShift[1]) {
             const polarConstraint = 0.00001;
+            const sensitivity = (this.isShiftDown ? 0.1 : 1) * sim.settings.ui.camera.mouseSensitivity;
             const pole = new Vector([0, 0, 1]);
             let poleAngle = this.position.angle(pole);
             let verticalRotationAxis = this.rightButtonDown
                 ? this.quaternion.rotate(new Vector([0, 0, 1])).cross(pole)
                 : this.position.cross(pole);
 
-            let verticalQuaternion = new Quaternion(verticalRotationAxis, Math.min(Math.max(mouseShift[1] * 0.01, poleAngle - Math.PI + polarConstraint), poleAngle - polarConstraint));
-            let mainQuaternion = (new Quaternion()).setAxisAngle(pole, -mouseShift[0] * 0.01).mul_(verticalQuaternion);
+            let verticalQuaternion = new Quaternion(verticalRotationAxis, Math.min(Math.max(mouseShift[1] * sensitivity, poleAngle - Math.PI + polarConstraint), poleAngle - polarConstraint));
+            let mainQuaternion = (new Quaternion()).setAxisAngle(pole, -mouseShift[0] * sensitivity).mul_(verticalQuaternion);
 
             if (!this.rightButtonDown) {
                 mainQuaternion.rotate_(this.position);

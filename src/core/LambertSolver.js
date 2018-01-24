@@ -5,79 +5,98 @@ import {SUN} from "../solar_system";
 
 export default class LambertSolver
 {
-    static getPlotData(orbit1, orbit2, epoch1Min, epoch1Max, transferMin, transferMax, points) {
-        const epoch1Step = (epoch1Max - epoch1Min) / (points - 1);
-        const epoch2Step = (transferMax - transferMin) / (points - 1);
+    static getPlotData(orbit1, orbit2, epochMin, epochMax, transferMin, transferMax, points) {
+        const epochStep = (epochMax - epochMin) / (points - 1);
+        const flightTimeStep = (transferMax - transferMin) / (points - 1);
         let result = [];
-        let epoch1 = epoch1Min;
+        let startEpoch = epochMin;
         let i = 0;
 
-        while (epoch1 < epoch1Max) {
-            let epoch2 = epoch1 + transferMin;
+        while (startEpoch <= epochMax) {
+            let flightTime = transferMin;
             let j = 0;
 
             result[i] = [];
-            while (epoch2 < epoch1 + transferMax) {
-                let res = this.calcDeltaV(orbit1, orbit2, epoch1, epoch2);
-                result[i][j] = res ? res.toPrecision(4) : '-----';
-                epoch2 += epoch2Step;
+            while (flightTime <= transferMax) {
+                let res = this.calcDeltaV(
+                    orbit1.getStateByEpoch(startEpoch),
+                    orbit2.getStateByEpoch(startEpoch + flightTime),
+                    startEpoch,
+                    flightTime,
+                    orbit1.mu
+                );
+                result[i][j] = res;
+                flightTime += flightTimeStep;
                 j++;
+
             }
-            epoch1 += epoch1Step;
+            startEpoch += epochStep;
             i++;
         }
         return result;
     }
 
-    static getDeltaV(orbit1, orbit2, transferOrbit, epoch1, epoch2) {
-        return orbit1.getStateByEpoch(epoch1).velocity.sub(transferOrbit.getStateByEpoch(epoch1).velocity).mag +
-            orbit2.getStateByEpoch(epoch2).velocity.sub(transferOrbit.getStateByEpoch(epoch2).velocity).mag;
+    static plot(plotData) {
+        let min = 1e99, max = 0;
+        let ctx = document.getElementById('lambertCanvas').getContext('2d');
 
+        ctx.clearRect(0, 0, 300, 300);
+
+        for (let row of plotData) {
+            for (let res of row) {
+                if (res === false) {
+                    continue;
+                }
+                if (res < min) {
+                    min = res;
+                }
+                if (res > max) {
+                    max = res;
+                }
+            }
+        }
+
+        for (let row in plotData) {
+            for (let col in plotData[row]) {
+                const res = plotData[row][col];
+                if (res === false) {
+                    ctx.fillStyle = "rgba(255,0,0,1)";
+                } else {
+                    const color = Math.round((1 - (res - min) / (max - min)) * 255);
+                    ctx.fillStyle = "rgba(" + color + "," + color + "," + color + ", 1)";
+                }
+                ctx.fillRect(0|row, 0|col, 1, 1);
+            }
+        }
     }
 
-    static calcDeltaV(orbit1, orbit2, epoch1, epoch2) {
-        const transferOrbit = this.solve(orbit1, orbit2, epoch1, epoch2);
+    static getDeltaV(state1, state2, transferOrbit, epoch1, epoch2) {
+        return state1.velocity.sub_(transferOrbit.getStateByEpoch(epoch1)._velocity).mag +
+            state2.velocity.sub_(transferOrbit.getStateByEpoch(epoch2)._velocity).mag;
+    }
+
+    static calcDeltaV(state1, state2, startEpoch, flightTime, mu) {
+        const transferOrbit = this.solve(state1, state2, startEpoch, flightTime, mu);
 
         if (!transferOrbit) {
             return false;
         }
 
-        return this.getDeltaV(orbit1, orbit2, transferOrbit, epoch1, epoch2);
+        return this.getDeltaV(state1, state2, transferOrbit, startEpoch, startEpoch + flightTime);
     }
 
-    static addVisHelper(vector, epoch) {
-        this.visHelpers = this.visHelpers || [];
-        this.visHelpers.push(new VisualVector(vector, sim.starSystem.getObject(SUN).getPositionByEpoch(epoch)));
-        sim.renderer.render(sim.scene, sim.camera.threeCamera);
-    }
-
-    static clearHelpers() {
-        if (this.visHelpers) {
-            for (let i in this.visHelpers) {
-                this.visHelpers[i].drop();
-            }
-        }
-        this.visHelpers = [];
-        sim.renderer.render(sim.scene, sim.camera.threeCamera);
-    }
-
-    static solve(orbit1, orbit2, epoch1, epoch2) {
+    static solve(state1, state2, startEpoch, flightTime, mu) {
         const maxError = 1;
-        const maxSteps = 15;
+        const maxSteps = 30;
 
-        const r1vec = orbit1.getStateByEpoch(epoch1).position;
-        const r2vec = orbit2.getStateByEpoch(epoch2).position;
+        const r1vec = state1.position;
+        const r2vec = state2.position;
         let normal = r1vec.cross(r2vec);
         const r1 = r1vec.mag;
         const r2 = r2vec.mag;
         let transferAngle = r1vec.angle(r2vec);
 
-        this.clearHelpers();
-
-        this.addVisHelper(r1vec, epoch1);
-        this.addVisHelper(r2vec, epoch2);
-
-        if (normal.angle(orbit1.getNormalVector()) > Math.PI / 2) {
+        if (normal.angle(state1._position.cross(state1._velocity)) > Math.PI / 2) {
             transferAngle = 2 * Math.PI - transferAngle;
             normal.mul_(-1);
         }
@@ -94,16 +113,15 @@ export default class LambertSolver
 
         const d = Math.sqrt(r1*r1 + r2*r2 - 2 * r1vec.dot(r2vec)) / 2;
 
-        const target = epoch2 - epoch1;
-        const parabolicTime = (Math.pow(r1+r2+2*d, 3/2) - signSinTransferAngle*Math.pow(r1+r2-2*d, 3/2)) / (6 * Math.sqrt(orbit1.mu));
+        const parabolicTime = (Math.pow(r1+r2+2*d, 3/2) - signSinTransferAngle*Math.pow(r1+r2-2*d, 3/2)) / (6 * Math.sqrt(mu));
 
-        if (target > parabolicTime) {
+        if (flightTime > parabolicTime) {
             // ellipse
             const A = (r2 - r1) / 2;
             const E = d / A;
             const B = Math.sqrt(d*d - A*A);
             let y = newtonSolve(
-                (yParam) => this.getTimeByY(yParam, A, B, E, r1, r2, d, transferAngle, orbit1.mu) - target,
+                (yParam) => this.getTimeByY(yParam, A, B, E, r1, r2, d, transferAngle, mu) - flightTime,
                 10000, 1, maxError, maxSteps
             );
 
@@ -130,10 +148,10 @@ export default class LambertSolver
                 (a) => {
                     const alpha = Math.acosh(1 + (r1 + r2 + 2 * d) / 2 / Math.abs(a));
                     const beta  = Math.acosh(1 + (r1 + r2 - 2 * d) / 2 / Math.abs(a));
-                    return Math.sqrt(Math.abs(Math.pow(a, 3)) / orbit1.mu) *
-                        (Math.sinh(alpha) - alpha - signSinTransferAngle * (Math.sinh(beta) - beta)) - target;
+                    return Math.sqrt(Math.abs(Math.pow(a, 3)) / mu) *
+                        (Math.sinh(alpha) - alpha - signSinTransferAngle * (Math.sinh(beta) - beta)) - flightTime;
                 },
-                orbit1.sma, 10, maxError, maxSteps
+                r1, 10, maxError, maxSteps
             );
 
             if (sma > 0) {
@@ -173,8 +191,7 @@ export default class LambertSolver
             aop = 2 * Math.PI - aop;
         }
 
-
-        return new KeplerianObject(e, sma, aop, inc, raan, ta1, epoch1, orbit1.mu, true);
+        return new KeplerianObject(e, sma, aop, inc, raan, ta1, startEpoch, mu, true);
     }
 
     static getTimeByY(y, A, B, E, r1, r2, d, alpha, mu) {

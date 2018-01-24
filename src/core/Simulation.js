@@ -63,10 +63,18 @@ export default class Simulation
         return this.time.epoch;
     }
 
+    get currentDate() {
+        return TimeLine.getDateByEpoch(this.time.epoch);
+    }
+
     initSettings() {
         this.settings = {
             ui: {
-                showAnglesOfSelectedOrbit: true
+                showAnglesOfSelectedOrbit: true,
+                camera: {
+                    mouseSensitivity: 0.007,
+                    zoomFactor: 1.5
+                }
             }
         }
     }

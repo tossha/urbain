@@ -40,6 +40,12 @@ button:hover {
     right: 0;
 }
 
+#lambertPanel {
+    position: absolute;
+    top: 50px;
+    left: 0;
+}
+
 #metricsHeader {
     min-width: 280px;
 }
