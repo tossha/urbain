@@ -2,13 +2,13 @@ import EventHandler from "./EventHandler";
 import {Vector} from "../algebra";
 import {Events} from "./Events";
 import {ReferenceFrame} from "./ReferenceFrame/Factory";
-import TimeLine from "./TimeLine";
+import TimeLine from "../ui/TimeLine";
 import StarSystemLoader from "../interface/StarSystemLoader";
-import VisualRaycaster from "../visual/VisualRaycaster";
-import SelectionHandler from "../visual/SelectionHandler";
+import VisualRaycaster from "../visual/Raycaster";
+import SelectionHandler from "../ui/SelectionHandler";
 import UI from "../ui/UI";
 import StarSystem from "./StarSystem";
-import Camera from "./Camera";
+import Camera from "../ui/Camera";
 import ReferenceFrameFactory from "./ReferenceFrame/Factory";
 
 export default class Simulation

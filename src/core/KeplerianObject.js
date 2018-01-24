@@ -276,8 +276,8 @@ export default class KeplerianObject
 
     getOrbitalFrameQuaternion() {
         return (new Quaternion(new Vector([0, 0, 1]), this._raan))
-            .mul(new Quaternion(new Vector([1, 0, 0]), this._inc))
-            .mul(new Quaternion(new Vector([0, 0, 1]), this._aop))
+            .mul_(new Quaternion(new Vector([1, 0, 0]), this._inc))
+            .mul_(new Quaternion(new Vector([0, 0, 1]), this._aop))
         ;
     }
 

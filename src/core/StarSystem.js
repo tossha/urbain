@@ -11,7 +11,6 @@ export default class StarSystem
         this.id = id;
         this.name = null;
         this.stars = null;
-        this.mainStars = [];
         this.mainObject = null;
         this.referenceFrames = {};
         this.trajectories = {};
@@ -21,15 +20,6 @@ export default class StarSystem
     addStars(stars) {
         this.stars = stars;
         return this;
-    }
-
-    setMainStars(objectIds) {
-        this.mainStars = objectIds;
-        return this;
-    }
-
-    getMainStars() {
-        return this.mainStars;
     }
 
     addReferenceFrame(frame) {
@@ -62,7 +52,7 @@ export default class StarSystem
 
     getObject(id) {
         if (this.objects[id] === undefined) {
-            this.objects[id] = new EphemerisObject(id, 'Unknown #' + id);
+            this.objects[id] = new EphemerisObject(id, EphemerisObject.TYPE_UNKNOWN, 'Unknown #' + id);
         }
         return this.objects[id];
     }

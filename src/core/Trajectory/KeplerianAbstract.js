@@ -14,7 +14,7 @@ export default class TrajectoryKeplerianAbstract extends TrajectoryAbstract
                 return that.referenceFrame.getOriginStateByEpoch(epoch);
             }),
             new FunctionOfEpochCustom((epoch) => {
-                return that.referenceFrame.getQuaternionByEpoch(epoch).mul(
+                return that.referenceFrame.getQuaternionByEpoch(epoch).mul_(
                     that.getKeplerianObjectByEpoch(epoch).getOrbitalFrameQuaternion()
                 );
             })

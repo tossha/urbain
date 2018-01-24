@@ -2,8 +2,9 @@ import {RF_BASE} from "./ReferenceFrame/Factory";
 
 export default class EphemerisObject
 {
-    constructor(bodyId, name) {
+    constructor(bodyId, type, name) {
         this.id   = bodyId;
+        this.type = type;
         this.name = name;
     }
 
@@ -29,3 +30,13 @@ export default class EphemerisObject
         return this.trajectory.getPositionByEpoch(epoch, referenceFrame || RF_BASE);
     }
 }
+
+EphemerisObject.TYPE_UNKNOWN    = 0;
+EphemerisObject.TYPE_STAR       = 1;
+EphemerisObject.TYPE_PLANET     = 2;
+EphemerisObject.TYPE_PLANETOID  = 3;
+EphemerisObject.TYPE_SATELLITE  = 4;
+EphemerisObject.TYPE_ASTEROID   = 5;
+EphemerisObject.TYPE_COMET      = 6;
+EphemerisObject.TYPE_SPACECRAFT = 7;
+EphemerisObject.TYPE_POINT      = 8;

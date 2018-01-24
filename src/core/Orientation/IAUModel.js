@@ -26,8 +26,7 @@ export default class OrientationIAUModel extends OrientationAbstract
             days * this.rotation[1] +
             days * days * this.rotation[2];
 
-        return Quaternion.mul(
-            this.ICRFQuaternion,
+        return this.ICRFQuaternion.mul(
             (new Quaternion())
                 .setFromEuler(deg2rad(rightAscension), deg2rad(declination), deg2rad(rotation), 'ZXZ')
         );

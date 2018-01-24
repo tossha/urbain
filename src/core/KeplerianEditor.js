@@ -144,7 +144,7 @@ export default class KeplerianEditor
         this.normal = (new Quaternion(this.node, keplerianObject.inc)).rotate(new Vector([0, 0, 1]));
         this.aopQuaternion = new Quaternion(this.normal, keplerianObject.aop);
 
-        this.periapsis = Quaternion.mul(this.aopQuaternion, this.nodeQuaternion).rotate(new Vector([1, 0, 0]));
+        this.periapsis = this.aopQuaternion.mul(this.nodeQuaternion).rotate(new Vector([1, 0, 0]));
         this.nodePerp = this.nodeQuaternion.rotate(
             new Vector([1, 0, 0])
                 .rotateZ(Math.PI / 2)

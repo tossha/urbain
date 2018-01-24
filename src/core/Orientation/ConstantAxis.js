@@ -12,8 +12,7 @@ export default class OrientationConstantAxis extends OrientationAbstract
     }
 
     getQuaternionByEpoch(epoch) {
-        return Quaternion.mul(
-            this.axisQuaternion,
+        return this.axisQuaternion.mul(
             new Quaternion(
                 [0, 0, 1],
                 this.initialAngle + (epoch - this.initialEpoch) * this.angularSpeed

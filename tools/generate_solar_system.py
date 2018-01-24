@@ -940,73 +940,82 @@ stars = [
 objects = [
 	{
 		'id': '10',
-		'parent': '0',
-		'name': 'Sun',
-		'maxError': 30000,
-		'color': 'yellow',
-		'texture': 'SunTexture.jpg'
-	},
-	{
-		'id': '199',
-		'name': 'Mercury',
-		'maxError': 30000,
-		'color': 'azure',
-		'texture': 'MercuryTexture.jpg'
-	},
-	{
-		'id': '299',
-		'name': 'Venus',
-		'maxError': 30000,
-		'color': 'orange',
-		'texture': 'VenusTexture.jpg'
-	},
-	# {
-	# 	'id': '3',
-	# 	'name': 'Earth-Moon barycenter',
-	# 	'maxError': 30000,
-	# 	'color': 'lightblue'
-	# },
-	{
-		'id': '399',
-		'name': 'Earth',
-		'maxError': 30000,
-		'color': 'blue',
-		'texture': 'EarthTexture.jpg',
-		'parent': '3',
-		'pair': '301'
-	},
-	{
-		'id': '301',
-		'name': 'Moon',
-		'maxError': 30000,
-		'color': 'white',
-		'texture': 'MoonTexture.jpg',
-		'parent': '3',
-		'pair': '399'
-	},
-	{
-		'id': '499',
-		'name': 'Mars',
-		'maxError': 30000,
-		'color': 'red',
-		'texture': 'MarsTexture.jpg'
-	},
-	{
-		'id': '599',
-		'name': 'Jupiter',
-		'maxError': 30000,
-		'color': 'burlywood',
-		'texture': 'JupiterTexture.jpg'
-	},
-	{
-		'id': '501',
-		'name': 'Io',
-		'maxError': 30000,
+        'parent': '0',
+        'type': 1,
+        'name': 'Sun',
+        'maxError': 30000,
+        'color': 'yellow',
+        'texture': 'SunTexture.jpg'
+    },
+    {
+        'id': '199',
+        'type': 2,
+        'name': 'Mercury',
+        'maxError': 30000,
+        'color': 'azure',
+        'texture': 'MercuryTexture.jpg'
+    },
+    {
+        'id': '299',
+        'type': 2,
+        'name': 'Venus',
+        'maxError': 30000,
+        'color': 'orange',
+        'texture': 'VenusTexture.jpg'
+    },
+    # {
+    #   'id': '3',
+    #   'name': 'Earth-Moon barycenter',
+    #   'maxError': 30000,
+    #   'color': 'lightblue'
+    # },
+    {
+        'id': '399',
+        'type': 2,
+        'name': 'Earth',
+        'maxError': 30000,
+        'color': 'blue',
+        'texture': 'EarthTexture.jpg',
+        'parent': '3',
+        'pair': '301'
+    },
+    {
+        'id': '301',
+        'type': 4,
+        'name': 'Moon',
+        'maxError': 30000,
+        'color': 'white',
+        'texture': 'MoonTexture.jpg',
+        'parent': '3',
+        'pair': '399'
+    },
+    {
+        'id': '499',
+        'type': 2,
+        'name': 'Mars',
+        'maxError': 30000,
+        'color': 'red',
+        'texture': 'MarsTexture.jpg'
+    },
+    {
+        'id': '599',
+        'type': 2,
+        'name': 'Jupiter',
+        'maxError': 30000,
+        'color': 'burlywood',
+        'texture': 'JupiterTexture.jpg'
+    },
+    {
+        'id': '501',
+        'type': 4,
+        'name': 'Io',
+        'maxError': 30000,
         'color': 'burlywood',
         'texture': 'Io.jpg',
     },
     {
         'id': '502',
+        'type': 4,
         'name': 'Europa',
         'maxError': 30000,
         'color': 'burlywood',
@@ -1014,6 +1023,7 @@ objects = [
     },
     {
         'id': '503',
+        'type': 4,
         'name': 'Ganymede',
         'maxError': 30000,
         'color': 'burlywood',
@@ -1021,6 +1031,7 @@ objects = [
     },
     {
         'id': '504',
+        'type': 4,
         'name': 'Callisto',
         'maxError': 30000,
         'color': 'burlywood',
@@ -1028,6 +1039,7 @@ objects = [
     },
     {
         'id': '699',
+        'type': 2,
         'name': 'Saturn',
         'maxError': 30000,
         'color': 'sandybrown',
@@ -1035,6 +1047,7 @@ objects = [
     },
     {
         'id': '601',
+        'type': 4,
         'name': 'Mimas',
         'maxError': 30000,
         'color': 'sandybrown',
@@ -1042,6 +1055,7 @@ objects = [
     },
     {
         'id': '602',
+        'type': 4,
         'name': 'Enceladus',
         'maxError': 30000,
         'color': 'sandybrown',
@@ -1049,6 +1063,7 @@ objects = [
     },
     {
         'id': '606',
+        'type': 4,
         'name': 'Titan',
         'maxError': 30000,
         'color': 'sandybrown',
@@ -1056,6 +1071,7 @@ objects = [
     },
     {
         'id': '799',
+        'type': 2,
         'name': 'Uranus',
         'maxError': 30000,
         'color': 'lightskyblue',
@@ -1063,6 +1079,7 @@ objects = [
     },
     {
         'id': '899',
+        'type': 2,
         'name': 'Neptune',
         'maxError': 30000,
         'color': 'steelblue',
@@ -1070,18 +1087,21 @@ objects = [
     },
     {
         'id': '801',
+        'type': 4,
         'name': 'Triton',
         'maxError': 10000,
         'color': 'steelblue'
     },
     {
         'id': '9',
+        'type': 8,
         'name': 'Pluto-Charon barycenter',
         'maxError': 30000,
         'color': 'tan'
     },
     {
         'id': '999',
+        'type': 3,
         'parent': '9',
         'name': 'Pluto',
         'maxError': 30000,
@@ -1091,51 +1111,59 @@ objects = [
     },
     {
         'id': '901',
+        'type': 4,
         'parent': '9',
         'name': 'Charon',
         'maxError': 30000,
         'color': 'rosybrown',
         'pair': '999',
-		'texture': 'Charon.jpg'
-	},
-	{
-		'id': '1',
-		'parent': '199',
-		'name': 'Mercury barycenter',
-		'position': [0,0,0]
-	},
-	{
-		'id': '2',
-		'parent': '299',
-		'name': 'Venus barycenter',
-		'position': [0,0,0]
-	},
-	{
-		'id': '4',
-		'parent': '499',
-		'name': 'Mars barycenter',
-		'position': [0,0,0]
-	},
-	{
-		'id': '5',
-		'parent': '599',
-		'name': 'Jupiter barycenter',
-		'position': [0,0,0]
-	},
-	{
-		'id': '6',
-		'parent': '699',
-		'name': 'Saturn barycenter',
-		'position': [0,0,0]
-	},
-	{
-		'id': '7',
-		'parent': '799',
-		'name': 'Uranus barycenter',
-		'position': [0,0,0]
-	},
-	{
-		'id': '8',
+        'texture': 'Charon.jpg'
+    },
+    {
+        'id': '1',
+        'type': 8,
+        'parent': '199',
+        'name': 'Mercury barycenter',
+        'position': [0,0,0]
+    },
+    {
+        'id': '2',
+        'type': 8,
+        'parent': '299',
+        'name': 'Venus barycenter',
+        'position': [0,0,0]
+    },
+    {
+        'id': '4',
+        'type': 8,
+        'parent': '499',
+        'name': 'Mars barycenter',
+        'position': [0,0,0]
+    },
+    {
+        'id': '5',
+        'type': 8,
+        'parent': '599',
+        'name': 'Jupiter barycenter',
+        'position': [0,0,0]
+    },
+    {
+        'id': '6',
+        'type': 8,
+        'parent': '699',
+        'name': 'Saturn barycenter',
+        'position': [0,0,0]
+    },
+    {
+        'id': '7',
+        'type': 8,
+        'parent': '799',
+        'name': 'Uranus barycenter',
+        'position': [0,0,0]
+    },
+    {
+        'id': '8',
+		'type': 8,
 		'parent': '899',
 		'name': 'Neptune barycenter',
 		'position': [0,0,0]
@@ -1425,7 +1453,7 @@ def getELP2000Trajectory(color, cutKm):
 		'data': _files
 	}
 
-def getBodyData(body, name, color, texture, parent, pairing, etFrom, etTo, maxError, staticPosition):
+def getBodyData(body, type, name, color, texture, parent, pairing, etFrom, etTo, maxError, staticPosition):
 	global vsopTotal
 	try:
 		parentMu = spice.bodvrd(parent, "GM", 1)[1][0] if parent != '0' else 319.77790837966666
@@ -1452,7 +1480,8 @@ def getBodyData(body, name, color, texture, parent, pairing, etFrom, etTo, maxEr
 		print(len(trajectory['data']['elementsArray']))
 	
 	objectData = {
-		'id': body,
+        'id': body,
+		'type': type,
 		'name': name,
 		'trajectory': trajectory
 	}
@@ -1497,7 +1526,8 @@ def getObjects(objects, etStart, etEnd):
 				parent = str(math.floor(int(body['id']) / 100) * 100 + 99);
 
 		data.append(getBodyData(
-			body = body['id'],
+            body = body['id'],
+			type = body['type'],
 			name = body['name'],
 			color = body['color'] if 'color' in body else False,
 			texture = body['texture'] if 'texture' in body else False,
@@ -1523,7 +1553,6 @@ file.write(json.dumps({
 	'id': 1,
 	'name': 'Solar System',
 	'directory': 'solar_system',
-	'mainStars': [10],
 	'mainObject': 399,
 	'referenceFrames': referenceFrames,
 	'objects': objectsData,

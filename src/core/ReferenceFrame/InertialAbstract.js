@@ -18,7 +18,7 @@ export default class ReferenceFrameInertialAbstract extends ReferenceFrameAbstra
 
     stateVectorFromBaseReferenceFrameByEpoch(epoch, state) {
         const originState = this.stateOfEpoch.evaluate(epoch);
-        const rotation = this.getQuaternionByEpoch(epoch).invert();
+        const rotation = this.getQuaternionByEpoch(epoch).invert_();
 
         return new StateVector(
             rotation.rotate(state.position.sub_(originState.position)),

@@ -26,7 +26,7 @@ export default class ReferenceFrameFactory
                     new FunctionOfEpochCustom((epoch) => {
                         const z = sim.starSystem.getObject(config.origin).orientation.getQuaternionByEpoch(epoch).rotate_(new Vector([0, 0, 1]));
                         const equinox = z.cross(new Vector([0, 0, 1]));
-                        return Quaternion.transfer(new Vector([0, 0, 1]), z).mul(
+                        return Quaternion.transfer(new Vector([0, 0, 1]), z).mul_(
                             Quaternion.transfer(new Vector([1, 0, 0]), equinox)
                         );
                     })
@@ -44,7 +44,7 @@ export default class ReferenceFrameFactory
                     if (parent instanceof Body) {
                         const z = parent.orientation.getQuaternionByEpoch(epoch).rotate_(new Vector([0, 0, 1]));
                         const equinox = z.cross(new Vector([0, 0, 1]));
-                        return Quaternion.transfer(new Vector([0, 0, 1]), z).mul(
+                        return Quaternion.transfer(new Vector([0, 0, 1]), z).mul_(
                             Quaternion.transfer(new Vector([1, 0, 0]), equinox)
                         );
                     } else {
@@ -138,7 +138,7 @@ export default class ReferenceFrameFactory
             || (type === ReferenceFrame.BODY_FIXED)
             || (type === ReferenceFrame.INERTIAL_PARENT_BODY_EQUATORIAL)
         ) {
-            return Math.sign(origin) * (Math.abs(origin) * 100000 + type * 1000);
+            return (origin ? Math.sign(origin) : 1) * (Math.abs(origin) * 100000 + type * 1000);
         }
 
         return null;
