@@ -3526,6 +3526,7 @@ class VisualBodyModelAbstract extends __WEBPACK_IMPORTED_MODULE_0__ModelAbstract
                 }),
                 {
                     text: this.body.name,
+                    margin: 0.3,
                     scaling: (this.body.type === __WEBPACK_IMPORTED_MODULE_3__core_EphemerisObject__["a" /* default */].TYPE_STAR
                             || this.body.type === __WEBPACK_IMPORTED_MODULE_3__core_EphemerisObject__["a" /* default */].TYPE_PLANET)
                         ? {callback: 'alwaysVisible'}
@@ -11898,7 +11899,7 @@ class VisualLabel extends __WEBPACK_IMPORTED_MODULE_0__ModelAbstract__["a" /* de
         context.font = this.parameters.fontSize + 'px ' + this.parameters.font;
 
         let canvasWidth = context.measureText(text).width;
-        let canvasHeight = this.parameters.fontSize * 2;
+        let canvasHeight = this.parameters.fontSize * (1 + this.parameters.margin) * 2;
         this.canvas.width = THREE.Math.ceilPowerOfTwo(canvasWidth);
         this.canvas.height = THREE.Math.ceilPowerOfTwo(canvasHeight);
 
@@ -11909,7 +11910,7 @@ class VisualLabel extends __WEBPACK_IMPORTED_MODULE_0__ModelAbstract__["a" /* de
         context.fillText(
             text,
             this.canvas.width / 2,
-            this.parameters.fontSize
+            this.parameters.fontSize + (this.canvas.height - canvasHeight) / 2
         );
 
         this.threeObj.material.map.needsUpdate = true;
@@ -11948,6 +11949,7 @@ VisualLabel.DEFAULT_SETTINGS = {
     font: 'Arial',
     color: 'white',
     fontSize: 32,
+    margin: 0,
     scaling: {
         range: {
             from: 30000,

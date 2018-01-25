@@ -33,6 +33,7 @@ export default class VisualBodyModelAbstract extends VisualModelAbstract
                 }),
                 {
                     text: this.body.name,
+                    margin: 0.3,
                     scaling: (this.body.type === EphemerisObject.TYPE_STAR
                             || this.body.type === EphemerisObject.TYPE_PLANET)
                         ? {callback: 'alwaysVisible'}

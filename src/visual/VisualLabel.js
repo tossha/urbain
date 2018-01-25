@@ -23,7 +23,7 @@ export default class VisualLabel extends VisualModelAbstract {
         context.font = this.parameters.fontSize + 'px ' + this.parameters.font;
 
         let canvasWidth = context.measureText(text).width;
-        let canvasHeight = this.parameters.fontSize * 2;
+        let canvasHeight = this.parameters.fontSize * (1 + this.parameters.margin) * 2;
         this.canvas.width = THREE.Math.ceilPowerOfTwo(canvasWidth);
         this.canvas.height = THREE.Math.ceilPowerOfTwo(canvasHeight);
 
@@ -34,7 +34,7 @@ export default class VisualLabel extends VisualModelAbstract {
         context.fillText(
             text,
             this.canvas.width / 2,
-            this.parameters.fontSize
+            this.parameters.fontSize + (this.canvas.height - canvasHeight) / 2
         );
 
         this.threeObj.material.map.needsUpdate = true;
@@ -71,6 +71,7 @@ VisualLabel.DEFAULT_SETTINGS = {
     font: 'Arial',
     color: 'white',
     fontSize: 32,
+    margin: 0,
     scaling: {
         range: {
             from: 30000,
