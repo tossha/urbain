@@ -58,7 +58,7 @@ require 'functions.php';
     <table width="100%" style="border-bottom: blue solid 1px" class="panelContent" data-panel-name="metrics">
         <tr>
             <td>
-                <label for="showAnglesOfSelectedOrbit">Show angles of selected orbit</label>
+                <label for="showAnglesOfSelectedOrbit">Visualize angles</label>
             </td>
             <td>
                 <input type="checkbox" id="showAnglesOfSelectedOrbit" checked>

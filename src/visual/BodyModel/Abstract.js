@@ -1,9 +1,8 @@
 import VisualModelAbstract from "../ModelAbstract";
-import VisualLabel, {DEFAULT_TEXT_SETTINGS} from "../VisualLabel";
-import FunctionOfEpochObjectPosition from "../../core/FunctionOfEpoch/ObjectPosition";
-import {RF_BASE} from "../../core/ReferenceFrame/Factory";
+import VisualLabel from "../VisualLabel";
 import {Events} from "../../core/Events";
 import EphemerisObject from "../../core/EphemerisObject";
+import FunctionOfEpochCustom from "../../core/FunctionOfEpoch/Custom";
 
 export default class VisualBodyModelAbstract extends VisualModelAbstract
 {
@@ -28,28 +27,27 @@ export default class VisualBodyModelAbstract extends VisualModelAbstract
     setObject(obj) {
         this.body = obj;
         document.addEventListener(Events.INIT_DONE, () => {
-            new VisualLabel(new FunctionOfEpochObjectPosition(this.body.id, RF_BASE), {
-                text: this.body.name,
-                objectSize: this.shape.getMaxDimension() / 2,
-                scaling:
-                           this.body.type === EphemerisObject.TYPE_STAR
-                        || this.body.type === EphemerisObject.TYPE_PLANET
-                    ?
-                        {callback: 'alwaysVisible'}
-                    :
-                           this.body.type === EphemerisObject.TYPE_PLANETOID
-                        || this.body.type === EphemerisObject.TYPE_SATELLITE
-                    ?
-                        {
-                            callback: 'range',
-                            range: {
-                                from: 10 * this.shape.getMaxDimension(),
-                                to: 1000 * this.shape.getMaxDimension()
+            this.label = new VisualLabel(
+                new FunctionOfEpochCustom((epoch) => {
+                    return obj.getPositionByEpoch(epoch).add_(sim.camera.getTopDirection(epoch).mul_(this.shape.getMaxDimension() / 2));
+                }),
+                {
+                    text: this.body.name,
+                    scaling: (this.body.type === EphemerisObject.TYPE_STAR
+                            || this.body.type === EphemerisObject.TYPE_PLANET)
+                        ? {callback: 'alwaysVisible'}
+                        : (this.body.type === EphemerisObject.TYPE_PLANETOID
+                            || this.body.type === EphemerisObject.TYPE_SATELLITE)
+                            ? {
+                                callback: 'range',
+                                range: {
+                                    from: 5 * this.shape.getMaxDimension(),
+                                    to: 1000 * this.shape.getMaxDimension()
+                                }
                             }
-                        }
-                    :
-                        DEFAULT_TEXT_SETTINGS.scaling
-            });
+                            : VisualLabel.DEFAULT_SETTINGS.scaling
+                }
+            );
         });
     }
 
@@ -58,6 +56,9 @@ export default class VisualBodyModelAbstract extends VisualModelAbstract
     }
 
     render(epoch) {
+        if (this.label) {
+            this.label.visible = sim.settings.ui.showBodyLabels;
+        }
         this.threeObj.position.copy(sim.getVisualCoords(this.body.getPositionByEpoch(epoch)));
         this.threeObj.quaternion.copy(
             this.body.orientation.getQuaternionByEpoch(epoch).toThreejs()

@@ -1,16 +1,19 @@
 import Simulation from "./core/Simulation";
 
 function init() {
+    let datGui = new dat.GUI();
     statistics = new Stats();
     document.body.appendChild(statistics.dom);
     statistics.dom.style.display = "none";
     statistics.showStatistics = false;
 
-    (new dat.GUI({width: 200})).add(statistics, 'showStatistics').onChange(value => {
+    datGui.add(statistics, 'showStatistics').onChange(value => {
         statistics.dom.style.display = value ? "" : "none";
     });
 
     window.sim = new Simulation();
+
+    datGui.add(sim.settings.ui, 'showBodyLabels');
 
     $.getJSON('./star_systems/solar_system.json', starSystemConfig => {
         sim.init('viewport', starSystemConfig);

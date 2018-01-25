@@ -1,80 +1,94 @@
 import VisualModelAbstract from "./ModelAbstract";
 
-export const DEFAULT_TEXT_SETTINGS = {
+export default class VisualLabel extends VisualModelAbstract {
+    constructor(functionOfEpoch, parameters) {
+        super();
+
+        this.visible = true;
+
+        this.parameters = Object.assign({}, VisualLabel.DEFAULT_SETTINGS, parameters);
+        this.functionOfEpoch = functionOfEpoch;
+
+        this.canvas = document.createElement('canvas');
+
+        this.setThreeObj(new THREE.Sprite(new THREE.SpriteMaterial(
+            {map: new THREE.CanvasTexture(this.canvas)}
+        )));
+
+        this.setText(this.parameters.text);
+    }
+
+    setText(text) {
+        let context = this.canvas.getContext('2d');
+        context.font = this.parameters.fontSize + 'px ' + this.parameters.font;
+
+        let canvasWidth = context.measureText(text).width;
+        let canvasHeight = this.parameters.fontSize * 2;
+        this.canvas.width = THREE.Math.ceilPowerOfTwo(canvasWidth);
+        this.canvas.height = THREE.Math.ceilPowerOfTwo(canvasHeight);
+
+        context.font = this.parameters.fontSize + 'px ' + this.parameters.font;
+        context.fillStyle = this.parameters.color;
+        context.textAlign = 'center';
+        context.textBaseline = 'bottom';
+        context.fillText(
+            text,
+            this.canvas.width / 2,
+            this.parameters.fontSize
+        );
+
+        this.threeObj.material.map.needsUpdate = true;
+    }
+
+    render(epoch) {
+        if (!this.visible) {
+            this.threeObj.visible = false;
+            return;
+        }
+
+        this.threeObj.position.copy(sim.getVisualCoords(this.functionOfEpoch.evaluate(epoch)));
+
+        const distance = this.threeObj.position.length();
+
+        const scaleCoeff = this.calculateScaleCoeff(distance, this.parameters.scaling) / 2;
+        this.threeObj.scale.x = this.canvas.width  * scaleCoeff;
+        this.threeObj.scale.y = this.canvas.height * scaleCoeff;
+
+        this.threeObj.visible = 1 < Math.max(this.threeObj.scale.x, this.threeObj.scale.y) /
+            (distance * sim.raycaster.getPixelAngleSize()) / 2;
+    }
+
+    calculateScaleCoeff(distance, scaling) {
+        if (typeof scaling.callback === 'string') {
+            return VisualLabel.scalingFunctions[scaling.callback](distance, scaling.range);
+        }
+        return scaling.callback(distance, scaling.range);
+    }
+}
+
+VisualLabel.DEFAULT_SETTINGS = {
     text: '',
     font: 'Arial',
     color: 'white',
-    size: 20,
-    objectSize: 0,
-    marginFromObject: 20,
+    fontSize: 32,
     scaling: {
         range: {
             from: 30000,
             to: 700000,
         },
         callback: 'range'
-    },
-    scalingFunctions: {
-        alwaysVisible: (position) => position.length() * sim.raycaster.getPixelAngleSize(),
-        range: (position, range) => {
-            if (position.length() < range.from) {
-                return range.from * sim.raycaster.getPixelAngleSize();
-            }
-            if (position.length() > range.to) {
-                return range.to * sim.raycaster.getPixelAngleSize();
-            }
-            return position.length() * sim.raycaster.getPixelAngleSize();
-        }
-    },
+    }
 };
-export default class VisualLabel extends VisualModelAbstract {
-    constructor(functionOfEpoch, parameters) {
-        super();
-        this.parameters = Object.assign({}, DEFAULT_TEXT_SETTINGS, parameters);
-        this.functionOfEpoch = functionOfEpoch;
-        this.canvas = document.createElement('canvas');
-        let context = this.canvas.getContext('2d');
-        context.font = this.parameters.size + 'px ' + this.parameters.font;
-        let canvasWidth = context.measureText(this.parameters.text).width;
-        let canvasHeight = this.parameters.size + this.parameters.marginFromObject;
-        this.canvas.height = THREE.Math.ceilPowerOfTwo(canvasHeight);
-        this.canvas.width = THREE.Math.ceilPowerOfTwo(canvasWidth);
-        context.font = this.parameters.size + 'px ' + this.parameters.font;
-        context.fillStyle = this.parameters.color;
-        context.textAlign = 'center';
-        context.textBaseline = 'top';
-        context.fillText(this.parameters.text,
-            this.canvas.width / 2,
-            (this.canvas.height - this.parameters.size) / 2
-        );
-        let texture = new THREE.CanvasTexture(this.canvas);
-        texture.needsUpdate = true;
-        let material = new THREE.SpriteMaterial({map: texture});
-        this.sprite = new THREE.Sprite(material);
-        this.setThreeObj(this.sprite);
-    }
 
-    render(epoch) {
-        this.scaleKoeff = this.calculateScaleKoeff(this.threeObj.position, this.parameters.scaling);
-        this.sprite.scale.x = this.canvas.width  * this.scaleKoeff;
-        this.sprite.scale.y = this.canvas.height * this.scaleKoeff;
-        this.threeObj.position.copy(sim.getVisualCoords(
-            this.functionOfEpoch.evaluate(epoch)
-            .add_(
-                sim.camera.getTopDirection(epoch)
-                .mul_(this.parameters.objectSize)
-            )
-            .add_(
-                sim.camera.getTopDirection(epoch)
-                .mul_((this.parameters.size / 2 + this.parameters.marginFromObject)*this.scaleKoeff)
-            )
-        ));
-    }
-
-    calculateScaleKoeff(position, scaling) {
-        if (typeof scaling.callback === 'string') {
-            return this.parameters.scalingFunctions[scaling.callback](position, scaling.range);
+VisualLabel.scalingFunctions = {
+    alwaysVisible: (distance) => distance * sim.raycaster.getPixelAngleSize(),
+    range: (distance, range) => {
+        if (distance < range.from) {
+            return range.from * sim.raycaster.getPixelAngleSize();
         }
-        return scaling.callback(position, scaling.range);
+        if (distance > range.to) {
+            return range.to * sim.raycaster.getPixelAngleSize();
+        }
+        return distance * sim.raycaster.getPixelAngleSize();
     }
-}
+};
