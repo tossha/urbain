@@ -13,9 +13,11 @@ import ReferenceFrameFactory from "./ReferenceFrame/Factory";
 
 export default class Simulation
 {
-    init(domElementId, starSystemConfig) {
+    constructor() {
         this.initSettings();
+    }
 
+    init(domElementId, starSystemConfig) {
         this.scene = new THREE.Scene();
         this.scene.add(new THREE.AmbientLight(0xFFEFD5, 0.15));
 
@@ -52,11 +54,11 @@ export default class Simulation
 
         document.dispatchEvent(new CustomEvent(Events.INIT_DONE));
 
-        StarSystemLoader.loadObjectByUrl(sim.starSystem, '/spacecraft/voyager1.json');
-        StarSystemLoader.loadObjectByUrl(sim.starSystem, '/spacecraft/voyager2.json');
-        StarSystemLoader.loadObjectByUrl(sim.starSystem, '/spacecraft/lro.json');
-        StarSystemLoader.loadObjectByUrl(sim.starSystem, '/spacecraft/ISS.json');
-        StarSystemLoader.loadObjectByUrl(sim.starSystem, '/spacecraft/hubble.json');
+        StarSystemLoader.loadObjectByUrl(this.starSystem, './spacecraft/voyager1.json');
+        StarSystemLoader.loadObjectByUrl(this.starSystem, './spacecraft/voyager2.json');
+        StarSystemLoader.loadObjectByUrl(this.starSystem, './spacecraft/lro.json');
+        StarSystemLoader.loadObjectByUrl(this.starSystem, './spacecraft/ISS.json');
+        StarSystemLoader.loadObjectByUrl(this.starSystem, './spacecraft/hubble.json');
     }
 
     get currentEpoch() {
@@ -70,6 +72,7 @@ export default class Simulation
     initSettings() {
         this.settings = {
             ui: {
+                showBodyLabels: true,
                 showAnglesOfSelectedOrbit: true,
                 camera: {
                     mouseSensitivity: 0.007,

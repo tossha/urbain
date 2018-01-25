@@ -2550,7 +2550,7 @@ class Body extends __WEBPACK_IMPORTED_MODULE_0__EphemerisObject__["a" /* default
         this.orientation   = orientation;    // class OrientationAbstract
 
         if (this.visualModel) {
-            this.visualModel.body = this;
+            this.visualModel.setObject(this);
         }
     }
 }
@@ -3487,6 +3487,14 @@ class VisualBodyModelBasic extends __WEBPACK_IMPORTED_MODULE_0__Abstract__["a" /
 
 "use strict";
 /* WEBPACK VAR INJECTION */(function(THREE) {/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__ModelAbstract__ = __webpack_require__(7);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__VisualLabel__ = __webpack_require__(75);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__core_Events__ = __webpack_require__(3);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__core_EphemerisObject__ = __webpack_require__(15);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_4__core_FunctionOfEpoch_Custom__ = __webpack_require__(12);
+
+
+
+
 
 
 class VisualBodyModelAbstract extends __WEBPACK_IMPORTED_MODULE_0__ModelAbstract__["a" /* default */]
@@ -3509,11 +3517,42 @@ class VisualBodyModelAbstract extends __WEBPACK_IMPORTED_MODULE_0__ModelAbstract
         );
     }
 
+    setObject(obj) {
+        this.body = obj;
+        document.addEventListener(__WEBPACK_IMPORTED_MODULE_2__core_Events__["a" /* Events */].INIT_DONE, () => {
+            this.label = new __WEBPACK_IMPORTED_MODULE_1__VisualLabel__["a" /* default */](
+                new __WEBPACK_IMPORTED_MODULE_4__core_FunctionOfEpoch_Custom__["a" /* default */]((epoch) => {
+                    return obj.getPositionByEpoch(epoch).add_(sim.camera.getTopDirection(epoch).mul_(this.shape.getMaxDimension() / 2));
+                }),
+                {
+                    text: this.body.name,
+                    margin: 0.3,
+                    scaling: (this.body.type === __WEBPACK_IMPORTED_MODULE_3__core_EphemerisObject__["a" /* default */].TYPE_STAR
+                            || this.body.type === __WEBPACK_IMPORTED_MODULE_3__core_EphemerisObject__["a" /* default */].TYPE_PLANET)
+                        ? {callback: 'alwaysVisible'}
+                        : (this.body.type === __WEBPACK_IMPORTED_MODULE_3__core_EphemerisObject__["a" /* default */].TYPE_PLANETOID
+                            || this.body.type === __WEBPACK_IMPORTED_MODULE_3__core_EphemerisObject__["a" /* default */].TYPE_SATELLITE)
+                            ? {
+                                callback: 'range',
+                                range: {
+                                    from: 5 * this.shape.getMaxDimension(),
+                                    to: 1000 * this.shape.getMaxDimension()
+                                }
+                            }
+                            : __WEBPACK_IMPORTED_MODULE_1__VisualLabel__["a" /* default */].DEFAULT_SETTINGS.scaling
+                }
+            );
+        });
+    }
+
     getMaterial(parameters) {
         return new THREE.MeshStandardMaterial(parameters);
     }
 
     render(epoch) {
+        if (this.label) {
+            this.label.visible = sim.settings.ui.showBodyLabels;
+        }
         this.threeObj.position.copy(sim.getVisualCoords(this.body.getPositionByEpoch(epoch)));
         this.threeObj.quaternion.copy(
             this.body.orientation.getQuaternionByEpoch(epoch).toThreejs()
@@ -3806,22 +3845,25 @@ class VisualVector extends __WEBPACK_IMPORTED_MODULE_0__ModelAbstract__["a" /* d
 
 "use strict";
 Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
-/* WEBPACK VAR INJECTION */(function(Stats, dat, $) {/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__core_Simulation__ = __webpack_require__(35);
+/* WEBPACK VAR INJECTION */(function(dat, Stats, $) {/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__core_Simulation__ = __webpack_require__(35);
 
 
 function init() {
+    let datGui = new dat.GUI();
     statistics = new Stats();
     document.body.appendChild(statistics.dom);
     statistics.dom.style.display = "none";
     statistics.showStatistics = false;
 
-    (new dat.GUI({width: 200})).add(statistics, 'showStatistics').onChange(value => {
+    datGui.add(statistics, 'showStatistics').onChange(value => {
         statistics.dom.style.display = value ? "" : "none";
     });
 
     window.sim = new __WEBPACK_IMPORTED_MODULE_0__core_Simulation__["a" /* default */]();
 
-    $.getJSON('/star_systems/solar_system.json', starSystemConfig => {
+    datGui.add(sim.settings.ui, 'showBodyLabels');
+
+    $.getJSON('./star_systems/solar_system.json', starSystemConfig => {
         sim.init('viewport', starSystemConfig);
         requestAnimationFrame(firstRender);
     });
@@ -3848,7 +3890,7 @@ $(() => {
     init();
 });
 
-/* WEBPACK VAR INJECTION */}.call(__webpack_exports__, __webpack_require__(32), __webpack_require__(33), __webpack_require__(5)))
+/* WEBPACK VAR INJECTION */}.call(__webpack_exports__, __webpack_require__(33), __webpack_require__(32), __webpack_require__(5)))
 
 /***/ }),
 /* 32 */
@@ -8109,9 +8151,11 @@ module.exports = __webpack_amd_options__;
 
 class Simulation
 {
-    init(domElementId, starSystemConfig) {
+    constructor() {
         this.initSettings();
+    }
 
+    init(domElementId, starSystemConfig) {
         this.scene = new THREE.Scene();
         this.scene.add(new THREE.AmbientLight(0xFFEFD5, 0.15));
 
@@ -8148,11 +8192,11 @@ class Simulation
 
         document.dispatchEvent(new CustomEvent(__WEBPACK_IMPORTED_MODULE_2__Events__["a" /* Events */].INIT_DONE));
 
-        __WEBPACK_IMPORTED_MODULE_5__interface_StarSystemLoader__["a" /* default */].loadObjectByUrl(sim.starSystem, '/spacecraft/voyager1.json');
-        __WEBPACK_IMPORTED_MODULE_5__interface_StarSystemLoader__["a" /* default */].loadObjectByUrl(sim.starSystem, '/spacecraft/voyager2.json');
-        __WEBPACK_IMPORTED_MODULE_5__interface_StarSystemLoader__["a" /* default */].loadObjectByUrl(sim.starSystem, '/spacecraft/lro.json');
-        __WEBPACK_IMPORTED_MODULE_5__interface_StarSystemLoader__["a" /* default */].loadObjectByUrl(sim.starSystem, '/spacecraft/ISS.json');
-        __WEBPACK_IMPORTED_MODULE_5__interface_StarSystemLoader__["a" /* default */].loadObjectByUrl(sim.starSystem, '/spacecraft/hubble.json');
+        __WEBPACK_IMPORTED_MODULE_5__interface_StarSystemLoader__["a" /* default */].loadObjectByUrl(this.starSystem, './spacecraft/voyager1.json');
+        __WEBPACK_IMPORTED_MODULE_5__interface_StarSystemLoader__["a" /* default */].loadObjectByUrl(this.starSystem, './spacecraft/voyager2.json');
+        __WEBPACK_IMPORTED_MODULE_5__interface_StarSystemLoader__["a" /* default */].loadObjectByUrl(this.starSystem, './spacecraft/lro.json');
+        __WEBPACK_IMPORTED_MODULE_5__interface_StarSystemLoader__["a" /* default */].loadObjectByUrl(this.starSystem, './spacecraft/ISS.json');
+        __WEBPACK_IMPORTED_MODULE_5__interface_StarSystemLoader__["a" /* default */].loadObjectByUrl(this.starSystem, './spacecraft/hubble.json');
     }
 
     get currentEpoch() {
@@ -8166,6 +8210,7 @@ class Simulation
     initSettings() {
         this.settings = {
             ui: {
+                showBodyLabels: true,
                 showAnglesOfSelectedOrbit: true,
                 camera: {
                     mouseSensitivity: 0.007,
@@ -11822,6 +11867,112 @@ TimeLine.scales = {
     fiveYears: 157788000,
 };
 
+
+/***/ }),
+/* 75 */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+/* WEBPACK VAR INJECTION */(function(THREE) {/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__ModelAbstract__ = __webpack_require__(7);
+
+
+class VisualLabel extends __WEBPACK_IMPORTED_MODULE_0__ModelAbstract__["a" /* default */] {
+    constructor(functionOfEpoch, parameters) {
+        super();
+
+        this.visible = true;
+
+        this.parameters = Object.assign({}, VisualLabel.DEFAULT_SETTINGS, parameters);
+        this.functionOfEpoch = functionOfEpoch;
+
+        this.canvas = document.createElement('canvas');
+
+        this.setThreeObj(new THREE.Sprite(new THREE.SpriteMaterial(
+            {map: new THREE.CanvasTexture(this.canvas)}
+        )));
+
+        this.setText(this.parameters.text);
+    }
+
+    setText(text) {
+        let context = this.canvas.getContext('2d');
+        context.font = this.parameters.fontSize + 'px ' + this.parameters.font;
+
+        let canvasWidth = context.measureText(text).width;
+        let canvasHeight = this.parameters.fontSize * (1 + this.parameters.margin) * 2;
+        this.canvas.width = THREE.Math.ceilPowerOfTwo(canvasWidth);
+        this.canvas.height = THREE.Math.ceilPowerOfTwo(canvasHeight);
+
+        context.font = this.parameters.fontSize + 'px ' + this.parameters.font;
+        context.fillStyle = this.parameters.color;
+        context.textAlign = 'center';
+        context.textBaseline = 'bottom';
+        context.fillText(
+            text,
+            this.canvas.width / 2,
+            this.parameters.fontSize + (this.canvas.height - canvasHeight) / 2
+        );
+
+        this.threeObj.material.map.needsUpdate = true;
+    }
+
+    render(epoch) {
+        if (!this.visible) {
+            this.threeObj.visible = false;
+            return;
+        }
+
+        this.threeObj.position.copy(sim.getVisualCoords(this.functionOfEpoch.evaluate(epoch)));
+
+        const distance = this.threeObj.position.length();
+
+        const scaleCoeff = this.calculateScaleCoeff(distance, this.parameters.scaling) / 2;
+        this.threeObj.scale.x = this.canvas.width  * scaleCoeff;
+        this.threeObj.scale.y = this.canvas.height * scaleCoeff;
+
+        this.threeObj.visible = 1 < Math.max(this.threeObj.scale.x, this.threeObj.scale.y) /
+            (distance * sim.raycaster.getPixelAngleSize()) / 2;
+    }
+
+    calculateScaleCoeff(distance, scaling) {
+        if (typeof scaling.callback === 'string') {
+            return VisualLabel.scalingFunctions[scaling.callback](distance, scaling.range);
+        }
+        return scaling.callback(distance, scaling.range);
+    }
+}
+/* harmony export (immutable) */ __webpack_exports__["a"] = VisualLabel;
+
+
+VisualLabel.DEFAULT_SETTINGS = {
+    text: '',
+    font: 'Arial',
+    color: 'white',
+    fontSize: 32,
+    margin: 0,
+    scaling: {
+        range: {
+            from: 30000,
+            to: 700000,
+        },
+        callback: 'range'
+    }
+};
+
+VisualLabel.scalingFunctions = {
+    alwaysVisible: (distance) => distance * sim.raycaster.getPixelAngleSize(),
+    range: (distance, range) => {
+        if (distance < range.from) {
+            return range.from * sim.raycaster.getPixelAngleSize();
+        }
+        if (distance > range.to) {
+            return range.to * sim.raycaster.getPixelAngleSize();
+        }
+        return distance * sim.raycaster.getPixelAngleSize();
+    }
+};
+
+/* WEBPACK VAR INJECTION */}.call(__webpack_exports__, __webpack_require__(2)))
 
 /***/ })
 /******/ ]);
