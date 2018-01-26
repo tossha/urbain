@@ -963,21 +963,13 @@ objects = [
         'color': 'orange',
         'texture': 'VenusTexture.jpg'
     },
-    # {
-    #   'id': '3',
-    #   'name': 'Earth-Moon barycenter',
-    #   'maxError': 30000,
-    #   'color': 'lightblue'
-    # },
     {
         'id': '399',
         'type': 2,
         'name': 'Earth',
         'maxError': 30000,
-        'color': 'blue',
-        'texture': 'EarthTexture.jpg',
-        'parent': '3',
-        'pair': '301'
+        'color': 'lightblue',
+        'texture': 'EarthTexture.jpg'
     },
     {
         'id': '301',
@@ -985,9 +977,7 @@ objects = [
         'name': 'Moon',
         'maxError': 30000,
         'color': 'white',
-        'texture': 'MoonTexture.jpg',
-        'parent': '3',
-        'pair': '399'
+        'texture': 'MoonTexture.jpg'
     },
     {
         'id': '499',
@@ -1453,7 +1443,7 @@ def getELP2000Trajectory(color, cutKm):
 		'data': _files
 	}
 
-def getBodyData(body, type, name, color, texture, parent, pairing, etFrom, etTo, maxError, staticPosition):
+def getBodyData(body, type, soi, name, color, texture, parent, pairing, etFrom, etTo, maxError, staticPosition):
 	global vsopTotal
 	try:
 		parentMu = spice.bodvrd(parent, "GM", 1)[1][0] if parent != '0' else 319.77790837966666
@@ -1481,7 +1471,8 @@ def getBodyData(body, type, name, color, texture, parent, pairing, etFrom, etTo,
 	
 	objectData = {
         'id': body,
-		'type': type,
+        'type': type,
+		'parentSoi': parent,
 		'name': name,
 		'trajectory': trajectory
 	}
@@ -1527,7 +1518,8 @@ def getObjects(objects, etStart, etEnd):
 
 		data.append(getBodyData(
             body = body['id'],
-			type = body['type'],
+            type = body['type'],
+			soi  = body['soi'] if 'soi' in body else False,
 			name = body['name'],
 			color = body['color'] if 'color' in body else False,
 			texture = body['texture'] if 'texture' in body else False,

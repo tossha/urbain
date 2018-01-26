@@ -68,6 +68,18 @@ export default class ReferenceFrameAbstract
         ).position;
     }
 
+    rotateVectorByEpoch(epoch, vec, destinationFrame) {
+        let destinationFrameObj = (destinationFrame instanceof ReferenceFrameAbstract)
+            ? destinationFrame
+            : sim.starSystem.getReferenceFrame(destinationFrame);
+
+        if (this === destinationFrameObj) {
+            return vec.copy();
+        }
+
+        return destinationFrameObj.getQuaternionByEpoch(epoch).invert_().mul_(this.getQuaternionByEpoch(epoch)).rotate(vec);
+    }
+
     stateVectorFromBaseReferenceFrameByEpoch(epoch, state) {}
     stateVectorToBaseReferenceFrameByEpoch(epoch, state) {}
 }

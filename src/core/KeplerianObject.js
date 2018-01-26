@@ -227,6 +227,14 @@ export default class KeplerianObject
         return Math.acos(-1 / this._e);
     }
 
+    getPeriapsisRadius() {
+        return this._sma * (1 - this._e * this._e) / (1 + this._e);
+    }
+
+    getPeriapsisSpeed() {
+        return Math.sqrt(this._mu * (2 / this.getPeriapsisRadius() - 1 / this._sma));
+    }
+
     /**
      *  @see http://microsat.sm.bmstu.ru/e-library/Ballistics/kepler.pdf
      */

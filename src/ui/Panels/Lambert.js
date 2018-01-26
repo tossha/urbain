@@ -1,7 +1,6 @@
 
 import UIPanel from "../Panel";
 import LambertSolver from "../../core/LambertSolver";
-import TrajectoryKeplerianBasic from "../../core/Trajectory/KeplerianBasic";
 import ReferenceFrameFactory, {ReferenceFrame} from "../../core/ReferenceFrame/Factory";
 import VisualTrajectoryModelKeplerian from "../../visual/TrajectoryModel/Keplerian";
 import VisualVector from "../../visual/Vector";
@@ -28,41 +27,63 @@ export default class UIPanelLambert extends UIPanel
         this.initOrigin();
         this.initTarget();
         this.useCurrentTime();
+
+        this.origin = 399;
+        this.jqOrigin.val(this.origin);
     }
 
     solve() {
-        if (!this.target) {
+        if (!this.origin || !this.target) {
             return;
         }
 
         const parentObject = sim.starSystem.getCommonParentObject(this.origin, this.target, this.departureTime, this.departureTime + this.transferTime);
         const referenceFrameId = ReferenceFrameFactory.buildId(parentObject.id, ReferenceFrame.INERTIAL_ECLIPTIC);
-        const mu = parentObject.physicalModel.mu;
         const origin = sim.starSystem.getObject(this.origin);
         const target = sim.starSystem.getObject(this.target);
         const state1 = origin.trajectory.getStateByEpoch(this.departureTime, referenceFrameId);
         const state2 = target.trajectory.getStateByEpoch(this.departureTime + this.transferTime, referenceFrameId);
 
-        const transfer = LambertSolver.solve(state1, state2, this.departureTime, this.transferTime, mu);
-        const trajectory = new TrajectoryKeplerianBasic(referenceFrameId, transfer);
-        trajectory.setObject(new EphemerisObject(-1, EphemerisObject.TYPE_UNKNOWN, origin.name + '->' + target.name + ' transfer'));
+        const solverResult = LambertSolver.solveFullTransfer(
+            origin,
+            target,
+            origin.physicalModel.radius + 200,
+            target.physicalModel.radius + 200,
+            this.departureTime,
+            this.transferTime
+        );
+        const transferTrajectory = solverResult.trajectory;
+        transferTrajectory.setObject(new EphemerisObject(-1, EphemerisObject.TYPE_UNKNOWN, origin.name + '->' + target.name + ' transfer'));
 
         if (this.visualModel) {
             this.visualModel.drop();
+            this.visualModel2.drop();
+            this.visualModel3.drop();
             this.vector1.drop();
             this.vector2.drop();
         }
 
-        this.visualModel = new VisualTrajectoryModelKeplerian(trajectory, 'yellow');
+        this.visualModel = new VisualTrajectoryModelKeplerian(transferTrajectory.components[1], 'yellow');
+        this.visualModel2 = new VisualTrajectoryModelKeplerian(transferTrajectory.components[0], 'red');
+        this.visualModel3 = new VisualTrajectoryModelKeplerian(transferTrajectory.components[2], 'red');
         this.vector1 = new VisualVector(state1.position, referenceFrameId);
         this.vector2 = new VisualVector(state2.position, referenceFrameId);
 
-        const deltaV1 = state1.velocity.sub_(transfer.getStateByEpoch(this.departureTime)._velocity).mag;
-        const deltaV2 = state2.velocity.sub_(transfer.getStateByEpoch(this.departureTime + this.transferTime)._velocity).mag;
+        this.jqDom.find('#deltaVEjection').html(solverResult.ejectionDeltaV.toPrecision(4) + ' km/s');
+        this.jqDom.find('#deltaVInsertion').html(solverResult.insertionDeltaV.toPrecision(4) + ' km/s');
+        this.jqDom.find('#deltaVTotal').html((solverResult.ejectionDeltaV + solverResult.insertionDeltaV).toPrecision(4) + ' km/s');
+    }
 
-        this.jqDom.find('#deltaVEjection').html(deltaV1.toPrecision(4) + ' km/s');
-        this.jqDom.find('#deltaVInsertion').html(deltaV2.toPrecision(4) + ' km/s');
-        this.jqDom.find('#deltaVTotal').html((deltaV1 + deltaV2).toPrecision(4) + ' km/s');
+    collapse() {
+        if (this.visualModel) {
+            this.visualModel.drop();
+            this.visualModel2.drop();
+            this.visualModel3.drop();
+            this.vector1.drop();
+            this.vector2.drop();
+            this.visualModel = null;
+        }
+        super.collapse();
     }
 
     useCurrentTime() {

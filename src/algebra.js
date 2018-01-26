@@ -40,12 +40,16 @@ export class Vector extends Array
         this[2] = value;
     }
 
-    get mag() {
+    get quadrance() {
         let res = 0;
         for (let i = 0; i < this.length; ++i) {
             res += this[i] * this[i];
         }
-        return Math.sqrt(res);
+        return res;
+    }
+
+    get mag() {
+        return Math.sqrt(this.quadrance);
     }
 
     copy() {
@@ -426,7 +430,7 @@ export function newtonSolve(func, start, d, maxError, maxSteps) {
         step += 1;
     } while (error > maxError && step < maxSteps);
 
-    return (error > maxError) ? false : val;
+    return (error > maxError) ? null : val;
 }
 
 export function deg2rad(degrees) {

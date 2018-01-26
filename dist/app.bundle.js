@@ -117,12 +117,16 @@ class Vector extends Array
         this[2] = value;
     }
 
-    get mag() {
+    get quadrance() {
         let res = 0;
         for (let i = 0; i < this.length; ++i) {
             res += this[i] * this[i];
         }
-        return Math.sqrt(res);
+        return res;
+    }
+
+    get mag() {
+        return Math.sqrt(this.quadrance);
     }
 
     copy() {
@@ -509,7 +513,7 @@ function newtonSolve(func, start, d, maxError, maxSteps) {
         step += 1;
     } while (error > maxError && step < maxSteps);
 
-    return (error > maxError) ? false : val;
+    return (error > maxError) ? null : val;
 }
 
 function deg2rad(degrees) {
@@ -577,13 +581,13 @@ function presentNumberWithSuffix(number) {
 "use strict";
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__FunctionOfEpoch_ObjectState__ = __webpack_require__(37);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__algebra__ = __webpack_require__(0);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__FunctionOfEpoch_Custom__ = __webpack_require__(12);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__FunctionOfEpoch_Custom__ = __webpack_require__(11);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__BodyFixed__ = __webpack_require__(18);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_4__solar_system__ = __webpack_require__(8);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_4__solar_system__ = __webpack_require__(9);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_5__Base__ = __webpack_require__(38);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_6__Inertial__ = __webpack_require__(39);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_7__InertialDynamic__ = __webpack_require__(20);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_8__Body__ = __webpack_require__(14);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_8__Body__ = __webpack_require__(12);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_9__Topocentric__ = __webpack_require__(40);
 
 
@@ -1712,6 +1716,53 @@ class StateVector
 
 /***/ }),
 /* 5 */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__core_Events__ = __webpack_require__(3);
+
+
+class VisualModelAbstract
+{
+    constructor() {
+        this.threeObj = null;
+        this.scene = sim.scene;
+    }
+
+    setThreeObj(obj) {
+        this.threeObj = obj;
+        this.scene.add(this.threeObj);
+        this.renderListener = this._onRender.bind(this);
+        document.addEventListener(__WEBPACK_IMPORTED_MODULE_0__core_Events__["a" /* Events */].RENDER, this.renderListener);
+    }
+
+    _onRender(event) {
+        this.render(event.detail.epoch);
+    }
+
+    render(epoch) {}
+
+    drop() {
+        if (this.threeObj) {
+            this.scene.remove(this.threeObj);
+            if (this.threeObj.geometry) {
+                this.threeObj.geometry.dispose();
+            }
+            if (this.threeObj.material) {
+                this.threeObj.material.dispose();
+            }
+            delete this.threeObj;
+        }
+        document.removeEventListener(__WEBPACK_IMPORTED_MODULE_0__core_Events__["a" /* Events */].RENDER, this.renderListener);
+    }
+}
+/* harmony export (immutable) */ __webpack_exports__["a"] = VisualModelAbstract;
+
+
+VisualModelAbstract.texturePath = 'texture/';
+
+/***/ }),
+/* 6 */
 /***/ (function(module, exports, __webpack_require__) {
 
 var __WEBPACK_AMD_DEFINE_ARRAY__, __WEBPACK_AMD_DEFINE_RESULT__;/*! jQuery v3.2.1 | (c) JS Foundation and other contributors | jquery.org/license */
@@ -1722,7 +1773,7 @@ null==d?void 0:d))},attrHooks:{type:{set:function(a,b){if(!o.radioValue&&"radio"
 
 
 /***/ }),
-/* 6 */
+/* 7 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -1957,6 +2008,14 @@ class KeplerianObject
         return Math.acos(-1 / this._e);
     }
 
+    getPeriapsisRadius() {
+        return this._sma * (1 - this._e * this._e) / (1 + this._e);
+    }
+
+    getPeriapsisSpeed() {
+        return Math.sqrt(this._mu * (2 / this.getPeriapsisRadius() - 1 / this._sma));
+    }
+
     /**
      *  @see http://microsat.sm.bmstu.ru/e-library/Ballistics/kepler.pdf
      */
@@ -2048,54 +2107,59 @@ class KeplerianObject
 
 
 /***/ }),
-/* 7 */
+/* 8 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__core_Events__ = __webpack_require__(3);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__ReferenceFrame_Factory__ = __webpack_require__(1);
 
 
-class VisualModelAbstract
+class EphemerisObject
 {
-    constructor() {
-        this.threeObj = null;
-        this.scene = sim.scene;
+    constructor(bodyId, type, name) {
+        this.id   = bodyId;
+        this.type = type;
+        this.name = name;
     }
 
-    setThreeObj(obj) {
-        this.threeObj = obj;
-        this.scene.add(this.threeObj);
-        this.renderListener = this._onRender.bind(this);
-        document.addEventListener(__WEBPACK_IMPORTED_MODULE_0__core_Events__["a" /* Events */].RENDER, this.renderListener);
+    setTrajectory(trajectory) {
+        this.trajectory = trajectory;
+        this.trajectory.setObject(this);
     }
 
-    _onRender(event) {
-        this.render(event.detail.epoch);
-    }
-
-    render(epoch) {}
-
-    drop() {
-        if (this.threeObj) {
-            this.scene.remove(this.threeObj);
-            if (this.threeObj.geometry) {
-                this.threeObj.geometry.dispose();
-            }
-            if (this.threeObj.material) {
-                this.threeObj.material.dispose();
-            }
-            delete this.threeObj;
+    getParentObjectIdByEpoch(epoch) {
+        if (!this.trajectory) {
+            return null;
         }
-        document.removeEventListener(__WEBPACK_IMPORTED_MODULE_0__core_Events__["a" /* Events */].RENDER, this.renderListener);
+
+        const rf = this.trajectory.getReferenceFrameByEpoch(epoch);
+        if (!rf) {
+            return null;
+        }
+
+        return rf.originId;
+    }
+
+    getPositionByEpoch(epoch, referenceFrame) {
+        return this.trajectory.getPositionByEpoch(epoch, referenceFrame || __WEBPACK_IMPORTED_MODULE_0__ReferenceFrame_Factory__["a" /* RF_BASE */]);
     }
 }
-/* harmony export (immutable) */ __webpack_exports__["a"] = VisualModelAbstract;
+/* harmony export (immutable) */ __webpack_exports__["a"] = EphemerisObject;
 
 
-VisualModelAbstract.texturePath = 'texture/';
+EphemerisObject.TYPE_UNKNOWN    = 0;
+EphemerisObject.TYPE_STAR       = 1;
+EphemerisObject.TYPE_PLANET     = 2;
+EphemerisObject.TYPE_PLANETOID  = 3;
+EphemerisObject.TYPE_SATELLITE  = 4;
+EphemerisObject.TYPE_ASTEROID   = 5;
+EphemerisObject.TYPE_COMET      = 6;
+EphemerisObject.TYPE_SPACECRAFT = 7;
+EphemerisObject.TYPE_POINT      = 8;
+
 
 /***/ }),
-/* 8 */
+/* 9 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -2296,7 +2360,7 @@ const RF_EARTH_EQUATORIAL_INERTIAL = 2399000;
 
 
 /***/ }),
-/* 9 */
+/* 10 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -2349,15 +2413,71 @@ class UIPanel
 }
 /* harmony export (immutable) */ __webpack_exports__["a"] = UIPanel;
 
-/* WEBPACK VAR INJECTION */}.call(__webpack_exports__, __webpack_require__(5)))
+/* WEBPACK VAR INJECTION */}.call(__webpack_exports__, __webpack_require__(6)))
 
 /***/ }),
-/* 10 */
+/* 11 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__Abstract__ = __webpack_require__(16);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__FunctionOfEpoch_Custom__ = __webpack_require__(12);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__Abstract__ = __webpack_require__(15);
+
+
+class FunctionOfEpochCustom extends __WEBPACK_IMPORTED_MODULE_0__Abstract__["a" /* default */]
+{
+    constructor(func) {
+        super();
+        this.func = func;
+    }
+
+    evaluate(epoch) {
+        return this.func(epoch);
+    }
+}
+/* harmony export (immutable) */ __webpack_exports__["a"] = FunctionOfEpochCustom;
+
+
+/***/ }),
+/* 12 */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__EphemerisObject__ = __webpack_require__(8);
+
+
+class Body extends __WEBPACK_IMPORTED_MODULE_0__EphemerisObject__["a" /* default */]
+{
+    constructor(bodyId, type, parentSoiId, name, visualModel, physicalModel, orientation) {
+        super(bodyId, type, name);
+
+        this.visualModel   = visualModel;    // class VisualBodyModelBasic
+        this.physicalModel = physicalModel;  // class PhysicalBodyModel
+        this.orientation   = orientation;    // class OrientationAbstract
+        this.parentSoiId   = parentSoiId;
+
+        if (this.visualModel) {
+            this.visualModel.setObject(this);
+        }
+    }
+
+    getSoiRadius(epoch) {
+        const parent = sim.starSystem.getObject(this.parentSoiId);
+        const muCoeff = this.physicalModel.mu / parent.physicalModel.mu;
+        const dist = this.getPositionByEpoch(epoch).sub_(parent.getPositionByEpoch(epoch)).mag;
+
+        return dist * Math.pow(muCoeff, 2/5);
+    }
+}
+/* harmony export (immutable) */ __webpack_exports__["a"] = Body;
+
+
+/***/ }),
+/* 13 */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__Abstract__ = __webpack_require__(17);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__FunctionOfEpoch_Custom__ = __webpack_require__(11);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__ReferenceFrame_InertialDynamic__ = __webpack_require__(20);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__KeplerianEditor__ = __webpack_require__(46);
 
@@ -2410,7 +2530,108 @@ class TrajectoryKeplerianAbstract extends __WEBPACK_IMPORTED_MODULE_0__Abstract_
 
 
 /***/ }),
-/* 11 */
+/* 14 */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__KeplerianAbstract__ = __webpack_require__(13);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__KeplerianObject__ = __webpack_require__(7);
+
+
+
+class TrajectoryKeplerianBasic extends __WEBPACK_IMPORTED_MODULE_0__KeplerianAbstract__["a" /* default */]
+{
+    constructor(referenceFrameId, keplerianObject) {
+        super(referenceFrameId);
+        this.keplerianObject = keplerianObject;
+    }
+
+    isEditable() {
+        return true;
+    }
+
+    get mu() {
+        return this.keplerianObject.mu;
+    }
+
+    set mu(value) {
+        this.keplerianObject.mu = value;
+    }
+
+    get sma() {
+        return this.keplerianObject.sma;
+    }
+
+    set sma(value) {
+        this.keplerianObject.sma = value;
+    }
+
+    get e() {
+        return this.keplerianObject.e;
+    }
+
+    set e(value) {
+        this.keplerianObject.e = value;
+    }
+
+    get inc() {
+        return this.keplerianObject.inc;
+    }
+
+    set inc(value) {
+        this.keplerianObject.inc = value;
+    }
+
+    get raan() {
+        return this.keplerianObject.raan;
+    }
+
+    set raan(value) {
+        this.keplerianObject.raan = value;
+    }
+
+    get aop() {
+        return this.keplerianObject.aop;
+    }
+
+    set aop(value) {
+        this.keplerianObject.aop = value;
+    }
+
+    get ta() {
+        return this.keplerianObject.ta;
+    }
+
+    set ta(value) {
+        this.keplerianObject.ta = value;
+    }
+
+    get epoch() {
+        return this.keplerianObject.epoch;
+    }
+
+    set epoch(value) {
+        this.keplerianObject.epoch = value;
+    }
+
+    getKeplerianObjectByEpoch(epoch) {
+        return this.keplerianObject;
+    }
+
+    static createFromState(referenceFrame, state, mu, epoch, color) {
+        return new TrajectoryKeplerianBasic(
+            referenceFrame,
+            __WEBPACK_IMPORTED_MODULE_1__KeplerianObject__["a" /* default */].createFromState(state, mu, epoch),
+            color
+        );
+    }
+}
+/* harmony export (immutable) */ __webpack_exports__["a"] = TrajectoryKeplerianBasic;
+
+
+
+/***/ }),
+/* 15 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -2427,29 +2648,7 @@ class FunctionOfEpochAbstract
 
 
 /***/ }),
-/* 12 */
-/***/ (function(module, __webpack_exports__, __webpack_require__) {
-
-"use strict";
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__Abstract__ = __webpack_require__(11);
-
-
-class FunctionOfEpochCustom extends __WEBPACK_IMPORTED_MODULE_0__Abstract__["a" /* default */]
-{
-    constructor(func) {
-        super();
-        this.func = func;
-    }
-
-    evaluate(epoch) {
-        return this.func(epoch);
-    }
-}
-/* harmony export (immutable) */ __webpack_exports__["a"] = FunctionOfEpochCustom;
-
-
-/***/ }),
-/* 13 */
+/* 16 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -2526,6 +2725,18 @@ class ReferenceFrameAbstract
         ).position;
     }
 
+    rotateVectorByEpoch(epoch, vec, destinationFrame) {
+        let destinationFrameObj = (destinationFrame instanceof ReferenceFrameAbstract)
+            ? destinationFrame
+            : sim.starSystem.getReferenceFrame(destinationFrame);
+
+        if (this === destinationFrameObj) {
+            return vec.copy();
+        }
+
+        return destinationFrameObj.getQuaternionByEpoch(epoch).invert_().mul_(this.getQuaternionByEpoch(epoch)).rotate(vec);
+    }
+
     stateVectorFromBaseReferenceFrameByEpoch(epoch, state) {}
     stateVectorToBaseReferenceFrameByEpoch(epoch, state) {}
 }
@@ -2533,90 +2744,13 @@ class ReferenceFrameAbstract
 
 
 /***/ }),
-/* 14 */
-/***/ (function(module, __webpack_exports__, __webpack_require__) {
-
-"use strict";
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__EphemerisObject__ = __webpack_require__(15);
-
-
-class Body extends __WEBPACK_IMPORTED_MODULE_0__EphemerisObject__["a" /* default */]
-{
-    constructor(bodyId, type, name, visualModel, physicalModel, orientation) {
-        super(bodyId, type, name);
-
-        this.visualModel   = visualModel;    // class VisualBodyModelBasic
-        this.physicalModel = physicalModel;  // class PhysicalBodyModel
-        this.orientation   = orientation;    // class OrientationAbstract
-
-        if (this.visualModel) {
-            this.visualModel.setObject(this);
-        }
-    }
-}
-/* harmony export (immutable) */ __webpack_exports__["a"] = Body;
-
-
-/***/ }),
-/* 15 */
-/***/ (function(module, __webpack_exports__, __webpack_require__) {
-
-"use strict";
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__ReferenceFrame_Factory__ = __webpack_require__(1);
-
-
-class EphemerisObject
-{
-    constructor(bodyId, type, name) {
-        this.id   = bodyId;
-        this.type = type;
-        this.name = name;
-    }
-
-    setTrajectory(trajectory) {
-        this.trajectory = trajectory;
-        this.trajectory.setObject(this);
-    }
-
-    getParentObjectIdByEpoch(epoch) {
-        if (!this.trajectory) {
-            return null;
-        }
-
-        const rf = this.trajectory.getReferenceFrameByEpoch(epoch);
-        if (!rf) {
-            return null;
-        }
-
-        return rf.originId;
-    }
-
-    getPositionByEpoch(epoch, referenceFrame) {
-        return this.trajectory.getPositionByEpoch(epoch, referenceFrame || __WEBPACK_IMPORTED_MODULE_0__ReferenceFrame_Factory__["a" /* RF_BASE */]);
-    }
-}
-/* harmony export (immutable) */ __webpack_exports__["a"] = EphemerisObject;
-
-
-EphemerisObject.TYPE_UNKNOWN    = 0;
-EphemerisObject.TYPE_STAR       = 1;
-EphemerisObject.TYPE_PLANET     = 2;
-EphemerisObject.TYPE_PLANETOID  = 3;
-EphemerisObject.TYPE_SATELLITE  = 4;
-EphemerisObject.TYPE_ASTEROID   = 5;
-EphemerisObject.TYPE_COMET      = 6;
-EphemerisObject.TYPE_SPACECRAFT = 7;
-EphemerisObject.TYPE_POINT      = 8;
-
-
-/***/ }),
-/* 16 */
+/* 17 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__StateVector__ = __webpack_require__(4);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__ReferenceFrame_Factory__ = __webpack_require__(1);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__KeplerianObject__ = __webpack_require__(6);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__KeplerianObject__ = __webpack_require__(7);
 
 
 
@@ -2713,112 +2847,11 @@ class TrajectoryAbstract
 
 
 /***/ }),
-/* 17 */
-/***/ (function(module, __webpack_exports__, __webpack_require__) {
-
-"use strict";
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__KeplerianAbstract__ = __webpack_require__(10);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__KeplerianObject__ = __webpack_require__(6);
-
-
-
-class TrajectoryKeplerianBasic extends __WEBPACK_IMPORTED_MODULE_0__KeplerianAbstract__["a" /* default */]
-{
-    constructor(referenceFrameId, keplerianObject) {
-        super(referenceFrameId);
-        this.keplerianObject = keplerianObject;
-    }
-
-    isEditable() {
-        return true;
-    }
-
-    get mu() {
-        return this.keplerianObject.mu;
-    }
-
-    set mu(value) {
-        this.keplerianObject.mu = value;
-    }
-
-    get sma() {
-        return this.keplerianObject.sma;
-    }
-
-    set sma(value) {
-        this.keplerianObject.sma = value;
-    }
-
-    get e() {
-        return this.keplerianObject.e;
-    }
-
-    set e(value) {
-        this.keplerianObject.e = value;
-    }
-
-    get inc() {
-        return this.keplerianObject.inc;
-    }
-
-    set inc(value) {
-        this.keplerianObject.inc = value;
-    }
-
-    get raan() {
-        return this.keplerianObject.raan;
-    }
-
-    set raan(value) {
-        this.keplerianObject.raan = value;
-    }
-
-    get aop() {
-        return this.keplerianObject.aop;
-    }
-
-    set aop(value) {
-        this.keplerianObject.aop = value;
-    }
-
-    get ta() {
-        return this.keplerianObject.ta;
-    }
-
-    set ta(value) {
-        this.keplerianObject.ta = value;
-    }
-
-    get epoch() {
-        return this.keplerianObject.epoch;
-    }
-
-    set epoch(value) {
-        this.keplerianObject.epoch = value;
-    }
-
-    getKeplerianObjectByEpoch(epoch) {
-        return this.keplerianObject;
-    }
-
-    static createFromState(referenceFrame, state, mu, epoch, color) {
-        return new TrajectoryKeplerianBasic(
-            referenceFrame,
-            __WEBPACK_IMPORTED_MODULE_1__KeplerianObject__["a" /* default */].createFromState(state, mu, epoch),
-            color
-        );
-    }
-}
-/* harmony export (immutable) */ __webpack_exports__["a"] = TrajectoryKeplerianBasic;
-
-
-
-/***/ }),
 /* 18 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__Abstract__ = __webpack_require__(13);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__Abstract__ = __webpack_require__(16);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__Factory__ = __webpack_require__(1);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__algebra__ = __webpack_require__(0);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__StateVector__ = __webpack_require__(4);
@@ -2898,7 +2931,7 @@ class ReferenceFrameBodyFixed extends __WEBPACK_IMPORTED_MODULE_0__Abstract__["a
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__Abstract__ = __webpack_require__(13);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__Abstract__ = __webpack_require__(16);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__StateVector__ = __webpack_require__(4);
 
 
@@ -2965,7 +2998,357 @@ class ReferenceFrameInertialDynamic extends __WEBPACK_IMPORTED_MODULE_0__Inertia
 
 
 /***/ }),
-/* 21 */,
+/* 21 */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__core_Events__ = __webpack_require__(3);
+
+
+const J2000_TIMESTAMP = 946728000;
+/* unused harmony export J2000_TIMESTAMP */
+
+
+class TimeLine
+{
+    constructor(epoch, timeScale, isTimeRunning) {
+        this.epoch = epoch;
+        this.timeScale = timeScale;
+        this.isTimeRunning = isTimeRunning;
+
+        this.mouseState = {
+            x: 0,
+            y: 0,
+            leftButton: false,
+            rightButton: false
+        };
+
+        this.span = timeScale * 86400 * 5;
+
+        this.markDistance = 300;
+        this.scaleType = "month";
+
+        this.domElement = document.getElementById("timeLineCanvas");
+        this.canvasContext = this.domElement.getContext("2d");
+        this.canvasRect = {};
+        this.updateCanvasStyle();
+
+        this.leftEpoch = this.epoch - this.span / 2;
+
+        this.updateScaleType();
+
+        this.domElement.addEventListener("mousedown",  this.onMouseDown  .bind(this));
+        window         .addEventListener("mouseup",    this.onMouseUp    .bind(this));
+        window         .addEventListener("mousemove",  this.onMouseMove  .bind(this));
+        this.domElement.addEventListener("mousewheel", this.onMouseWheel .bind(this));
+
+        window.addEventListener('keypress', e => {
+            if (e.key === ' ') {
+                this.togglePause();
+            }
+        });
+
+        window.addEventListener("resize", this.updateCanvasStyle.bind(this));
+        window.oncontextmenu = () => false;
+    }
+
+    setTimeScale(newScale) {
+        document.dispatchEvent(new CustomEvent(
+            __WEBPACK_IMPORTED_MODULE_0__core_Events__["a" /* Events */].TIME_SCALE_CHANGED,
+            {detail: {old: this.timeScale, new: newScale}}
+        ));
+        this.timeScale = newScale;
+    }
+
+    togglePause() {
+        this.isTimeRunning = !this.isTimeRunning;
+        document.dispatchEvent(new CustomEvent(
+            this.isTimeRunning ? __WEBPACK_IMPORTED_MODULE_0__core_Events__["a" /* Events */].TIME_UNPAUSED : __WEBPACK_IMPORTED_MODULE_0__core_Events__["a" /* Events */].TIME_PAUSED
+        ));
+    }
+
+    tick(timePassed) {
+        if (this.mouseState.leftButton) {
+            this.epoch = this.leftEpoch + (this.mouseState.x
+                - this.canvasRect.left) * this.span / this.domElement.width;
+        } else if (this.isTimeRunning) {
+            if ((this.leftEpoch < this.epoch)
+                && (this.epoch < this.leftEpoch + this.span)
+            ) {
+                this.leftEpoch += this.timeScale * timePassed;
+            }
+
+            this.epoch += this.timeScale * timePassed;
+        }
+
+        document.dispatchEvent(new CustomEvent(
+            __WEBPACK_IMPORTED_MODULE_0__core_Events__["a" /* Events */].EPOCH_CHANGED,
+            {detail: {
+                epoch: this.epoch,
+                date: new Date((J2000_TIMESTAMP + this.epoch) * 1000)
+            }}
+        ));
+
+        this.redraw();
+    }
+
+    forceEpoch(newEpoch) {
+        this.epoch = newEpoch;
+        this.tick(0);
+    }
+
+    useCurrentTime() {
+        this.forceEpoch(TimeLine.getEpochByDate(new Date()));
+    }
+
+    redraw() {
+        this.canvasContext.fillStyle = "#222";
+        this.canvasContext.fillRect(0, 0, this.domElement.width, this.domElement.height);
+
+        this.canvasContext.fillStyle = "#2FA1D6";
+        this.drawCurrentTimeMark();
+
+        this.canvasContext.strokeStyle = "#fff";
+        this.canvasContext.fillStyle   = "#fff";
+        this.canvasContext.font        = "11pt sans-serif";
+
+        let markDate = this.roundDateUp(TimeLine.getDateByEpoch(this.leftEpoch));
+        let markEpoch = TimeLine.getEpochByDate(markDate);
+
+        while (markEpoch < this.leftEpoch + this.span) {
+            this.drawMark(this.getCanvasPositionByEpoch(markEpoch), this.formatDate(markDate));
+            markDate = this.nextRenderingDate(markDate);
+            markEpoch = TimeLine.getEpochByDate(markDate);
+        }
+    }
+
+    static getDateByEpoch(epoch) {
+        return new Date((J2000_TIMESTAMP + epoch) * 1000);
+    }
+
+    static getEpochByDate(date) {
+        return date / 1000 - J2000_TIMESTAMP;
+    }
+
+    getCanvasPositionByEpoch(epoch) {
+        return (epoch - this.leftEpoch) * this.domElement.width / this.span;
+    }
+
+    updateCanvasStyle() {
+        this.canvasRect = this.domElement.getBoundingClientRect();
+        this.domElement.width  = this.canvasRect.right  - this.canvasRect.left;
+        this.domElement.height = this.canvasRect.bottom - this.canvasRect.top;
+    }
+
+    updateScaleType() {
+        const secondsPerPeriod = this.markDistance * this.span / this.domElement.width;
+        let bestScale = false;
+
+        for (const scale in TimeLine.scales) {
+            if (!bestScale) {
+                bestScale = scale;
+                continue;
+            }
+
+            if (Math.abs(TimeLine.scales[bestScale] / secondsPerPeriod - 1)
+                > Math.abs(TimeLine.scales[scale] / secondsPerPeriod - 1)
+            ) {
+                bestScale = scale;
+            }
+        }
+
+        this.scaleType = bestScale;
+    }
+
+    drawMark(x, text) {
+        this.canvasContext.beginPath();
+        this.canvasContext.moveTo(x, 0);
+        this.canvasContext.lineTo(x, this.domElement.height / 2);
+        this.canvasContext.stroke();
+        this.canvasContext.fillText(
+            text,
+            x - this.canvasContext.measureText(text).width / 2,
+            this.domElement.height - 2
+        );
+    }
+
+    drawCurrentTimeMark() {
+        this.canvasContext.fillRect(0, 0, this.getCanvasPositionByEpoch(this.epoch), this.domElement.height);
+    }
+
+    roundDateUp(date) {
+        const d = new Date(date);
+        if (this.scaleType === "minute") {
+            d.setSeconds(60, 0);
+        } else if (this.scaleType === "fiveMinutes") {
+            d.setMinutes(5 + d.getMinutes() - d.getMinutes() % 5, 0, 0);
+        } else if (this.scaleType === "tenMinutes") {
+            d.setMinutes(10 + d.getMinutes() - d.getMinutes() % 10, 0, 0);
+        } else if (this.scaleType === "thirtyMinutes") {
+            d.setMinutes(30 + d.getMinutes() - d.getMinutes() % 30, 0, 0);
+        } else if (this.scaleType === "hour") {
+            d.setMinutes(60, 0, 0);
+        } else if (this.scaleType === "threeHours") {
+            d.setHours(3 + d.getHours() - d.getHours() % 3, 0, 0, 0);
+        } else if (this.scaleType === "sixHours") {
+            d.setHours(6 + d.getHours() - d.getHours() % 6, 0, 0, 0);
+        } else if (this.scaleType === "day") {
+            d.setHours(24, 0, 0, 0);
+        } else if (this.scaleType === "week") {
+            d.setHours(0, 0, 0, 0);
+            d.setDate(7 + d.getDate() - d.getDay());
+        } else if (this.scaleType === "month") {
+            d.setHours(0, 0, 0, 0);
+            d.setDate(1);
+            d.setMonth(d.getMonth() + 1);
+        } else if (this.scaleType === "threeMonths") {
+            d.setHours(0, 0, 0, 0);
+            d.setDate(1);
+            d.setMonth(3 + d.getMonth() - d.getMonth() % 3);
+        } else if (this.scaleType === "year") {
+            d.setHours(0, 0, 0, 0);
+            d.setMonth(0, 1);
+        } else if (this.scaleType === "fiveYears") {
+            d.setHours(0, 0, 0, 0);
+            d.setFullYear(5 + d.getFullYear() - d.getFullYear() % 5, 0, 1);
+        } else {
+            return;
+        }
+        return d;
+    }
+
+    nextRenderingDate(date) {
+        const d = new Date(date);
+        if (this.scaleType === "minute") {
+            d.setMinutes(d.getMinutes() + 1);
+        } else if (this.scaleType === "fiveMinutes") {
+            d.setMinutes(d.getMinutes() + 5);
+        } else if (this.scaleType === "tenMinutes") {
+            d.setMinutes(d.getMinutes() + 10);
+        } else if (this.scaleType === "thirtyMinutes") {
+            d.setMinutes(d.getMinutes() + 30);
+        } else if (this.scaleType === "hour") {
+            d.setHours(d.getHours() + 1);
+        } else if (this.scaleType === "threeHours") {
+            d.setHours(d.getHours() + 3);
+        } else if (this.scaleType === "sixHours") {
+            d.setHours(d.getHours() + 6);
+        } else if (this.scaleType === "day") {
+            d.setDate(d.getDate() + 1);
+        } else if (this.scaleType === "week") {
+            d.setDate(d.getDate() + 7);
+        } else if (this.scaleType === "month") {
+            d.setMonth(d.getMonth() + 1);
+        } else if (this.scaleType === "threeMonths") {
+            d.setMonth(d.getMonth() + 3);
+        } else if (this.scaleType === "year") {
+            d.setFullYear(d.getFullYear() + 1, d.getMonth(), d.getDate());
+        } else if (this.scaleType === "fiveYears") {
+            d.setFullYear(d.getFullYear() + 5, d.getMonth(), d.getDate());
+        } else {
+            return;
+        }
+        return d;
+    }
+
+    formatDate(date) {
+        if ((this.scaleType === "minute")
+            || (this.scaleType === "fiveMinutes")
+            || (this.scaleType === "tenMinutes")
+            || (this.scaleType === "thirtyMinutes")
+            || (this.scaleType === "hour")
+            || (this.scaleType === "threeHours")
+            || (this.scaleType === "sixHours")
+        ) {
+            let string = date.getYear() + 1900;
+            string += '-' + ((date.getMonth() + 1) + '').padStart(2, '0');
+            string += '-' + (date.getDate() + '').padStart(2, '0');
+            string += ' ' + (date.getHours() + '').padStart(2, '0');
+            string += ':' + (date.getMinutes() + '').padStart(2, '0');
+            return string;
+        } else if ((this.scaleType === "day")
+            || (this.scaleType === "week")
+        ) {
+            let string = date.getYear() + 1900;
+            string += '-' + ((date.getMonth() + 1) + '').padStart(2, '0');
+            string += '-' + (date.getDate() + '').padStart(2, '0');
+            return string;
+        } else if ((this.scaleType === "month")
+            || (this.scaleType === "threeMonths")
+        ) {
+            const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+            return months[date.getMonth()] + ' ' + (date.getYear() + 1900);
+        } else if ((this.scaleType === "year")
+            || (this.scaleType === "fiveYears")
+        ) {
+            return (date.getYear() + 1900) + '';
+        }
+        return date.toString();
+    }
+
+    onMouseDown(e) {
+        if (e.button === 0) {
+            this.mouseState.leftButton = true;
+        } else if (e.button === 2) {
+            this.mouseState.rightButton = true;
+        }
+        return false;
+    }
+
+    onMouseUp(e) {
+        if (e.button === 0) {
+            this.mouseState.leftButton = false;
+        } else if (e.button === 2) {
+            this.mouseState.rightButton = false;
+        }
+        return false;
+    }
+
+    onMouseMove(e) {
+        if (this.mouseState.rightButton) {
+            this.leftEpoch += (this.mouseState.x - e.x) * this.span / this.domElement.width;
+        }
+
+        this.mouseState.x = e.x;
+        this.mouseState.y = e.y;
+        return false;
+    }
+
+    onMouseWheel(e) {
+        const stepMult = 1.3;
+        const mult = (e.deltaY > 0) ? stepMult : (1 / stepMult);
+        const newSpan = Math.min(Math.max(this.span * mult,
+            (this.canvasRect.right - this.canvasRect.left) / this.markDistance * TimeLine.scales.minute),
+            (this.canvasRect.right - this.canvasRect.left) / this.markDistance * TimeLine.scales.fiveYears);
+        this.leftEpoch += (this.mouseState.x - this.canvasRect.left)
+            * (this.span - newSpan) / (this.canvasRect.right - this.canvasRect.left);
+        this.span = newSpan;
+
+        this.updateScaleType();
+        return false;
+    }
+}
+/* harmony export (immutable) */ __webpack_exports__["a"] = TimeLine;
+
+
+TimeLine.scales = {
+    minute: 60,
+    fiveMinutes: 300,
+    tenMinutes: 600,
+    thirtyMinutes: 1800,
+    hour: 3600,
+    threeHours: 10800,
+    sixHours: 21600,
+    day: 86400,
+    week: 604800,
+    month: 2592000,
+    threeMonths: 7776000,
+    year: 31557600,
+    fiveYears: 157788000,
+};
+
+
+/***/ }),
 /* 22 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
@@ -2983,9 +3366,9 @@ class OrientationAbstract
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__KeplerianAbstract__ = __webpack_require__(10);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__KeplerianAbstract__ = __webpack_require__(13);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__algebra__ = __webpack_require__(0);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__KeplerianObject__ = __webpack_require__(6);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__KeplerianObject__ = __webpack_require__(7);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__StateVector__ = __webpack_require__(4);
 
 
@@ -3183,7 +3566,112 @@ class TrajectoryKeplerianArray extends __WEBPACK_IMPORTED_MODULE_0__KeplerianAbs
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
-/* WEBPACK VAR INJECTION */(function(THREE) {/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__ModelAbstract__ = __webpack_require__(7);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__Abstract__ = __webpack_require__(17);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__ReferenceFrame_Factory__ = __webpack_require__(1);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__ui_TimeLine__ = __webpack_require__(21);
+
+
+
+
+
+class TrajectoryComposite extends __WEBPACK_IMPORTED_MODULE_0__Abstract__["a" /* default */]
+{
+    constructor() {
+        super(__WEBPACK_IMPORTED_MODULE_1__ReferenceFrame_Factory__["a" /* RF_BASE */]);
+        this.components = [];
+        this.lastUsedTrajectory = null;
+    }
+
+    getReferenceFrameByEpoch(epoch) {
+        const traj = this._getTrajectoryByEpoch(epoch);
+        if (!traj) {
+            return null;
+        }
+        return traj.getReferenceFrameByEpoch(epoch);
+    }
+
+    getKeplerianObjectByEpoch(epoch) {
+        const traj = this._getTrajectoryByEpoch(epoch);
+        if (!traj) {
+            return null;
+        }
+        return traj.getKeplerianObjectByEpoch(epoch);
+    }
+
+    addComponent(trajectory) {
+        this.components.push(trajectory);
+        trajectory.setParent(this);
+
+        if (this.minEpoch === null
+            || (trajectory.minEpoch !== null
+                && trajectory.minEpoch !== false
+                && this.minEpoch > trajectory.minEpoch
+            )
+        ) {
+            this.minEpoch = trajectory.minEpoch;
+        }
+        if (this.maxEpoch === null
+            || (trajectory.maxEpoch !== null
+                && trajectory.maxEpoch !== false
+                && this.maxEpoch < trajectory.maxEpoch
+            )
+        ) {
+            this.maxEpoch = trajectory.maxEpoch;
+        }
+    }
+
+    select() {
+        super.select();
+        this.components.map(traj => traj.select());
+    }
+
+    deselect() {
+        super.deselect();
+        this.components.map(traj => traj.deselect());
+    }
+
+    getStateInOwnFrameByEpoch(epoch) {
+        return this._getTrajectoryByEpoch(epoch).getStateInOwnFrameByEpoch(epoch);
+    }
+
+    getStateByEpoch(epoch, referenceFrame) {
+        return this._getTrajectoryByEpoch(epoch).getStateByEpoch(epoch, referenceFrame);
+    }
+
+    _getTrajectoryByEpoch(epoch) {
+        if (this.lastUsedTrajectory
+            && (this.lastUsedTrajectory.minEpoch <= epoch || this.lastUsedTrajectory.minEpoch === false)
+            && (this.lastUsedTrajectory.maxEpoch >= epoch || this.lastUsedTrajectory.maxEpoch === false)
+        ) {
+            return this.lastUsedTrajectory;
+        }
+
+        for (let trajectory of this.components) {
+            if ((trajectory.minEpoch <= epoch || trajectory.minEpoch === false)
+                && (trajectory.maxEpoch >= epoch || trajectory.maxEpoch === false)
+            ) {
+                this.lastUsedTrajectory = trajectory;
+                return trajectory;
+            }
+        }
+
+        console.log('Insufficient ephemeris data has been loaded to compute the state of ' +
+            (this.object && this.object.id) + ' (' + (this.object && this.object.name) + ') at the ephemeris epoch ' +
+            epoch + ' (' + __WEBPACK_IMPORTED_MODULE_2__ui_TimeLine__["a" /* default */].getDateByEpoch(epoch) + ').'
+        );
+
+        return null;
+    }
+}
+/* harmony export (immutable) */ __webpack_exports__["a"] = TrajectoryComposite;
+
+
+/***/ }),
+/* 26 */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+/* WEBPACK VAR INJECTION */(function(THREE) {/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__ModelAbstract__ = __webpack_require__(5);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__LineObject__ = __webpack_require__(24);
 
 
@@ -3239,11 +3727,11 @@ class VisualTrajectoryModelAbstract extends __WEBPACK_IMPORTED_MODULE_0__ModelAb
 /* WEBPACK VAR INJECTION */}.call(__webpack_exports__, __webpack_require__(2)))
 
 /***/ }),
-/* 26 */
+/* 27 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
-/* WEBPACK VAR INJECTION */(function(THREE) {/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__Abstract__ = __webpack_require__(25);
+/* WEBPACK VAR INJECTION */(function(THREE) {/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__Abstract__ = __webpack_require__(26);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__core_ReferenceFrame_Factory__ = __webpack_require__(1);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__algebra__ = __webpack_require__(0);
 
@@ -3432,12 +3920,12 @@ class VisualTrajectoryModelKeplerian extends __WEBPACK_IMPORTED_MODULE_0__Abstra
 /* WEBPACK VAR INJECTION */}.call(__webpack_exports__, __webpack_require__(2)))
 
 /***/ }),
-/* 27 */
+/* 28 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
-/* WEBPACK VAR INJECTION */(function(THREE) {/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__Abstract__ = __webpack_require__(28);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__ModelAbstract__ = __webpack_require__(7);
+/* WEBPACK VAR INJECTION */(function(THREE) {/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__Abstract__ = __webpack_require__(29);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__ModelAbstract__ = __webpack_require__(5);
 
 
 
@@ -3482,15 +3970,15 @@ class VisualBodyModelBasic extends __WEBPACK_IMPORTED_MODULE_0__Abstract__["a" /
 /* WEBPACK VAR INJECTION */}.call(__webpack_exports__, __webpack_require__(2)))
 
 /***/ }),
-/* 28 */
+/* 29 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
-/* WEBPACK VAR INJECTION */(function(THREE) {/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__ModelAbstract__ = __webpack_require__(7);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__VisualLabel__ = __webpack_require__(75);
+/* WEBPACK VAR INJECTION */(function(THREE) {/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__ModelAbstract__ = __webpack_require__(5);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__VisualLabel__ = __webpack_require__(57);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__core_Events__ = __webpack_require__(3);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__core_EphemerisObject__ = __webpack_require__(15);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_4__core_FunctionOfEpoch_Custom__ = __webpack_require__(12);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__core_EphemerisObject__ = __webpack_require__(8);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_4__core_FunctionOfEpoch_Custom__ = __webpack_require__(11);
 
 
 
@@ -3564,250 +4052,11 @@ class VisualBodyModelAbstract extends __WEBPACK_IMPORTED_MODULE_0__ModelAbstract
 /* WEBPACK VAR INJECTION */}.call(__webpack_exports__, __webpack_require__(2)))
 
 /***/ }),
-/* 29 */
-/***/ (function(module, __webpack_exports__, __webpack_require__) {
-
-"use strict";
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__algebra__ = __webpack_require__(0);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__KeplerianObject__ = __webpack_require__(6);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__visual_Vector__ = __webpack_require__(30);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__solar_system__ = __webpack_require__(8);
-
-
-
-
-
-class LambertSolver
-{
-    static getPlotData(orbit1, orbit2, epochMin, epochMax, transferMin, transferMax, points) {
-        const epochStep = (epochMax - epochMin) / (points - 1);
-        const flightTimeStep = (transferMax - transferMin) / (points - 1);
-        let result = [];
-        let startEpoch = epochMin;
-        let i = 0;
-
-        while (startEpoch <= epochMax) {
-            let flightTime = transferMin;
-            let j = 0;
-
-            result[i] = [];
-            while (flightTime <= transferMax) {
-                let res = this.calcDeltaV(
-                    orbit1.getStateByEpoch(startEpoch),
-                    orbit2.getStateByEpoch(startEpoch + flightTime),
-                    startEpoch,
-                    flightTime,
-                    orbit1.mu
-                );
-                result[i][j] = res;
-                flightTime += flightTimeStep;
-                j++;
-
-            }
-            startEpoch += epochStep;
-            i++;
-        }
-        return result;
-    }
-
-    static plot(plotData) {
-        let min = 1e99, max = 0;
-        let ctx = document.getElementById('lambertCanvas').getContext('2d');
-
-        ctx.clearRect(0, 0, 300, 300);
-
-        for (let row of plotData) {
-            for (let res of row) {
-                if (res === false) {
-                    continue;
-                }
-                if (res < min) {
-                    min = res;
-                }
-                if (res > max) {
-                    max = res;
-                }
-            }
-        }
-
-        for (let row in plotData) {
-            for (let col in plotData[row]) {
-                const res = plotData[row][col];
-                if (res === false) {
-                    ctx.fillStyle = "rgba(255,0,0,1)";
-                } else {
-                    const color = Math.round((1 - (res - min) / (max - min)) * 255);
-                    ctx.fillStyle = "rgba(" + color + "," + color + "," + color + ", 1)";
-                }
-                ctx.fillRect(0|row, 0|col, 1, 1);
-            }
-        }
-    }
-
-    static getDeltaV(state1, state2, transferOrbit, epoch1, epoch2) {
-        return state1.velocity.sub_(transferOrbit.getStateByEpoch(epoch1)._velocity).mag +
-            state2.velocity.sub_(transferOrbit.getStateByEpoch(epoch2)._velocity).mag;
-    }
-
-    static calcDeltaV(state1, state2, startEpoch, flightTime, mu) {
-        const transferOrbit = this.solve(state1, state2, startEpoch, flightTime, mu);
-
-        if (!transferOrbit) {
-            return false;
-        }
-
-        return this.getDeltaV(state1, state2, transferOrbit, startEpoch, startEpoch + flightTime);
-    }
-
-    static solve(state1, state2, startEpoch, flightTime, mu) {
-        const maxError = 1;
-        const maxSteps = 30;
-
-        const r1vec = state1.position;
-        const r2vec = state2.position;
-        let normal = r1vec.cross(r2vec);
-        const r1 = r1vec.mag;
-        const r2 = r2vec.mag;
-        let transferAngle = r1vec.angle(r2vec);
-
-        if (normal.angle(state1._position.cross(state1._velocity)) > Math.PI / 2) {
-            transferAngle = 2 * Math.PI - transferAngle;
-            normal.mul_(-1);
-        }
-
-        const signSinTransferAngle = Math.sign(Math.sin(transferAngle));
-        const inc = normal.angle(new __WEBPACK_IMPORTED_MODULE_0__algebra__["c" /* Vector */]([0, 0, 1]));
-        const nodeVector = (new __WEBPACK_IMPORTED_MODULE_0__algebra__["c" /* Vector */]([0, 0, 1])).cross(normal);
-
-        let e, sma, ta1;
-        let raan = nodeVector.angle(new __WEBPACK_IMPORTED_MODULE_0__algebra__["c" /* Vector */]([1, 0, 0]));
-        if ((new __WEBPACK_IMPORTED_MODULE_0__algebra__["c" /* Vector */]([1, 0, 0])).cross(nodeVector).angle(new __WEBPACK_IMPORTED_MODULE_0__algebra__["c" /* Vector */]([0, 0, 1])) > Math.PI / 2) {
-            raan = 2 * Math.PI - raan;
-        }
-
-        const d = Math.sqrt(r1*r1 + r2*r2 - 2 * r1vec.dot(r2vec)) / 2;
-
-        const parabolicTime = (Math.pow(r1+r2+2*d, 3/2) - signSinTransferAngle*Math.pow(r1+r2-2*d, 3/2)) / (6 * Math.sqrt(mu));
-
-        if (flightTime > parabolicTime) {
-            // ellipse
-            const A = (r2 - r1) / 2;
-            const E = d / A;
-            const B = Math.sqrt(d*d - A*A);
-            let y = Object(__WEBPACK_IMPORTED_MODULE_0__algebra__["h" /* newtonSolve */])(
-                (yParam) => this.getTimeByY(yParam, A, B, E, r1, r2, d, transferAngle, mu) - flightTime,
-                10000, 1, maxError, maxSteps
-            );
-
-            if (y === false) {
-                return false;
-            }
-
-            const x0 = -(r2 + r1) / 2 / E;
-            const y0 = B * Math.sqrt(x0 * x0 / A / A - 1);
-            const x = A * Math.sqrt(1 + y * y / B / B);
-            const temp = Math.sqrt((x0 - x) * (x0 - x) + (y0 - y) * (y0 - y));
-            const fx = (x0 - x) / temp;
-            const fy = (y0 - y) / temp;
-            ta1 = Object(__WEBPACK_IMPORTED_MODULE_0__algebra__["g" /* getAngleBySinCos */])(
-                signSinTransferAngle * ((x0 + d) * fy - y0 * fx) / r1,
-                -((x0 + d) * fx + y0 * fy) / r1
-            );
-            sma = E * (x - x0) / 2;
-            e = temp / 2 / sma;
-
-        } else {
-            // hyperbola
-            sma = Object(__WEBPACK_IMPORTED_MODULE_0__algebra__["h" /* newtonSolve */])(
-                (a) => {
-                    const alpha = Math.acosh(1 + (r1 + r2 + 2 * d) / 2 / Math.abs(a));
-                    const beta  = Math.acosh(1 + (r1 + r2 - 2 * d) / 2 / Math.abs(a));
-                    return Math.sqrt(Math.abs(Math.pow(a, 3)) / mu) *
-                        (Math.sinh(alpha) - alpha - signSinTransferAngle * (Math.sinh(beta) - beta)) - flightTime;
-                },
-                r1, 10, maxError, maxSteps
-            );
-
-            if (sma > 0) {
-                sma = -sma;
-            }
-
-            let f1 = r1vec.rotate(nodeVector, -inc).mul_(-1);
-            let p2 = r2vec.rotate(nodeVector, -inc).add_(f1);
-            const d1 = r1 - 2 * sma;
-            const d2 = r2 - 2 * sma;
-            const tempAng = -Math.sign(p2.y) * p2.angle(new __WEBPACK_IMPORTED_MODULE_0__algebra__["c" /* Vector */]([1,0,0]));
-            f1 = f1.rotateZ(tempAng);
-            p2 = p2.rotateZ(tempAng);
-
-            const f2x = (p2.x*p2.x - d2*d2 + d1*d1) / 2 / p2.x;
-            let f2y = Math.sqrt(d1*d1 - f2x*f2x);
-
-            if (transferAngle > Math.PI ? (f1.y < 0) : (f1.y > 0)) {
-                f2y = -f2y;
-            }
-
-            e = -f1.sub_(new __WEBPACK_IMPORTED_MODULE_0__algebra__["c" /* Vector */]([f2x, f2y, 0])).mag / 2 / sma;
-
-            const p = sma * (1 - e*e);
-            ta1 = Math.acos((p / r1 - 1) / e);
-            const ta2 = Math.acos((p / r2 - 1) / e);
-
-            if (ta1 > ta2 || ta2 - transferAngle < 0) {
-                ta1 = -ta1;
-            }
-        }
-
-        const perVector = (new __WEBPACK_IMPORTED_MODULE_0__algebra__["a" /* Quaternion */](normal, -ta1)).rotate(r1vec);
-        let aop = nodeVector.angle(perVector);
-
-        if (nodeVector.cross(perVector).angle(normal) > Math.PI / 2) {
-            aop = 2 * Math.PI - aop;
-        }
-
-        return new __WEBPACK_IMPORTED_MODULE_1__KeplerianObject__["a" /* default */](e, sma, aop, inc, raan, ta1, startEpoch, mu, true);
-    }
-
-    static getTimeByY(y, A, B, E, r1, r2, d, alpha, mu) {
-        const rm = (r2 + r1) / 2;
-        const x0 = - rm / E;
-        const y0 = B * Math.sqrt(x0*x0/A/A - 1);
-        const x = A * Math.sqrt(1 + y*y/B/B);
-        const a = (rm + E * x) / 2;
-        const temp = Math.sqrt((x0 - x)*(x0 - x) + (y0 - y)*(y0 - y));
-        const e = temp / 2 / a;
-        const fx = (x0 - x) / temp;
-        const fy = (y0 - y) / temp;
-        const cosTa1 = -((x0 + d) * fx + y0 * fy) / r1;
-        const sinTa1 = Math.sign(Math.sin(alpha)) * ((x0 + d) * fy - y0 * fx) / r1;
-        const ta1 = Object(__WEBPACK_IMPORTED_MODULE_0__algebra__["g" /* getAngleBySinCos */])(sinTa1, cosTa1);
-        const n = Math.sqrt(mu/a/a/a);
-        const E1 = this.getEccentricAnomalyByTrueAnomaly(ta1, e);
-        let E2 = this.getEccentricAnomalyByTrueAnomaly(ta1 + alpha, e);
-        if (ta1 + alpha > 2 * Math.PI) {
-            E2 += 2 * Math.PI;
-        }
-        return (E2 - E1 - e * (Math.sin(E2) - Math.sin(E1))) / n;
-    }
-
-    static getEccentricAnomalyByTrueAnomaly(ta, ecc) {
-        const cos = Math.cos(ta);
-        return Object(__WEBPACK_IMPORTED_MODULE_0__algebra__["g" /* getAngleBySinCos */])(
-            Math.sqrt(1 - ecc * ecc) * Math.sin(ta) / (1 + ecc * cos),
-            (ecc + cos) / (1 + ecc * cos)
-        );
-    }
-
-}
-/* harmony export (immutable) */ __webpack_exports__["a"] = LambertSolver;
-
-
-/***/ }),
 /* 30 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
-/* WEBPACK VAR INJECTION */(function(THREE) {/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__ModelAbstract__ = __webpack_require__(7);
+/* WEBPACK VAR INJECTION */(function(THREE) {/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__ModelAbstract__ = __webpack_require__(5);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__algebra__ = __webpack_require__(0);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__core_ReferenceFrame_Factory__ = __webpack_require__(1);
 
@@ -3890,21 +4139,10 @@ $(() => {
     init();
 });
 
-/* WEBPACK VAR INJECTION */}.call(__webpack_exports__, __webpack_require__(33), __webpack_require__(32), __webpack_require__(5)))
+/* WEBPACK VAR INJECTION */}.call(__webpack_exports__, __webpack_require__(32), __webpack_require__(33), __webpack_require__(6)))
 
 /***/ }),
 /* 32 */
-/***/ (function(module, exports) {
-
-// stats.js - http://github.com/mrdoob/stats.js
-var Stats=function(){function h(a){c.appendChild(a.dom);return a}function k(a){for(var d=0;d<c.children.length;d++)c.children[d].style.display=d===a?"block":"none";l=a}var l=0,c=document.createElement("div");c.style.cssText="position:fixed;top:0;left:0;cursor:pointer;opacity:0.9;z-index:10000";c.addEventListener("click",function(a){a.preventDefault();k(++l%c.children.length)},!1);var g=(performance||Date).now(),e=g,a=0,r=h(new Stats.Panel("FPS","#0ff","#002")),f=h(new Stats.Panel("MS","#0f0","#020"));
-if(self.performance&&self.performance.memory)var t=h(new Stats.Panel("MB","#f08","#201"));k(0);return{REVISION:16,dom:c,addPanel:h,showPanel:k,begin:function(){g=(performance||Date).now()},end:function(){a++;var c=(performance||Date).now();f.update(c-g,200);if(c>e+1E3&&(r.update(1E3*a/(c-e),100),e=c,a=0,t)){var d=performance.memory;t.update(d.usedJSHeapSize/1048576,d.jsHeapSizeLimit/1048576)}return c},update:function(){g=this.end()},domElement:c,setMode:k}};
-Stats.Panel=function(h,k,l){var c=Infinity,g=0,e=Math.round,a=e(window.devicePixelRatio||1),r=80*a,f=48*a,t=3*a,u=2*a,d=3*a,m=15*a,n=74*a,p=30*a,q=document.createElement("canvas");q.width=r;q.height=f;q.style.cssText="width:80px;height:48px";var b=q.getContext("2d");b.font="bold "+9*a+"px Helvetica,Arial,sans-serif";b.textBaseline="top";b.fillStyle=l;b.fillRect(0,0,r,f);b.fillStyle=k;b.fillText(h,t,u);b.fillRect(d,m,n,p);b.fillStyle=l;b.globalAlpha=.9;b.fillRect(d,m,n,p);return{dom:q,update:function(f,
-v){c=Math.min(c,f);g=Math.max(g,f);b.fillStyle=l;b.globalAlpha=1;b.fillRect(0,0,r,m);b.fillStyle=k;b.fillText(e(f)+" "+h+" ("+e(c)+"-"+e(g)+")",t,u);b.drawImage(q,d+a,m,n-a,p,d,m,n-a,p);b.fillRect(d+n-a,m,a,p);b.fillStyle=l;b.globalAlpha=.9;b.fillRect(d+n-a,m,a,e((1-f/v)*p))}}};"object"===typeof module&&(module.exports=Stats);
-
-
-/***/ }),
-/* 33 */
 /***/ (function(module, exports, __webpack_require__) {
 
 (function webpackUniversalModuleDefinition(root, factory) {
@@ -8112,6 +8350,17 @@ return /******/ (function(modules) { // webpackBootstrap
 //# sourceMappingURL=dat.gui.js.map
 
 /***/ }),
+/* 33 */
+/***/ (function(module, exports) {
+
+// stats.js - http://github.com/mrdoob/stats.js
+var Stats=function(){function h(a){c.appendChild(a.dom);return a}function k(a){for(var d=0;d<c.children.length;d++)c.children[d].style.display=d===a?"block":"none";l=a}var l=0,c=document.createElement("div");c.style.cssText="position:fixed;top:0;left:0;cursor:pointer;opacity:0.9;z-index:10000";c.addEventListener("click",function(a){a.preventDefault();k(++l%c.children.length)},!1);var g=(performance||Date).now(),e=g,a=0,r=h(new Stats.Panel("FPS","#0ff","#002")),f=h(new Stats.Panel("MS","#0f0","#020"));
+if(self.performance&&self.performance.memory)var t=h(new Stats.Panel("MB","#f08","#201"));k(0);return{REVISION:16,dom:c,addPanel:h,showPanel:k,begin:function(){g=(performance||Date).now()},end:function(){a++;var c=(performance||Date).now();f.update(c-g,200);if(c>e+1E3&&(r.update(1E3*a/(c-e),100),e=c,a=0,t)){var d=performance.memory;t.update(d.usedJSHeapSize/1048576,d.jsHeapSizeLimit/1048576)}return c},update:function(){g=this.end()},domElement:c,setMode:k}};
+Stats.Panel=function(h,k,l){var c=Infinity,g=0,e=Math.round,a=e(window.devicePixelRatio||1),r=80*a,f=48*a,t=3*a,u=2*a,d=3*a,m=15*a,n=74*a,p=30*a,q=document.createElement("canvas");q.width=r;q.height=f;q.style.cssText="width:80px;height:48px";var b=q.getContext("2d");b.font="bold "+9*a+"px Helvetica,Arial,sans-serif";b.textBaseline="top";b.fillStyle=l;b.fillRect(0,0,r,f);b.fillStyle=k;b.fillText(h,t,u);b.fillRect(d,m,n,p);b.fillStyle=l;b.globalAlpha=.9;b.fillRect(d,m,n,p);return{dom:q,update:function(f,
+v){c=Math.min(c,f);g=Math.max(g,f);b.fillStyle=l;b.globalAlpha=1;b.fillRect(0,0,r,m);b.fillStyle=k;b.fillText(e(f)+" "+h+" ("+e(c)+"-"+e(g)+")",t,u);b.drawImage(q,d+a,m,n-a,p,d,m,n-a,p);b.fillRect(d+n-a,m,a,p);b.fillStyle=l;b.globalAlpha=.9;b.fillRect(d+n-a,m,a,e((1-f/v)*p))}}};"object"===typeof module&&(module.exports=Stats);
+
+
+/***/ }),
 /* 34 */
 /***/ (function(module, exports) {
 
@@ -8129,13 +8378,13 @@ module.exports = __webpack_amd_options__;
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__algebra__ = __webpack_require__(0);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__Events__ = __webpack_require__(3);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__ReferenceFrame_Factory__ = __webpack_require__(1);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_4__ui_TimeLine__ = __webpack_require__(74);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_4__ui_TimeLine__ = __webpack_require__(21);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_5__interface_StarSystemLoader__ = __webpack_require__(41);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_6__visual_Raycaster__ = __webpack_require__(71);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_7__ui_SelectionHandler__ = __webpack_require__(72);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_6__visual_Raycaster__ = __webpack_require__(61);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_7__ui_SelectionHandler__ = __webpack_require__(62);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_8__ui_UI__ = __webpack_require__(63);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_9__StarSystem__ = __webpack_require__(69);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_10__ui_Camera__ = __webpack_require__(73);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_9__StarSystem__ = __webpack_require__(70);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_10__ui_Camera__ = __webpack_require__(71);
 
 
 
@@ -8321,7 +8570,7 @@ class EventHandler
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__Abstract__ = __webpack_require__(11);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__Abstract__ = __webpack_require__(15);
 
 
 class FunctionOfEpochObjectState extends __WEBPACK_IMPORTED_MODULE_0__Abstract__["a" /* default */]
@@ -8344,7 +8593,7 @@ class FunctionOfEpochObjectState extends __WEBPACK_IMPORTED_MODULE_0__Abstract__
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__Abstract__ = __webpack_require__(13);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__Abstract__ = __webpack_require__(16);
 
 
 class ReferenceFrameBase extends __WEBPACK_IMPORTED_MODULE_0__Abstract__["a" /* default */]
@@ -8436,17 +8685,17 @@ class ReferenceFrameTopocentric extends __WEBPACK_IMPORTED_MODULE_0__BodyFixed__
 
 "use strict";
 /* WEBPACK VAR INJECTION */(function($) {/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__core_ReferenceFrame_Factory__ = __webpack_require__(1);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__solar_system__ = __webpack_require__(8);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__core_Body__ = __webpack_require__(14);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__solar_system__ = __webpack_require__(9);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__core_Body__ = __webpack_require__(12);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__core_Orientation_IAUModel__ = __webpack_require__(42);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_4__core_Orientation_ConstantAxis__ = __webpack_require__(43);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_5__core_PhysicalBodyModel__ = __webpack_require__(44);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_6__core_EphemerisObject__ = __webpack_require__(15);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_6__core_EphemerisObject__ = __webpack_require__(8);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_7__TrajectoryLoader__ = __webpack_require__(45);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_8__visual_StarsModel__ = __webpack_require__(56);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_9__visual_BodyModel_Light__ = __webpack_require__(57);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_8__visual_StarsModel__ = __webpack_require__(55);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_9__visual_BodyModel_Light__ = __webpack_require__(56);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_10__visual_BodyModel_Rings__ = __webpack_require__(58);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_11__visual_BodyModel_Basic__ = __webpack_require__(27);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_11__visual_BodyModel_Basic__ = __webpack_require__(28);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_12__visual_Shape_Sphere__ = __webpack_require__(59);
 
 
@@ -8564,6 +8813,7 @@ class StarSystemLoader
             object = new __WEBPACK_IMPORTED_MODULE_2__core_Body__["a" /* default */](
                 config.id,
                 config.type || __WEBPACK_IMPORTED_MODULE_6__core_EphemerisObject__["a" /* default */].TYPE_UNKNOWN,
+                config.parentSoi || null,
                 config.name,
                 visualModel,
                 physicalModel,
@@ -8585,7 +8835,7 @@ class StarSystemLoader
 }
 /* harmony export (immutable) */ __webpack_exports__["a"] = StarSystemLoader;
 
-/* WEBPACK VAR INJECTION */}.call(__webpack_exports__, __webpack_require__(5)))
+/* WEBPACK VAR INJECTION */}.call(__webpack_exports__, __webpack_require__(6)))
 
 /***/ }),
 /* 42 */
@@ -8685,16 +8935,16 @@ class PhysicalBodyModel
 "use strict";
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__core_Trajectory_KeplerianArray__ = __webpack_require__(23);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__core_Trajectory_KeplerianPrecessingArray__ = __webpack_require__(49);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__core_Trajectory_KeplerianBasic__ = __webpack_require__(17);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__core_Trajectory_KeplerianBasic__ = __webpack_require__(14);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__core_Trajectory_KeplerianPrecessing__ = __webpack_require__(50);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_4__core_KeplerianObject__ = __webpack_require__(6);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_5__core_Trajectory_Composite__ = __webpack_require__(51);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_6__visual_TrajectoryModel_PointArray__ = __webpack_require__(52);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_7__visual_TrajectoryModel_Keplerian__ = __webpack_require__(26);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_8__core_Trajectory_StaticPosition__ = __webpack_require__(53);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_4__core_KeplerianObject__ = __webpack_require__(7);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_5__core_Trajectory_Composite__ = __webpack_require__(25);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_6__visual_TrajectoryModel_PointArray__ = __webpack_require__(51);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_7__visual_TrajectoryModel_Keplerian__ = __webpack_require__(27);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_8__core_Trajectory_StaticPosition__ = __webpack_require__(52);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_9__algebra__ = __webpack_require__(0);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_10__core_Trajectory_VSOP87__ = __webpack_require__(54);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_11__core_Trajectory_ELP2000__ = __webpack_require__(55);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_10__core_Trajectory_VSOP87__ = __webpack_require__(53);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_11__core_Trajectory_ELP2000__ = __webpack_require__(54);
 
 
 
@@ -8864,7 +9114,7 @@ class TrajectoryLoader
 
 "use strict";
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__Events__ = __webpack_require__(3);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__FunctionOfEpoch_Custom__ = __webpack_require__(12);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__FunctionOfEpoch_Custom__ = __webpack_require__(11);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__algebra__ = __webpack_require__(0);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__visual_HelperAngle__ = __webpack_require__(47);
 
@@ -9453,8 +9703,8 @@ class TrajectoryKeplerianPrecessingArray extends __WEBPACK_IMPORTED_MODULE_0__Ke
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__KeplerianBasic__ = __webpack_require__(17);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__KeplerianObject__ = __webpack_require__(6);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__KeplerianBasic__ = __webpack_require__(14);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__KeplerianObject__ = __webpack_require__(7);
 
 
 
@@ -9490,112 +9740,7 @@ class TrajectoryKeplerianPrecessing extends __WEBPACK_IMPORTED_MODULE_0__Kepleri
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__Abstract__ = __webpack_require__(16);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__ReferenceFrame_Factory__ = __webpack_require__(1);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__ui_TimeLine__ = __webpack_require__(74);
-
-
-
-
-
-class TrajectoryComposite extends __WEBPACK_IMPORTED_MODULE_0__Abstract__["a" /* default */]
-{
-    constructor() {
-        super(__WEBPACK_IMPORTED_MODULE_1__ReferenceFrame_Factory__["a" /* RF_BASE */]);
-        this.components = [];
-        this.lastUsedTrajectory = null;
-    }
-
-    getReferenceFrameByEpoch(epoch) {
-        const traj = this._getTrajectoryByEpoch(epoch);
-        if (!traj) {
-            return null;
-        }
-        return traj.getReferenceFrameByEpoch(epoch);
-    }
-
-    getKeplerianObjectByEpoch(epoch) {
-        const traj = this._getTrajectoryByEpoch(epoch);
-        if (!traj) {
-            return null;
-        }
-        return traj.getKeplerianObjectByEpoch(epoch);
-    }
-
-    addComponent(trajectory) {
-        this.components.push(trajectory);
-        trajectory.setParent(this);
-
-        if (this.minEpoch === null
-            || (trajectory.minEpoch !== null
-                && trajectory.minEpoch !== false
-                && this.minEpoch > trajectory.minEpoch
-            )
-        ) {
-            this.minEpoch = trajectory.minEpoch;
-        }
-        if (this.maxEpoch === null
-            || (trajectory.maxEpoch !== null
-                && trajectory.maxEpoch !== false
-                && this.maxEpoch < trajectory.maxEpoch
-            )
-        ) {
-            this.maxEpoch = trajectory.maxEpoch;
-        }
-    }
-
-    select() {
-        super.select();
-        this.components.map(traj => traj.select());
-    }
-
-    deselect() {
-        super.deselect();
-        this.components.map(traj => traj.deselect());
-    }
-
-    getStateInOwnFrameByEpoch(epoch) {
-        return this._getTrajectoryByEpoch(epoch).getStateInOwnFrameByEpoch(epoch);
-    }
-
-    getStateByEpoch(epoch, referenceFrame) {
-        return this._getTrajectoryByEpoch(epoch).getStateByEpoch(epoch, referenceFrame);
-    }
-
-    _getTrajectoryByEpoch(epoch) {
-        if (this.lastUsedTrajectory
-            && (this.lastUsedTrajectory.minEpoch <= epoch || this.lastUsedTrajectory.minEpoch === false)
-            && (this.lastUsedTrajectory.maxEpoch >= epoch || this.lastUsedTrajectory.maxEpoch === false)
-        ) {
-            return this.lastUsedTrajectory;
-        }
-
-        for (let trajectory of this.components) {
-            if ((trajectory.minEpoch <= epoch || trajectory.minEpoch === false)
-                && (trajectory.maxEpoch >= epoch || trajectory.maxEpoch === false)
-            ) {
-                this.lastUsedTrajectory = trajectory;
-                return trajectory;
-            }
-        }
-
-        console.log('Insufficient ephemeris data has been loaded to compute the state of ' +
-            (this.object && this.object.id) + ' (' + (this.object && this.object.name) + ') at the ephemeris epoch ' +
-            epoch + ' (' + __WEBPACK_IMPORTED_MODULE_2__ui_TimeLine__["a" /* default */].getDateByEpoch(epoch) + ').'
-        );
-
-        return null;
-    }
-}
-/* harmony export (immutable) */ __webpack_exports__["a"] = TrajectoryComposite;
-
-
-/***/ }),
-/* 52 */
-/***/ (function(module, __webpack_exports__, __webpack_require__) {
-
-"use strict";
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__Abstract__ = __webpack_require__(25);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__Abstract__ = __webpack_require__(26);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__algebra__ = __webpack_require__(0);
 
 
@@ -9768,11 +9913,11 @@ class VisualTrajectoryModelPointArray extends __WEBPACK_IMPORTED_MODULE_0__Abstr
 
 
 /***/ }),
-/* 53 */
+/* 52 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__Abstract__ = __webpack_require__(16);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__Abstract__ = __webpack_require__(17);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__StateVector__ = __webpack_require__(4);
 
 
@@ -9792,14 +9937,14 @@ class TrajectoryStaticPosition extends __WEBPACK_IMPORTED_MODULE_0__Abstract__["
 
 
 /***/ }),
-/* 54 */
+/* 53 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__ReferenceFrame_Factory__ = __webpack_require__(1);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__solar_system__ = __webpack_require__(8);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__KeplerianAbstract__ = __webpack_require__(10);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__KeplerianObject__ = __webpack_require__(6);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__solar_system__ = __webpack_require__(9);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__KeplerianAbstract__ = __webpack_require__(13);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__KeplerianObject__ = __webpack_require__(7);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_4__algebra__ = __webpack_require__(0);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_5__StateVector__ = __webpack_require__(4);
 
@@ -9851,13 +9996,13 @@ class TrajectoryVSOP87 extends __WEBPACK_IMPORTED_MODULE_2__KeplerianAbstract__[
 
 
 /***/ }),
-/* 55 */
+/* 54 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__KeplerianAbstract__ = __webpack_require__(10);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__KeplerianAbstract__ = __webpack_require__(13);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__ReferenceFrame_Factory__ = __webpack_require__(1);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__solar_system__ = __webpack_require__(8);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__solar_system__ = __webpack_require__(9);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__algebra__ = __webpack_require__(0);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_4__StateVector__ = __webpack_require__(4);
 
@@ -10086,12 +10231,12 @@ class TrajectoryELP2000 extends __WEBPACK_IMPORTED_MODULE_0__KeplerianAbstract__
 
 
 /***/ }),
-/* 56 */
+/* 55 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
 /* WEBPACK VAR INJECTION */(function(THREE) {/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__algebra__ = __webpack_require__(0);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__ModelAbstract__ = __webpack_require__(7);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__ModelAbstract__ = __webpack_require__(5);
 
 
 
@@ -10136,11 +10281,11 @@ class VisualStarsModel extends __WEBPACK_IMPORTED_MODULE_1__ModelAbstract__["a" 
 /* WEBPACK VAR INJECTION */}.call(__webpack_exports__, __webpack_require__(2)))
 
 /***/ }),
-/* 57 */
+/* 56 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
-/* WEBPACK VAR INJECTION */(function(THREE) {/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__Basic__ = __webpack_require__(27);
+/* WEBPACK VAR INJECTION */(function(THREE) {/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__Basic__ = __webpack_require__(28);
 
 
 class VisualBodyModelLight extends __WEBPACK_IMPORTED_MODULE_0__Basic__["a" /* default */]
@@ -10165,12 +10310,118 @@ class VisualBodyModelLight extends __WEBPACK_IMPORTED_MODULE_0__Basic__["a" /* d
 /* WEBPACK VAR INJECTION */}.call(__webpack_exports__, __webpack_require__(2)))
 
 /***/ }),
+/* 57 */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+/* WEBPACK VAR INJECTION */(function(THREE) {/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__ModelAbstract__ = __webpack_require__(5);
+
+
+class VisualLabel extends __WEBPACK_IMPORTED_MODULE_0__ModelAbstract__["a" /* default */] {
+    constructor(functionOfEpoch, parameters) {
+        super();
+
+        this.visible = true;
+
+        this.parameters = Object.assign({}, VisualLabel.DEFAULT_SETTINGS, parameters);
+        this.functionOfEpoch = functionOfEpoch;
+
+        this.canvas = document.createElement('canvas');
+
+        this.setThreeObj(new THREE.Sprite(new THREE.SpriteMaterial(
+            {map: new THREE.CanvasTexture(this.canvas)}
+        )));
+
+        this.setText(this.parameters.text);
+    }
+
+    setText(text) {
+        let context = this.canvas.getContext('2d');
+        context.font = this.parameters.fontSize + 'px ' + this.parameters.font;
+
+        let canvasWidth = context.measureText(text).width;
+        let canvasHeight = this.parameters.fontSize * (1 + this.parameters.margin) * 2;
+        this.canvas.width = THREE.Math.ceilPowerOfTwo(canvasWidth);
+        this.canvas.height = THREE.Math.ceilPowerOfTwo(canvasHeight);
+
+        context.font = this.parameters.fontSize + 'px ' + this.parameters.font;
+        context.fillStyle = this.parameters.color;
+        context.textAlign = 'center';
+        context.textBaseline = 'bottom';
+        context.fillText(
+            text,
+            this.canvas.width / 2,
+            this.parameters.fontSize + (this.canvas.height - canvasHeight) / 2
+        );
+
+        this.threeObj.material.map.needsUpdate = true;
+    }
+
+    render(epoch) {
+        if (!this.visible) {
+            this.threeObj.visible = false;
+            return;
+        }
+
+        this.threeObj.position.copy(sim.getVisualCoords(this.functionOfEpoch.evaluate(epoch)));
+
+        const distance = this.threeObj.position.length();
+
+        const scaleCoeff = this.calculateScaleCoeff(distance, this.parameters.scaling) / 2;
+        this.threeObj.scale.x = this.canvas.width  * scaleCoeff;
+        this.threeObj.scale.y = this.canvas.height * scaleCoeff;
+
+        this.threeObj.visible = 1 < Math.max(this.threeObj.scale.x, this.threeObj.scale.y) /
+            (distance * sim.raycaster.getPixelAngleSize()) / 2;
+    }
+
+    calculateScaleCoeff(distance, scaling) {
+        if (typeof scaling.callback === 'string') {
+            return VisualLabel.scalingFunctions[scaling.callback](distance, scaling.range);
+        }
+        return scaling.callback(distance, scaling.range);
+    }
+}
+/* harmony export (immutable) */ __webpack_exports__["a"] = VisualLabel;
+
+
+VisualLabel.DEFAULT_SETTINGS = {
+    text: '',
+    font: 'Arial',
+    color: 'white',
+    fontSize: 32,
+    margin: 0,
+    scaling: {
+        range: {
+            from: 30000,
+            to: 700000,
+        },
+        callback: 'range'
+    }
+};
+
+VisualLabel.scalingFunctions = {
+    alwaysVisible: (distance) => distance * sim.raycaster.getPixelAngleSize(),
+    range: (distance, range) => {
+        if (distance < range.from) {
+            return range.from * sim.raycaster.getPixelAngleSize();
+        }
+        if (distance > range.to) {
+            return range.to * sim.raycaster.getPixelAngleSize();
+        }
+        return distance * sim.raycaster.getPixelAngleSize();
+    }
+};
+
+/* WEBPACK VAR INJECTION */}.call(__webpack_exports__, __webpack_require__(2)))
+
+/***/ }),
 /* 58 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
-/* WEBPACK VAR INJECTION */(function(THREE) {/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__Abstract__ = __webpack_require__(28);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__ModelAbstract__ = __webpack_require__(7);
+/* WEBPACK VAR INJECTION */(function(THREE) {/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__Abstract__ = __webpack_require__(29);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__ModelAbstract__ = __webpack_require__(5);
 
 
 
@@ -10317,697 +10568,7 @@ class VisualShapeAbstract
 
 
 /***/ }),
-/* 61 */,
-/* 62 */,
-/* 63 */
-/***/ (function(module, __webpack_exports__, __webpack_require__) {
-
-"use strict";
-/* WEBPACK VAR INJECTION */(function($) {/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__Panels_Time__ = __webpack_require__(64);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__Panels_Camera__ = __webpack_require__(65);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__Panels_Metrics__ = __webpack_require__(66);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__Panels_Lambert__ = __webpack_require__(68);
-
-
-
-
-
-class UI
-{
-    constructor() {
-        this.timePanel    = new __WEBPACK_IMPORTED_MODULE_0__Panels_Time__["a" /* default */]   ($('#timePanel'),    sim.time);
-        this.cameraPanel  = new __WEBPACK_IMPORTED_MODULE_1__Panels_Camera__["a" /* default */] ($('#cameraPanel'),  sim.camera, sim.starSystem);
-        this.metricsPanel = new __WEBPACK_IMPORTED_MODULE_2__Panels_Metrics__["a" /* default */]($('#metricsPanel'), sim.selection);
-        this.lambertPanel = new __WEBPACK_IMPORTED_MODULE_3__Panels_Lambert__["a" /* default */]($('#lambertPanel'));
-    }
-}
-/* harmony export (immutable) */ __webpack_exports__["a"] = UI;
-
-
-/* WEBPACK VAR INJECTION */}.call(__webpack_exports__, __webpack_require__(5)))
-
-/***/ }),
-/* 64 */
-/***/ (function(module, __webpack_exports__, __webpack_require__) {
-
-"use strict";
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__core_Events__ = __webpack_require__(3);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__Panel__ = __webpack_require__(9);
-
-
-
-
-class UIPanelTime extends __WEBPACK_IMPORTED_MODULE_1__Panel__["a" /* default */]
-{
-    constructor(panelDom, timeLine) {
-        super(panelDom);
-
-        this.timeLine = timeLine;
-
-        this.maxTimeScale = 6 * 30 * 86400;
-
-        this.jqSlider = this.jqDom.find('#timeScaleSlider');
-        this.jqSlider.on('input change', () => this.timeLine.setTimeScale(this.getCurrentTimeScale()));
-        this.jqSlider.val(this.getNeededSliderValue(this.timeLine.timeScale));
-
-        this.jqScaleText = this.jqDom.find('#timeScaleValue');
-        this.jqScaleText.html(this.formatTimeScale(this.timeLine.timeScale));
-
-        document.addEventListener(__WEBPACK_IMPORTED_MODULE_0__core_Events__["a" /* Events */].TIME_SCALE_CHANGED, (event) => {
-            this.jqSlider.val(this.getNeededSliderValue(event.detail.new));
-            this.jqScaleText.html(this.formatTimeScale(event.detail.new));
-        });
-
-        this.jqPause = this.jqDom.find('#pauseButton');
-        this.jqPause.click(() => this.timeLine.togglePause());
-        this.jqPause.html(this.timeLine.isTimeRunning ? 'Pause' : 'Resume');
-
-        document.addEventListener(__WEBPACK_IMPORTED_MODULE_0__core_Events__["a" /* Events */].TIME_PAUSED,   () => this.jqPause.html('Resume'));
-        document.addEventListener(__WEBPACK_IMPORTED_MODULE_0__core_Events__["a" /* Events */].TIME_UNPAUSED, () => this.jqPause.html('Pause'));
-
-        this.jqDateText = this.jqDom.find('#currentDateValue');
-        document.addEventListener(__WEBPACK_IMPORTED_MODULE_0__core_Events__["a" /* Events */].EPOCH_CHANGED, (event) => this.updateTime(event.detail.date));
-
-        this.jqDom.find('#setRealTimeScale').click(() => this.timeLine.setTimeScale(1));
-        this.jqDom.find('#useCurrentTime').click(() => this.timeLine.useCurrentTime());
-    }
-
-    updateTime(date) {
-        let string = date.getYear() + 1900;
-        string += '-' + ((date.getMonth() + 1) + '').padStart(2, '0');
-        string += '-' + (date.getDate() + '').padStart(2, '0');
-        string += ' ' + (date.getHours() + '').padStart(2, '0');
-        string += ':' + (date.getMinutes() + '').padStart(2, '0');
-        string += ':' + (date.getSeconds() + '').padStart(2, '0');
-        this.jqDateText.html(string);
-    }
-
-    /**
-     * @returns {number} — simulation seconds per 1 real life second
-     */
-    getCurrentTimeScale() {
-        const val = this.jqSlider.val();
-        return Math.sign(val) * val * val * val * val * this.maxTimeScale;
-    }
-
-    getNeededSliderValue(timeScale) {
-        const val = Math.sqrt(Math.sqrt(Math.abs(timeScale) / this.maxTimeScale));
-        return Math.sign(timeScale) * Math.min(1, val);
-    }
-
-    formatTimeScale(scale) {
-        const precision = 2;
-
-        const prefix = (scale < 0) ? '-' : '';
-        const abs = Math.abs(scale);
-        if (abs === 0) {
-            return '0';
-        }
-
-        if (abs < 60) {
-            return prefix + abs.toPrecision(precision) + ' s/s';
-        }
-
-        if (abs < 3600) {
-            return prefix + (abs / 60).toPrecision(precision) + ' min/s';
-        }
-
-        if (abs < 86400) {
-            return prefix + (abs / 3600).toPrecision(precision) + ' h/s';
-        }
-
-        if (abs < 2592000) {
-            return prefix + (abs / 86400).toPrecision(precision) + ' days/s';
-        }
-
-        if (abs < 31557600) {
-            return prefix + (abs / 2592000).toPrecision(precision) + ' months/s';
-        }
-
-        return prefix + (abs / 31557600).toPrecision(precision) + ' years/s';
-    }
-}
-/* harmony export (immutable) */ __webpack_exports__["a"] = UIPanelTime;
-
-
-
-/***/ }),
-/* 65 */
-/***/ (function(module, __webpack_exports__, __webpack_require__) {
-
-"use strict";
-/* WEBPACK VAR INJECTION */(function($) {/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__core_Events__ = __webpack_require__(3);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__Panel__ = __webpack_require__(9);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__core_ReferenceFrame_Factory__ = __webpack_require__(1);
-
-
-
-
-
-class UIPanelCamera extends __WEBPACK_IMPORTED_MODULE_1__Panel__["a" /* default */]
-{
-    constructor(panelDom, camera, starSystem) {
-        super(panelDom);
-
-        this.camera = camera;
-        this.starSystem = starSystem;
-
-        this.initTarget();
-        this.initFrameType();
-
-        document.addEventListener(__WEBPACK_IMPORTED_MODULE_0__core_Events__["a" /* Events */].CAMERA_RF_CHANGED, (event) => {
-            this.updateTarget(event.detail.new.originId);
-            this.updateFrameTypeList();
-            this.updateFrameType(event.detail.new.type);
-        });
-        document.addEventListener(__WEBPACK_IMPORTED_MODULE_0__core_Events__["a" /* Events */].OBJECT_ADDED, () => {
-            this.updateTargetList();
-        });
-    }
-
-    initTarget() {
-        this.jqTarget = this.jqDom.find('#targetSelect');
-        this.jqTarget.on('change', () => this.camera.changeOrigin(0|this.jqTarget.val()));
-        this.updateTargetList();
-        this.updateTarget(this.camera.orbitingPoint);
-    }
-
-    initFrameType() {
-        this.jqFrameType = this.jqDom.find('#rfTypeSelect');
-        this.jqFrameType.on('change', () => this.camera.changeReferenceFrameType(0|this.jqFrameType.val()));
-        this.updateFrameTypeList();
-        this.updateFrameType(this.camera.frameType);
-    }
-
-    updateTargetList() {
-        $.each(this.starSystem.getObjectNames(), (objId, objName) => {
-            if (this.jqTarget.find("option[value='" + objId + "']").length === 0) {
-                this.jqTarget.append($('<option>', {value: objId}).text(objName));
-            }
-        });
-    }
-
-    updateFrameTypeList() {
-        const selected = 0|this.jqFrameType.val();
-        this.jqFrameType.html('');
-        $.each(this.camera.getAvailableFrameTypes(), (idx, typeId) => {
-            this.jqFrameType.append($('<option>', {value: typeId, selected: typeId == selected}).text(UIPanelCamera.frameTypeNames[typeId]));
-        });
-    }
-
-    updateTarget(value) {
-        this.jqTarget.val(value);
-    }
-
-    updateFrameType(value) {
-        this.jqFrameType.val(value);
-    }
-}
-/* harmony export (immutable) */ __webpack_exports__["a"] = UIPanelCamera;
-
-
-UIPanelCamera.frameTypeNames = {
-    [__WEBPACK_IMPORTED_MODULE_2__core_ReferenceFrame_Factory__["b" /* ReferenceFrame */].INERTIAL_ECLIPTIC]: 'Ecliptic',
-    [__WEBPACK_IMPORTED_MODULE_2__core_ReferenceFrame_Factory__["b" /* ReferenceFrame */].INERTIAL_BODY_EQUATORIAL]: 'Equatorial',
-    [__WEBPACK_IMPORTED_MODULE_2__core_ReferenceFrame_Factory__["b" /* ReferenceFrame */].INERTIAL_BODY_FIXED]: 'Body fixed',
-    [__WEBPACK_IMPORTED_MODULE_2__core_ReferenceFrame_Factory__["b" /* ReferenceFrame */].INERTIAL_PARENT_BODY_EQUATORIAL]: 'Parent equatorial',
-};
-/* WEBPACK VAR INJECTION */}.call(__webpack_exports__, __webpack_require__(5)))
-
-/***/ }),
-/* 66 */
-/***/ (function(module, __webpack_exports__, __webpack_require__) {
-
-"use strict";
-/* WEBPACK VAR INJECTION */(function($) {/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__Panel__ = __webpack_require__(9);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__core_Events__ = __webpack_require__(3);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__Vector__ = __webpack_require__(67);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__algebra__ = __webpack_require__(0);
-
-
-
-
-
-
-class UIPanelMetrics extends __WEBPACK_IMPORTED_MODULE_0__Panel__["a" /* default */]
-{
-    constructor(panelDom, selection) {
-        super(panelDom);
-
-        this.selection = selection;
-        this.precision = 5;
-
-        this.renderListener = this.render.bind(this);
-
-        document.addEventListener(__WEBPACK_IMPORTED_MODULE_1__core_Events__["a" /* Events */].SELECT, this.handleSelect.bind(this));
-        document.addEventListener(__WEBPACK_IMPORTED_MODULE_1__core_Events__["a" /* Events */].DESELECT, this.handleDeselect.bind(this));
-
-        this.jqDom.find('#showAnglesOfSelectedOrbit').on('change', function() {
-            sim.settings.ui.showAnglesOfSelectedOrbit = this.checked;
-            if (!selection.getSelectedObject()) {
-                return;
-            }
-            if (this.checked) {
-                selection.getSelectedObject().keplerianEditor.init();
-            } else {
-                selection.getSelectedObject().keplerianEditor.remove();
-            }
-        });
-
-        this.positionPanel = new __WEBPACK_IMPORTED_MODULE_2__Vector__["a" /* default */](this.jqDom.find("table[data-panel-name='position_vector']"), null);
-        this.velocityPanel = new __WEBPACK_IMPORTED_MODULE_2__Vector__["a" /* default */](this.jqDom.find("table[data-panel-name='velocity_vector']"), null);
-
-        this.hide();
-    }
-
-    render(event) {
-        const selectedObject = this.selection.getSelectedObject();
-        if (!selectedObject) {
-            return;
-        }
-
-        const referenceFrame = selectedObject.getReferenceFrameByEpoch(event.detail.epoch);
-        if (referenceFrame) {
-            this.jqDom.find('#relativeTo').html(sim.starSystem.getObject(referenceFrame.originId).name);
-        }
-
-        this.updateCartesian(selectedObject, event.detail.epoch);
-        this.updateKeplerian(selectedObject, event.detail.epoch);
-    }
-
-    updateCartesian(selectedObject, epoch) {
-        const state = selectedObject.getStateInOwnFrameByEpoch(epoch);
-        this.positionPanel.set(state.position);
-        this.velocityPanel.set(state.velocity);
-    }
-
-    updateKeplerian(selectedObject, epoch) {
-        const keplerianObject = selectedObject.getKeplerianObjectByEpoch(epoch);
-        this.jqDom.find('#elements-ecc' ).html('' +        ( keplerianObject.e   ).toPrecision(this.precision));
-        this.jqDom.find('#elements-sma' ).html('' + Object(__WEBPACK_IMPORTED_MODULE_3__algebra__["i" /* presentNumberWithSuffix */])(keplerianObject.sma));
-        this.jqDom.find('#elements-inc' ).html('' + Object(__WEBPACK_IMPORTED_MODULE_3__algebra__["j" /* rad2deg */])( keplerianObject.inc ).toPrecision(this.precision));
-        this.jqDom.find('#elements-aop' ).html('' + Object(__WEBPACK_IMPORTED_MODULE_3__algebra__["j" /* rad2deg */])( keplerianObject.aop ).toPrecision(this.precision));
-        this.jqDom.find('#elements-raan').html('' + Object(__WEBPACK_IMPORTED_MODULE_3__algebra__["j" /* rad2deg */])( keplerianObject.raan).toPrecision(this.precision));
-        this.jqDom.find('#elements-ta'  ).html('' + Object(__WEBPACK_IMPORTED_MODULE_3__algebra__["j" /* rad2deg */])( keplerianObject.getTrueAnomalyByEpoch(epoch)  ).toPrecision(this.precision));
-        this.jqDom.find('#elements-period').html('' + (keplerianObject.period / 86400).toPrecision(this.precision));
-    }
-
-    handleSelect() {
-        this.show();
-
-        const object = this.selection.getSelectedObject().object;
-        if (object) {
-            $('#metricsOf').html(object.name);
-        } else {
-            $('#relativeTo,#metricsOf').html('');
-        }
-
-        document.addEventListener(__WEBPACK_IMPORTED_MODULE_1__core_Events__["a" /* Events */].RENDER, this.renderListener);
-    }
-
-    handleDeselect() {
-        this.hide();
-        document.removeEventListener(__WEBPACK_IMPORTED_MODULE_1__core_Events__["a" /* Events */].RENDER, this.renderListener);
-    }
-}
-/* harmony export (immutable) */ __webpack_exports__["a"] = UIPanelMetrics;
-
-/* WEBPACK VAR INJECTION */}.call(__webpack_exports__, __webpack_require__(5)))
-
-/***/ }),
-/* 67 */
-/***/ (function(module, __webpack_exports__, __webpack_require__) {
-
-"use strict";
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__Panel__ = __webpack_require__(9);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__algebra__ = __webpack_require__(0);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__core_FunctionOfEpoch_Abstract__ = __webpack_require__(11);
-
-
-
-
-
-class UIPanelVector extends __WEBPACK_IMPORTED_MODULE_0__Panel__["a" /* default */]
-{
-    constructor(panelDom, vectorOfEpoch) {
-        super(panelDom, true);
-        this.vectorOfEpoch = vectorOfEpoch;
-        this.jqMag = this.jqDom.find('.vec-magnitude');
-        this.jqX = this.jqDom.find('.vec-x');
-        this.jqY = this.jqDom.find('.vec-y');
-        this.jqZ = this.jqDom.find('.vec-z');
-    }
-
-    set(vector, epoch) {
-        this.vectorOfEpoch = vector;
-        this.update(epoch);
-    }
-
-    update(epoch) {
-        let vector = this.vectorOfEpoch;
-        if ((epoch || epoch === 0)
-            && (vector instanceof __WEBPACK_IMPORTED_MODULE_2__core_FunctionOfEpoch_Abstract__["a" /* default */])
-        ) {
-            vector = vector.evaluate(epoch);
-        }
-
-        if (!vector instanceof __WEBPACK_IMPORTED_MODULE_1__algebra__["c" /* Vector */]) {
-            return;
-        }
-
-        this.jqMag.html(Object(__WEBPACK_IMPORTED_MODULE_1__algebra__["i" /* presentNumberWithSuffix */])(vector.mag));
-        this.jqX.html  (Object(__WEBPACK_IMPORTED_MODULE_1__algebra__["i" /* presentNumberWithSuffix */])(vector.x));
-        this.jqY.html  (Object(__WEBPACK_IMPORTED_MODULE_1__algebra__["i" /* presentNumberWithSuffix */])(vector.y));
-        this.jqZ.html  (Object(__WEBPACK_IMPORTED_MODULE_1__algebra__["i" /* presentNumberWithSuffix */])(vector.z));
-    }
-}
-/* harmony export (immutable) */ __webpack_exports__["a"] = UIPanelVector;
-
-
-/***/ }),
-/* 68 */
-/***/ (function(module, __webpack_exports__, __webpack_require__) {
-
-"use strict";
-/* WEBPACK VAR INJECTION */(function($) {/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__Panel__ = __webpack_require__(9);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__core_LambertSolver__ = __webpack_require__(29);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__core_Trajectory_KeplerianBasic__ = __webpack_require__(17);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__core_ReferenceFrame_Factory__ = __webpack_require__(1);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_4__visual_TrajectoryModel_Keplerian__ = __webpack_require__(26);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_5__visual_Vector__ = __webpack_require__(30);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_6__core_EphemerisObject__ = __webpack_require__(15);
-
-
-
-
-
-
-
-
-
-class UIPanelLambert extends __WEBPACK_IMPORTED_MODULE_0__Panel__["a" /* default */]
-{
-    constructor(panelDom) {
-        super(panelDom, true);
-
-        this.maxTransferTime = 86400 * 365.25 * 40;
-
-        this.jqSlider = this.jqDom.find('#transferTimeSlider');
-        this.jqSlider.on('input change', () => this.changeTransferTime(this.getCurrentTransferTime()));
-        this.transferTime = this.getCurrentTransferTime();
-
-        this.jqTransferTimeText = this.jqDom.find('#transferTimeValue');
-        this.jqTransferTimeText.html(this.formatTransferTime(this.transferTime));
-
-        this.jqDateText = this.jqDom.find('#departureDateValue');
-
-        this.jqDom.find('#useCurrentTime').click(() => this.useCurrentTime());
-
-        this.initOrigin();
-        this.initTarget();
-        this.useCurrentTime();
-    }
-
-    solve() {
-        if (!this.target) {
-            return;
-        }
-
-        const parentObject = sim.starSystem.getCommonParentObject(this.origin, this.target, this.departureTime, this.departureTime + this.transferTime);
-        const referenceFrameId = __WEBPACK_IMPORTED_MODULE_3__core_ReferenceFrame_Factory__["c" /* default */].buildId(parentObject.id, __WEBPACK_IMPORTED_MODULE_3__core_ReferenceFrame_Factory__["b" /* ReferenceFrame */].INERTIAL_ECLIPTIC);
-        const mu = parentObject.physicalModel.mu;
-        const origin = sim.starSystem.getObject(this.origin);
-        const target = sim.starSystem.getObject(this.target);
-        const state1 = origin.trajectory.getStateByEpoch(this.departureTime, referenceFrameId);
-        const state2 = target.trajectory.getStateByEpoch(this.departureTime + this.transferTime, referenceFrameId);
-
-        const transfer = __WEBPACK_IMPORTED_MODULE_1__core_LambertSolver__["a" /* default */].solve(state1, state2, this.departureTime, this.transferTime, mu);
-        const trajectory = new __WEBPACK_IMPORTED_MODULE_2__core_Trajectory_KeplerianBasic__["a" /* default */](referenceFrameId, transfer);
-        trajectory.setObject(new __WEBPACK_IMPORTED_MODULE_6__core_EphemerisObject__["a" /* default */](-1, __WEBPACK_IMPORTED_MODULE_6__core_EphemerisObject__["a" /* default */].TYPE_UNKNOWN, origin.name + '->' + target.name + ' transfer'));
-
-        if (this.visualModel) {
-            this.visualModel.drop();
-            this.vector1.drop();
-            this.vector2.drop();
-        }
-
-        this.visualModel = new __WEBPACK_IMPORTED_MODULE_4__visual_TrajectoryModel_Keplerian__["a" /* default */](trajectory, 'yellow');
-        this.vector1 = new __WEBPACK_IMPORTED_MODULE_5__visual_Vector__["a" /* default */](state1.position, referenceFrameId);
-        this.vector2 = new __WEBPACK_IMPORTED_MODULE_5__visual_Vector__["a" /* default */](state2.position, referenceFrameId);
-
-        const deltaV1 = state1.velocity.sub_(transfer.getStateByEpoch(this.departureTime)._velocity).mag;
-        const deltaV2 = state2.velocity.sub_(transfer.getStateByEpoch(this.departureTime + this.transferTime)._velocity).mag;
-
-        this.jqDom.find('#deltaVEjection').html(deltaV1.toPrecision(4) + ' km/s');
-        this.jqDom.find('#deltaVInsertion').html(deltaV2.toPrecision(4) + ' km/s');
-        this.jqDom.find('#deltaVTotal').html((deltaV1 + deltaV2).toPrecision(4) + ' km/s');
-    }
-
-    useCurrentTime() {
-        this.departureTime = sim.currentEpoch;
-        this.updateTime(sim.currentDate);
-        this.solve();
-    }
-
-    changeOrigin(newOrigin) {
-        this.origin = newOrigin;
-        this.solve();
-    }
-
-    changeTarget(newTarget) {
-        this.target = newTarget;
-        this.solve();
-    }
-
-    changeTransferTime(newTransferTime) {
-        this.transferTime = newTransferTime;
-        this.jqTransferTimeText.html(this.formatTransferTime(this.transferTime));
-        this.solve();
-    }
-
-    getCurrentTransferTime() {
-        const val = this.jqSlider.val();
-        return val * val * val * val * this.maxTransferTime;
-    }
-
-    getNeededSliderValue(transferTime) {
-        const val = Math.sqrt(Math.sqrt(transferTime / this.maxTransferTime));
-        return Math.max(0, Math.min(1, val));
-    }
-
-    initOrigin() {
-        this.jqOrigin = this.jqDom.find('#originSelect');
-        this.jqOrigin.on('change', () => this.changeOrigin(0|this.jqOrigin.val()));
-        this.updateOriginList();
-    }
-
-    initTarget() {
-        this.jqTarget = this.jqDom.find('#targetSelect');
-        this.jqTarget.on('change', () => this.changeTarget(0|this.jqTarget.val()));
-        this.updateTargetList();
-    }
-
-    updateOriginList() {
-        $.each(sim.starSystem.getObjectNames(), (objId, objName) => {
-            if (this.jqOrigin.find("option[value='" + objId + "']").length === 0) {
-                this.jqOrigin.append($('<option>', {value: objId}).text(objName));
-            }
-        });
-    }
-
-    updateTargetList() {
-        $.each(sim.starSystem.getObjectNames(), (objId, objName) => {
-            if (this.jqTarget.find("option[value='" + objId + "']").length === 0) {
-                this.jqTarget.append($('<option>', {value: objId}).text(objName));
-            }
-        });
-    }
-
-    updateTime(date) {
-        let string = date.getYear() + 1900;
-        string += '-' + ((date.getMonth() + 1) + '').padStart(2, '0');
-        string += '-' + (date.getDate() + '').padStart(2, '0');
-        string += ' ' + (date.getHours() + '').padStart(2, '0');
-        string += ':' + (date.getMinutes() + '').padStart(2, '0');
-        string += ':' + (date.getSeconds() + '').padStart(2, '0');
-        this.jqDateText.html(string);
-    }
-
-
-    formatTransferTime(scale) {
-        const precision = 3;
-
-        const prefix = (scale < 0) ? '-' : '';
-        const abs = Math.abs(scale);
-        if (abs === 0) {
-            return '0';
-        }
-
-        if (abs < 60) {
-            return prefix + abs.toPrecision(precision) + ' s';
-        }
-
-        if (abs < 3600) {
-            return prefix + (abs / 60).toPrecision(precision) + ' min';
-        }
-
-        if (abs < 86400) {
-            return prefix + (abs / 3600).toPrecision(precision) + ' h';
-        }
-
-        if (abs < 2592000) {
-            return prefix + (abs / 86400).toPrecision(precision) + ' days';
-        }
-
-        if (abs < 31557600) {
-            return prefix + (abs / 2592000).toPrecision(precision) + ' months';
-        }
-
-        return prefix + (abs / 31557600).toPrecision(precision) + ' years';
-    }
-}
-/* harmony export (immutable) */ __webpack_exports__["a"] = UIPanelLambert;
-
-
-/* WEBPACK VAR INJECTION */}.call(__webpack_exports__, __webpack_require__(5)))
-
-/***/ }),
-/* 69 */
-/***/ (function(module, __webpack_exports__, __webpack_require__) {
-
-"use strict";
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__ReferenceFrame_Factory__ = __webpack_require__(1);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__EphemerisObject__ = __webpack_require__(15);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__Body__ = __webpack_require__(14);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__Events__ = __webpack_require__(3);
-
-
-
-
-
-const STAR_SYSTEM_BARYCENTER = 0;
-/* unused harmony export STAR_SYSTEM_BARYCENTER */
-
-
-class StarSystem
-{
-    constructor(id) {
-        this.id = id;
-        this.name = null;
-        this.stars = null;
-        this.mainObject = null;
-        this.referenceFrames = {};
-        this.trajectories = {};
-        this.objects = {};
-    }
-
-    addStars(stars) {
-        this.stars = stars;
-        return this;
-    }
-
-    addReferenceFrame(frame) {
-        this.referenceFrames[frame.id] = frame;
-    }
-
-    getReferenceFrame(id) {
-        if (this.referenceFrames[id] === undefined) {
-            this.referenceFrames[id] = __WEBPACK_IMPORTED_MODULE_0__ReferenceFrame_Factory__["c" /* default */].createById(id);
-        }
-        return this.referenceFrames[id];
-    }
-
-    getTrajectory(objectId) {
-        if (this.trajectories && this.trajectories[objectId]) {
-            return this.trajectories[objectId];
-        }
-        return null;
-    }
-
-    addTrajectory(objectId, trajectory) {
-        this.trajectories[objectId] = trajectory;
-        this.getObject(objectId).setTrajectory(trajectory);
-    }
-
-    deleteTrajectory(objectId) {
-        this.trajectories[objectId].drop();
-        delete this.trajectories[objectId];
-    }
-
-    getObject(id) {
-        if (this.objects[id] === undefined) {
-            this.objects[id] = new __WEBPACK_IMPORTED_MODULE_1__EphemerisObject__["a" /* default */](id, __WEBPACK_IMPORTED_MODULE_1__EphemerisObject__["a" /* default */].TYPE_UNKNOWN, 'Unknown #' + id);
-        }
-        return this.objects[id];
-    }
-
-    getCommonParentObject(object1, object2, epoch1, epoch2) {
-        if (epoch2 === undefined) {
-            epoch2 = epoch1;
-        }
-
-        let chain1 = [object1];
-        let parent;
-
-        while (parent = this.getObject(chain1[chain1.length-1]).getParentObjectIdByEpoch(epoch1)) {
-            chain1.push(parent);
-        }
-        chain1.push(0);
-
-        parent = object2;
-        while ((parent = this.getObject(parent).getParentObjectIdByEpoch(epoch2)) !== null) {
-            if (chain1.indexOf(parent) !== -1) {
-                return this.getObject(parent);
-            }
-        }
-
-        return null;
-    }
-
-    isBody(objectId) {
-        if (this.objects[objectId] === undefined) {
-            return null;
-        }
-        return this.objects[objectId] instanceof __WEBPACK_IMPORTED_MODULE_2__Body__["a" /* default */];
-    }
-
-    getObjectNames() {
-        let names = {};
-        for (const object of Object.values(this.objects)) {
-            names[object.id] = object.name;
-        }
-        return names;
-    }
-
-    getBodies() {
-        let bodies = [];
-        for (const object of Object.values(this.objects)) {
-            if (object instanceof __WEBPACK_IMPORTED_MODULE_2__Body__["a" /* default */]) {
-                bodies.push(object);
-            }
-        }
-        return bodies;
-    }
-
-    addObject(id, body) {
-        this.objects[id] = body;
-        document.dispatchEvent(new CustomEvent(
-            __WEBPACK_IMPORTED_MODULE_3__Events__["a" /* Events */].OBJECT_ADDED,
-            {detail: {object: body}}
-        ));
-    }
-
-    deleteObject(id) {
-        this.objects[id].drop();
-        delete this.objects[id];
-    }
-}
-/* harmony export (immutable) */ __webpack_exports__["a"] = StarSystem;
-
-
-/***/ }),
-/* 70 */,
-/* 71 */
+/* 61 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -11071,11 +10632,11 @@ class VisualRaycaster
 /* WEBPACK VAR INJECTION */}.call(__webpack_exports__, __webpack_require__(2)))
 
 /***/ }),
-/* 72 */
+/* 62 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
-/* WEBPACK VAR INJECTION */(function(THREE) {/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__visual_ModelAbstract__ = __webpack_require__(7);
+/* WEBPACK VAR INJECTION */(function(THREE) {/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__visual_ModelAbstract__ = __webpack_require__(5);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__core_Events__ = __webpack_require__(3);
 
 
@@ -11218,7 +10779,1112 @@ class SelectionHandler extends __WEBPACK_IMPORTED_MODULE_0__visual_ModelAbstract
 /* WEBPACK VAR INJECTION */}.call(__webpack_exports__, __webpack_require__(2)))
 
 /***/ }),
-/* 73 */
+/* 63 */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+/* WEBPACK VAR INJECTION */(function($) {/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__Panels_Time__ = __webpack_require__(64);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__Panels_Camera__ = __webpack_require__(65);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__Panels_Metrics__ = __webpack_require__(66);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__Panels_Lambert__ = __webpack_require__(68);
+
+
+
+
+
+class UI
+{
+    constructor() {
+        this.timePanel    = new __WEBPACK_IMPORTED_MODULE_0__Panels_Time__["a" /* default */]   ($('#timePanel'),    sim.time);
+        this.cameraPanel  = new __WEBPACK_IMPORTED_MODULE_1__Panels_Camera__["a" /* default */] ($('#cameraPanel'),  sim.camera, sim.starSystem);
+        this.metricsPanel = new __WEBPACK_IMPORTED_MODULE_2__Panels_Metrics__["a" /* default */]($('#metricsPanel'), sim.selection);
+        this.lambertPanel = new __WEBPACK_IMPORTED_MODULE_3__Panels_Lambert__["a" /* default */]($('#lambertPanel'));
+    }
+}
+/* harmony export (immutable) */ __webpack_exports__["a"] = UI;
+
+
+/* WEBPACK VAR INJECTION */}.call(__webpack_exports__, __webpack_require__(6)))
+
+/***/ }),
+/* 64 */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__core_Events__ = __webpack_require__(3);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__Panel__ = __webpack_require__(10);
+
+
+
+
+class UIPanelTime extends __WEBPACK_IMPORTED_MODULE_1__Panel__["a" /* default */]
+{
+    constructor(panelDom, timeLine) {
+        super(panelDom);
+
+        this.timeLine = timeLine;
+
+        this.maxTimeScale = 6 * 30 * 86400;
+
+        this.jqSlider = this.jqDom.find('#timeScaleSlider');
+        this.jqSlider.on('input change', () => this.timeLine.setTimeScale(this.getCurrentTimeScale()));
+        this.jqSlider.val(this.getNeededSliderValue(this.timeLine.timeScale));
+
+        this.jqScaleText = this.jqDom.find('#timeScaleValue');
+        this.jqScaleText.html(this.formatTimeScale(this.timeLine.timeScale));
+
+        document.addEventListener(__WEBPACK_IMPORTED_MODULE_0__core_Events__["a" /* Events */].TIME_SCALE_CHANGED, (event) => {
+            this.jqSlider.val(this.getNeededSliderValue(event.detail.new));
+            this.jqScaleText.html(this.formatTimeScale(event.detail.new));
+        });
+
+        this.jqPause = this.jqDom.find('#pauseButton');
+        this.jqPause.click(() => this.timeLine.togglePause());
+        this.jqPause.html(this.timeLine.isTimeRunning ? 'Pause' : 'Resume');
+
+        document.addEventListener(__WEBPACK_IMPORTED_MODULE_0__core_Events__["a" /* Events */].TIME_PAUSED,   () => this.jqPause.html('Resume'));
+        document.addEventListener(__WEBPACK_IMPORTED_MODULE_0__core_Events__["a" /* Events */].TIME_UNPAUSED, () => this.jqPause.html('Pause'));
+
+        this.jqDateText = this.jqDom.find('#currentDateValue');
+        document.addEventListener(__WEBPACK_IMPORTED_MODULE_0__core_Events__["a" /* Events */].EPOCH_CHANGED, (event) => this.updateTime(event.detail.date));
+
+        this.jqDom.find('#setRealTimeScale').click(() => this.timeLine.setTimeScale(1));
+        this.jqDom.find('#useCurrentTime').click(() => this.timeLine.useCurrentTime());
+    }
+
+    updateTime(date) {
+        let string = date.getYear() + 1900;
+        string += '-' + ((date.getMonth() + 1) + '').padStart(2, '0');
+        string += '-' + (date.getDate() + '').padStart(2, '0');
+        string += ' ' + (date.getHours() + '').padStart(2, '0');
+        string += ':' + (date.getMinutes() + '').padStart(2, '0');
+        string += ':' + (date.getSeconds() + '').padStart(2, '0');
+        this.jqDateText.html(string);
+    }
+
+    /**
+     * @returns {number} — simulation seconds per 1 real life second
+     */
+    getCurrentTimeScale() {
+        const val = this.jqSlider.val();
+        return Math.sign(val) * val * val * val * val * this.maxTimeScale;
+    }
+
+    getNeededSliderValue(timeScale) {
+        const val = Math.sqrt(Math.sqrt(Math.abs(timeScale) / this.maxTimeScale));
+        return Math.sign(timeScale) * Math.min(1, val);
+    }
+
+    formatTimeScale(scale) {
+        const precision = 2;
+
+        const prefix = (scale < 0) ? '-' : '';
+        const abs = Math.abs(scale);
+        if (abs === 0) {
+            return '0';
+        }
+
+        if (abs < 60) {
+            return prefix + abs.toPrecision(precision) + ' s/s';
+        }
+
+        if (abs < 3600) {
+            return prefix + (abs / 60).toPrecision(precision) + ' min/s';
+        }
+
+        if (abs < 86400) {
+            return prefix + (abs / 3600).toPrecision(precision) + ' h/s';
+        }
+
+        if (abs < 2592000) {
+            return prefix + (abs / 86400).toPrecision(precision) + ' days/s';
+        }
+
+        if (abs < 31557600) {
+            return prefix + (abs / 2592000).toPrecision(precision) + ' months/s';
+        }
+
+        return prefix + (abs / 31557600).toPrecision(precision) + ' years/s';
+    }
+}
+/* harmony export (immutable) */ __webpack_exports__["a"] = UIPanelTime;
+
+
+
+/***/ }),
+/* 65 */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+/* WEBPACK VAR INJECTION */(function($) {/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__core_Events__ = __webpack_require__(3);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__Panel__ = __webpack_require__(10);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__core_ReferenceFrame_Factory__ = __webpack_require__(1);
+
+
+
+
+
+class UIPanelCamera extends __WEBPACK_IMPORTED_MODULE_1__Panel__["a" /* default */]
+{
+    constructor(panelDom, camera, starSystem) {
+        super(panelDom);
+
+        this.camera = camera;
+        this.starSystem = starSystem;
+
+        this.initTarget();
+        this.initFrameType();
+
+        document.addEventListener(__WEBPACK_IMPORTED_MODULE_0__core_Events__["a" /* Events */].CAMERA_RF_CHANGED, (event) => {
+            this.updateTarget(event.detail.new.originId);
+            this.updateFrameTypeList();
+            this.updateFrameType(event.detail.new.type);
+        });
+        document.addEventListener(__WEBPACK_IMPORTED_MODULE_0__core_Events__["a" /* Events */].OBJECT_ADDED, () => {
+            this.updateTargetList();
+        });
+    }
+
+    initTarget() {
+        this.jqTarget = this.jqDom.find('#targetSelect');
+        this.jqTarget.on('change', () => this.camera.changeOrigin(0|this.jqTarget.val()));
+        this.updateTargetList();
+        this.updateTarget(this.camera.orbitingPoint);
+    }
+
+    initFrameType() {
+        this.jqFrameType = this.jqDom.find('#rfTypeSelect');
+        this.jqFrameType.on('change', () => this.camera.changeReferenceFrameType(0|this.jqFrameType.val()));
+        this.updateFrameTypeList();
+        this.updateFrameType(this.camera.frameType);
+    }
+
+    updateTargetList() {
+        $.each(this.starSystem.getObjectNames(), (objId, objName) => {
+            if (this.jqTarget.find("option[value='" + objId + "']").length === 0) {
+                this.jqTarget.append($('<option>', {value: objId}).text(objName));
+            }
+        });
+    }
+
+    updateFrameTypeList() {
+        const selected = 0|this.jqFrameType.val();
+        this.jqFrameType.html('');
+        $.each(this.camera.getAvailableFrameTypes(), (idx, typeId) => {
+            this.jqFrameType.append($('<option>', {value: typeId, selected: typeId == selected}).text(UIPanelCamera.frameTypeNames[typeId]));
+        });
+    }
+
+    updateTarget(value) {
+        this.jqTarget.val(value);
+    }
+
+    updateFrameType(value) {
+        this.jqFrameType.val(value);
+    }
+}
+/* harmony export (immutable) */ __webpack_exports__["a"] = UIPanelCamera;
+
+
+UIPanelCamera.frameTypeNames = {
+    [__WEBPACK_IMPORTED_MODULE_2__core_ReferenceFrame_Factory__["b" /* ReferenceFrame */].INERTIAL_ECLIPTIC]: 'Ecliptic',
+    [__WEBPACK_IMPORTED_MODULE_2__core_ReferenceFrame_Factory__["b" /* ReferenceFrame */].INERTIAL_BODY_EQUATORIAL]: 'Equatorial',
+    [__WEBPACK_IMPORTED_MODULE_2__core_ReferenceFrame_Factory__["b" /* ReferenceFrame */].INERTIAL_BODY_FIXED]: 'Body fixed',
+    [__WEBPACK_IMPORTED_MODULE_2__core_ReferenceFrame_Factory__["b" /* ReferenceFrame */].INERTIAL_PARENT_BODY_EQUATORIAL]: 'Parent equatorial',
+};
+/* WEBPACK VAR INJECTION */}.call(__webpack_exports__, __webpack_require__(6)))
+
+/***/ }),
+/* 66 */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+/* WEBPACK VAR INJECTION */(function($) {/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__Panel__ = __webpack_require__(10);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__core_Events__ = __webpack_require__(3);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__Vector__ = __webpack_require__(67);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__algebra__ = __webpack_require__(0);
+
+
+
+
+
+
+class UIPanelMetrics extends __WEBPACK_IMPORTED_MODULE_0__Panel__["a" /* default */]
+{
+    constructor(panelDom, selection) {
+        super(panelDom);
+
+        this.selection = selection;
+        this.precision = 5;
+
+        this.renderListener = this.render.bind(this);
+
+        document.addEventListener(__WEBPACK_IMPORTED_MODULE_1__core_Events__["a" /* Events */].SELECT, this.handleSelect.bind(this));
+        document.addEventListener(__WEBPACK_IMPORTED_MODULE_1__core_Events__["a" /* Events */].DESELECT, this.handleDeselect.bind(this));
+
+        this.jqDom.find('#showAnglesOfSelectedOrbit').on('change', function() {
+            sim.settings.ui.showAnglesOfSelectedOrbit = this.checked;
+            if (!selection.getSelectedObject()) {
+                return;
+            }
+            if (this.checked) {
+                selection.getSelectedObject().keplerianEditor.init();
+            } else {
+                selection.getSelectedObject().keplerianEditor.remove();
+            }
+        });
+
+        this.positionPanel = new __WEBPACK_IMPORTED_MODULE_2__Vector__["a" /* default */](this.jqDom.find("table[data-panel-name='position_vector']"), null);
+        this.velocityPanel = new __WEBPACK_IMPORTED_MODULE_2__Vector__["a" /* default */](this.jqDom.find("table[data-panel-name='velocity_vector']"), null);
+
+        this.hide();
+    }
+
+    render(event) {
+        const selectedObject = this.selection.getSelectedObject();
+        if (!selectedObject) {
+            return;
+        }
+
+        const referenceFrame = selectedObject.getReferenceFrameByEpoch(event.detail.epoch);
+        if (referenceFrame) {
+            this.jqDom.find('#relativeTo').html(sim.starSystem.getObject(referenceFrame.originId).name);
+        }
+
+        this.updateCartesian(selectedObject, event.detail.epoch);
+        this.updateKeplerian(selectedObject, event.detail.epoch);
+    }
+
+    updateCartesian(selectedObject, epoch) {
+        const state = selectedObject.getStateInOwnFrameByEpoch(epoch);
+        this.positionPanel.set(state.position);
+        this.velocityPanel.set(state.velocity);
+    }
+
+    updateKeplerian(selectedObject, epoch) {
+        const keplerianObject = selectedObject.getKeplerianObjectByEpoch(epoch);
+        this.jqDom.find('#elements-ecc' ).html('' +        ( keplerianObject.e   ).toPrecision(this.precision));
+        this.jqDom.find('#elements-sma' ).html('' + Object(__WEBPACK_IMPORTED_MODULE_3__algebra__["i" /* presentNumberWithSuffix */])(keplerianObject.sma));
+        this.jqDom.find('#elements-inc' ).html('' + Object(__WEBPACK_IMPORTED_MODULE_3__algebra__["j" /* rad2deg */])( keplerianObject.inc ).toPrecision(this.precision));
+        this.jqDom.find('#elements-aop' ).html('' + Object(__WEBPACK_IMPORTED_MODULE_3__algebra__["j" /* rad2deg */])( keplerianObject.aop ).toPrecision(this.precision));
+        this.jqDom.find('#elements-raan').html('' + Object(__WEBPACK_IMPORTED_MODULE_3__algebra__["j" /* rad2deg */])( keplerianObject.raan).toPrecision(this.precision));
+        this.jqDom.find('#elements-ta'  ).html('' + Object(__WEBPACK_IMPORTED_MODULE_3__algebra__["j" /* rad2deg */])( keplerianObject.getTrueAnomalyByEpoch(epoch)  ).toPrecision(this.precision));
+        this.jqDom.find('#elements-period').html('' + (keplerianObject.period / 86400).toPrecision(this.precision));
+    }
+
+    handleSelect() {
+        this.show();
+
+        const object = this.selection.getSelectedObject().object;
+        if (object) {
+            $('#metricsOf').html(object.name);
+        } else {
+            $('#relativeTo,#metricsOf').html('');
+        }
+
+        document.addEventListener(__WEBPACK_IMPORTED_MODULE_1__core_Events__["a" /* Events */].RENDER, this.renderListener);
+    }
+
+    handleDeselect() {
+        this.hide();
+        document.removeEventListener(__WEBPACK_IMPORTED_MODULE_1__core_Events__["a" /* Events */].RENDER, this.renderListener);
+    }
+}
+/* harmony export (immutable) */ __webpack_exports__["a"] = UIPanelMetrics;
+
+/* WEBPACK VAR INJECTION */}.call(__webpack_exports__, __webpack_require__(6)))
+
+/***/ }),
+/* 67 */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__Panel__ = __webpack_require__(10);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__algebra__ = __webpack_require__(0);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__core_FunctionOfEpoch_Abstract__ = __webpack_require__(15);
+
+
+
+
+
+class UIPanelVector extends __WEBPACK_IMPORTED_MODULE_0__Panel__["a" /* default */]
+{
+    constructor(panelDom, vectorOfEpoch) {
+        super(panelDom, true);
+        this.vectorOfEpoch = vectorOfEpoch;
+        this.jqMag = this.jqDom.find('.vec-magnitude');
+        this.jqX = this.jqDom.find('.vec-x');
+        this.jqY = this.jqDom.find('.vec-y');
+        this.jqZ = this.jqDom.find('.vec-z');
+    }
+
+    set(vector, epoch) {
+        this.vectorOfEpoch = vector;
+        this.update(epoch);
+    }
+
+    update(epoch) {
+        let vector = this.vectorOfEpoch;
+        if ((epoch || epoch === 0)
+            && (vector instanceof __WEBPACK_IMPORTED_MODULE_2__core_FunctionOfEpoch_Abstract__["a" /* default */])
+        ) {
+            vector = vector.evaluate(epoch);
+        }
+
+        if (!vector instanceof __WEBPACK_IMPORTED_MODULE_1__algebra__["c" /* Vector */]) {
+            return;
+        }
+
+        this.jqMag.html(Object(__WEBPACK_IMPORTED_MODULE_1__algebra__["i" /* presentNumberWithSuffix */])(vector.mag));
+        this.jqX.html  (Object(__WEBPACK_IMPORTED_MODULE_1__algebra__["i" /* presentNumberWithSuffix */])(vector.x));
+        this.jqY.html  (Object(__WEBPACK_IMPORTED_MODULE_1__algebra__["i" /* presentNumberWithSuffix */])(vector.y));
+        this.jqZ.html  (Object(__WEBPACK_IMPORTED_MODULE_1__algebra__["i" /* presentNumberWithSuffix */])(vector.z));
+    }
+}
+/* harmony export (immutable) */ __webpack_exports__["a"] = UIPanelVector;
+
+
+/***/ }),
+/* 68 */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+/* WEBPACK VAR INJECTION */(function($) {/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__Panel__ = __webpack_require__(10);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__core_LambertSolver__ = __webpack_require__(69);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__core_ReferenceFrame_Factory__ = __webpack_require__(1);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__visual_TrajectoryModel_Keplerian__ = __webpack_require__(27);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_4__visual_Vector__ = __webpack_require__(30);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_5__core_EphemerisObject__ = __webpack_require__(8);
+
+
+
+
+
+
+
+
+class UIPanelLambert extends __WEBPACK_IMPORTED_MODULE_0__Panel__["a" /* default */]
+{
+    constructor(panelDom) {
+        super(panelDom, true);
+
+        this.maxTransferTime = 86400 * 365.25 * 40;
+
+        this.jqSlider = this.jqDom.find('#transferTimeSlider');
+        this.jqSlider.on('input change', () => this.changeTransferTime(this.getCurrentTransferTime()));
+        this.transferTime = this.getCurrentTransferTime();
+
+        this.jqTransferTimeText = this.jqDom.find('#transferTimeValue');
+        this.jqTransferTimeText.html(this.formatTransferTime(this.transferTime));
+
+        this.jqDateText = this.jqDom.find('#departureDateValue');
+
+        this.jqDom.find('#useCurrentTime').click(() => this.useCurrentTime());
+
+        this.initOrigin();
+        this.initTarget();
+        this.useCurrentTime();
+
+        this.origin = 399;
+        this.jqOrigin.val(this.origin);
+    }
+
+    solve() {
+        if (!this.origin || !this.target) {
+            return;
+        }
+
+        const parentObject = sim.starSystem.getCommonParentObject(this.origin, this.target, this.departureTime, this.departureTime + this.transferTime);
+        const referenceFrameId = __WEBPACK_IMPORTED_MODULE_2__core_ReferenceFrame_Factory__["c" /* default */].buildId(parentObject.id, __WEBPACK_IMPORTED_MODULE_2__core_ReferenceFrame_Factory__["b" /* ReferenceFrame */].INERTIAL_ECLIPTIC);
+        const origin = sim.starSystem.getObject(this.origin);
+        const target = sim.starSystem.getObject(this.target);
+        const state1 = origin.trajectory.getStateByEpoch(this.departureTime, referenceFrameId);
+        const state2 = target.trajectory.getStateByEpoch(this.departureTime + this.transferTime, referenceFrameId);
+
+        const solverResult = __WEBPACK_IMPORTED_MODULE_1__core_LambertSolver__["a" /* default */].solveFullTransfer(
+            origin,
+            target,
+            origin.physicalModel.radius + 200,
+            target.physicalModel.radius + 200,
+            this.departureTime,
+            this.transferTime
+        );
+        const transferTrajectory = solverResult.trajectory;
+        transferTrajectory.setObject(new __WEBPACK_IMPORTED_MODULE_5__core_EphemerisObject__["a" /* default */](-1, __WEBPACK_IMPORTED_MODULE_5__core_EphemerisObject__["a" /* default */].TYPE_UNKNOWN, origin.name + '->' + target.name + ' transfer'));
+
+        if (this.visualModel) {
+            this.visualModel.drop();
+            this.visualModel2.drop();
+            this.visualModel3.drop();
+            this.vector1.drop();
+            this.vector2.drop();
+        }
+
+        this.visualModel = new __WEBPACK_IMPORTED_MODULE_3__visual_TrajectoryModel_Keplerian__["a" /* default */](transferTrajectory.components[1], 'yellow');
+        this.visualModel2 = new __WEBPACK_IMPORTED_MODULE_3__visual_TrajectoryModel_Keplerian__["a" /* default */](transferTrajectory.components[0], 'red');
+        this.visualModel3 = new __WEBPACK_IMPORTED_MODULE_3__visual_TrajectoryModel_Keplerian__["a" /* default */](transferTrajectory.components[2], 'red');
+        this.vector1 = new __WEBPACK_IMPORTED_MODULE_4__visual_Vector__["a" /* default */](state1.position, referenceFrameId);
+        this.vector2 = new __WEBPACK_IMPORTED_MODULE_4__visual_Vector__["a" /* default */](state2.position, referenceFrameId);
+
+        this.jqDom.find('#deltaVEjection').html(solverResult.ejectionDeltaV.toPrecision(4) + ' km/s');
+        this.jqDom.find('#deltaVInsertion').html(solverResult.insertionDeltaV.toPrecision(4) + ' km/s');
+        this.jqDom.find('#deltaVTotal').html((solverResult.ejectionDeltaV + solverResult.insertionDeltaV).toPrecision(4) + ' km/s');
+    }
+
+    collapse() {
+        if (this.visualModel) {
+            this.visualModel.drop();
+            this.visualModel2.drop();
+            this.visualModel3.drop();
+            this.vector1.drop();
+            this.vector2.drop();
+            this.visualModel = null;
+        }
+        super.collapse();
+    }
+
+    useCurrentTime() {
+        this.departureTime = sim.currentEpoch;
+        this.updateTime(sim.currentDate);
+        this.solve();
+    }
+
+    changeOrigin(newOrigin) {
+        this.origin = newOrigin;
+        this.solve();
+    }
+
+    changeTarget(newTarget) {
+        this.target = newTarget;
+        this.solve();
+    }
+
+    changeTransferTime(newTransferTime) {
+        this.transferTime = newTransferTime;
+        this.jqTransferTimeText.html(this.formatTransferTime(this.transferTime));
+        this.solve();
+    }
+
+    getCurrentTransferTime() {
+        const val = this.jqSlider.val();
+        return val * val * val * val * this.maxTransferTime;
+    }
+
+    getNeededSliderValue(transferTime) {
+        const val = Math.sqrt(Math.sqrt(transferTime / this.maxTransferTime));
+        return Math.max(0, Math.min(1, val));
+    }
+
+    initOrigin() {
+        this.jqOrigin = this.jqDom.find('#originSelect');
+        this.jqOrigin.on('change', () => this.changeOrigin(0|this.jqOrigin.val()));
+        this.updateOriginList();
+    }
+
+    initTarget() {
+        this.jqTarget = this.jqDom.find('#targetSelect');
+        this.jqTarget.on('change', () => this.changeTarget(0|this.jqTarget.val()));
+        this.updateTargetList();
+    }
+
+    updateOriginList() {
+        $.each(sim.starSystem.getObjectNames(), (objId, objName) => {
+            if (this.jqOrigin.find("option[value='" + objId + "']").length === 0) {
+                this.jqOrigin.append($('<option>', {value: objId}).text(objName));
+            }
+        });
+    }
+
+    updateTargetList() {
+        $.each(sim.starSystem.getObjectNames(), (objId, objName) => {
+            if (this.jqTarget.find("option[value='" + objId + "']").length === 0) {
+                this.jqTarget.append($('<option>', {value: objId}).text(objName));
+            }
+        });
+    }
+
+    updateTime(date) {
+        let string = date.getYear() + 1900;
+        string += '-' + ((date.getMonth() + 1) + '').padStart(2, '0');
+        string += '-' + (date.getDate() + '').padStart(2, '0');
+        string += ' ' + (date.getHours() + '').padStart(2, '0');
+        string += ':' + (date.getMinutes() + '').padStart(2, '0');
+        string += ':' + (date.getSeconds() + '').padStart(2, '0');
+        this.jqDateText.html(string);
+    }
+
+
+    formatTransferTime(scale) {
+        const precision = 3;
+
+        const prefix = (scale < 0) ? '-' : '';
+        const abs = Math.abs(scale);
+        if (abs === 0) {
+            return '0';
+        }
+
+        if (abs < 60) {
+            return prefix + abs.toPrecision(precision) + ' s';
+        }
+
+        if (abs < 3600) {
+            return prefix + (abs / 60).toPrecision(precision) + ' min';
+        }
+
+        if (abs < 86400) {
+            return prefix + (abs / 3600).toPrecision(precision) + ' h';
+        }
+
+        if (abs < 2592000) {
+            return prefix + (abs / 86400).toPrecision(precision) + ' days';
+        }
+
+        if (abs < 31557600) {
+            return prefix + (abs / 2592000).toPrecision(precision) + ' months';
+        }
+
+        return prefix + (abs / 31557600).toPrecision(precision) + ' years';
+    }
+}
+/* harmony export (immutable) */ __webpack_exports__["a"] = UIPanelLambert;
+
+
+/* WEBPACK VAR INJECTION */}.call(__webpack_exports__, __webpack_require__(6)))
+
+/***/ }),
+/* 69 */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__algebra__ = __webpack_require__(0);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__KeplerianObject__ = __webpack_require__(7);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__EphemerisObject__ = __webpack_require__(8);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__ReferenceFrame_Factory__ = __webpack_require__(1);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_4__Body__ = __webpack_require__(12);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_5__StateVector__ = __webpack_require__(4);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_6__Trajectory_Composite__ = __webpack_require__(25);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_7__Trajectory_KeplerianBasic__ = __webpack_require__(14);
+
+
+
+
+
+
+
+
+
+class LambertSolver
+{
+    static getPlotData(orbit1, orbit2, epochMin, epochMax, transferMin, transferMax, points) {
+        const epochStep = (epochMax - epochMin) / (points - 1);
+        const flightTimeStep = (transferMax - transferMin) / (points - 1);
+        let result = [];
+        let startEpoch = epochMin;
+        let i = 0;
+
+        while (startEpoch <= epochMax) {
+            let flightTime = transferMin;
+            let j = 0;
+
+            result[i] = [];
+            while (flightTime <= transferMax) {
+                let res = this.calcDeltaV(
+                    orbit1.getStateByEpoch(startEpoch),
+                    orbit2.getStateByEpoch(startEpoch + flightTime),
+                    startEpoch,
+                    flightTime,
+                    orbit1.mu
+                );
+                result[i][j] = res;
+                flightTime += flightTimeStep;
+                j++;
+
+            }
+            startEpoch += epochStep;
+            i++;
+        }
+        return result;
+    }
+
+    static plot(plotData) {
+        let min = 1e99, max = 0;
+        let ctx = document.getElementById('lambertCanvas').getContext('2d');
+
+        ctx.clearRect(0, 0, 300, 300);
+
+        for (let row of plotData) {
+            for (let res of row) {
+                if (res === false) {
+                    continue;
+                }
+                if (res < min) {
+                    min = res;
+                }
+                if (res > max) {
+                    max = res;
+                }
+            }
+        }
+
+        for (let row in plotData) {
+            for (let col in plotData[row]) {
+                const res = plotData[row][col];
+                if (res === false) {
+                    ctx.fillStyle = "rgba(255,0,0,1)";
+                } else {
+                    const color = Math.round((1 - (res - min) / (max - min)) * 255);
+                    ctx.fillStyle = "rgba(" + color + "," + color + "," + color + ", 1)";
+                }
+                ctx.fillRect(0|row, 0|col, 1, 1);
+            }
+        }
+    }
+
+    static getDeltaV(state1, state2, transferOrbit, epoch1, epoch2) {
+        return state1.velocity.sub_(transferOrbit.getStateByEpoch(epoch1)._velocity).mag +
+            state2.velocity.sub_(transferOrbit.getStateByEpoch(epoch2)._velocity).mag;
+    }
+
+    static calcDeltaV(state1, state2, startEpoch, flightTime, mu) {
+        const transferOrbit = this.solve(state1, state2, startEpoch, flightTime, mu);
+
+        if (!transferOrbit) {
+            return false;
+        }
+
+        return this.getDeltaV(state1, state2, transferOrbit, startEpoch, startEpoch + flightTime);
+    }
+
+    static solveFullTransfer(originObject, targetObject, rPer1, rPer2, departureTime, flightTime) {
+        const parentObject = sim.starSystem.getCommonParentObject(originObject.id, targetObject.id, departureTime, departureTime + flightTime);
+
+        if (!(parentObject instanceof __WEBPACK_IMPORTED_MODULE_4__Body__["a" /* default */])) {
+            return null;
+        }
+
+        const rfMainId = __WEBPACK_IMPORTED_MODULE_3__ReferenceFrame_Factory__["c" /* default */].buildId(
+            parentObject.id,
+            (parentObject.type === __WEBPACK_IMPORTED_MODULE_2__EphemerisObject__["a" /* default */].TYPE_STAR)
+                ? __WEBPACK_IMPORTED_MODULE_3__ReferenceFrame_Factory__["b" /* ReferenceFrame */].INERTIAL_ECLIPTIC
+                : __WEBPACK_IMPORTED_MODULE_3__ReferenceFrame_Factory__["b" /* ReferenceFrame */].INERTIAL_BODY_EQUATORIAL
+        );
+        const rfMain = sim.starSystem.getReferenceFrame(rfMainId);
+
+        const mu = parentObject.physicalModel.mu;
+
+        let state1;
+        let state2;
+
+        const rfOrigin = sim.starSystem.getReferenceFrame(__WEBPACK_IMPORTED_MODULE_3__ReferenceFrame_Factory__["c" /* default */].buildId(originObject.id, __WEBPACK_IMPORTED_MODULE_3__ReferenceFrame_Factory__["b" /* ReferenceFrame */].INERTIAL_BODY_EQUATORIAL));
+        const rfTarget = sim.starSystem.getReferenceFrame(__WEBPACK_IMPORTED_MODULE_3__ReferenceFrame_Factory__["c" /* default */].buildId(targetObject.id, __WEBPACK_IMPORTED_MODULE_3__ReferenceFrame_Factory__["b" /* ReferenceFrame */].INERTIAL_BODY_EQUATORIAL));
+        const originSoi = originObject.getSoiRadius(departureTime);
+        const targetSoi = targetObject.getSoiRadius(departureTime + flightTime);
+
+        let ejectionTime = 0;
+        let insertionTime = 0;
+        let ejectionPosShift = new __WEBPACK_IMPORTED_MODULE_0__algebra__["c" /* Vector */](3);
+        let insertionPosShift = new __WEBPACK_IMPORTED_MODULE_0__algebra__["c" /* Vector */](3);
+        let ejectionVelInf;
+        let insertionVelInf;
+        let steps = 0;
+        let transferKO;
+        let ejectionSoiEpoch;
+        let insertionSoiEpoch;
+
+        while (true) {
+            ejectionSoiEpoch = departureTime + ejectionTime;
+            insertionSoiEpoch = departureTime + flightTime - insertionTime;
+
+            state1 = originObject.trajectory.getStateByEpoch(ejectionSoiEpoch, rfMain);
+            state1._position = rfOrigin.transformPositionByEpoch(ejectionSoiEpoch, ejectionPosShift, rfMain);
+
+            state2 = targetObject.trajectory.getStateByEpoch(insertionSoiEpoch, rfMain);
+            state2._position = rfTarget.transformPositionByEpoch(insertionSoiEpoch, insertionPosShift, rfMain);
+
+            transferKO = this.solve(state1, state2, ejectionSoiEpoch, insertionSoiEpoch - ejectionSoiEpoch, mu);
+            if (transferKO === null) {
+                return null;
+            }
+
+            steps++;
+
+            ejectionVelInf  = transferKO.getStateByEpoch(ejectionSoiEpoch)._velocity.sub_(state1._velocity);
+            insertionVelInf = transferKO.getStateByEpoch(insertionSoiEpoch)._velocity.sub_(state2._velocity);
+
+            const ejectionNormal  = state1._position.cross(ejectionVelInf);
+            const insertionNormal = state2._position.cross(insertionVelInf);
+
+            const ejectionPosTime = this.getSoiEdgePositionAndTime(
+                rfMain.rotateVectorByEpoch(ejectionSoiEpoch, ejectionVelInf, rfOrigin),
+                rfMain.rotateVectorByEpoch(ejectionSoiEpoch, ejectionNormal, rfOrigin),
+                rPer1,
+                originSoi,
+                originObject.physicalModel.mu,
+                1
+            );
+
+            const insertionPosTime = this.getSoiEdgePositionAndTime(
+                rfMain.rotateVectorByEpoch(insertionSoiEpoch, insertionVelInf, rfTarget),
+                rfMain.rotateVectorByEpoch(insertionSoiEpoch, insertionNormal, rfTarget),
+                rPer2,
+                targetSoi,
+                targetObject.physicalModel.mu,
+                -1
+            );
+
+            ejectionTime = ejectionPosTime[1];
+            insertionTime = insertionPosTime[1];
+
+            if (steps > 10 || (ejectionPosShift.sub(ejectionPosTime[0]).mag < 10 && insertionPosShift.sub(insertionPosTime[0]).mag < 10)) {
+                ejectionPosShift = ejectionPosTime[0];
+                insertionPosShift = insertionPosTime[0];
+                break;
+            }
+
+            ejectionPosShift = ejectionPosTime[0];
+            insertionPosShift = insertionPosTime[0];
+        }
+
+        const ejectionKO = __WEBPACK_IMPORTED_MODULE_1__KeplerianObject__["a" /* default */].createFromState(
+            new __WEBPACK_IMPORTED_MODULE_5__StateVector__["a" /* default */](ejectionPosShift, rfMain.rotateVectorByEpoch(ejectionSoiEpoch, ejectionVelInf, rfOrigin)),
+            originObject.physicalModel.mu,
+            departureTime + ejectionTime
+        );
+        const ejectionDeltaV = ejectionKO.getPeriapsisSpeed() - Math.sqrt(originObject.physicalModel.mu / ejectionKO.getPeriapsisRadius());
+        const ejection = new __WEBPACK_IMPORTED_MODULE_7__Trajectory_KeplerianBasic__["a" /* default */](rfOrigin.id, ejectionKO);
+        ejection.minEpoch = departureTime;
+        ejection.maxEpoch = departureTime + ejectionTime;
+
+
+        const insertionKO = __WEBPACK_IMPORTED_MODULE_1__KeplerianObject__["a" /* default */].createFromState(
+            new __WEBPACK_IMPORTED_MODULE_5__StateVector__["a" /* default */](insertionPosShift, rfMain.rotateVectorByEpoch(insertionSoiEpoch, insertionVelInf, rfTarget)),
+            targetObject.physicalModel.mu,
+            departureTime + flightTime - insertionTime
+        );
+        const insertionDeltaV = insertionKO.getPeriapsisSpeed() - Math.sqrt(targetObject.physicalModel.mu / insertionKO.getPeriapsisRadius());
+        const insertion = new __WEBPACK_IMPORTED_MODULE_7__Trajectory_KeplerianBasic__["a" /* default */](rfTarget.id, insertionKO);
+        insertion.minEpoch = departureTime + flightTime - insertionTime;
+        insertion.maxEpoch = departureTime + flightTime;
+
+
+        const transfer = new __WEBPACK_IMPORTED_MODULE_7__Trajectory_KeplerianBasic__["a" /* default */](rfMainId, transferKO);
+        transfer.minEpoch = departureTime + ejectionTime;
+        transfer.maxEpoch = departureTime + flightTime - insertionTime;
+
+        let trajectory = new __WEBPACK_IMPORTED_MODULE_6__Trajectory_Composite__["a" /* default */]();
+        trajectory.addComponent(ejection);
+        trajectory.addComponent(transfer);
+        trajectory.addComponent(insertion);
+
+        return {
+            trajectory: trajectory,
+            ejectionDeltaV: ejectionDeltaV,
+            insertionDeltaV: insertionDeltaV,
+        };
+    }
+
+    static getSoiEdgePositionAndTime(velInf, normal, rPer, rInf, mu, direction) {
+        const sma = 1 / (2 / rInf - velInf.quadrance / mu);
+        const ecc = 1 - rPer / sma;
+        const trueAnomaly = direction * Math.acos((sma * (1 - ecc*ecc) / rInf - 1) / ecc);
+        const flightPathAngle = Math.atan(ecc * Math.sin(trueAnomaly) / (sma * (1 - ecc*ecc) / rInf));
+        const position = (new __WEBPACK_IMPORTED_MODULE_0__algebra__["a" /* Quaternion */](normal, flightPathAngle - Math.PI / 2)).rotate_(velInf.unit().mul_(rInf));
+
+        const H = this.getEccentricAnomalyByTrueAnomaly(trueAnomaly, ecc);
+        const time = (ecc > 1)
+            ? (ecc * Math.sinh(H) - H) / Math.sqrt(mu / sma / sma / Math.abs(sma))
+            : (H - ecc * Math.sin(H)) / Math.sqrt(mu / sma / sma / sma);
+
+        return [position, Math.abs(time)];
+    }
+
+    static solve(state1, state2, startEpoch, flightTime, mu) {
+        const maxError = 1;
+        const maxSteps = 30;
+
+        const r1vec = state1.position;
+        const r2vec = state2.position;
+        let normal = r1vec.cross(r2vec);
+        const r1 = r1vec.mag;
+        const r2 = r2vec.mag;
+        let transferAngle = r1vec.angle(r2vec);
+
+        if (normal.angle(state1._position.cross(state1._velocity)) > Math.PI / 2) {
+            transferAngle = 2 * Math.PI - transferAngle;
+            normal.mul_(-1);
+        }
+
+        const signSinTransferAngle = Math.sign(Math.sin(transferAngle));
+        const inc = normal.angle(new __WEBPACK_IMPORTED_MODULE_0__algebra__["c" /* Vector */]([0, 0, 1]));
+        const nodeVector = (new __WEBPACK_IMPORTED_MODULE_0__algebra__["c" /* Vector */]([0, 0, 1])).cross(normal);
+
+        let e, sma, ta1;
+        let raan = nodeVector.angle(new __WEBPACK_IMPORTED_MODULE_0__algebra__["c" /* Vector */]([1, 0, 0]));
+        if ((new __WEBPACK_IMPORTED_MODULE_0__algebra__["c" /* Vector */]([1, 0, 0])).cross(nodeVector).angle(new __WEBPACK_IMPORTED_MODULE_0__algebra__["c" /* Vector */]([0, 0, 1])) > Math.PI / 2) {
+            raan = 2 * Math.PI - raan;
+        }
+
+        const d = Math.sqrt(r1*r1 + r2*r2 - 2 * r1vec.dot(r2vec)) / 2;
+
+        const parabolicTime = (Math.pow(r1+r2+2*d, 3/2) - signSinTransferAngle*Math.pow(r1+r2-2*d, 3/2)) / (6 * Math.sqrt(mu));
+
+        if (flightTime > parabolicTime) {
+            // ellipse
+            const A = (r2 - r1) / 2;
+            const E = d / A;
+            const B = Math.sqrt(d*d - A*A);
+            let y = Object(__WEBPACK_IMPORTED_MODULE_0__algebra__["h" /* newtonSolve */])(
+                (yParam) => this.getTimeByY(yParam, A, B, E, r1, r2, d, transferAngle, mu) - flightTime,
+                10000, 1, maxError, maxSteps
+            );
+
+            if (y === null) {
+                return null;
+            }
+
+            const x0 = -(r2 + r1) / 2 / E;
+            const y0 = B * Math.sqrt(x0 * x0 / A / A - 1);
+            const x = A * Math.sqrt(1 + y * y / B / B);
+            const temp = Math.sqrt((x0 - x) * (x0 - x) + (y0 - y) * (y0 - y));
+            const fx = (x0 - x) / temp;
+            const fy = (y0 - y) / temp;
+            ta1 = Object(__WEBPACK_IMPORTED_MODULE_0__algebra__["g" /* getAngleBySinCos */])(
+                signSinTransferAngle * ((x0 + d) * fy - y0 * fx) / r1,
+                -((x0 + d) * fx + y0 * fy) / r1
+            );
+            sma = E * (x - x0) / 2;
+            e = temp / 2 / sma;
+
+        } else {
+            // hyperbola
+            sma = Object(__WEBPACK_IMPORTED_MODULE_0__algebra__["h" /* newtonSolve */])(
+                (a) => {
+                    const alpha = Math.acosh(1 + (r1 + r2 + 2 * d) / 2 / Math.abs(a));
+                    const beta  = Math.acosh(1 + (r1 + r2 - 2 * d) / 2 / Math.abs(a));
+                    return Math.sqrt(Math.abs(Math.pow(a, 3)) / mu) *
+                        (Math.sinh(alpha) - alpha - signSinTransferAngle * (Math.sinh(beta) - beta)) - flightTime;
+                },
+                r1, 10, maxError, maxSteps
+            );
+
+            if (sma === false) {
+                return null;
+            }
+
+            if (sma > 0) {
+                sma = -sma;
+            }
+
+            let f1 = r1vec.rotate(nodeVector, -inc).mul_(-1);
+            let p2 = r2vec.rotate(nodeVector, -inc).add_(f1);
+            const d1 = r1 - 2 * sma;
+            const d2 = r2 - 2 * sma;
+            const tempAng = -Math.sign(p2.y) * p2.angle(new __WEBPACK_IMPORTED_MODULE_0__algebra__["c" /* Vector */]([1,0,0]));
+            f1 = f1.rotateZ(tempAng);
+            p2 = p2.rotateZ(tempAng);
+
+            const f2x = (p2.x*p2.x - d2*d2 + d1*d1) / 2 / p2.x;
+            let f2y = Math.sqrt(d1*d1 - f2x*f2x);
+
+            if (transferAngle > Math.PI ? (f1.y < 0) : (f1.y > 0)) {
+                f2y = -f2y;
+            }
+
+            e = -f1.sub_(new __WEBPACK_IMPORTED_MODULE_0__algebra__["c" /* Vector */]([f2x, f2y, 0])).mag / 2 / sma;
+
+            const p = sma * (1 - e*e);
+            ta1 = Math.acos((p / r1 - 1) / e);
+            const ta2 = Math.acos((p / r2 - 1) / e);
+
+            if (ta1 > ta2 || ta2 - transferAngle < 0) {
+                ta1 = -ta1;
+            }
+        }
+
+        const perVector = (new __WEBPACK_IMPORTED_MODULE_0__algebra__["a" /* Quaternion */](normal, -ta1)).rotate(r1vec);
+        let aop = nodeVector.angle(perVector);
+
+        if (nodeVector.cross(perVector).angle(normal) > Math.PI / 2) {
+            aop = 2 * Math.PI - aop;
+        }
+
+        return new __WEBPACK_IMPORTED_MODULE_1__KeplerianObject__["a" /* default */](e, sma, aop, inc, raan, ta1, startEpoch, mu, true);
+    }
+
+    static getTimeByY(y, A, B, E, r1, r2, d, alpha, mu) {
+        const rm = (r2 + r1) / 2;
+        const x0 = - rm / E;
+        const y0 = B * Math.sqrt(x0*x0/A/A - 1);
+        const x = A * Math.sqrt(1 + y*y/B/B);
+        const a = (rm + E * x) / 2;
+        const temp = Math.sqrt((x0 - x)*(x0 - x) + (y0 - y)*(y0 - y));
+        const e = temp / 2 / a;
+        const fx = (x0 - x) / temp;
+        const fy = (y0 - y) / temp;
+        const cosTa1 = -((x0 + d) * fx + y0 * fy) / r1;
+        const sinTa1 = Math.sign(Math.sin(alpha)) * ((x0 + d) * fy - y0 * fx) / r1;
+        const ta1 = Object(__WEBPACK_IMPORTED_MODULE_0__algebra__["g" /* getAngleBySinCos */])(sinTa1, cosTa1);
+        const n = Math.sqrt(mu/a/a/a);
+        const E1 = this.getEccentricAnomalyByTrueAnomaly(ta1, e);
+        let E2 = this.getEccentricAnomalyByTrueAnomaly(ta1 + alpha, e);
+        if (ta1 + alpha > 2 * Math.PI) {
+            E2 += 2 * Math.PI;
+        }
+        return (E2 - E1 - e * (Math.sin(E2) - Math.sin(E1))) / n;
+    }
+
+    static getEccentricAnomalyByTrueAnomaly(ta, ecc) {
+        if (ecc < 1) {
+            const cos = Math.cos(ta);
+            return Object(__WEBPACK_IMPORTED_MODULE_0__algebra__["g" /* getAngleBySinCos */])(
+                Math.sqrt(1 - ecc * ecc) * Math.sin(ta) / (1 + ecc * cos),
+                (ecc + cos) / (1 + ecc * cos)
+            );
+        } else {
+            return 2 * Math.atanh(Math.tan(ta / 2) / Math.sqrt((ecc + 1) / (ecc - 1)));
+        }
+    }
+
+}
+/* harmony export (immutable) */ __webpack_exports__["a"] = LambertSolver;
+
+
+/***/ }),
+/* 70 */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__ReferenceFrame_Factory__ = __webpack_require__(1);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__EphemerisObject__ = __webpack_require__(8);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__Body__ = __webpack_require__(12);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__Events__ = __webpack_require__(3);
+
+
+
+
+
+const STAR_SYSTEM_BARYCENTER = 0;
+/* unused harmony export STAR_SYSTEM_BARYCENTER */
+
+
+class StarSystem
+{
+    constructor(id) {
+        this.id = id;
+        this.name = null;
+        this.stars = null;
+        this.mainObject = null;
+        this.referenceFrames = {};
+        this.trajectories = {};
+        this.objects = {};
+    }
+
+    addStars(stars) {
+        this.stars = stars;
+        return this;
+    }
+
+    addReferenceFrame(frame) {
+        this.referenceFrames[frame.id] = frame;
+    }
+
+    getReferenceFrame(id) {
+        if (this.referenceFrames[id] === undefined) {
+            this.referenceFrames[id] = __WEBPACK_IMPORTED_MODULE_0__ReferenceFrame_Factory__["c" /* default */].createById(id);
+        }
+        return this.referenceFrames[id];
+    }
+
+    getTrajectory(objectId) {
+        if (this.trajectories && this.trajectories[objectId]) {
+            return this.trajectories[objectId];
+        }
+        return null;
+    }
+
+    addTrajectory(objectId, trajectory) {
+        this.trajectories[objectId] = trajectory;
+        this.getObject(objectId).setTrajectory(trajectory);
+    }
+
+    deleteTrajectory(objectId) {
+        this.trajectories[objectId].drop();
+        delete this.trajectories[objectId];
+    }
+
+    getObject(id) {
+        if (this.objects[id] === undefined) {
+            this.objects[id] = new __WEBPACK_IMPORTED_MODULE_1__EphemerisObject__["a" /* default */](id, __WEBPACK_IMPORTED_MODULE_1__EphemerisObject__["a" /* default */].TYPE_UNKNOWN, 'Unknown #' + id);
+        }
+        return this.objects[id];
+    }
+
+    getCommonParentObject(object1, object2, epoch1, epoch2) {
+        if (epoch2 === undefined) {
+            epoch2 = epoch1;
+        }
+
+        let chain1 = [object1];
+        let parent;
+
+        while (parent = this.getObject(chain1[chain1.length-1]).getParentObjectIdByEpoch(epoch1)) {
+            chain1.push(parent);
+        }
+        chain1.push(0);
+
+        parent = object2;
+        while ((parent = this.getObject(parent).getParentObjectIdByEpoch(epoch2)) !== null) {
+            if (chain1.indexOf(parent) !== -1) {
+                return this.getObject(parent);
+            }
+        }
+
+        return null;
+    }
+
+    isBody(objectId) {
+        if (this.objects[objectId] === undefined) {
+            return null;
+        }
+        return this.objects[objectId] instanceof __WEBPACK_IMPORTED_MODULE_2__Body__["a" /* default */];
+    }
+
+    getObjectNames() {
+        let names = {};
+        for (const object of Object.values(this.objects)) {
+            names[object.id] = object.name;
+        }
+        return names;
+    }
+
+    getBodies() {
+        let bodies = [];
+        for (const object of Object.values(this.objects)) {
+            if (object instanceof __WEBPACK_IMPORTED_MODULE_2__Body__["a" /* default */]) {
+                bodies.push(object);
+            }
+        }
+        return bodies;
+    }
+
+    addObject(id, body) {
+        this.objects[id] = body;
+        document.dispatchEvent(new CustomEvent(
+            __WEBPACK_IMPORTED_MODULE_3__Events__["a" /* Events */].OBJECT_ADDED,
+            {detail: {object: body}}
+        ));
+    }
+
+    deleteObject(id) {
+        this.objects[id].drop();
+        delete this.objects[id];
+    }
+}
+/* harmony export (immutable) */ __webpack_exports__["a"] = StarSystem;
+
+
+/***/ }),
+/* 71 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -11514,463 +12180,6 @@ class Camera
 }
 /* harmony export (immutable) */ __webpack_exports__["a"] = Camera;
 
-
-/* WEBPACK VAR INJECTION */}.call(__webpack_exports__, __webpack_require__(2)))
-
-/***/ }),
-/* 74 */
-/***/ (function(module, __webpack_exports__, __webpack_require__) {
-
-"use strict";
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__core_Events__ = __webpack_require__(3);
-
-
-const J2000_TIMESTAMP = 946728000;
-/* unused harmony export J2000_TIMESTAMP */
-
-
-class TimeLine
-{
-    constructor(epoch, timeScale, isTimeRunning) {
-        this.epoch = epoch;
-        this.timeScale = timeScale;
-        this.isTimeRunning = isTimeRunning;
-
-        this.mouseState = {
-            x: 0,
-            y: 0,
-            leftButton: false,
-            rightButton: false
-        };
-
-        this.span = timeScale * 86400 * 5;
-
-        this.markDistance = 300;
-        this.scaleType = "month";
-
-        this.domElement = document.getElementById("timeLineCanvas");
-        this.canvasContext = this.domElement.getContext("2d");
-        this.canvasRect = {};
-        this.updateCanvasStyle();
-
-        this.leftEpoch = this.epoch - this.span / 2;
-
-        this.updateScaleType();
-
-        this.domElement.addEventListener("mousedown",  this.onMouseDown  .bind(this));
-        window         .addEventListener("mouseup",    this.onMouseUp    .bind(this));
-        window         .addEventListener("mousemove",  this.onMouseMove  .bind(this));
-        this.domElement.addEventListener("mousewheel", this.onMouseWheel .bind(this));
-
-        window.addEventListener('keypress', e => {
-            if (e.key === ' ') {
-                this.togglePause();
-            }
-        });
-
-        window.addEventListener("resize", this.updateCanvasStyle.bind(this));
-        window.oncontextmenu = () => false;
-    }
-
-    setTimeScale(newScale) {
-        document.dispatchEvent(new CustomEvent(
-            __WEBPACK_IMPORTED_MODULE_0__core_Events__["a" /* Events */].TIME_SCALE_CHANGED,
-            {detail: {old: this.timeScale, new: newScale}}
-        ));
-        this.timeScale = newScale;
-    }
-
-    togglePause() {
-        this.isTimeRunning = !this.isTimeRunning;
-        document.dispatchEvent(new CustomEvent(
-            this.isTimeRunning ? __WEBPACK_IMPORTED_MODULE_0__core_Events__["a" /* Events */].TIME_UNPAUSED : __WEBPACK_IMPORTED_MODULE_0__core_Events__["a" /* Events */].TIME_PAUSED
-        ));
-    }
-
-    tick(timePassed) {
-        if (this.mouseState.leftButton) {
-            this.epoch = this.leftEpoch + (this.mouseState.x
-                - this.canvasRect.left) * this.span / this.domElement.width;
-        } else if (this.isTimeRunning) {
-            if ((this.leftEpoch < this.epoch)
-                && (this.epoch < this.leftEpoch + this.span)
-            ) {
-                this.leftEpoch += this.timeScale * timePassed;
-            }
-
-            this.epoch += this.timeScale * timePassed;
-        }
-
-        document.dispatchEvent(new CustomEvent(
-            __WEBPACK_IMPORTED_MODULE_0__core_Events__["a" /* Events */].EPOCH_CHANGED,
-            {detail: {
-                epoch: this.epoch,
-                date: new Date((J2000_TIMESTAMP + this.epoch) * 1000)
-            }}
-        ));
-
-        this.redraw();
-    }
-
-    forceEpoch(newEpoch) {
-        this.epoch = newEpoch;
-        this.tick(0);
-    }
-
-    useCurrentTime() {
-        this.forceEpoch(TimeLine.getEpochByDate(new Date()));
-    }
-
-    redraw() {
-        this.canvasContext.fillStyle = "#222";
-        this.canvasContext.fillRect(0, 0, this.domElement.width, this.domElement.height);
-
-        this.canvasContext.fillStyle = "#2FA1D6";
-        this.drawCurrentTimeMark();
-
-        this.canvasContext.strokeStyle = "#fff";
-        this.canvasContext.fillStyle   = "#fff";
-        this.canvasContext.font        = "11pt sans-serif";
-
-        let markDate = this.roundDateUp(TimeLine.getDateByEpoch(this.leftEpoch));
-        let markEpoch = TimeLine.getEpochByDate(markDate);
-
-        while (markEpoch < this.leftEpoch + this.span) {
-            this.drawMark(this.getCanvasPositionByEpoch(markEpoch), this.formatDate(markDate));
-            markDate = this.nextRenderingDate(markDate);
-            markEpoch = TimeLine.getEpochByDate(markDate);
-        }
-    }
-
-    static getDateByEpoch(epoch) {
-        return new Date((J2000_TIMESTAMP + epoch) * 1000);
-    }
-
-    static getEpochByDate(date) {
-        return date / 1000 - J2000_TIMESTAMP;
-    }
-
-    getCanvasPositionByEpoch(epoch) {
-        return (epoch - this.leftEpoch) * this.domElement.width / this.span;
-    }
-
-    updateCanvasStyle() {
-        this.canvasRect = this.domElement.getBoundingClientRect();
-        this.domElement.width  = this.canvasRect.right  - this.canvasRect.left;
-        this.domElement.height = this.canvasRect.bottom - this.canvasRect.top;
-    }
-
-    updateScaleType() {
-        const secondsPerPeriod = this.markDistance * this.span / this.domElement.width;
-        let bestScale = false;
-
-        for (const scale in TimeLine.scales) {
-            if (!bestScale) {
-                bestScale = scale;
-                continue;
-            }
-
-            if (Math.abs(TimeLine.scales[bestScale] / secondsPerPeriod - 1)
-                > Math.abs(TimeLine.scales[scale] / secondsPerPeriod - 1)
-            ) {
-                bestScale = scale;
-            }
-        }
-
-        this.scaleType = bestScale;
-    }
-
-    drawMark(x, text) {
-        this.canvasContext.beginPath();
-        this.canvasContext.moveTo(x, 0);
-        this.canvasContext.lineTo(x, this.domElement.height / 2);
-        this.canvasContext.stroke();
-        this.canvasContext.fillText(
-            text,
-            x - this.canvasContext.measureText(text).width / 2,
-            this.domElement.height - 2
-        );
-    }
-
-    drawCurrentTimeMark() {
-        this.canvasContext.fillRect(0, 0, this.getCanvasPositionByEpoch(this.epoch), this.domElement.height);
-    }
-
-    roundDateUp(date) {
-        const d = new Date(date);
-        if (this.scaleType === "minute") {
-            d.setSeconds(60, 0);
-        } else if (this.scaleType === "fiveMinutes") {
-            d.setMinutes(5 + d.getMinutes() - d.getMinutes() % 5, 0, 0);
-        } else if (this.scaleType === "tenMinutes") {
-            d.setMinutes(10 + d.getMinutes() - d.getMinutes() % 10, 0, 0);
-        } else if (this.scaleType === "thirtyMinutes") {
-            d.setMinutes(30 + d.getMinutes() - d.getMinutes() % 30, 0, 0);
-        } else if (this.scaleType === "hour") {
-            d.setMinutes(60, 0, 0);
-        } else if (this.scaleType === "threeHours") {
-            d.setHours(3 + d.getHours() - d.getHours() % 3, 0, 0, 0);
-        } else if (this.scaleType === "sixHours") {
-            d.setHours(6 + d.getHours() - d.getHours() % 6, 0, 0, 0);
-        } else if (this.scaleType === "day") {
-            d.setHours(24, 0, 0, 0);
-        } else if (this.scaleType === "week") {
-            d.setHours(0, 0, 0, 0);
-            d.setDate(7 + d.getDate() - d.getDay());
-        } else if (this.scaleType === "month") {
-            d.setHours(0, 0, 0, 0);
-            d.setDate(1);
-            d.setMonth(d.getMonth() + 1);
-        } else if (this.scaleType === "threeMonths") {
-            d.setHours(0, 0, 0, 0);
-            d.setDate(1);
-            d.setMonth(3 + d.getMonth() - d.getMonth() % 3);
-        } else if (this.scaleType === "year") {
-            d.setHours(0, 0, 0, 0);
-            d.setMonth(0, 1);
-        } else if (this.scaleType === "fiveYears") {
-            d.setHours(0, 0, 0, 0);
-            d.setFullYear(5 + d.getFullYear() - d.getFullYear() % 5, 0, 1);
-        } else {
-            return;
-        }
-        return d;
-    }
-
-    nextRenderingDate(date) {
-        const d = new Date(date);
-        if (this.scaleType === "minute") {
-            d.setMinutes(d.getMinutes() + 1);
-        } else if (this.scaleType === "fiveMinutes") {
-            d.setMinutes(d.getMinutes() + 5);
-        } else if (this.scaleType === "tenMinutes") {
-            d.setMinutes(d.getMinutes() + 10);
-        } else if (this.scaleType === "thirtyMinutes") {
-            d.setMinutes(d.getMinutes() + 30);
-        } else if (this.scaleType === "hour") {
-            d.setHours(d.getHours() + 1);
-        } else if (this.scaleType === "threeHours") {
-            d.setHours(d.getHours() + 3);
-        } else if (this.scaleType === "sixHours") {
-            d.setHours(d.getHours() + 6);
-        } else if (this.scaleType === "day") {
-            d.setDate(d.getDate() + 1);
-        } else if (this.scaleType === "week") {
-            d.setDate(d.getDate() + 7);
-        } else if (this.scaleType === "month") {
-            d.setMonth(d.getMonth() + 1);
-        } else if (this.scaleType === "threeMonths") {
-            d.setMonth(d.getMonth() + 3);
-        } else if (this.scaleType === "year") {
-            d.setFullYear(d.getFullYear() + 1, d.getMonth(), d.getDate());
-        } else if (this.scaleType === "fiveYears") {
-            d.setFullYear(d.getFullYear() + 5, d.getMonth(), d.getDate());
-        } else {
-            return;
-        }
-        return d;
-    }
-
-    formatDate(date) {
-        if ((this.scaleType === "minute")
-            || (this.scaleType === "fiveMinutes")
-            || (this.scaleType === "tenMinutes")
-            || (this.scaleType === "thirtyMinutes")
-            || (this.scaleType === "hour")
-            || (this.scaleType === "threeHours")
-            || (this.scaleType === "sixHours")
-        ) {
-            let string = date.getYear() + 1900;
-            string += '-' + ((date.getMonth() + 1) + '').padStart(2, '0');
-            string += '-' + (date.getDate() + '').padStart(2, '0');
-            string += ' ' + (date.getHours() + '').padStart(2, '0');
-            string += ':' + (date.getMinutes() + '').padStart(2, '0');
-            return string;
-        } else if ((this.scaleType === "day")
-            || (this.scaleType === "week")
-        ) {
-            let string = date.getYear() + 1900;
-            string += '-' + ((date.getMonth() + 1) + '').padStart(2, '0');
-            string += '-' + (date.getDate() + '').padStart(2, '0');
-            return string;
-        } else if ((this.scaleType === "month")
-            || (this.scaleType === "threeMonths")
-        ) {
-            const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
-            return months[date.getMonth()] + ' ' + (date.getYear() + 1900);
-        } else if ((this.scaleType === "year")
-            || (this.scaleType === "fiveYears")
-        ) {
-            return (date.getYear() + 1900) + '';
-        }
-        return date.toString();
-    }
-
-    onMouseDown(e) {
-        if (e.button === 0) {
-            this.mouseState.leftButton = true;
-        } else if (e.button === 2) {
-            this.mouseState.rightButton = true;
-        }
-        return false;
-    }
-
-    onMouseUp(e) {
-        if (e.button === 0) {
-            this.mouseState.leftButton = false;
-        } else if (e.button === 2) {
-            this.mouseState.rightButton = false;
-        }
-        return false;
-    }
-
-    onMouseMove(e) {
-        if (this.mouseState.rightButton) {
-            this.leftEpoch += (this.mouseState.x - e.x) * this.span / this.domElement.width;
-        }
-
-        this.mouseState.x = e.x;
-        this.mouseState.y = e.y;
-        return false;
-    }
-
-    onMouseWheel(e) {
-        const stepMult = 1.3;
-        const mult = (e.deltaY > 0) ? stepMult : (1 / stepMult);
-        const newSpan = Math.min(Math.max(this.span * mult,
-            (this.canvasRect.right - this.canvasRect.left) / this.markDistance * TimeLine.scales.minute),
-            (this.canvasRect.right - this.canvasRect.left) / this.markDistance * TimeLine.scales.fiveYears);
-        this.leftEpoch += (this.mouseState.x - this.canvasRect.left)
-            * (this.span - newSpan) / (this.canvasRect.right - this.canvasRect.left);
-        this.span = newSpan;
-
-        this.updateScaleType();
-        return false;
-    }
-}
-/* harmony export (immutable) */ __webpack_exports__["a"] = TimeLine;
-
-
-TimeLine.scales = {
-    minute: 60,
-    fiveMinutes: 300,
-    tenMinutes: 600,
-    thirtyMinutes: 1800,
-    hour: 3600,
-    threeHours: 10800,
-    sixHours: 21600,
-    day: 86400,
-    week: 604800,
-    month: 2592000,
-    threeMonths: 7776000,
-    year: 31557600,
-    fiveYears: 157788000,
-};
-
-
-/***/ }),
-/* 75 */
-/***/ (function(module, __webpack_exports__, __webpack_require__) {
-
-"use strict";
-/* WEBPACK VAR INJECTION */(function(THREE) {/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__ModelAbstract__ = __webpack_require__(7);
-
-
-class VisualLabel extends __WEBPACK_IMPORTED_MODULE_0__ModelAbstract__["a" /* default */] {
-    constructor(functionOfEpoch, parameters) {
-        super();
-
-        this.visible = true;
-
-        this.parameters = Object.assign({}, VisualLabel.DEFAULT_SETTINGS, parameters);
-        this.functionOfEpoch = functionOfEpoch;
-
-        this.canvas = document.createElement('canvas');
-
-        this.setThreeObj(new THREE.Sprite(new THREE.SpriteMaterial(
-            {map: new THREE.CanvasTexture(this.canvas)}
-        )));
-
-        this.setText(this.parameters.text);
-    }
-
-    setText(text) {
-        let context = this.canvas.getContext('2d');
-        context.font = this.parameters.fontSize + 'px ' + this.parameters.font;
-
-        let canvasWidth = context.measureText(text).width;
-        let canvasHeight = this.parameters.fontSize * (1 + this.parameters.margin) * 2;
-        this.canvas.width = THREE.Math.ceilPowerOfTwo(canvasWidth);
-        this.canvas.height = THREE.Math.ceilPowerOfTwo(canvasHeight);
-
-        context.font = this.parameters.fontSize + 'px ' + this.parameters.font;
-        context.fillStyle = this.parameters.color;
-        context.textAlign = 'center';
-        context.textBaseline = 'bottom';
-        context.fillText(
-            text,
-            this.canvas.width / 2,
-            this.parameters.fontSize + (this.canvas.height - canvasHeight) / 2
-        );
-
-        this.threeObj.material.map.needsUpdate = true;
-    }
-
-    render(epoch) {
-        if (!this.visible) {
-            this.threeObj.visible = false;
-            return;
-        }
-
-        this.threeObj.position.copy(sim.getVisualCoords(this.functionOfEpoch.evaluate(epoch)));
-
-        const distance = this.threeObj.position.length();
-
-        const scaleCoeff = this.calculateScaleCoeff(distance, this.parameters.scaling) / 2;
-        this.threeObj.scale.x = this.canvas.width  * scaleCoeff;
-        this.threeObj.scale.y = this.canvas.height * scaleCoeff;
-
-        this.threeObj.visible = 1 < Math.max(this.threeObj.scale.x, this.threeObj.scale.y) /
-            (distance * sim.raycaster.getPixelAngleSize()) / 2;
-    }
-
-    calculateScaleCoeff(distance, scaling) {
-        if (typeof scaling.callback === 'string') {
-            return VisualLabel.scalingFunctions[scaling.callback](distance, scaling.range);
-        }
-        return scaling.callback(distance, scaling.range);
-    }
-}
-/* harmony export (immutable) */ __webpack_exports__["a"] = VisualLabel;
-
-
-VisualLabel.DEFAULT_SETTINGS = {
-    text: '',
-    font: 'Arial',
-    color: 'white',
-    fontSize: 32,
-    margin: 0,
-    scaling: {
-        range: {
-            from: 30000,
-            to: 700000,
-        },
-        callback: 'range'
-    }
-};
-
-VisualLabel.scalingFunctions = {
-    alwaysVisible: (distance) => distance * sim.raycaster.getPixelAngleSize(),
-    range: (distance, range) => {
-        if (distance < range.from) {
-            return range.from * sim.raycaster.getPixelAngleSize();
-        }
-        if (distance > range.to) {
-            return range.to * sim.raycaster.getPixelAngleSize();
-        }
-        return distance * sim.raycaster.getPixelAngleSize();
-    }
-};
 
 /* WEBPACK VAR INJECTION */}.call(__webpack_exports__, __webpack_require__(2)))
 
