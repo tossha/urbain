@@ -114,6 +114,7 @@ export default class StarSystemLoader
             object = new Body(
                 config.id,
                 config.type || EphemerisObject.TYPE_UNKNOWN,
+                config.parentSoi || null,
                 config.name,
                 visualModel,
                 physicalModel,

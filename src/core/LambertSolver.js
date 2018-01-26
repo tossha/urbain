@@ -1,7 +1,11 @@
 import {getAngleBySinCos, Vector, Quaternion, newtonSolve} from "../algebra";
 import KeplerianObject from "./KeplerianObject";
-import VisualVector from "../visual/Vector";
-import {SUN} from "../solar_system";
+import EphemerisObject from "./EphemerisObject";
+import ReferenceFrameFactory, {ReferenceFrame} from "./ReferenceFrame/Factory";
+import Body from "./Body";
+import StateVector from "./StateVector";
+import TrajectoryComposite from "./Trajectory/Composite";
+import TrajectoryKeplerianBasic from "./Trajectory/KeplerianBasic";
 
 export default class LambertSolver
 {
@@ -85,6 +89,149 @@ export default class LambertSolver
         return this.getDeltaV(state1, state2, transferOrbit, startEpoch, startEpoch + flightTime);
     }
 
+    static solveFullTransfer(originObject, targetObject, rPer1, rPer2, departureTime, flightTime) {
+        const parentObject = sim.starSystem.getCommonParentObject(originObject.id, targetObject.id, departureTime, departureTime + flightTime);
+
+        if (!(parentObject instanceof Body)) {
+            return null;
+        }
+
+        const rfMainId = ReferenceFrameFactory.buildId(
+            parentObject.id,
+            (parentObject.type === EphemerisObject.TYPE_STAR)
+                ? ReferenceFrame.INERTIAL_ECLIPTIC
+                : ReferenceFrame.INERTIAL_BODY_EQUATORIAL
+        );
+        const rfMain = sim.starSystem.getReferenceFrame(rfMainId);
+
+        const mu = parentObject.physicalModel.mu;
+
+        let state1;
+        let state2;
+
+        const rfOrigin = sim.starSystem.getReferenceFrame(ReferenceFrameFactory.buildId(originObject.id, ReferenceFrame.INERTIAL_BODY_EQUATORIAL));
+        const rfTarget = sim.starSystem.getReferenceFrame(ReferenceFrameFactory.buildId(targetObject.id, ReferenceFrame.INERTIAL_BODY_EQUATORIAL));
+        const originSoi = originObject.getSoiRadius(departureTime);
+        const targetSoi = targetObject.getSoiRadius(departureTime + flightTime);
+
+        let ejectionTime = 0;
+        let insertionTime = 0;
+        let ejectionPosShift = new Vector(3);
+        let insertionPosShift = new Vector(3);
+        let ejectionVelInf;
+        let insertionVelInf;
+        let steps = 0;
+        let transferKO;
+        let ejectionSoiEpoch;
+        let insertionSoiEpoch;
+
+        while (true) {
+            ejectionSoiEpoch = departureTime + ejectionTime;
+            insertionSoiEpoch = departureTime + flightTime - insertionTime;
+
+            state1 = originObject.trajectory.getStateByEpoch(ejectionSoiEpoch, rfMain);
+            state1._position = rfOrigin.transformPositionByEpoch(ejectionSoiEpoch, ejectionPosShift, rfMain);
+
+            state2 = targetObject.trajectory.getStateByEpoch(insertionSoiEpoch, rfMain);
+            state2._position = rfTarget.transformPositionByEpoch(insertionSoiEpoch, insertionPosShift, rfMain);
+
+            transferKO = this.solve(state1, state2, ejectionSoiEpoch, insertionSoiEpoch - ejectionSoiEpoch, mu);
+            if (transferKO === null) {
+                return null;
+            }
+
+            steps++;
+
+            ejectionVelInf  = transferKO.getStateByEpoch(ejectionSoiEpoch)._velocity.sub_(state1._velocity);
+            insertionVelInf = transferKO.getStateByEpoch(insertionSoiEpoch)._velocity.sub_(state2._velocity);
+
+            const ejectionNormal  = state1._position.cross(ejectionVelInf);
+            const insertionNormal = state2._position.cross(insertionVelInf);
+
+            const ejectionPosTime = this.getSoiEdgePositionAndTime(
+                rfMain.rotateVectorByEpoch(ejectionSoiEpoch, ejectionVelInf, rfOrigin),
+                rfMain.rotateVectorByEpoch(ejectionSoiEpoch, ejectionNormal, rfOrigin),
+                rPer1,
+                originSoi,
+                originObject.physicalModel.mu,
+                1
+            );
+
+            const insertionPosTime = this.getSoiEdgePositionAndTime(
+                rfMain.rotateVectorByEpoch(insertionSoiEpoch, insertionVelInf, rfTarget),
+                rfMain.rotateVectorByEpoch(insertionSoiEpoch, insertionNormal, rfTarget),
+                rPer2,
+                targetSoi,
+                targetObject.physicalModel.mu,
+                -1
+            );
+
+            ejectionTime = ejectionPosTime[1];
+            insertionTime = insertionPosTime[1];
+
+            if (steps > 10 || (ejectionPosShift.sub(ejectionPosTime[0]).mag < 10 && insertionPosShift.sub(insertionPosTime[0]).mag < 10)) {
+                ejectionPosShift = ejectionPosTime[0];
+                insertionPosShift = insertionPosTime[0];
+                break;
+            }
+
+            ejectionPosShift = ejectionPosTime[0];
+            insertionPosShift = insertionPosTime[0];
+        }
+
+        const ejectionKO = KeplerianObject.createFromState(
+            new StateVector(ejectionPosShift, rfMain.rotateVectorByEpoch(ejectionSoiEpoch, ejectionVelInf, rfOrigin)),
+            originObject.physicalModel.mu,
+            departureTime + ejectionTime
+        );
+        const ejectionDeltaV = ejectionKO.getPeriapsisSpeed() - Math.sqrt(originObject.physicalModel.mu / ejectionKO.getPeriapsisRadius());
+        const ejection = new TrajectoryKeplerianBasic(rfOrigin.id, ejectionKO);
+        ejection.minEpoch = departureTime;
+        ejection.maxEpoch = departureTime + ejectionTime;
+
+
+        const insertionKO = KeplerianObject.createFromState(
+            new StateVector(insertionPosShift, rfMain.rotateVectorByEpoch(insertionSoiEpoch, insertionVelInf, rfTarget)),
+            targetObject.physicalModel.mu,
+            departureTime + flightTime - insertionTime
+        );
+        const insertionDeltaV = insertionKO.getPeriapsisSpeed() - Math.sqrt(targetObject.physicalModel.mu / insertionKO.getPeriapsisRadius());
+        const insertion = new TrajectoryKeplerianBasic(rfTarget.id, insertionKO);
+        insertion.minEpoch = departureTime + flightTime - insertionTime;
+        insertion.maxEpoch = departureTime + flightTime;
+
+
+        const transfer = new TrajectoryKeplerianBasic(rfMainId, transferKO);
+        transfer.minEpoch = departureTime + ejectionTime;
+        transfer.maxEpoch = departureTime + flightTime - insertionTime;
+
+        let trajectory = new TrajectoryComposite();
+        trajectory.addComponent(ejection);
+        trajectory.addComponent(transfer);
+        trajectory.addComponent(insertion);
+
+        return {
+            trajectory: trajectory,
+            ejectionDeltaV: ejectionDeltaV,
+            insertionDeltaV: insertionDeltaV,
+        };
+    }
+
+    static getSoiEdgePositionAndTime(velInf, normal, rPer, rInf, mu, direction) {
+        const sma = 1 / (2 / rInf - velInf.quadrance / mu);
+        const ecc = 1 - rPer / sma;
+        const trueAnomaly = direction * Math.acos((sma * (1 - ecc*ecc) / rInf - 1) / ecc);
+        const flightPathAngle = Math.atan(ecc * Math.sin(trueAnomaly) / (sma * (1 - ecc*ecc) / rInf));
+        const position = (new Quaternion(normal, flightPathAngle - Math.PI / 2)).rotate_(velInf.unit().mul_(rInf));
+
+        const H = this.getEccentricAnomalyByTrueAnomaly(trueAnomaly, ecc);
+        const time = (ecc > 1)
+            ? (ecc * Math.sinh(H) - H) / Math.sqrt(mu / sma / sma / Math.abs(sma))
+            : (H - ecc * Math.sin(H)) / Math.sqrt(mu / sma / sma / sma);
+
+        return [position, Math.abs(time)];
+    }
+
     static solve(state1, state2, startEpoch, flightTime, mu) {
         const maxError = 1;
         const maxSteps = 30;
@@ -125,8 +272,8 @@ export default class LambertSolver
                 10000, 1, maxError, maxSteps
             );
 
-            if (y === false) {
-                return false;
+            if (y === null) {
+                return null;
             }
 
             const x0 = -(r2 + r1) / 2 / E;
@@ -153,6 +300,10 @@ export default class LambertSolver
                 },
                 r1, 10, maxError, maxSteps
             );
+
+            if (sma === false) {
+                return null;
+            }
 
             if (sma > 0) {
                 sma = -sma;
@@ -217,11 +368,15 @@ export default class LambertSolver
     }
 
     static getEccentricAnomalyByTrueAnomaly(ta, ecc) {
-        const cos = Math.cos(ta);
-        return getAngleBySinCos(
-            Math.sqrt(1 - ecc * ecc) * Math.sin(ta) / (1 + ecc * cos),
-            (ecc + cos) / (1 + ecc * cos)
-        );
+        if (ecc < 1) {
+            const cos = Math.cos(ta);
+            return getAngleBySinCos(
+                Math.sqrt(1 - ecc * ecc) * Math.sin(ta) / (1 + ecc * cos),
+                (ecc + cos) / (1 + ecc * cos)
+            );
+        } else {
+            return 2 * Math.atanh(Math.tan(ta / 2) / Math.sqrt((ecc + 1) / (ecc - 1)));
+        }
     }
 
 }
