@@ -15,6 +15,13 @@ export default class VisualTrajectoryModelAbstract extends VisualModelAbstract
             new THREE.LineBasicMaterial({vertexColors: THREE.VertexColors})
         ));
 
+        this.point = new THREE.Mesh(
+            new THREE.SphereGeometry(1, 8, 8),
+            new THREE.MeshBasicMaterial({color: color})
+        );
+        this.scene.add(this.point);
+        this.pointSize = 3;
+
         this.threeObj.userData = {trajectory: trajectory};
         sim.selection.addSelectableObject(this.threeObj);
     }
@@ -32,6 +39,20 @@ export default class VisualTrajectoryModelAbstract extends VisualModelAbstract
                 curColor.multiplyScalar(mult)
             );
         }
+    }
+
+    render(epoch) {
+        const pos = this.trajectory.getPositionByEpoch(epoch);
+
+        if (!pos) {
+            return;
+        }
+
+        this.point.position.copy(sim.getVisualCoords(pos));
+        const scaleKoeff = this.pointSize * this.point.position.length() * sim.raycaster.getPixelAngleSize();
+        this.point.scale.x = scaleKoeff;
+        this.point.scale.y = scaleKoeff;
+        this.point.scale.z = scaleKoeff;
     }
 
     select() {
