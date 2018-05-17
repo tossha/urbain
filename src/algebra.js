@@ -425,6 +425,11 @@ export function newtonSolve(func, start, d, maxError, maxSteps) {
         const v1 = func(val);
         const v2 = func(val + d);
         const diff = (v2 - v1) / d;
+
+        if (v1 === null || v2 === null) {
+            return null;
+        }
+
         error = Math.abs(v1);
         val -= v1 / diff;
         step += 1;

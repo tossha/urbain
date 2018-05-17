@@ -2,6 +2,7 @@ import spice
 import json
 import math
 import kepler
+from math import pi
 
 spice.loadKernel('kernels/de430.bsp')
 spice.loadKernel('naif0012.tls')
@@ -1470,8 +1471,8 @@ def getBodyData(body, type, soi, name, color, texture, parent, pairing, etFrom, 
 		print(len(trajectory['data']['elementsArray']))
 	
 	objectData = {
-        'id': body,
-        'type': type,
+		'id': body,
+		'type': type,
 		'parentSoi': parent,
 		'name': name,
 		'trajectory': trajectory

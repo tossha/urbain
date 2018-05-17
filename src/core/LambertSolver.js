@@ -89,7 +89,58 @@ export default class LambertSolver
         return this.getDeltaV(state1, state2, transferOrbit, startEpoch, startEpoch + flightTime);
     }
 
+    static findBestTransfer(originObject, targetObject, rPer1, rPer2, departureTime, flightTimeMin, flightTimeMax) {
+        const d = (flightTimeMax - flightTimeMin) * 1e-6;
+        const getDiff = (flightTime) => {
+            if (flightTime < flightTimeMin) {
+                return null;
+            }
+            if (flightTime > flightTimeMax) {
+                return null;
+            }
+            const v1 = this.solveFullTransfer(originObject, targetObject, rPer1, rPer2, departureTime, flightTime - d/2);
+            const v2 = this.solveFullTransfer(originObject, targetObject, rPer1, rPer2, departureTime, flightTime + d/2);
+
+            if (v1 === null || v2 === null) {
+                return null;
+            }
+
+            return (v2.totalDeltaV - v1.totalDeltaV) / d;
+        };
+
+        const stepCount = 50;
+        const step = (flightTimeMax - flightTimeMin) / (stepCount - 1);
+
+        let minDeltaV = 1e100;
+        let bestFlightTime;
+
+        for (let flightTime = flightTimeMin; flightTime <= flightTimeMax; flightTime += step) {
+            const transfer = this.solveFullTransfer(originObject, targetObject, rPer1, rPer2, departureTime, flightTime);
+            if (transfer === null) {
+                continue;
+            }
+            const deltaV = transfer.totalDeltaV;
+            // console.log(flightTime, deltaV);
+            if (deltaV < minDeltaV) {
+                bestFlightTime = flightTime;
+                minDeltaV = deltaV;
+            }
+        }
+
+        bestFlightTime = newtonSolve(getDiff, bestFlightTime, step * 1e-3, 1e-6, 10);
+
+        if (bestFlightTime === null) {
+            return {totalDeltaV: null};
+        }
+
+        return this.solveFullTransfer(originObject, targetObject, rPer1, rPer2, departureTime, bestFlightTime);
+    }
+
     static solveFullTransfer(originObject, targetObject, rPer1, rPer2, departureTime, flightTime) {
+        if (flightTime <= 0) {
+            return null;
+        }
+
         const parentObject = sim.starSystem.getCommonParentObject(originObject.id, targetObject.id, departureTime, departureTime + flightTime);
 
         if (!(parentObject instanceof Body)) {
@@ -109,10 +160,22 @@ export default class LambertSolver
         let state1;
         let state2;
 
-        const rfOrigin = sim.starSystem.getReferenceFrame(ReferenceFrameFactory.buildId(originObject.id, ReferenceFrame.INERTIAL_BODY_EQUATORIAL));
-        const rfTarget = sim.starSystem.getReferenceFrame(ReferenceFrameFactory.buildId(targetObject.id, ReferenceFrame.INERTIAL_BODY_EQUATORIAL));
-        const originSoi = originObject.getSoiRadius(departureTime);
-        const targetSoi = targetObject.getSoiRadius(departureTime + flightTime);
+        let calcOriginSoi = originObject instanceof Body;
+        let calcTargetSoi = targetObject instanceof Body;
+
+        let rfOrigin;
+        let rfTarget;
+        let originSoi;
+        let targetSoi;
+
+        if (calcOriginSoi) {
+            rfOrigin = sim.starSystem.getReferenceFrame(ReferenceFrameFactory.buildId(originObject.id, ReferenceFrame.INERTIAL_BODY_EQUATORIAL));
+            originSoi = originObject.getSoiRadius(departureTime);
+        }
+        if (calcTargetSoi) {
+            targetSoi = targetObject.getSoiRadius(departureTime + flightTime);
+            rfTarget = sim.starSystem.getReferenceFrame(ReferenceFrameFactory.buildId(targetObject.id, ReferenceFrame.INERTIAL_BODY_EQUATORIAL));
+        }
 
         let ejectionTime = 0;
         let insertionTime = 0;
@@ -130,10 +193,14 @@ export default class LambertSolver
             insertionSoiEpoch = departureTime + flightTime - insertionTime;
 
             state1 = originObject.trajectory.getStateByEpoch(ejectionSoiEpoch, rfMain);
-            state1._position = rfOrigin.transformPositionByEpoch(ejectionSoiEpoch, ejectionPosShift, rfMain);
+            if (calcOriginSoi) {
+                state1._position = rfOrigin.transformPositionByEpoch(ejectionSoiEpoch, ejectionPosShift, rfMain);
+            }
 
             state2 = targetObject.trajectory.getStateByEpoch(insertionSoiEpoch, rfMain);
-            state2._position = rfTarget.transformPositionByEpoch(insertionSoiEpoch, insertionPosShift, rfMain);
+            if (calcTargetSoi) {
+                state2._position = rfTarget.transformPositionByEpoch(insertionSoiEpoch, insertionPosShift, rfMain);
+            }
 
             transferKO = this.solve(state1, state2, ejectionSoiEpoch, insertionSoiEpoch - ejectionSoiEpoch, mu);
             if (transferKO === null) {
@@ -142,34 +209,43 @@ export default class LambertSolver
 
             steps++;
 
-            ejectionVelInf  = transferKO.getStateByEpoch(ejectionSoiEpoch)._velocity.sub_(state1._velocity);
-            insertionVelInf = transferKO.getStateByEpoch(insertionSoiEpoch)._velocity.sub_(state2._velocity);
+            let ejectionPosTime = [new Vector(3), 0];
+            let insertionPosTime = [new Vector(3), 0];
 
-            const ejectionNormal  = state1._position.cross(ejectionVelInf);
-            const insertionNormal = state2._position.cross(insertionVelInf);
+            if (calcOriginSoi) {
+                ejectionVelInf = transferKO.getStateByEpoch(ejectionSoiEpoch)._velocity.sub_(state1._velocity);
+                const ejectionNormal  = state1._position.cross(ejectionVelInf);
+                ejectionPosTime = this.getSoiEdgePositionAndTime(
+                    rfMain.rotateVectorByEpoch(ejectionSoiEpoch, ejectionVelInf, rfOrigin),
+                    rfMain.rotateVectorByEpoch(ejectionSoiEpoch, ejectionNormal, rfOrigin),
+                    rPer1,
+                    originSoi,
+                    originObject.physicalModel.mu,
+                    1
+                );
+                ejectionTime = ejectionPosTime[1];
+            }
 
-            const ejectionPosTime = this.getSoiEdgePositionAndTime(
-                rfMain.rotateVectorByEpoch(ejectionSoiEpoch, ejectionVelInf, rfOrigin),
-                rfMain.rotateVectorByEpoch(ejectionSoiEpoch, ejectionNormal, rfOrigin),
-                rPer1,
-                originSoi,
-                originObject.physicalModel.mu,
-                1
-            );
+            if (calcTargetSoi) {
+                insertionVelInf = transferKO.getStateByEpoch(insertionSoiEpoch)._velocity.sub_(state2._velocity);
+                const insertionNormal = state2._position.cross(insertionVelInf);
+                insertionPosTime = this.getSoiEdgePositionAndTime(
+                    rfMain.rotateVectorByEpoch(insertionSoiEpoch, insertionVelInf, rfTarget),
+                    rfMain.rotateVectorByEpoch(insertionSoiEpoch, insertionNormal, rfTarget),
+                    rPer2,
+                    targetSoi,
+                    targetObject.physicalModel.mu,
+                    -1
+                );
+                insertionTime = insertionPosTime[1];
+            }
 
-            const insertionPosTime = this.getSoiEdgePositionAndTime(
-                rfMain.rotateVectorByEpoch(insertionSoiEpoch, insertionVelInf, rfTarget),
-                rfMain.rotateVectorByEpoch(insertionSoiEpoch, insertionNormal, rfTarget),
-                rPer2,
-                targetSoi,
-                targetObject.physicalModel.mu,
-                -1
-            );
-
-            ejectionTime = ejectionPosTime[1];
-            insertionTime = insertionPosTime[1];
-
-            if (steps > 10 || (ejectionPosShift.sub(ejectionPosTime[0]).mag < 10 && insertionPosShift.sub(insertionPosTime[0]).mag < 10)) {
+            if (steps > 10
+                || (
+                    (!calcOriginSoi || ejectionPosShift.sub(ejectionPosTime[0]).mag < 10)
+                    && (!calcTargetSoi || insertionPosShift.sub(insertionPosTime[0]).mag < 10)
+                )
+            ) {
                 ejectionPosShift = ejectionPosTime[0];
                 insertionPosShift = insertionPosTime[0];
                 break;
@@ -179,41 +255,50 @@ export default class LambertSolver
             insertionPosShift = insertionPosTime[0];
         }
 
-        const ejectionKO = KeplerianObject.createFromState(
-            new StateVector(ejectionPosShift, rfMain.rotateVectorByEpoch(ejectionSoiEpoch, ejectionVelInf, rfOrigin)),
-            originObject.physicalModel.mu,
-            departureTime + ejectionTime
-        );
-        const ejectionDeltaV = ejectionKO.getPeriapsisSpeed() - Math.sqrt(originObject.physicalModel.mu / ejectionKO.getPeriapsisRadius());
-        const ejection = new TrajectoryKeplerianBasic(rfOrigin.id, ejectionKO);
-        ejection.minEpoch = departureTime;
-        ejection.maxEpoch = departureTime + ejectionTime;
-
-
-        const insertionKO = KeplerianObject.createFromState(
-            new StateVector(insertionPosShift, rfMain.rotateVectorByEpoch(insertionSoiEpoch, insertionVelInf, rfTarget)),
-            targetObject.physicalModel.mu,
-            departureTime + flightTime - insertionTime
-        );
-        const insertionDeltaV = insertionKO.getPeriapsisSpeed() - Math.sqrt(targetObject.physicalModel.mu / insertionKO.getPeriapsisRadius());
-        const insertion = new TrajectoryKeplerianBasic(rfTarget.id, insertionKO);
-        insertion.minEpoch = departureTime + flightTime - insertionTime;
-        insertion.maxEpoch = departureTime + flightTime;
-
+        let ejectionDeltaV = 0;
+        let insertionDeltaV = 0;
+        let trajectory = new TrajectoryComposite();
 
         const transfer = new TrajectoryKeplerianBasic(rfMainId, transferKO);
         transfer.minEpoch = departureTime + ejectionTime;
         transfer.maxEpoch = departureTime + flightTime - insertionTime;
-
-        let trajectory = new TrajectoryComposite();
-        trajectory.addComponent(ejection);
         trajectory.addComponent(transfer);
-        trajectory.addComponent(insertion);
+
+        if (calcOriginSoi) {
+            const ejectionKO = KeplerianObject.createFromState(
+                new StateVector(ejectionPosShift, rfMain.rotateVectorByEpoch(ejectionSoiEpoch, ejectionVelInf, rfOrigin)),
+                originObject.physicalModel.mu,
+                departureTime + ejectionTime
+            );
+            ejectionDeltaV = ejectionKO.getPeriapsisSpeed() - Math.sqrt(originObject.physicalModel.mu / ejectionKO.getPeriapsisRadius());
+            const ejection = new TrajectoryKeplerianBasic(rfOrigin.id, ejectionKO);
+            ejection.minEpoch = departureTime;
+            ejection.maxEpoch = departureTime + ejectionTime;
+            trajectory.addComponent(ejection);
+        } else {
+            ejectionDeltaV = state1.velocity.sub(transferKO.getStateByEpoch(departureTime)._velocity).mag;
+        }
+
+        if (calcTargetSoi) {
+            const insertionKO = KeplerianObject.createFromState(
+                new StateVector(insertionPosShift, rfMain.rotateVectorByEpoch(insertionSoiEpoch, insertionVelInf, rfTarget)),
+                targetObject.physicalModel.mu,
+                departureTime + flightTime - insertionTime
+            );
+            insertionDeltaV = insertionKO.getPeriapsisSpeed() - Math.sqrt(targetObject.physicalModel.mu / insertionKO.getPeriapsisRadius());
+            const insertion = new TrajectoryKeplerianBasic(rfTarget.id, insertionKO);
+            insertion.minEpoch = departureTime + flightTime - insertionTime;
+            insertion.maxEpoch = departureTime + flightTime;
+            trajectory.addComponent(insertion);
+        } else {
+            insertionDeltaV = state2.velocity.sub(transferKO.getStateByEpoch(departureTime + flightTime)._velocity).mag;
+        }
 
         return {
             trajectory: trajectory,
             ejectionDeltaV: ejectionDeltaV,
             insertionDeltaV: insertionDeltaV,
+            totalDeltaV: ejectionDeltaV + insertionDeltaV,
         };
     }
 
@@ -301,7 +386,7 @@ export default class LambertSolver
                 r1, 10, maxError, maxSteps
             );
 
-            if (sma === false) {
+            if (sma === null) {
                 return null;
             }
 

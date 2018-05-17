@@ -12,12 +12,13 @@ spice.loadKernel('pck00010.tpc')
 spice.loadKernel('gm_de431.tpc')
 
 # spice.loadKernel('kernels/spacecraft/voyager/voyager_1.ST+1991_a54418u.merged.bsp')
-
 # spice.loadKernel('kernels/spacecraft/voyager/voyager_2.ST+1992_m05208u.merged.bsp')
 
-spice.loadKernel('kernels/spacecraft/lro/lrorg_2009169_2010001_v01.bsp')
-spice.loadKernel('kernels/spacecraft/lro/lroevnt_2009173_2009180_v01.bes')
-spice.loadKernel('kernels/spacecraft/lro/de421.bsp')
+# spice.loadKernel('kernels/spacecraft/lro/lrorg_2009169_2010001_v01.bsp')
+# spice.loadKernel('kernels/spacecraft/lro/lroevnt_2009173_2009180_v01.bes')
+# spice.loadKernel('kernels/spacecraft/lro/de421.bsp')
+
+spice.loadKernel('kernels/spacecraft/tesla/tesla1.bsp')
 
 TWO_PI = 2 * math.pi
 
@@ -82,9 +83,9 @@ def approximateOrbit(object1, object2, epoch):
 		False
 	);
 
-def getStateFromSpice(parent, body, epoch):
+def getStateFromSpice(parent, body, epoch, referenceFrame = 'ECLIPJ2000'):
 	global linearPoints
-	state = list(spice.spkezr(body, epoch, 'ECLIPJ2000', 'NONE', parent)[0])
+	state = list(spice.spkezr(body, epoch, referenceFrame, 'NONE', parent)[0])
 	velocity = kepler.Vector3(state[3], state[4], state[5])
 
 	for record in linearPoints:
@@ -511,38 +512,29 @@ lroRendering = {
 	}
 }
 
+
+teslaTraj = (
+	{
+		'parent': 	'399',
+		'from': 	'2018 FEB 07 02:00:00.000',
+		'to': 		'2018 FEB 12 02:00:00.000',
+		'error': 	30,
+		'step':     600,
+		'rendering': {
+			'color': 'yellow',
+			'pointArrayModel': {
+				'showAhead': False,
+				'showBehind': True,
+				'trailPeriod': 3600 * 5,
+				'referenceFrame': 39901000,
+			}
+		}
+	},
+)
+
 # createSpacecraftFile('voyager1.json', '-31', 'Voyager 1', voyagerRendering, voyager1traj)
 # createSpacecraftFile('voyager2.json', '-32', 'Voyager 2', voyagerRendering, voyager2traj)
 
-# handleManeuvers('-85', '301')
-# print(getOrbitFromSpice('301', '-85', 299024951.06256104, 4902.80006616))
-# print(getOrbitFromSpice('301', '-85', 299024951.06256104, spice.bodvrd('301', "GM", 1)[1][0]))
+# createSpacecraftFile('./../dist/spacecraft/lro.json', '-85', 'LRO', False, lroTraj)
 
-# prevVel = False
-# x = []
-# y1 = []
-# y2 = []
-# y3 = []
-# et = 299110000
-# while et < 299112000:
-# 	state1 = getStateFromSpice('301', '-85', et)
-# 	state2 = list(spice.spkezr('-85', et, 'ECLIPJ2000', 'NONE', '301')[0])
-# 	vel2 = kepler.Vector3(state2[3], state2[4], state2[5]).mag
-# 	# if prevVel != False:
-# 	x.append(et)
-# 		# y3.append(vel2 - prevVel)
-# 	prevVel = vel2
-# 	y1.append(state1.velocity.mag)
-# 	y2.append(vel2)
-# 	et += 1
-
-# if len(y1):
-# 	plt.plot(x,y1,label='my')
-# if len(y2):
-# 	plt.plot(x,y2,label='DE')
-# if len(y3):
-# 	plt.plot(x,y3)
-
-# plt.legend()
-# plt.show()
-createSpacecraftFile('./../dist/spacecraft/lro.json', '-85', 'LRO', False, lroTraj)
+createSpacecraftFile('./../dist/spacecraft/tesla.json', '-10000001', 'TeslaRoadster', False, teslaTraj)
