@@ -65,6 +65,8 @@ export default class VisualTrajectoryModelPointArray extends VisualTrajectoryMod
 
         this.threeObj.position.copy(sim.getVisualCoords(originPos));
         this.threeObj.quaternion.copy(this.referenceFrame.getQuaternionByEpoch(epoch).toThreejs());
+
+        super.render(epoch);
     }
 
     findPointByEpoch(epoch) {

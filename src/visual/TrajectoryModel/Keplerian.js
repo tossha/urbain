@@ -26,6 +26,7 @@ export default class VisualTrajectoryModelKeplerian extends VisualTrajectoryMode
         } else {
             this.renderHyperbola(keplerianObject, epoch);
         }
+        super.render(epoch);
     }
 
     renderHyperbola(traj, epoch) {
