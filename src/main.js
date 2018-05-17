@@ -1,4 +1,10 @@
 import Simulation from "./core/Simulation";
+import StarSystemLoader from "./interface/StarSystemLoader";
+
+window.loadTLE = function(noradId) {
+    const path = Math.floor(noradId / 1000);
+    StarSystemLoader.loadObjectByUrl(sim.starSystem, './spacecraft/' + path + '/' + noradId + '.json.gz');
+};
 
 function init() {
     let datGui = new dat.GUI();

@@ -47,8 +47,8 @@ export default class UIPanelLambert extends UIPanel
         const solverResult = LambertSolver.solveFullTransfer(
             origin,
             target,
-            origin.physicalModel.radius + 200,
-            target.physicalModel.radius + 200,
+            origin.physicalModel ? origin.physicalModel.radius + 200 : 0,
+            target.physicalModel ? target.physicalModel.radius + 200 : 0,
             this.departureTime,
             this.transferTime
         );
@@ -57,15 +57,19 @@ export default class UIPanelLambert extends UIPanel
 
         if (this.visualModel) {
             this.visualModel.drop();
-            this.visualModel2.drop();
-            this.visualModel3.drop();
+            this.visualModel2 && this.visualModel2.drop();
+            this.visualModel3 && this.visualModel3.drop();
             this.vector1.drop();
             this.vector2.drop();
         }
 
-        this.visualModel = new VisualTrajectoryModelKeplerian(transferTrajectory.components[1], 'yellow');
-        this.visualModel2 = new VisualTrajectoryModelKeplerian(transferTrajectory.components[0], 'red');
-        this.visualModel3 = new VisualTrajectoryModelKeplerian(transferTrajectory.components[2], 'red');
+        this.visualModel = new VisualTrajectoryModelKeplerian(transferTrajectory.components[0], 'yellow');
+        if (transferTrajectory.components[1]) {
+            this.visualModel2 = new VisualTrajectoryModelKeplerian(transferTrajectory.components[1], 'red');
+        }
+        if (transferTrajectory.components[2]) {
+            this.visualModel3 = new VisualTrajectoryModelKeplerian(transferTrajectory.components[2], 'red');
+        }
         this.vector1 = new VisualVector(state1.position, referenceFrameId);
         this.vector2 = new VisualVector(state2.position, referenceFrameId);
 
