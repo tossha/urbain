@@ -57,8 +57,8 @@ export default class Simulation
         StarSystemLoader.loadObjectByUrl(this.starSystem, './spacecraft/voyager1.json');
         StarSystemLoader.loadObjectByUrl(this.starSystem, './spacecraft/voyager2.json');
         StarSystemLoader.loadObjectByUrl(this.starSystem, './spacecraft/lro.json');
-        StarSystemLoader.loadObjectByUrl(this.starSystem, './spacecraft/ISS.json');
-        StarSystemLoader.loadObjectByUrl(this.starSystem, './spacecraft/hubble.json');
+        StarSystemLoader.loadTLE(this.starSystem, 25544); // ISS
+        StarSystemLoader.loadTLE(this.starSystem, 20580); // Hubble
     }
 
     get currentEpoch() {

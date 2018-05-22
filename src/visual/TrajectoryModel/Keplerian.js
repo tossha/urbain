@@ -6,6 +6,7 @@ export default class VisualTrajectoryModelKeplerian extends VisualTrajectoryMode
 {
     render(epoch)
     {
+        super.render(epoch);
         if (this.trajectory.minEpoch !== null && this.trajectory.minEpoch !== false) {
             if (epoch < this.trajectory.minEpoch) {
                 this.threeObj.visible = false;
@@ -26,7 +27,6 @@ export default class VisualTrajectoryModelKeplerian extends VisualTrajectoryMode
         } else {
             this.renderHyperbola(keplerianObject, epoch);
         }
-        super.render(epoch);
     }
 
     renderHyperbola(traj, epoch) {

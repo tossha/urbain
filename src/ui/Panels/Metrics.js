@@ -2,7 +2,7 @@
 import UIPanel from "../Panel";
 import {Events} from "../../core/Events";
 import UIPanelVector from "./Vector";
-import {presentNumberWithSuffix, rad2deg} from "../../algebra";
+import {deg2rad, presentNumberWithSuffix, rad2deg} from "../../algebra";
 
 export default class UIPanelMetrics extends UIPanel
 {
@@ -37,17 +37,44 @@ export default class UIPanelMetrics extends UIPanel
 
     render(event) {
         const selectedObject = this.selection.getSelectedObject();
+        let parent = null;
         if (!selectedObject) {
             return;
         }
 
         const referenceFrame = selectedObject.getReferenceFrameByEpoch(event.detail.epoch);
         if (referenceFrame) {
-            this.jqDom.find('#relativeTo').html(sim.starSystem.getObject(referenceFrame.originId).name);
+            parent = sim.starSystem.getObject(referenceFrame.originId);
+            this.jqDom.find('#relativeTo').html(parent.name);
         }
 
+        this.updateMain     (selectedObject, event.detail.epoch, parent);
         this.updateCartesian(selectedObject, event.detail.epoch);
         this.updateKeplerian(selectedObject, event.detail.epoch);
+    }
+
+    updateMain(selectedObject, epoch, parent) {
+        const keplerianObject = selectedObject.getKeplerianObjectByEpoch(epoch);
+        const sma = keplerianObject.sma;
+        const per = sma * (1 - keplerianObject.e);
+        const apo = sma * (1 + keplerianObject.e);
+        const surfaceAlt = parent.physicalModel ? parent.physicalModel.radius : 0;
+        const state = selectedObject.getStateInOwnFrameByEpoch(epoch);
+
+        this.jqDom.find('#elements-orbit-alt' ).html(
+            '' + (per - surfaceAlt).toPrecision(this.precision)
+            + ' x ' + (apo - surfaceAlt).toPrecision(this.precision)
+        );
+
+        this.jqDom.find('#elements-orbit-avg' ).html(''   + (sma - surfaceAlt).toPrecision(this.precision));
+        this.jqDom.find('#elements-alt' ).html(''   + (state.position.mag - surfaceAlt).toPrecision(this.precision));
+        this.jqDom.find('#elements-speed' ).html('' + (state.velocity.mag * 1000).toPrecision(this.precision));
+
+        if (parent.physicalModel.j2 && parent.physicalModel.j2) {
+            this.jqDom.find('#elements-precession').html('' + (
+                rad2deg(keplerianObject.getNodalPrecessionRate(parent.physicalModel.eqRadius, parent.physicalModel.j2) * 86400)
+            ).toPrecision(this.precision));
+        }
     }
 
     updateCartesian(selectedObject, epoch) {
