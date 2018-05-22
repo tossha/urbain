@@ -110,9 +110,12 @@ export default class KeplerianObject
         return 2 * Math.PI * Math.sqrt(this._sma * this._sma * this._sma / this._mu);
     }
 
+    getNodalPrecessionRate(r, j2) {
+        return -3/2 * r * r * j2 * Math.cos(this.inc) * this.meanMotion / Math.pow(this.sma * (1 - this.e * this.e), 2);
+    }
+
     getNodalPrecessionByEpoch(r, j2, epoch) {
-        const rate = -3/2 * r * r * j2 * Math.cos(this.inc) * this.meanMotion / Math.pow(this.sma * (1 - this.e * this.e), 2);
-        return rate * (epoch - this._epoch);
+        return (epoch - this._epoch) * this.getNodalPrecessionRate(r, j2);
     }
 
     addPrecession(r, j2, epoch) {

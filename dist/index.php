@@ -69,6 +69,44 @@ require 'functions.php';
     <table width="100%" style="border-bottom: blue solid 1px" class="panelContent" data-panel-name="metrics">
         <tr>
             <td colspan="3">
+                Main
+            </td>
+        </tr>
+        <tr>
+            <td style="width: 60px">Orbit</td>
+            <td id="elements-orbit-alt" align="right"></td>
+            <td style="width: 60px">km</td>
+        </tr>
+        <tr>
+            <td style="width: 60px">Avg height</td>
+            <td id="elements-orbit-avg" align="right"></td>
+            <td style="width: 60px">km</td>
+        </tr>
+        <tr>
+            <td style="width: 60px">Altitude</td>
+            <td id="elements-alt" align="right"></td>
+            <td style="width: 60px">km</td>
+        </tr>
+        <tr>
+            <td style="width: 60px">Speed</td>
+            <td id="elements-speed" align="right"></td>
+            <td style="width: 60px">m/s</td>
+        </tr>
+        <tr>
+            <td style="width: 60px">Precession</td>
+            <td id="elements-precession" align="right"></td>
+            <td style="width: 60px">deg/day</td>
+        </tr>
+        <tr id="row-node-time" style="display: none">
+            <td style="width: 60px">Node local time</td>
+            <td id="elements-node-time" align="right"></td>
+            <td style="width: 60px"></td>
+        </tr>
+    </table>
+
+    <table width="100%" style="border-bottom: blue solid 1px" class="panelContent" data-panel-name="metrics">
+        <tr>
+            <td colspan="3">
                 Keplerian
             </td>
         </tr>

@@ -1896,9 +1896,12 @@ class KeplerianObject
         return 2 * Math.PI * Math.sqrt(this._sma * this._sma * this._sma / this._mu);
     }
 
+    getNodalPrecessionRate(r, j2) {
+        return -3/2 * r * r * j2 * Math.cos(this.inc) * this.meanMotion / Math.pow(this.sma * (1 - this.e * this.e), 2);
+    }
+
     getNodalPrecessionByEpoch(r, j2, epoch) {
-        const rate = -3/2 * r * r * j2 * Math.cos(this.inc) * this.meanMotion / Math.pow(this.sma * (1 - this.e * this.e), 2);
-        return rate * (epoch - this._epoch);
+        return (epoch - this._epoch) * this.getNodalPrecessionRate(r, j2);
     }
 
     addPrecession(r, j2, epoch) {
@@ -3428,6 +3431,11 @@ class StarSystemLoader
         });
     }
 
+    static loadTLE(starSystem, noradId) {
+        const path = Math.floor(noradId / 1000);
+        this.loadObjectByUrl(starSystem, './spacecraft/' + path + '/' + noradId + '.json.gz');
+    };
+
     static _loadObject(starSystem, config) {
         let object;
         let visualModel = null;
@@ -3478,8 +3486,7 @@ class StarSystemLoader
 
         if (config.physical) {
             physicalModel = new __WEBPACK_IMPORTED_MODULE_5__core_PhysicalBodyModel__["a" /* default */](
-                config.physical.mu,
-                config.physical.radius
+                config.physical
             );
         }
 
@@ -3880,12 +3887,27 @@ class VisualTrajectoryModelAbstract extends __WEBPACK_IMPORTED_MODULE_0__ModelAb
     }
 
     render(epoch) {
+        if (this.trajectory.minEpoch !== null && this.trajectory.minEpoch !== false) {
+            if (epoch < this.trajectory.minEpoch) {
+                this.point.visible = false;
+                return;
+            }
+        }
+        if (this.trajectory.maxEpoch !== null && this.trajectory.maxEpoch !== false) {
+            if (epoch > this.trajectory.maxEpoch) {
+                this.point.visible = false;
+                return;
+            }
+        }
+
         const pos = this.trajectory.getPositionByEpoch(epoch);
 
         if (!pos) {
+            this.point.visible = false;
             return;
         }
 
+        this.point.visible = true;
         this.point.position.copy(sim.getVisualCoords(pos));
         const scaleKoeff = this.pointSize * this.point.position.length() * sim.raycaster.getPixelAngleSize();
         this.point.scale.x = scaleKoeff;
@@ -3895,10 +3917,14 @@ class VisualTrajectoryModelAbstract extends __WEBPACK_IMPORTED_MODULE_0__ModelAb
 
     select() {
         this.color = 0xFFFFFF;
+        this.point.material.color.set(this.color);
+        this.point.material.needsUpdate = true;
     }
 
     deselect() {
         this.color = this.standardColor;
+        this.point.material.color.set(this.color);
+        this.point.material.needsUpdate = true;
     }
 
     drop() {
@@ -3926,6 +3952,7 @@ class VisualTrajectoryModelKeplerian extends __WEBPACK_IMPORTED_MODULE_0__Abstra
 {
     render(epoch)
     {
+        super.render(epoch);
         if (this.trajectory.minEpoch !== null && this.trajectory.minEpoch !== false) {
             if (epoch < this.trajectory.minEpoch) {
                 this.threeObj.visible = false;
@@ -3946,7 +3973,6 @@ class VisualTrajectoryModelKeplerian extends __WEBPACK_IMPORTED_MODULE_0__Abstra
         } else {
             this.renderHyperbola(keplerianObject, epoch);
         }
-        super.render(epoch);
     }
 
     renderHyperbola(traj, epoch) {
@@ -4248,8 +4274,7 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 
 
 window.loadTLE = function(noradId) {
-    const path = Math.floor(noradId / 1000);
-    __WEBPACK_IMPORTED_MODULE_1__interface_StarSystemLoader__["a" /* default */].loadObjectByUrl(sim.starSystem, './spacecraft/' + path + '/' + noradId + '.json.gz');
+    __WEBPACK_IMPORTED_MODULE_1__interface_StarSystemLoader__["a" /* default */].loadTLE(sim.starSystem, noradId);
 };
 
 function init() {
@@ -8599,8 +8624,8 @@ class Simulation
         __WEBPACK_IMPORTED_MODULE_5__interface_StarSystemLoader__["a" /* default */].loadObjectByUrl(this.starSystem, './spacecraft/voyager1.json');
         __WEBPACK_IMPORTED_MODULE_5__interface_StarSystemLoader__["a" /* default */].loadObjectByUrl(this.starSystem, './spacecraft/voyager2.json');
         __WEBPACK_IMPORTED_MODULE_5__interface_StarSystemLoader__["a" /* default */].loadObjectByUrl(this.starSystem, './spacecraft/lro.json');
-        __WEBPACK_IMPORTED_MODULE_5__interface_StarSystemLoader__["a" /* default */].loadObjectByUrl(this.starSystem, './spacecraft/ISS.json');
-        __WEBPACK_IMPORTED_MODULE_5__interface_StarSystemLoader__["a" /* default */].loadObjectByUrl(this.starSystem, './spacecraft/hubble.json');
+        __WEBPACK_IMPORTED_MODULE_5__interface_StarSystemLoader__["a" /* default */].loadTLE(this.starSystem, 25544); // ISS
+        __WEBPACK_IMPORTED_MODULE_5__interface_StarSystemLoader__["a" /* default */].loadTLE(this.starSystem, 20580); // Hubble
     }
 
     get currentEpoch() {
@@ -8917,9 +8942,11 @@ class OrientationConstantAxis extends __WEBPACK_IMPORTED_MODULE_0__Abstract__["a
 "use strict";
 class PhysicalBodyModel
 {
-    constructor(mu, radius) {
-        this.mu     = mu;     // gravitational parameter
-        this.radius = radius;
+    constructor(config) {
+        this.mu       = config.mu;     // gravitational parameter
+        this.radius   = config.radius;
+        this.eqRadius = config.eqRadius;
+        this.j2       = config.j2 || 0;
     }
 }
 /* harmony export (immutable) */ __webpack_exports__["a"] = PhysicalBodyModel;
@@ -11041,17 +11068,44 @@ class UIPanelMetrics extends __WEBPACK_IMPORTED_MODULE_0__Panel__["a" /* default
 
     render(event) {
         const selectedObject = this.selection.getSelectedObject();
+        let parent = null;
         if (!selectedObject) {
             return;
         }
 
         const referenceFrame = selectedObject.getReferenceFrameByEpoch(event.detail.epoch);
         if (referenceFrame) {
-            this.jqDom.find('#relativeTo').html(sim.starSystem.getObject(referenceFrame.originId).name);
+            parent = sim.starSystem.getObject(referenceFrame.originId);
+            this.jqDom.find('#relativeTo').html(parent.name);
         }
 
+        this.updateMain     (selectedObject, event.detail.epoch, parent);
         this.updateCartesian(selectedObject, event.detail.epoch);
         this.updateKeplerian(selectedObject, event.detail.epoch);
+    }
+
+    updateMain(selectedObject, epoch, parent) {
+        const keplerianObject = selectedObject.getKeplerianObjectByEpoch(epoch);
+        const sma = keplerianObject.sma;
+        const per = sma * (1 - keplerianObject.e);
+        const apo = sma * (1 + keplerianObject.e);
+        const surfaceAlt = parent.physicalModel ? parent.physicalModel.radius : 0;
+        const state = selectedObject.getStateInOwnFrameByEpoch(epoch);
+
+        this.jqDom.find('#elements-orbit-alt' ).html(
+            '' + (per - surfaceAlt).toPrecision(this.precision)
+            + ' x ' + (apo - surfaceAlt).toPrecision(this.precision)
+        );
+
+        this.jqDom.find('#elements-orbit-avg' ).html(''   + (sma - surfaceAlt).toPrecision(this.precision));
+        this.jqDom.find('#elements-alt' ).html(''   + (state.position.mag - surfaceAlt).toPrecision(this.precision));
+        this.jqDom.find('#elements-speed' ).html('' + (state.velocity.mag * 1000).toPrecision(this.precision));
+
+        if (parent.physicalModel.j2 && parent.physicalModel.j2) {
+            this.jqDom.find('#elements-precession').html('' + (
+                Object(__WEBPACK_IMPORTED_MODULE_3__algebra__["j" /* rad2deg */])(keplerianObject.getNodalPrecessionRate(parent.physicalModel.eqRadius, parent.physicalModel.j2) * 86400)
+            ).toPrecision(this.precision));
+        }
     }
 
     updateCartesian(selectedObject, epoch) {

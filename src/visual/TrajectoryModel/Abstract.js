@@ -42,12 +42,27 @@ export default class VisualTrajectoryModelAbstract extends VisualModelAbstract
     }
 
     render(epoch) {
+        if (this.trajectory.minEpoch !== null && this.trajectory.minEpoch !== false) {
+            if (epoch < this.trajectory.minEpoch) {
+                this.point.visible = false;
+                return;
+            }
+        }
+        if (this.trajectory.maxEpoch !== null && this.trajectory.maxEpoch !== false) {
+            if (epoch > this.trajectory.maxEpoch) {
+                this.point.visible = false;
+                return;
+            }
+        }
+
         const pos = this.trajectory.getPositionByEpoch(epoch);
 
         if (!pos) {
+            this.point.visible = false;
             return;
         }
 
+        this.point.visible = true;
         this.point.position.copy(sim.getVisualCoords(pos));
         const scaleKoeff = this.pointSize * this.point.position.length() * sim.raycaster.getPixelAngleSize();
         this.point.scale.x = scaleKoeff;
@@ -57,10 +72,14 @@ export default class VisualTrajectoryModelAbstract extends VisualModelAbstract
 
     select() {
         this.color = 0xFFFFFF;
+        this.point.material.color.set(this.color);
+        this.point.material.needsUpdate = true;
     }
 
     deselect() {
         this.color = this.standardColor;
+        this.point.material.color.set(this.color);
+        this.point.material.needsUpdate = true;
     }
 
     drop() {

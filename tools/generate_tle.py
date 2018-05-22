@@ -5,6 +5,7 @@ import sys
 import pymysql
 import datetime
 from numpy import deg2rad
+from subprocess import check_output
 
 from matplotlib import pyplot as plt
 
