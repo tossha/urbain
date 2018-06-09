@@ -4,7 +4,7 @@ import KeplerianObject from "../KeplerianObject";
 
 export default class TrajectoryAbstract
 {
-    constructor(referenceFrameId) {
+    constructor() {
         this.minEpoch = null;
         this.maxEpoch = null;
 
@@ -16,7 +16,10 @@ export default class TrajectoryAbstract
 
         this.parent = null;
 
-        this.referenceFrameId = referenceFrameId;
+        this.referenceFrame = null;
+    }
+
+    setReferenceFrame(referenceFrameId) {
         this.referenceFrame = sim.starSystem.getReferenceFrame(referenceFrameId);
     }
 
@@ -62,31 +65,41 @@ export default class TrajectoryAbstract
         return new StateVector();
     }
 
-    getStateByEpoch(epoch, referenceFrame) {
+    getStateByEpoch(epoch, referenceFrameOrId) {
         let state;
 
-        if (referenceFrame === undefined) {
-            referenceFrame = RF_BASE;
+        if (this.referenceFrame === null) {
+            return null;
         }
 
-        if (referenceFrame === RF_BASE && epoch === this.cachedEpoch) {
+        if (referenceFrameOrId === undefined) {
+            referenceFrameOrId = RF_BASE;
+        }
+
+        if (referenceFrameOrId === RF_BASE && epoch === this.cachedEpoch) {
             state = this.cachedState;
         } else {
             state = this.getStateInOwnFrameByEpoch(epoch);
-            if (referenceFrame === RF_BASE && epoch === sim.currentEpoch) {
+            if (referenceFrameOrId === RF_BASE && epoch === sim.currentEpoch) {
                 this.cachedState = state;
                 this.cachedEpoch = epoch;
             }
         }
 
-        return this.referenceFrame.transformStateVectorByEpoch(epoch, state, referenceFrame);
+        if (state === null) {
+            return null;
+        }
+
+        return this.referenceFrame.transformStateVectorByEpoch(epoch, state, referenceFrameOrId);
     }
 
-    getPositionByEpoch(epoch, referenceFrame) {
-        return this.getStateByEpoch(epoch, referenceFrame).position;
+    getPositionByEpoch(epoch, referenceFrameOrId) {
+        const state = this.getStateByEpoch(epoch, referenceFrameOrId);
+        return (state !== null) ? state.position : null;
     }
 
-    getVelocityByEpoch(epoch, referenceFrame) {
-        return this.getStateByEpoch(epoch, referenceFrame).velocity;
+    getVelocityByEpoch(epoch, referenceFrameOrId) {
+        const state = this.getStateByEpoch(epoch, referenceFrameOrId);
+        return (state !== null) ? state.velocity : null;
     }
 }

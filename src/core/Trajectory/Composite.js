@@ -6,47 +6,9 @@ import TimeLine from "../../ui/TimeLine";
 export default class TrajectoryComposite extends TrajectoryAbstract
 {
     constructor() {
-        super(RF_BASE);
+        super();
         this.components = [];
         this.lastUsedTrajectory = null;
-    }
-
-    getReferenceFrameByEpoch(epoch) {
-        const traj = this._getTrajectoryByEpoch(epoch);
-        if (!traj) {
-            return null;
-        }
-        return traj.getReferenceFrameByEpoch(epoch);
-    }
-
-    getKeplerianObjectByEpoch(epoch) {
-        const traj = this._getTrajectoryByEpoch(epoch);
-        if (!traj) {
-            return null;
-        }
-        return traj.getKeplerianObjectByEpoch(epoch);
-    }
-
-    addComponent(trajectory) {
-        this.components.push(trajectory);
-        trajectory.setParent(this);
-
-        if (this.minEpoch === null
-            || (trajectory.minEpoch !== null
-                && trajectory.minEpoch !== false
-                && this.minEpoch > trajectory.minEpoch
-            )
-        ) {
-            this.minEpoch = trajectory.minEpoch;
-        }
-        if (this.maxEpoch === null
-            || (trajectory.maxEpoch !== null
-                && trajectory.maxEpoch !== false
-                && this.maxEpoch < trajectory.maxEpoch
-            )
-        ) {
-            this.maxEpoch = trajectory.maxEpoch;
-        }
     }
 
     select() {
@@ -63,12 +25,19 @@ export default class TrajectoryComposite extends TrajectoryAbstract
         this.components.map(traj => traj.drop());
     }
 
-    getStateInOwnFrameByEpoch(epoch) {
-        return this._getTrajectoryByEpoch(epoch).getStateInOwnFrameByEpoch(epoch);
+    getReferenceFrameByEpoch(epoch) {
+        const traj = this._getTrajectoryByEpoch(epoch);
+        return traj ? traj.getReferenceFrameByEpoch(epoch) : null;
     }
 
-    getStateByEpoch(epoch, referenceFrame) {
-        return this._getTrajectoryByEpoch(epoch).getStateByEpoch(epoch, referenceFrame);
+    getStateInOwnFrameByEpoch(epoch) {
+        const traj = this._getTrajectoryByEpoch(epoch);
+        return traj ? traj.getStateInOwnFrameByEpoch(epoch) : null;
+    }
+
+    getStateByEpoch(epoch, referenceFrameOrId) {
+        const traj = this._getTrajectoryByEpoch(epoch);
+        return traj ? traj.getStateByEpoch(epoch, referenceFrameOrId) : null;
     }
 
     _getTrajectoryByEpoch(epoch) {
@@ -94,5 +63,27 @@ export default class TrajectoryComposite extends TrajectoryAbstract
         );
 
         return null;
+    }
+
+    addComponent(trajectory) {
+        this.components.push(trajectory);
+        trajectory.setParent(this);
+
+        if (this.minEpoch === null
+            || (trajectory.minEpoch !== null
+                && trajectory.minEpoch !== false
+                && this.minEpoch > trajectory.minEpoch
+            )
+        ) {
+            this.minEpoch = trajectory.minEpoch;
+        }
+        if (this.maxEpoch === null
+            || (trajectory.maxEpoch !== null
+                && trajectory.maxEpoch !== false
+                && this.maxEpoch < trajectory.maxEpoch
+            )
+        ) {
+            this.maxEpoch = trajectory.maxEpoch;
+        }
     }
 }

@@ -6,17 +6,17 @@ import KeplerianEditor from "../KeplerianEditor";
 export default class TrajectoryKeplerianAbstract extends TrajectoryAbstract
 {
     constructor(referenceFrameId) {
-        super(referenceFrameId);
+        super();
+        this.setReferenceFrame(referenceFrameId);
 
-        let that = this;
         this.orbitalReferenceFrame = new ReferenceFrameInertialDynamic(
             new FunctionOfEpochCustom((epoch) => {
-                return that.referenceFrame.getOriginStateByEpoch(epoch);
+                return this.referenceFrame.getOriginStateByEpoch(epoch);
             }),
             new FunctionOfEpochCustom((epoch) => {
-                return that.referenceFrame.getQuaternionByEpoch(epoch).mul_(
-                    that.getKeplerianObjectByEpoch(epoch).getOrbitalFrameQuaternion()
-                );
+                const quat = this.referenceFrame.getQuaternionByEpoch(epoch);
+                const ko = this.getKeplerianObjectByEpoch(epoch);
+                return (quat && ko) ? quat.mul_(ko.getOrbitalFrameQuaternion()) : null;
             })
         );
     }
@@ -33,14 +33,12 @@ export default class TrajectoryKeplerianAbstract extends TrajectoryAbstract
     }
 
     getPeriapsisVector(epoch) {
-        return this.getKeplerianObjectByEpoch(epoch).getPeriapsisVector();
-    }
-
-    isEditable() {
-        return false;
+        const ko = this.getKeplerianObjectByEpoch(epoch);
+        return ko ? ko.getPeriapsisVector() : null;
     }
 
     getStateInOwnFrameByEpoch(epoch) {
-        return this.getKeplerianObjectByEpoch(epoch).getStateByEpoch(epoch);
+        const ko = this.getKeplerianObjectByEpoch(epoch);
+        return ko ? ko.getStateByEpoch(epoch) : null;
     }
 }

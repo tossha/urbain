@@ -3,7 +3,8 @@ import TrajectoryAbstract from "./Abstract";
 export default class TrajectoryStateArray extends TrajectoryAbstract
 {
     constructor(referenceFrameId) {
-        super(referenceFrameId);
+        super();
+        this.setReferenceFrame(referenceFrameId);
 
         this.states = []; // array of {epoch: epoch, state: class StateVector}
         this.minEpoch = null;

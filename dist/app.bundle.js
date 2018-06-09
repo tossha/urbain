@@ -2104,6 +2104,10 @@ class KeplerianObject
     static createFromState(state, mu, epoch) {
         epoch = epoch || 0;
 
+        if (!state) {
+            return null;
+        }
+
         const pos = state.position;
         const vel = state.velocity;
 
@@ -2526,17 +2530,17 @@ class Body extends __WEBPACK_IMPORTED_MODULE_0__EphemerisObject__["a" /* default
 class TrajectoryKeplerianAbstract extends __WEBPACK_IMPORTED_MODULE_0__Abstract__["a" /* default */]
 {
     constructor(referenceFrameId) {
-        super(referenceFrameId);
+        super();
+        this.setReferenceFrame(referenceFrameId);
 
-        let that = this;
         this.orbitalReferenceFrame = new __WEBPACK_IMPORTED_MODULE_2__ReferenceFrame_InertialDynamic__["a" /* default */](
             new __WEBPACK_IMPORTED_MODULE_1__FunctionOfEpoch_Custom__["a" /* default */]((epoch) => {
-                return that.referenceFrame.getOriginStateByEpoch(epoch);
+                return this.referenceFrame.getOriginStateByEpoch(epoch);
             }),
             new __WEBPACK_IMPORTED_MODULE_1__FunctionOfEpoch_Custom__["a" /* default */]((epoch) => {
-                return that.referenceFrame.getQuaternionByEpoch(epoch).mul_(
-                    that.getKeplerianObjectByEpoch(epoch).getOrbitalFrameQuaternion()
-                );
+                const quat = this.referenceFrame.getQuaternionByEpoch(epoch);
+                const ko = this.getKeplerianObjectByEpoch(epoch);
+                return (quat && ko) ? quat.mul_(ko.getOrbitalFrameQuaternion()) : null;
             })
         );
     }
@@ -2553,15 +2557,13 @@ class TrajectoryKeplerianAbstract extends __WEBPACK_IMPORTED_MODULE_0__Abstract_
     }
 
     getPeriapsisVector(epoch) {
-        return this.getKeplerianObjectByEpoch(epoch).getPeriapsisVector();
-    }
-
-    isEditable() {
-        return false;
+        const ko = this.getKeplerianObjectByEpoch(epoch);
+        return ko ? ko.getPeriapsisVector() : null;
     }
 
     getStateInOwnFrameByEpoch(epoch) {
-        return this.getKeplerianObjectByEpoch(epoch).getStateByEpoch(epoch);
+        const ko = this.getKeplerianObjectByEpoch(epoch);
+        return ko ? ko.getStateByEpoch(epoch) : null;
     }
 }
 /* harmony export (immutable) */ __webpack_exports__["a"] = TrajectoryKeplerianAbstract;
@@ -2628,50 +2630,50 @@ class ReferenceFrameAbstract
         return new __WEBPACK_IMPORTED_MODULE_1__StateVector__["a" /* default */]();
     }
 
-    transformStateVectorByEpoch(epoch, state, destinationFrame) {
-        let destinationFrameObj = (destinationFrame instanceof ReferenceFrameAbstract)
-            ? destinationFrame
-            : sim.starSystem.getReferenceFrame(destinationFrame);
+    transformStateVectorByEpoch(epoch, state, destinationFrameOrId) {
+        let destinationFrame = (destinationFrameOrId instanceof ReferenceFrameAbstract)
+            ? destinationFrameOrId
+            : sim.starSystem.getReferenceFrame(destinationFrameOrId);
 
-        if (this === destinationFrameObj) {
+        if (this === destinationFrame) {
             return state;
         }
 
         if (this.id === __WEBPACK_IMPORTED_MODULE_2__Factory__["a" /* RF_BASE */]) {
-            return destinationFrameObj.stateVectorFromBaseReferenceFrameByEpoch(
+            return destinationFrame.stateVectorFromBaseReferenceFrameByEpoch(
                 epoch,
                 state
             );
         }
 
-        if (destinationFrameObj.id === __WEBPACK_IMPORTED_MODULE_2__Factory__["a" /* RF_BASE */]) {
+        if (destinationFrame.id === __WEBPACK_IMPORTED_MODULE_2__Factory__["a" /* RF_BASE */]) {
             return this.stateVectorToBaseReferenceFrameByEpoch(epoch, state);
         }
 
-        return destinationFrameObj.stateVectorFromBaseReferenceFrameByEpoch(
+        return destinationFrame.stateVectorFromBaseReferenceFrameByEpoch(
             epoch,
             this.stateVectorToBaseReferenceFrameByEpoch(epoch, state)
         );
     }
 
-    transformPositionByEpoch(epoch, pos, destinationFrame) {
+    transformPositionByEpoch(epoch, pos, destinationFrameOrId) {
         return this.transformStateVectorByEpoch(
             epoch,
             new __WEBPACK_IMPORTED_MODULE_1__StateVector__["a" /* default */](pos),
-            destinationFrame
+            destinationFrameOrId
         ).position;
     }
 
-    rotateVectorByEpoch(epoch, vec, destinationFrame) {
-        let destinationFrameObj = (destinationFrame instanceof ReferenceFrameAbstract)
-            ? destinationFrame
-            : sim.starSystem.getReferenceFrame(destinationFrame);
+    rotateVectorByEpoch(epoch, vec, destinationFrameOrId) {
+        let destinationFrame = (destinationFrameOrId instanceof ReferenceFrameAbstract)
+            ? destinationFrameOrId
+            : sim.starSystem.getReferenceFrame(destinationFrameOrId);
 
-        if (this === destinationFrameObj) {
+        if (this === destinationFrame) {
             return vec.copy();
         }
 
-        return destinationFrameObj.getQuaternionByEpoch(epoch).invert_().mul_(this.getQuaternionByEpoch(epoch)).rotate(vec);
+        return destinationFrame.getQuaternionByEpoch(epoch).invert_().mul_(this.getQuaternionByEpoch(epoch)).rotate(vec);
     }
 
     stateVectorFromBaseReferenceFrameByEpoch(epoch, state) {}
@@ -2694,7 +2696,7 @@ class ReferenceFrameAbstract
 
 class TrajectoryAbstract
 {
-    constructor(referenceFrameId) {
+    constructor() {
         this.minEpoch = null;
         this.maxEpoch = null;
 
@@ -2706,7 +2708,10 @@ class TrajectoryAbstract
 
         this.parent = null;
 
-        this.referenceFrameId = referenceFrameId;
+        this.referenceFrame = null;
+    }
+
+    setReferenceFrame(referenceFrameId) {
         this.referenceFrame = sim.starSystem.getReferenceFrame(referenceFrameId);
     }
 
@@ -2752,32 +2757,42 @@ class TrajectoryAbstract
         return new __WEBPACK_IMPORTED_MODULE_0__StateVector__["a" /* default */]();
     }
 
-    getStateByEpoch(epoch, referenceFrame) {
+    getStateByEpoch(epoch, referenceFrameOrId) {
         let state;
 
-        if (referenceFrame === undefined) {
-            referenceFrame = __WEBPACK_IMPORTED_MODULE_1__ReferenceFrame_Factory__["a" /* RF_BASE */];
+        if (this.referenceFrame === null) {
+            return null;
         }
 
-        if (referenceFrame === __WEBPACK_IMPORTED_MODULE_1__ReferenceFrame_Factory__["a" /* RF_BASE */] && epoch === this.cachedEpoch) {
+        if (referenceFrameOrId === undefined) {
+            referenceFrameOrId = __WEBPACK_IMPORTED_MODULE_1__ReferenceFrame_Factory__["a" /* RF_BASE */];
+        }
+
+        if (referenceFrameOrId === __WEBPACK_IMPORTED_MODULE_1__ReferenceFrame_Factory__["a" /* RF_BASE */] && epoch === this.cachedEpoch) {
             state = this.cachedState;
         } else {
             state = this.getStateInOwnFrameByEpoch(epoch);
-            if (referenceFrame === __WEBPACK_IMPORTED_MODULE_1__ReferenceFrame_Factory__["a" /* RF_BASE */] && epoch === sim.currentEpoch) {
+            if (referenceFrameOrId === __WEBPACK_IMPORTED_MODULE_1__ReferenceFrame_Factory__["a" /* RF_BASE */] && epoch === sim.currentEpoch) {
                 this.cachedState = state;
                 this.cachedEpoch = epoch;
             }
         }
 
-        return this.referenceFrame.transformStateVectorByEpoch(epoch, state, referenceFrame);
+        if (state === null) {
+            return null;
+        }
+
+        return this.referenceFrame.transformStateVectorByEpoch(epoch, state, referenceFrameOrId);
     }
 
-    getPositionByEpoch(epoch, referenceFrame) {
-        return this.getStateByEpoch(epoch, referenceFrame).position;
+    getPositionByEpoch(epoch, referenceFrameOrId) {
+        const state = this.getStateByEpoch(epoch, referenceFrameOrId);
+        return (state !== null) ? state.position : null;
     }
 
-    getVelocityByEpoch(epoch, referenceFrame) {
-        return this.getStateByEpoch(epoch, referenceFrame).velocity;
+    getVelocityByEpoch(epoch, referenceFrameOrId) {
+        const state = this.getStateByEpoch(epoch, referenceFrameOrId);
+        return (state !== null) ? state.velocity : null;
     }
 }
 /* harmony export (immutable) */ __webpack_exports__["a"] = TrajectoryAbstract;
@@ -2798,10 +2813,6 @@ class TrajectoryKeplerianBasic extends __WEBPACK_IMPORTED_MODULE_0__KeplerianAbs
     constructor(referenceFrameId, keplerianObject) {
         super(referenceFrameId);
         this.keplerianObject = keplerianObject;
-    }
-
-    isEditable() {
-        return true;
     }
 
     get mu() {
@@ -2870,14 +2881,6 @@ class TrajectoryKeplerianBasic extends __WEBPACK_IMPORTED_MODULE_0__KeplerianAbs
 
     getKeplerianObjectByEpoch(epoch) {
         return this.keplerianObject;
-    }
-
-    static createFromState(referenceFrame, state, mu, epoch, color) {
-        return new TrajectoryKeplerianBasic(
-            referenceFrame,
-            __WEBPACK_IMPORTED_MODULE_1__KeplerianObject__["a" /* default */].createFromState(state, mu, epoch),
-            color
-        );
     }
 }
 /* harmony export (immutable) */ __webpack_exports__["a"] = TrajectoryKeplerianBasic;
@@ -3769,47 +3772,9 @@ class TrajectoryKeplerianArray extends __WEBPACK_IMPORTED_MODULE_0__KeplerianAbs
 class TrajectoryComposite extends __WEBPACK_IMPORTED_MODULE_0__Abstract__["a" /* default */]
 {
     constructor() {
-        super(__WEBPACK_IMPORTED_MODULE_1__ReferenceFrame_Factory__["a" /* RF_BASE */]);
+        super();
         this.components = [];
         this.lastUsedTrajectory = null;
-    }
-
-    getReferenceFrameByEpoch(epoch) {
-        const traj = this._getTrajectoryByEpoch(epoch);
-        if (!traj) {
-            return null;
-        }
-        return traj.getReferenceFrameByEpoch(epoch);
-    }
-
-    getKeplerianObjectByEpoch(epoch) {
-        const traj = this._getTrajectoryByEpoch(epoch);
-        if (!traj) {
-            return null;
-        }
-        return traj.getKeplerianObjectByEpoch(epoch);
-    }
-
-    addComponent(trajectory) {
-        this.components.push(trajectory);
-        trajectory.setParent(this);
-
-        if (this.minEpoch === null
-            || (trajectory.minEpoch !== null
-                && trajectory.minEpoch !== false
-                && this.minEpoch > trajectory.minEpoch
-            )
-        ) {
-            this.minEpoch = trajectory.minEpoch;
-        }
-        if (this.maxEpoch === null
-            || (trajectory.maxEpoch !== null
-                && trajectory.maxEpoch !== false
-                && this.maxEpoch < trajectory.maxEpoch
-            )
-        ) {
-            this.maxEpoch = trajectory.maxEpoch;
-        }
     }
 
     select() {
@@ -3826,12 +3791,19 @@ class TrajectoryComposite extends __WEBPACK_IMPORTED_MODULE_0__Abstract__["a" /*
         this.components.map(traj => traj.drop());
     }
 
-    getStateInOwnFrameByEpoch(epoch) {
-        return this._getTrajectoryByEpoch(epoch).getStateInOwnFrameByEpoch(epoch);
+    getReferenceFrameByEpoch(epoch) {
+        const traj = this._getTrajectoryByEpoch(epoch);
+        return traj ? traj.getReferenceFrameByEpoch(epoch) : null;
     }
 
-    getStateByEpoch(epoch, referenceFrame) {
-        return this._getTrajectoryByEpoch(epoch).getStateByEpoch(epoch, referenceFrame);
+    getStateInOwnFrameByEpoch(epoch) {
+        const traj = this._getTrajectoryByEpoch(epoch);
+        return traj ? traj.getStateInOwnFrameByEpoch(epoch) : null;
+    }
+
+    getStateByEpoch(epoch, referenceFrameOrId) {
+        const traj = this._getTrajectoryByEpoch(epoch);
+        return traj ? traj.getStateByEpoch(epoch, referenceFrameOrId) : null;
     }
 
     _getTrajectoryByEpoch(epoch) {
@@ -3858,8 +3830,31 @@ class TrajectoryComposite extends __WEBPACK_IMPORTED_MODULE_0__Abstract__["a" /*
 
         return null;
     }
+
+    addComponent(trajectory) {
+        this.components.push(trajectory);
+        trajectory.setParent(this);
+
+        if (this.minEpoch === null
+            || (trajectory.minEpoch !== null
+                && trajectory.minEpoch !== false
+                && this.minEpoch > trajectory.minEpoch
+            )
+        ) {
+            this.minEpoch = trajectory.minEpoch;
+        }
+        if (this.maxEpoch === null
+            || (trajectory.maxEpoch !== null
+                && trajectory.maxEpoch !== false
+                && this.maxEpoch < trajectory.maxEpoch
+            )
+        ) {
+            this.maxEpoch = trajectory.maxEpoch;
+        }
+    }
 }
 /* harmony export (immutable) */ __webpack_exports__["a"] = TrajectoryComposite;
+
 
 
 /***/ }),
@@ -9031,7 +9026,7 @@ class TrajectoryLoader
         let visualModel;
 
         if (type === 'keplerian') {
-            trajectory = this.createKeplerian(config);
+            trajectory = this.createKeplerianBasic(config);
         }
 
         if (type === 'keplerian_precessing') {
@@ -9120,7 +9115,7 @@ class TrajectoryLoader
         return traj;
     }
 
-    static createKeplerian(config) {
+    static createKeplerianBasic(config) {
         return new __WEBPACK_IMPORTED_MODULE_2__core_Trajectory_KeplerianBasic__["a" /* default */](
             config.data.referenceFrame,
             this.createKeplerianObject(config.data.elements)
@@ -9986,13 +9981,16 @@ class VisualTrajectoryModelPointArray extends __WEBPACK_IMPORTED_MODULE_0__Abstr
 "use strict";
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__Abstract__ = __webpack_require__(16);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__StateVector__ = __webpack_require__(4);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__algebra__ = __webpack_require__(0);
+
 
 
 
 class TrajectoryStaticPosition extends __WEBPACK_IMPORTED_MODULE_0__Abstract__["a" /* default */]
 {
     constructor(referenceFrameId, pos) {
-        super(referenceFrameId);
+        super();
+        this.setReferenceFrame(referenceFrameId);
         this.pos = pos;
     }
 

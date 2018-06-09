@@ -19,7 +19,7 @@ export default class TrajectoryLoader
         let visualModel;
 
         if (type === 'keplerian') {
-            trajectory = this.createKeplerian(config);
+            trajectory = this.createKeplerianBasic(config);
         }
 
         if (type === 'keplerian_precessing') {
@@ -108,7 +108,7 @@ export default class TrajectoryLoader
         return traj;
     }
 
-    static createKeplerian(config) {
+    static createKeplerianBasic(config) {
         return new TrajectoryKeplerianBasic(
             config.data.referenceFrame,
             this.createKeplerianObject(config.data.elements)
