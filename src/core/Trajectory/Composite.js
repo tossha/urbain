@@ -59,6 +59,10 @@ export default class TrajectoryComposite extends TrajectoryAbstract
         this.components.map(traj => traj.deselect());
     }
 
+    drop() {
+        this.components.map(traj => traj.drop());
+    }
+
     getStateInOwnFrameByEpoch(epoch) {
         return this._getTrajectoryByEpoch(epoch).getStateInOwnFrameByEpoch(epoch);
     }

@@ -56,6 +56,14 @@ export default class VisualBodyModelAbstract extends VisualModelAbstract
         return new THREE.MeshStandardMaterial(parameters);
     }
 
+    drop() {
+        if (this.label) {
+            this.label.drop();
+        }
+
+        super.drop();
+    }
+
     render(epoch) {
         if (this.label) {
             this.label.visible = sim.settings.ui.showBodyLabels;

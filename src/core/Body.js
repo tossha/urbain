@@ -22,4 +22,12 @@ export default class Body extends EphemerisObject
 
         return dist * Math.pow(muCoeff, 2/5);
     }
+
+    drop() {
+        if (this.visualModel) {
+            this.visualModel.drop();
+            delete this.visualModel;
+        }
+        super.drop();
+    }
 }

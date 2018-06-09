@@ -64,6 +64,14 @@ require 'functions.php';
                 <input type="checkbox" id="showAnglesOfSelectedOrbit" checked>
             </td>
         </tr>
+        <tr>
+            <td>
+                &nbsp;
+            </td>
+            <td>
+                <input type="button" id="unloadObject" value="Unload object">
+            </td>
+        </tr>
     </table>
 
     <table width="100%" style="border-bottom: blue solid 1px" class="panelContent" data-panel-name="metrics">

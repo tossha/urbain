@@ -84,6 +84,16 @@ export default class VisualTrajectoryModelAbstract extends VisualModelAbstract
 
     drop() {
         sim.selection.removeSelectableObject(this.threeObj);
+
+        this.scene.remove(this.point);
+        if (this.point.geometry) {
+            this.point.geometry.dispose();
+        }
+        if (this.point.material) {
+            this.point.material.dispose();
+        }
+        delete this.point;
+
         super.drop();
     }
 }
