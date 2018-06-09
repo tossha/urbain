@@ -1671,19 +1671,34 @@ function(a,b){console.warn("THREE.Projector: .projectVector() is now vector.proj
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
-const Events = {
-    RENDER: 'urb_render',
-    INIT_DONE: 'urb_init_done',
-    SELECT: 'urb_select',
-    DESELECT: 'urb_deselect',
-    CAMERA_RF_CHANGED: 'urb_camera_rf_change',
-    OBJECT_ADDED: 'urb_object_added',
-    TIME_SCALE_CHANGED: 'urb_time_scale_change',
-    TIME_PAUSED: 'urb_time_paused',
-    TIME_UNPAUSED: 'urb_time_unpaused',
-    EPOCH_CHANGED: 'urb_epoch_change',
-};
+class Events
+{
+    static dispatch(event, detail) {
+        let eventObj;
+        if (detail) {
+            eventObj = new CustomEvent(
+                event,
+                {detail: detail}
+            );
+        } else {
+            eventObj = new CustomEvent(event);
+        }
+        document.dispatchEvent(eventObj);
+    }
+}
 /* harmony export (immutable) */ __webpack_exports__["a"] = Events;
+
+
+Events.RENDER = 'urb_render';
+Events.INIT_DONE = 'urb_init_done';
+Events.SELECT = 'urb_select';
+Events.DESELECT = 'urb_deselect';
+Events.CAMERA_RF_CHANGED = 'urb_camera_rf_change';
+Events.OBJECT_ADDED = 'urb_object_added';
+Events.TIME_SCALE_CHANGED = 'urb_time_scale_change';
+Events.TIME_PAUSED = 'urb_time_paused';
+Events.TIME_UNPAUSED = 'urb_time_unpaused';
+Events.EPOCH_CHANGED = 'urb_epoch_change';
 
 
 /***/ }),
@@ -1738,7 +1753,7 @@ class VisualModelAbstract
         this.threeObj = obj;
         this.scene.add(this.threeObj);
         this.renderListener = this._onRender.bind(this);
-        document.addEventListener(__WEBPACK_IMPORTED_MODULE_0__core_Events__["a" /* Events */].RENDER, this.renderListener);
+        document.addEventListener(__WEBPACK_IMPORTED_MODULE_0__core_Events__["a" /* default */].RENDER, this.renderListener);
     }
 
     _onRender(event) {
@@ -1758,7 +1773,7 @@ class VisualModelAbstract
             }
             delete this.threeObj;
         }
-        document.removeEventListener(__WEBPACK_IMPORTED_MODULE_0__core_Events__["a" /* Events */].RENDER, this.renderListener);
+        document.removeEventListener(__WEBPACK_IMPORTED_MODULE_0__core_Events__["a" /* default */].RENDER, this.renderListener);
     }
 }
 /* harmony export (immutable) */ __webpack_exports__["a"] = VisualModelAbstract;
@@ -3076,18 +3091,13 @@ class TimeLine
     }
 
     setTimeScale(newScale) {
-        document.dispatchEvent(new CustomEvent(
-            __WEBPACK_IMPORTED_MODULE_0__core_Events__["a" /* Events */].TIME_SCALE_CHANGED,
-            {detail: {old: this.timeScale, new: newScale}}
-        ));
+        __WEBPACK_IMPORTED_MODULE_0__core_Events__["a" /* default */].dispatch(__WEBPACK_IMPORTED_MODULE_0__core_Events__["a" /* default */].TIME_SCALE_CHANGED, {old: this.timeScale, new: newScale});
         this.timeScale = newScale;
     }
 
     togglePause() {
         this.isTimeRunning = !this.isTimeRunning;
-        document.dispatchEvent(new CustomEvent(
-            this.isTimeRunning ? __WEBPACK_IMPORTED_MODULE_0__core_Events__["a" /* Events */].TIME_UNPAUSED : __WEBPACK_IMPORTED_MODULE_0__core_Events__["a" /* Events */].TIME_PAUSED
-        ));
+        __WEBPACK_IMPORTED_MODULE_0__core_Events__["a" /* default */].dispatch(this.isTimeRunning ? __WEBPACK_IMPORTED_MODULE_0__core_Events__["a" /* default */].TIME_UNPAUSED : __WEBPACK_IMPORTED_MODULE_0__core_Events__["a" /* default */].TIME_PAUSED);
     }
 
     tick(timePassed) {
@@ -3104,13 +3114,10 @@ class TimeLine
             this.epoch += this.timeScale * timePassed;
         }
 
-        document.dispatchEvent(new CustomEvent(
-            __WEBPACK_IMPORTED_MODULE_0__core_Events__["a" /* Events */].EPOCH_CHANGED,
-            {detail: {
-                epoch: this.epoch,
-                date: new Date((J2000_TIMESTAMP + this.epoch) * 1000)
-            }}
-        ));
+        __WEBPACK_IMPORTED_MODULE_0__core_Events__["a" /* default */].dispatch(__WEBPACK_IMPORTED_MODULE_0__core_Events__["a" /* default */].EPOCH_CHANGED, {
+            epoch: this.epoch,
+            date: new Date((J2000_TIMESTAMP + this.epoch) * 1000)
+        });
 
         this.redraw();
     }
@@ -4247,7 +4254,7 @@ class VisualBodyModelAbstract extends __WEBPACK_IMPORTED_MODULE_0__ModelAbstract
 
     setObject(obj) {
         this.body = obj;
-        document.addEventListener(__WEBPACK_IMPORTED_MODULE_2__core_Events__["a" /* Events */].INIT_DONE, () => {
+        document.addEventListener(__WEBPACK_IMPORTED_MODULE_2__core_Events__["a" /* default */].INIT_DONE, () => {
             this.label = new __WEBPACK_IMPORTED_MODULE_1__VisualLabel__["a" /* default */](
                 new __WEBPACK_IMPORTED_MODULE_4__core_FunctionOfEpoch_Custom__["a" /* default */]((epoch) => {
                     return obj.getPositionByEpoch(epoch).add_(sim.camera.getTopDirection(epoch).mul_(this.shape.getMaxDimension() / 2));
@@ -8656,7 +8663,7 @@ class Simulation
 
         this.ui = new __WEBPACK_IMPORTED_MODULE_8__ui_UI__["a" /* default */]();
 
-        document.dispatchEvent(new CustomEvent(__WEBPACK_IMPORTED_MODULE_2__Events__["a" /* Events */].INIT_DONE));
+        __WEBPACK_IMPORTED_MODULE_2__Events__["a" /* default */].dispatch(__WEBPACK_IMPORTED_MODULE_2__Events__["a" /* default */].INIT_DONE);
 
         __WEBPACK_IMPORTED_MODULE_5__interface_StarSystemLoader__["a" /* default */].loadObjectByUrl(this.starSystem, './spacecraft/voyager1.json');
         __WEBPACK_IMPORTED_MODULE_5__interface_StarSystemLoader__["a" /* default */].loadObjectByUrl(this.starSystem, './spacecraft/voyager2.json');
@@ -8704,10 +8711,7 @@ class Simulation
 
         this.camera.update(this.time.epoch);
 
-        document.dispatchEvent(new CustomEvent(
-            __WEBPACK_IMPORTED_MODULE_2__Events__["a" /* Events */].RENDER,
-            {detail: {epoch: this.time.epoch}}
-        ));
+        __WEBPACK_IMPORTED_MODULE_2__Events__["a" /* default */].dispatch(__WEBPACK_IMPORTED_MODULE_2__Events__["a" /* default */].RENDER, {epoch: this.time.epoch});
 
         this.renderer.render(this.scene, this.camera.threeCamera);
     }
@@ -9199,7 +9203,7 @@ class KeplerianEditor
 
     init() {
         this.initAnglesListener = this.initAngles.bind(this);
-        document.addEventListener(__WEBPACK_IMPORTED_MODULE_0__Events__["a" /* Events */].RENDER, this.initAnglesListener);
+        document.addEventListener(__WEBPACK_IMPORTED_MODULE_0__Events__["a" /* default */].RENDER, this.initAnglesListener);
     }
 
     initAngles(event) {
@@ -9255,9 +9259,9 @@ class KeplerianEditor
             true
         );
 
-        document.removeEventListener(__WEBPACK_IMPORTED_MODULE_0__Events__["a" /* Events */].RENDER, this.initAnglesListener);
+        document.removeEventListener(__WEBPACK_IMPORTED_MODULE_0__Events__["a" /* default */].RENDER, this.initAnglesListener);
         this.updateAnglesListener = this.updateAngles.bind(this);
-        document.addEventListener(__WEBPACK_IMPORTED_MODULE_0__Events__["a" /* Events */].RENDER, this.updateAnglesListener);
+        document.addEventListener(__WEBPACK_IMPORTED_MODULE_0__Events__["a" /* default */].RENDER, this.updateAnglesListener);
 
         if ((this.trajectory.minEpoch !== null && this.trajectory.minEpoch !== false && event.detail.epoch < this.trajectory.minEpoch)
             || (this.trajectory.maxEpoch !== null && this.trajectory.maxEpoch !== false && event.detail.epoch > this.trajectory.maxEpoch)
@@ -9314,7 +9318,7 @@ class KeplerianEditor
         if (this.incAngle)  this.incAngle.remove();
         if (this.taAngle)   this.taAngle.remove();
 
-        document.removeEventListener(__WEBPACK_IMPORTED_MODULE_0__Events__["a" /* Events */].RENDER, this.updateAnglesListener);
+        document.removeEventListener(__WEBPACK_IMPORTED_MODULE_0__Events__["a" /* default */].RENDER, this.updateAnglesListener);
     }
 
     calculateAdditionalParameters(keplerianObject) {
@@ -9390,7 +9394,7 @@ class HelperAngle
         }
 
         this.onRenderListener = this.onRender.bind(this);
-        document.addEventListener(__WEBPACK_IMPORTED_MODULE_2__core_Events__["a" /* Events */].RENDER, this.onRenderListener);
+        document.addEventListener(__WEBPACK_IMPORTED_MODULE_2__core_Events__["a" /* default */].RENDER, this.onRenderListener);
 
         this.onWheelListener = this.onMouseWheel.bind(this);
         document.addEventListener('wheel', this.onWheelListener);
@@ -9604,7 +9608,7 @@ class HelperAngle
         sim.scene.remove(this.threeMainAxis);
         sim.scene.remove(this.threeDirection);
 
-        document.removeEventListener(__WEBPACK_IMPORTED_MODULE_2__core_Events__["a" /* Events */].RENDER, this.onRenderListener);
+        document.removeEventListener(__WEBPACK_IMPORTED_MODULE_2__core_Events__["a" /* default */].RENDER, this.onRenderListener);
     }
 
     createPointersGeometries() {
@@ -10819,18 +10823,11 @@ class SelectionHandler extends __WEBPACK_IMPORTED_MODULE_0__visual_ModelAbstract
         this.selectedObject = object;
         this.selectedObject.select();
 
-        document.dispatchEvent(new CustomEvent(
-            __WEBPACK_IMPORTED_MODULE_1__core_Events__["a" /* Events */].SELECT,
-            {detail: {trajectory: this.selectedObject}}
-        ));
-
+        __WEBPACK_IMPORTED_MODULE_1__core_Events__["a" /* default */].dispatch(__WEBPACK_IMPORTED_MODULE_1__core_Events__["a" /* default */].SELECT, {trajectory: this.selectedObject});
     }
 
     deselect() {
-        document.dispatchEvent(new CustomEvent(
-            __WEBPACK_IMPORTED_MODULE_1__core_Events__["a" /* Events */].DESELECT,
-            {detail: {trajectory: this.selectedObject}}
-        ));
+        __WEBPACK_IMPORTED_MODULE_1__core_Events__["a" /* default */].dispatch(__WEBPACK_IMPORTED_MODULE_1__core_Events__["a" /* default */].DESELECT, {trajectory: this.selectedObject});
 
         this.selectedObject.deselect();
         this.selectedObject = null;
@@ -10896,7 +10893,7 @@ class UIPanelTime extends __WEBPACK_IMPORTED_MODULE_1__Panel__["a" /* default */
         this.jqScaleText = this.jqDom.find('#timeScaleValue');
         this.jqScaleText.html(this.formatTimeScale(this.timeLine.timeScale));
 
-        document.addEventListener(__WEBPACK_IMPORTED_MODULE_0__core_Events__["a" /* Events */].TIME_SCALE_CHANGED, (event) => {
+        document.addEventListener(__WEBPACK_IMPORTED_MODULE_0__core_Events__["a" /* default */].TIME_SCALE_CHANGED, (event) => {
             this.jqSlider.val(this.getNeededSliderValue(event.detail.new));
             this.jqScaleText.html(this.formatTimeScale(event.detail.new));
         });
@@ -10905,11 +10902,11 @@ class UIPanelTime extends __WEBPACK_IMPORTED_MODULE_1__Panel__["a" /* default */
         this.jqPause.click(() => this.timeLine.togglePause());
         this.jqPause.html(this.timeLine.isTimeRunning ? 'Pause' : 'Resume');
 
-        document.addEventListener(__WEBPACK_IMPORTED_MODULE_0__core_Events__["a" /* Events */].TIME_PAUSED,   () => this.jqPause.html('Resume'));
-        document.addEventListener(__WEBPACK_IMPORTED_MODULE_0__core_Events__["a" /* Events */].TIME_UNPAUSED, () => this.jqPause.html('Pause'));
+        document.addEventListener(__WEBPACK_IMPORTED_MODULE_0__core_Events__["a" /* default */].TIME_PAUSED,   () => this.jqPause.html('Resume'));
+        document.addEventListener(__WEBPACK_IMPORTED_MODULE_0__core_Events__["a" /* default */].TIME_UNPAUSED, () => this.jqPause.html('Pause'));
 
         this.jqDateText = this.jqDom.find('#currentDateValue');
-        document.addEventListener(__WEBPACK_IMPORTED_MODULE_0__core_Events__["a" /* Events */].EPOCH_CHANGED, (event) => this.updateTime(event.detail.date));
+        document.addEventListener(__WEBPACK_IMPORTED_MODULE_0__core_Events__["a" /* default */].EPOCH_CHANGED, (event) => this.updateTime(event.detail.date));
 
         this.jqDom.find('#setRealTimeScale').click(() => this.timeLine.setTimeScale(1));
         this.jqDom.find('#useCurrentTime').click(() => this.timeLine.useCurrentTime());
@@ -10998,12 +10995,12 @@ class UIPanelCamera extends __WEBPACK_IMPORTED_MODULE_1__Panel__["a" /* default 
         this.initTarget();
         this.initFrameType();
 
-        document.addEventListener(__WEBPACK_IMPORTED_MODULE_0__core_Events__["a" /* Events */].CAMERA_RF_CHANGED, (event) => {
+        document.addEventListener(__WEBPACK_IMPORTED_MODULE_0__core_Events__["a" /* default */].CAMERA_RF_CHANGED, (event) => {
             this.updateTarget(event.detail.new.originId);
             this.updateFrameTypeList();
             this.updateFrameType(event.detail.new.type);
         });
-        document.addEventListener(__WEBPACK_IMPORTED_MODULE_0__core_Events__["a" /* Events */].OBJECT_ADDED, () => {
+        document.addEventListener(__WEBPACK_IMPORTED_MODULE_0__core_Events__["a" /* default */].OBJECT_ADDED, () => {
             this.updateTargetList();
         });
     }
@@ -11084,8 +11081,8 @@ class UIPanelMetrics extends __WEBPACK_IMPORTED_MODULE_0__Panel__["a" /* default
 
         this.renderListener = this.render.bind(this);
 
-        document.addEventListener(__WEBPACK_IMPORTED_MODULE_1__core_Events__["a" /* Events */].SELECT, this.handleSelect.bind(this));
-        document.addEventListener(__WEBPACK_IMPORTED_MODULE_1__core_Events__["a" /* Events */].DESELECT, this.handleDeselect.bind(this));
+        document.addEventListener(__WEBPACK_IMPORTED_MODULE_1__core_Events__["a" /* default */].SELECT, this.handleSelect.bind(this));
+        document.addEventListener(__WEBPACK_IMPORTED_MODULE_1__core_Events__["a" /* default */].DESELECT, this.handleDeselect.bind(this));
 
         this.jqDom.find('#unloadObject').on('click', function() {
             let wasSelected = selection.getSelectedObject().object;
@@ -11185,12 +11182,12 @@ class UIPanelMetrics extends __WEBPACK_IMPORTED_MODULE_0__Panel__["a" /* default
             this.jqDom.find('#unloadObject').hide();
         }
 
-        document.addEventListener(__WEBPACK_IMPORTED_MODULE_1__core_Events__["a" /* Events */].RENDER, this.renderListener);
+        document.addEventListener(__WEBPACK_IMPORTED_MODULE_1__core_Events__["a" /* default */].RENDER, this.renderListener);
     }
 
     handleDeselect() {
         this.hide();
-        document.removeEventListener(__WEBPACK_IMPORTED_MODULE_1__core_Events__["a" /* Events */].RENDER, this.renderListener);
+        document.removeEventListener(__WEBPACK_IMPORTED_MODULE_1__core_Events__["a" /* default */].RENDER, this.renderListener);
     }
 }
 /* harmony export (immutable) */ __webpack_exports__["a"] = UIPanelMetrics;
@@ -12098,10 +12095,7 @@ class StarSystem
 
     addObject(id, body) {
         this.objects[id] = body;
-        document.dispatchEvent(new CustomEvent(
-            __WEBPACK_IMPORTED_MODULE_3__Events__["a" /* Events */].OBJECT_ADDED,
-            {detail: {object: body}}
-        ));
+        __WEBPACK_IMPORTED_MODULE_3__Events__["a" /* default */].dispatch(__WEBPACK_IMPORTED_MODULE_3__Events__["a" /* default */].OBJECT_ADDED, {object: body});
     }
 
     deleteObject(id) {
@@ -12240,10 +12234,7 @@ class Camera
             this.quaternion = this._getQuaternionByPosition(this.position);
         }
 
-        document.dispatchEvent(new CustomEvent(
-            __WEBPACK_IMPORTED_MODULE_2__core_Events__["a" /* Events */].CAMERA_RF_CHANGED,
-            {detail: {old: this.referenceFrame, new: newFrame}}
-        ));
+        __WEBPACK_IMPORTED_MODULE_2__core_Events__["a" /* default */].dispatch(__WEBPACK_IMPORTED_MODULE_2__core_Events__["a" /* default */].CAMERA_RF_CHANGED, {old: this.referenceFrame, new: newFrame});
 
         this.referenceFrame = newFrame;
     }

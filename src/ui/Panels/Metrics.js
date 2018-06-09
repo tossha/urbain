@@ -1,6 +1,6 @@
 
 import UIPanel from "../Panel";
-import {Events} from "../../core/Events";
+import Events from "../../core/Events";
 import UIPanelVector from "./Vector";
 import {deg2rad, presentNumberWithSuffix, rad2deg} from "../../algebra";
 import EphemerisObject from "../../core/EphemerisObject";

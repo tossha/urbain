@@ -1,7 +1,7 @@
 import ReferenceFrameFactory from "./ReferenceFrame/Factory";
 import EphemerisObject from "./EphemerisObject";
 import Body from "./Body";
-import {Events} from "./Events";
+import Events from "./Events";
 
 export const STAR_SYSTEM_BARYCENTER = 0;
 
@@ -107,10 +107,7 @@ export default class StarSystem
 
     addObject(id, body) {
         this.objects[id] = body;
-        document.dispatchEvent(new CustomEvent(
-            Events.OBJECT_ADDED,
-            {detail: {object: body}}
-        ));
+        Events.dispatch(Events.OBJECT_ADDED, {object: body});
     }
 
     deleteObject(id) {

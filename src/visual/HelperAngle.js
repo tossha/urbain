@@ -1,6 +1,6 @@
 import VirtualPlane from "./VirtualPlane";
 import {TWO_PI} from "../algebra";
-import {Events} from "../core/Events";
+import Events from "../core/Events";
 import LineObject from "./LineObject";
 
 export const INITIAL_SEGMENTS_NUMBER = 200;

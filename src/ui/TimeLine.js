@@ -1,4 +1,4 @@
-import {Events} from "../core/Events";
+import Events from "../core/Events";
 
 export const J2000_TIMESTAMP = 946728000;
 
@@ -46,18 +46,13 @@ export default class TimeLine
     }
 
     setTimeScale(newScale) {
-        document.dispatchEvent(new CustomEvent(
-            Events.TIME_SCALE_CHANGED,
-            {detail: {old: this.timeScale, new: newScale}}
-        ));
+        Events.dispatch(Events.TIME_SCALE_CHANGED, {old: this.timeScale, new: newScale});
         this.timeScale = newScale;
     }
 
     togglePause() {
         this.isTimeRunning = !this.isTimeRunning;
-        document.dispatchEvent(new CustomEvent(
-            this.isTimeRunning ? Events.TIME_UNPAUSED : Events.TIME_PAUSED
-        ));
+        Events.dispatch(this.isTimeRunning ? Events.TIME_UNPAUSED : Events.TIME_PAUSED);
     }
 
     tick(timePassed) {
@@ -74,13 +69,10 @@ export default class TimeLine
             this.epoch += this.timeScale * timePassed;
         }
 
-        document.dispatchEvent(new CustomEvent(
-            Events.EPOCH_CHANGED,
-            {detail: {
-                epoch: this.epoch,
-                date: new Date((J2000_TIMESTAMP + this.epoch) * 1000)
-            }}
-        ));
+        Events.dispatch(Events.EPOCH_CHANGED, {
+            epoch: this.epoch,
+            date: new Date((J2000_TIMESTAMP + this.epoch) * 1000)
+        });
 
         this.redraw();
     }

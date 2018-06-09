@@ -1,4 +1,4 @@
-import {Events} from "./Events";
+import Events from "./Events";
 import FunctionOfEpochCustom from "./FunctionOfEpoch/Custom";
 import {Quaternion, Vector} from "../algebra";
 import HelperAngle from "../visual/HelperAngle";

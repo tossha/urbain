@@ -1,4 +1,4 @@
-import {Events} from "../core/Events";
+import Events from "../core/Events";
 
 export default class VisualModelAbstract
 {
