@@ -2151,6 +2151,13 @@ class EphemerisObject
     getPositionByEpoch(epoch, referenceFrame) {
         return this.trajectory.getPositionByEpoch(epoch, referenceFrame || __WEBPACK_IMPORTED_MODULE_0__ReferenceFrame_Factory__["a" /* RF_BASE */]);
     }
+
+    drop() {
+        if (this.trajectory) {
+            sim.starSystem.deleteTrajectory(this.id);
+            delete this.trajectory;
+        }
+    }
 }
 /* harmony export (immutable) */ __webpack_exports__["a"] = EphemerisObject;
 
@@ -2474,6 +2481,14 @@ class Body extends __WEBPACK_IMPORTED_MODULE_0__EphemerisObject__["a" /* default
         const dist = this.getPositionByEpoch(epoch).sub_(parent.getPositionByEpoch(epoch)).mag;
 
         return dist * Math.pow(muCoeff, 2/5);
+    }
+
+    drop() {
+        if (this.visualModel) {
+            this.visualModel.drop();
+            delete this.visualModel;
+        }
+        super.drop();
     }
 }
 /* harmony export (immutable) */ __webpack_exports__["a"] = Body;
@@ -3800,6 +3815,10 @@ class TrajectoryComposite extends __WEBPACK_IMPORTED_MODULE_0__Abstract__["a" /*
         this.components.map(traj => traj.deselect());
     }
 
+    drop() {
+        this.components.map(traj => traj.drop());
+    }
+
     getStateInOwnFrameByEpoch(epoch) {
         return this._getTrajectoryByEpoch(epoch).getStateInOwnFrameByEpoch(epoch);
     }
@@ -3929,6 +3948,16 @@ class VisualTrajectoryModelAbstract extends __WEBPACK_IMPORTED_MODULE_0__ModelAb
 
     drop() {
         sim.selection.removeSelectableObject(this.threeObj);
+
+        this.scene.remove(this.point);
+        if (this.point.geometry) {
+            this.point.geometry.dispose();
+        }
+        if (this.point.material) {
+            this.point.material.dispose();
+        }
+        delete this.point;
+
         super.drop();
     }
 }
@@ -4246,6 +4275,14 @@ class VisualBodyModelAbstract extends __WEBPACK_IMPORTED_MODULE_0__ModelAbstract
 
     getMaterial(parameters) {
         return new THREE.MeshStandardMaterial(parameters);
+    }
+
+    drop() {
+        if (this.label) {
+            this.label.drop();
+        }
+
+        super.drop();
     }
 
     render(epoch) {
@@ -11029,6 +11066,8 @@ UIPanelCamera.frameTypeNames = {
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__core_Events__ = __webpack_require__(3);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__Vector__ = __webpack_require__(66);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__algebra__ = __webpack_require__(0);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_4__core_EphemerisObject__ = __webpack_require__(8);
+
 
 
 
@@ -11048,6 +11087,11 @@ class UIPanelMetrics extends __WEBPACK_IMPORTED_MODULE_0__Panel__["a" /* default
         document.addEventListener(__WEBPACK_IMPORTED_MODULE_1__core_Events__["a" /* Events */].SELECT, this.handleSelect.bind(this));
         document.addEventListener(__WEBPACK_IMPORTED_MODULE_1__core_Events__["a" /* Events */].DESELECT, this.handleDeselect.bind(this));
 
+        this.jqDom.find('#unloadObject').on('click', function() {
+            let wasSelected = selection.getSelectedObject().object;
+            selection.deselect();
+            sim.starSystem.deleteObject(wasSelected.id);
+        });
         this.jqDom.find('#showAnglesOfSelectedOrbit').on('change', function() {
             sim.settings.ui.showAnglesOfSelectedOrbit = this.checked;
             if (!selection.getSelectedObject()) {
@@ -11133,6 +11177,12 @@ class UIPanelMetrics extends __WEBPACK_IMPORTED_MODULE_0__Panel__["a" /* default
             $('#metricsOf').html(object.name);
         } else {
             $('#relativeTo,#metricsOf').html('');
+        }
+
+        if (object.type === __WEBPACK_IMPORTED_MODULE_4__core_EphemerisObject__["a" /* default */].TYPE_SPACECRAFT || object.type === __WEBPACK_IMPORTED_MODULE_4__core_EphemerisObject__["a" /* default */].TYPE_UNKNOWN) {
+            this.jqDom.find('#unloadObject').show();
+        } else {
+            this.jqDom.find('#unloadObject').hide();
         }
 
         document.addEventListener(__WEBPACK_IMPORTED_MODULE_1__core_Events__["a" /* Events */].RENDER, this.renderListener);

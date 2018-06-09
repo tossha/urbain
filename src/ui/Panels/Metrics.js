@@ -3,6 +3,7 @@ import UIPanel from "../Panel";
 import {Events} from "../../core/Events";
 import UIPanelVector from "./Vector";
 import {deg2rad, presentNumberWithSuffix, rad2deg} from "../../algebra";
+import EphemerisObject from "../../core/EphemerisObject";
 
 export default class UIPanelMetrics extends UIPanel
 {
@@ -17,6 +18,11 @@ export default class UIPanelMetrics extends UIPanel
         document.addEventListener(Events.SELECT, this.handleSelect.bind(this));
         document.addEventListener(Events.DESELECT, this.handleDeselect.bind(this));
 
+        this.jqDom.find('#unloadObject').on('click', function() {
+            let wasSelected = selection.getSelectedObject().object;
+            selection.deselect();
+            sim.starSystem.deleteObject(wasSelected.id);
+        });
         this.jqDom.find('#showAnglesOfSelectedOrbit').on('change', function() {
             sim.settings.ui.showAnglesOfSelectedOrbit = this.checked;
             if (!selection.getSelectedObject()) {
@@ -102,6 +108,12 @@ export default class UIPanelMetrics extends UIPanel
             $('#metricsOf').html(object.name);
         } else {
             $('#relativeTo,#metricsOf').html('');
+        }
+
+        if (object.type === EphemerisObject.TYPE_SPACECRAFT || object.type === EphemerisObject.TYPE_UNKNOWN) {
+            this.jqDom.find('#unloadObject').show();
+        } else {
+            this.jqDom.find('#unloadObject').hide();
         }
 
         document.addEventListener(Events.RENDER, this.renderListener);

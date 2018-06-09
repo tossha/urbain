@@ -29,6 +29,13 @@ export default class EphemerisObject
     getPositionByEpoch(epoch, referenceFrame) {
         return this.trajectory.getPositionByEpoch(epoch, referenceFrame || RF_BASE);
     }
+
+    drop() {
+        if (this.trajectory) {
+            sim.starSystem.deleteTrajectory(this.id);
+            delete this.trajectory;
+        }
+    }
 }
 
 EphemerisObject.TYPE_UNKNOWN    = 0;
