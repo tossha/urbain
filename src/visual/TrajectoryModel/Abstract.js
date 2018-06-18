@@ -3,12 +3,15 @@ import LineObject from "../LineObject";
 
 export default class VisualTrajectoryModelAbstract extends VisualModelAbstract
 {
-    constructor(trajectory, color) {
+    constructor(trajectory, config) {
         super();
 
         this.trajectory = trajectory;
-        this.standardColor = color;
-        this.color = color;
+        this.standardColor = config.color;
+        this.color = config.color;
+
+        this.minEpoch = config.minEpoch || trajectory.minEpoch || null;
+        this.maxEpoch = config.maxEpoch || trajectory.maxEpoch || null;
 
         this.setThreeObj(new LineObject(
             new THREE.Geometry(),
@@ -17,10 +20,10 @@ export default class VisualTrajectoryModelAbstract extends VisualModelAbstract
 
         this.point = new THREE.Mesh(
             new THREE.SphereGeometry(1, 8, 8),
-            new THREE.MeshBasicMaterial({color: color})
+            new THREE.MeshBasicMaterial({color: this.color})
         );
         this.scene.add(this.point);
-        this.pointSize = 3;
+        this.pointSize = 4;
 
         this.threeObj.userData = {trajectory: trajectory};
         sim.selection.addSelectableObject(this.threeObj);
@@ -41,29 +44,33 @@ export default class VisualTrajectoryModelAbstract extends VisualModelAbstract
         }
     }
 
+    getRenderingEpoch(epoch) {
+        if ((this.minEpoch !== null && epoch < this.minEpoch)
+            || (this.maxEpoch !== null && epoch > this.maxEpoch)
+        ) {
+            return null;
+        }
+
+        if (!this.trajectory.isValidAtEpoch(epoch)) {
+            if (this.trajectory.minEpoch !== null && epoch < this.trajectory.minEpoch) {
+                return this.trajectory.minEpoch;
+            }
+            if (this.trajectory.maxEpoch !== null && epoch > this.trajectory.maxEpoch) {
+                return this.trajectory.maxEpoch;
+            }
+        }
+
+        return epoch;
+    }
+
     render(epoch) {
-        if (this.trajectory.minEpoch !== null && this.trajectory.minEpoch !== false) {
-            if (epoch < this.trajectory.minEpoch) {
-                this.point.visible = false;
-                return;
-            }
-        }
-        if (this.trajectory.maxEpoch !== null && this.trajectory.maxEpoch !== false) {
-            if (epoch > this.trajectory.maxEpoch) {
-                this.point.visible = false;
-                return;
-            }
-        }
-
-        const pos = this.trajectory.getPositionByEpoch(epoch);
-
-        if (!pos) {
+        if (!this.trajectory.isValidAtEpoch(epoch)) {
             this.point.visible = false;
             return;
         }
 
         this.point.visible = true;
-        this.point.position.copy(sim.getVisualCoords(pos));
+        this.point.position.copy(sim.getVisualCoords(this.trajectory.getPositionByEpoch(epoch)));
         const scaleKoeff = this.pointSize * this.point.position.length() * sim.raycaster.getPixelAngleSize();
         this.point.scale.x = scaleKoeff;
         this.point.scale.y = scaleKoeff;
@@ -71,13 +78,15 @@ export default class VisualTrajectoryModelAbstract extends VisualModelAbstract
     }
 
     select() {
-        this.color = 0xFFFFFF;
-        this.point.material.color.set(this.color);
-        this.point.material.needsUpdate = true;
+        this.setColor(0xFFFFFF);
     }
 
     deselect() {
-        this.color = this.standardColor;
+        this.setColor(this.standardColor);
+    }
+
+    setColor(color) {
+        this.color = color;
         this.point.material.color.set(this.color);
         this.point.material.needsUpdate = true;
     }

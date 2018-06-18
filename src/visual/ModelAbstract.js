@@ -15,7 +15,11 @@ export default class VisualModelAbstract
     }
 
     _onRender(event) {
-        this.render(event.detail.epoch);
+        try {
+            this.render(event.detail.epoch);
+        } catch (e) {
+            this.threeObj.visible = false;
+        }
     }
 
     render(epoch) {}
@@ -23,12 +27,10 @@ export default class VisualModelAbstract
     drop() {
         if (this.threeObj) {
             this.scene.remove(this.threeObj);
-            if (this.threeObj.geometry) {
-                this.threeObj.geometry.dispose();
-            }
-            if (this.threeObj.material) {
-                this.threeObj.material.dispose();
-            }
+            this.threeObj.traverse(object => {
+                if (object.geometry) object.geometry.dispose();
+                if (object.material) object.material.dispose();
+            });
             delete this.threeObj;
         }
         document.removeEventListener(Events.RENDER, this.renderListener);

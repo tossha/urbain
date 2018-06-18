@@ -15,6 +15,7 @@ export default class StarSystem
         this.referenceFrames = {};
         this.trajectories = {};
         this.objects = {};
+        this.created = 0;
     }
 
     addStars(stars) {

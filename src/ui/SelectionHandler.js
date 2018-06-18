@@ -93,9 +93,7 @@ export default class SelectionHandler extends VisualModelAbstract
             return;
         }
 
-        if (this.selectedObject) {
-            this.deselect();
-        }
+        this.deselect();
 
         if (this.bestIntersection) {
             let currentTraj = this.bestIntersection.object.userData.trajectory;
@@ -106,6 +104,11 @@ export default class SelectionHandler extends VisualModelAbstract
                 this.select(currentTraj);
             }
         }
+    }
+
+    forceSelection(object) {
+        this.deselect();
+        this.select(object);
     }
 
     getSelectedObject() {
@@ -120,6 +123,10 @@ export default class SelectionHandler extends VisualModelAbstract
     }
 
     deselect() {
+        if (!this.selectedObject) {
+            return;
+        }
+
         Events.dispatch(Events.DESELECT, {trajectory: this.selectedObject});
 
         this.selectedObject.deselect();

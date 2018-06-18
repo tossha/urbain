@@ -2,6 +2,7 @@
 import TrajectoryAbstract from "./Abstract";
 import {RF_BASE} from "../ReferenceFrame/Factory";
 import TimeLine from "../../ui/TimeLine";
+import ExceptionOutOfRange from "./ExceptionOutOfRange";
 
 export default class TrajectoryComposite extends TrajectoryAbstract
 {
@@ -26,18 +27,19 @@ export default class TrajectoryComposite extends TrajectoryAbstract
     }
 
     getReferenceFrameByEpoch(epoch) {
-        const traj = this._getTrajectoryByEpoch(epoch);
-        return traj ? traj.getReferenceFrameByEpoch(epoch) : null;
+        return this._getTrajectoryByEpoch(epoch).getReferenceFrameByEpoch(epoch);
     }
 
     getStateInOwnFrameByEpoch(epoch) {
-        const traj = this._getTrajectoryByEpoch(epoch);
-        return traj ? traj.getStateInOwnFrameByEpoch(epoch) : null;
+        return this._getTrajectoryByEpoch(epoch).getStateInOwnFrameByEpoch(epoch);
+    }
+
+    getKeplerianObjectByEpoch(epoch) {
+        return this._getTrajectoryByEpoch(epoch).getKeplerianObjectByEpoch(epoch);
     }
 
     getStateByEpoch(epoch, referenceFrameOrId) {
-        const traj = this._getTrajectoryByEpoch(epoch);
-        return traj ? traj.getStateByEpoch(epoch, referenceFrameOrId) : null;
+        return this._getTrajectoryByEpoch(epoch).getStateByEpoch(epoch, referenceFrameOrId);
     }
 
     _getTrajectoryByEpoch(epoch) {
@@ -57,12 +59,7 @@ export default class TrajectoryComposite extends TrajectoryAbstract
             }
         }
 
-        console.log('Insufficient ephemeris data has been loaded to compute the state of ' +
-            (this.object && this.object.id) + ' (' + (this.object && this.object.name) + ') at the ephemeris epoch ' +
-            epoch + ' (' + TimeLine.getDateByEpoch(epoch) + ').'
-        );
-
-        return null;
+        throw new ExceptionOutOfRange(this.object, epoch, this.minEpoch, this.maxEpoch);
     }
 
     addComponent(trajectory) {

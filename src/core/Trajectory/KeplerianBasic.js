@@ -73,6 +73,7 @@ export default class TrajectoryKeplerianBasic extends TrajectoryKeplerianAbstrac
     }
 
     getKeplerianObjectByEpoch(epoch) {
+        this.validateEpoch(epoch);
         return this.keplerianObject;
     }
 }

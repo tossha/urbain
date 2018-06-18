@@ -1757,7 +1757,11 @@ class VisualModelAbstract
     }
 
     _onRender(event) {
-        this.render(event.detail.epoch);
+        try {
+            this.render(event.detail.epoch);
+        } catch (e) {
+            this.threeObj.visible = false;
+        }
     }
 
     render(epoch) {}
@@ -1765,12 +1769,10 @@ class VisualModelAbstract
     drop() {
         if (this.threeObj) {
             this.scene.remove(this.threeObj);
-            if (this.threeObj.geometry) {
-                this.threeObj.geometry.dispose();
-            }
-            if (this.threeObj.material) {
-                this.threeObj.material.dispose();
-            }
+            this.threeObj.traverse(object => {
+                if (object.geometry) object.geometry.dispose();
+                if (object.material) object.material.dispose();
+            });
             delete this.threeObj;
         }
         document.removeEventListener(__WEBPACK_IMPORTED_MODULE_0__core_Events__["a" /* default */].RENDER, this.renderListener);
@@ -2378,95 +2380,95 @@ const CHARON    = 901;
 /*
 *---------------  REFERENCE_FRAMES  ---------------
  */
-const RF_SUN_INERTIAL = 1010000;
+const RF_SUN_INERTIAL = 1001000;
 /* unused harmony export RF_SUN_INERTIAL */
 
 
-const RF_MERCURY_BARYCENTER_INERTIAL = 1001000;
+const RF_MERCURY_BARYCENTER_INERTIAL = 101000;
 /* unused harmony export RF_MERCURY_BARYCENTER_INERTIAL */
 
-const RF_VENUS_BARYCENTER_INERTIAL   = 1002000;
+const RF_VENUS_BARYCENTER_INERTIAL   = 201000;
 /* unused harmony export RF_VENUS_BARYCENTER_INERTIAL */
 
-const RF_EARTH_BARYCENTER_INERTIAL   = 1003000;
+const RF_EARTH_BARYCENTER_INERTIAL   = 301000;
 /* unused harmony export RF_EARTH_BARYCENTER_INERTIAL */
 
-const RF_MARS_BARYCENTER_INERTIAL    = 1004000;
+const RF_MARS_BARYCENTER_INERTIAL    = 401000;
 /* unused harmony export RF_MARS_BARYCENTER_INERTIAL */
 
-const RF_JUPITER_BARYCENTER_INERTIAL = 1005000;
+const RF_JUPITER_BARYCENTER_INERTIAL = 501000;
 /* unused harmony export RF_JUPITER_BARYCENTER_INERTIAL */
 
-const RF_SATURN_BARYCENTER_INERTIAL  = 1006000;
+const RF_SATURN_BARYCENTER_INERTIAL  = 601000;
 /* unused harmony export RF_SATURN_BARYCENTER_INERTIAL */
 
-const RF_URANUS_BARYCENTER_INERTIAL  = 1007000;
+const RF_URANUS_BARYCENTER_INERTIAL  = 701000;
 /* unused harmony export RF_URANUS_BARYCENTER_INERTIAL */
 
-const RF_NEPTUNE_BARYCENTER_INERTIAL = 1008000;
+const RF_NEPTUNE_BARYCENTER_INERTIAL = 801000;
 /* unused harmony export RF_NEPTUNE_BARYCENTER_INERTIAL */
 
-const RF_PLUTO_BARYCENTER_INERTIAL   = 1009000;
+const RF_PLUTO_BARYCENTER_INERTIAL   = 901000;
 /* unused harmony export RF_PLUTO_BARYCENTER_INERTIAL */
 
 
-const RF_MERCURY_INERTIAL   = 1199000;
+const RF_MERCURY_INERTIAL   = 19901000;
 /* unused harmony export RF_MERCURY_INERTIAL */
 
-const RF_VENUS_INERTIAL     = 1299000;
+const RF_VENUS_INERTIAL     = 29901000;
 /* unused harmony export RF_VENUS_INERTIAL */
 
-const RF_EARTH_INERTIAL     = 1399000;
+const RF_EARTH_INERTIAL     = 39901000;
 /* unused harmony export RF_EARTH_INERTIAL */
 
-const RF_MARS_INERTIAL      = 1499000;
+const RF_MARS_INERTIAL      = 49901000;
 /* unused harmony export RF_MARS_INERTIAL */
 
-const RF_JUPITER_INERTIAL   = 1599000;
+const RF_JUPITER_INERTIAL   = 59901000;
 /* unused harmony export RF_JUPITER_INERTIAL */
 
-const RF_SATURN_INERTIAL    = 1699000;
+const RF_SATURN_INERTIAL    = 69901000;
 /* unused harmony export RF_SATURN_INERTIAL */
 
-const RF_URANUS_INERTIAL    = 1799000;
+const RF_URANUS_INERTIAL    = 79901000;
 /* unused harmony export RF_URANUS_INERTIAL */
 
-const RF_NEPTUNE_INERTIAL   = 1899000;
+const RF_NEPTUNE_INERTIAL   = 89901000;
 /* unused harmony export RF_NEPTUNE_INERTIAL */
 
-const RF_PLUTO_INERTIAL     = 1999000;
+const RF_PLUTO_INERTIAL     = 99901000;
 /* unused harmony export RF_PLUTO_INERTIAL */
 
 
-const RF_MOON_INERTIAL      = 1301000;
+const RF_MOON_INERTIAL      = 30101000;
 /* unused harmony export RF_MOON_INERTIAL */
 
-const RF_IO_INERTIAL        = 1501000;
+const RF_IO_INERTIAL        = 50101000;
 /* unused harmony export RF_IO_INERTIAL */
 
-const RF_EUROPA_INERTIAL    = 1502000;
+const RF_EUROPA_INERTIAL    = 50201000;
 /* unused harmony export RF_EUROPA_INERTIAL */
 
-const RF_GANYMEDE_INERTIAL  = 1503000;
+const RF_GANYMEDE_INERTIAL  = 50301000;
 /* unused harmony export RF_GANYMEDE_INERTIAL */
 
-const RF_CALLISTO_INERTIAL  = 1504000;
+const RF_CALLISTO_INERTIAL  = 50401000;
 /* unused harmony export RF_CALLISTO_INERTIAL */
 
-const RF_MIMAS_INERTIAL     = 1601000;
+const RF_MIMAS_INERTIAL     = 60101000;
 /* unused harmony export RF_MIMAS_INERTIAL */
 
-const RF_ENCELADUS_INERTIAL = 1602000;
+const RF_ENCELADUS_INERTIAL = 60201000;
 /* unused harmony export RF_ENCELADUS_INERTIAL */
 
-const RF_TITAN_INERTIAL     = 1606000;
+const RF_TITAN_INERTIAL     = 60601000;
 /* unused harmony export RF_TITAN_INERTIAL */
 
-const RF_CHARON_INERTIAL    = 1901000;
+const RF_CHARON_INERTIAL    = 90101000;
 /* unused harmony export RF_CHARON_INERTIAL */
 
 
-const RF_EARTH_EQUATORIAL_INERTIAL = 2399000;
+const RF_EARTH_EQUATORIAL_INERTIAL = 39902000;
 /* unused harmony export RF_EARTH_EQUATORIAL_INERTIAL */
 
 
@@ -2518,52 +2520,22 @@ class Body extends __WEBPACK_IMPORTED_MODULE_0__EphemerisObject__["a" /* default
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__Abstract__ = __webpack_require__(16);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__FunctionOfEpoch_Custom__ = __webpack_require__(10);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__ReferenceFrame_InertialDynamic__ = __webpack_require__(20);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__KeplerianEditor__ = __webpack_require__(45);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__Events__ = __webpack_require__(3);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__Abstract__ = __webpack_require__(16);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__KeplerianEditor__ = __webpack_require__(45);
 
 
 
 
-
-class TrajectoryKeplerianAbstract extends __WEBPACK_IMPORTED_MODULE_0__Abstract__["a" /* default */]
+class TrajectoryKeplerianAbstract extends __WEBPACK_IMPORTED_MODULE_1__Abstract__["a" /* default */]
 {
     constructor(referenceFrameId) {
         super();
         this.setReferenceFrame(referenceFrameId);
-
-        this.orbitalReferenceFrame = new __WEBPACK_IMPORTED_MODULE_2__ReferenceFrame_InertialDynamic__["a" /* default */](
-            new __WEBPACK_IMPORTED_MODULE_1__FunctionOfEpoch_Custom__["a" /* default */]((epoch) => {
-                return this.referenceFrame.getOriginStateByEpoch(epoch);
-            }),
-            new __WEBPACK_IMPORTED_MODULE_1__FunctionOfEpoch_Custom__["a" /* default */]((epoch) => {
-                const quat = this.referenceFrame.getQuaternionByEpoch(epoch);
-                const ko = this.getKeplerianObjectByEpoch(epoch);
-                return (quat && ko) ? quat.mul_(ko.getOrbitalFrameQuaternion()) : null;
-            })
-        );
-    }
-
-    select() {
-        this.keplerianEditor = new __WEBPACK_IMPORTED_MODULE_3__KeplerianEditor__["a" /* default */](this, false);
-        super.select();
-    }
-
-    deselect() {
-        this.keplerianEditor.remove();
-        delete this.keplerianEditor;
-        super.deselect();
-    }
-
-    getPeriapsisVector(epoch) {
-        const ko = this.getKeplerianObjectByEpoch(epoch);
-        return ko ? ko.getPeriapsisVector() : null;
     }
 
     getStateInOwnFrameByEpoch(epoch) {
-        const ko = this.getKeplerianObjectByEpoch(epoch);
-        return ko ? ko.getStateByEpoch(epoch) : null;
+        return this.getKeplerianObjectByEpoch(epoch).getStateByEpoch(epoch);
     }
 }
 /* harmony export (immutable) */ __webpack_exports__["a"] = TrajectoryKeplerianAbstract;
@@ -2690,6 +2662,14 @@ class ReferenceFrameAbstract
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__StateVector__ = __webpack_require__(4);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__ReferenceFrame_Factory__ = __webpack_require__(1);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__KeplerianObject__ = __webpack_require__(7);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__ExceptionOutOfRange__ = __webpack_require__(72);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_4__FunctionOfEpoch_Custom__ = __webpack_require__(10);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_5__ReferenceFrame_InertialDynamic__ = __webpack_require__(20);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_6__KeplerianEditor__ = __webpack_require__(45);
+
+
+
+
 
 
 
@@ -2709,6 +2689,17 @@ class TrajectoryAbstract
         this.parent = null;
 
         this.referenceFrame = null;
+
+        this.orbitalReferenceFrame = new __WEBPACK_IMPORTED_MODULE_5__ReferenceFrame_InertialDynamic__["a" /* default */](
+            new __WEBPACK_IMPORTED_MODULE_4__FunctionOfEpoch_Custom__["a" /* default */]((epoch) => {
+                return this.getReferenceFrameByEpoch(epoch).getOriginStateByEpoch(epoch);
+            }),
+            new __WEBPACK_IMPORTED_MODULE_4__FunctionOfEpoch_Custom__["a" /* default */]((epoch) => {
+                const quat = this.getReferenceFrameByEpoch(epoch).getQuaternionByEpoch(epoch);
+                const ko = this.getKeplerianObjectByEpoch(epoch);
+                return quat.mul_(ko.getOrbitalFrameQuaternion());
+            })
+        );
     }
 
     setReferenceFrame(referenceFrameId) {
@@ -2721,9 +2712,6 @@ class TrajectoryAbstract
 
     getKeplerianObjectByEpoch(epoch) {
         const rf = this.getReferenceFrameByEpoch(epoch);
-        if (!rf || !rf.mu) {
-            return null;
-        }
         return __WEBPACK_IMPORTED_MODULE_2__KeplerianObject__["a" /* default */].createFromState(this.getStateInOwnFrameByEpoch(epoch), rf.mu, epoch);
     }
 
@@ -2747,13 +2735,41 @@ class TrajectoryAbstract
 
     select() {
         this.visualModel && this.visualModel.select();
+        if (!this.parent) {
+            this.keplerianEditor = new __WEBPACK_IMPORTED_MODULE_6__KeplerianEditor__["a" /* default */](this, this.keplerianObject !== undefined);
+        }
     }
 
     deselect() {
         this.visualModel && this.visualModel.deselect();
+        if (this.keplerianEditor) {
+            this.keplerianEditor.remove();
+            delete this.keplerianEditor;
+        }
+    }
+
+    isValidAtEpoch(epoch) {
+        if (this.minEpoch !== null && this.minEpoch !== false) {
+            if (epoch < this.minEpoch) {
+                return false;
+            }
+        }
+        if (this.maxEpoch !== null && this.maxEpoch !== false) {
+            if (epoch > this.maxEpoch) {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    validateEpoch(epoch) {
+        if (!this.isValidAtEpoch(epoch)) {
+            throw new __WEBPACK_IMPORTED_MODULE_3__ExceptionOutOfRange__["a" /* default */](this.object, epoch, this.minEpoch, this.maxEpoch);
+        }
     }
 
     getStateInOwnFrameByEpoch(epoch) {
+        this.validateEpoch(epoch);
         return new __WEBPACK_IMPORTED_MODULE_0__StateVector__["a" /* default */]();
     }
 
@@ -2786,13 +2802,11 @@ class TrajectoryAbstract
     }
 
     getPositionByEpoch(epoch, referenceFrameOrId) {
-        const state = this.getStateByEpoch(epoch, referenceFrameOrId);
-        return (state !== null) ? state.position : null;
+        return this.getStateByEpoch(epoch, referenceFrameOrId).position;
     }
 
     getVelocityByEpoch(epoch, referenceFrameOrId) {
-        const state = this.getStateByEpoch(epoch, referenceFrameOrId);
-        return (state !== null) ? state.velocity : null;
+        return this.getStateByEpoch(epoch, referenceFrameOrId).velocity;
     }
 }
 /* harmony export (immutable) */ __webpack_exports__["a"] = TrajectoryAbstract;
@@ -2880,6 +2894,7 @@ class TrajectoryKeplerianBasic extends __WEBPACK_IMPORTED_MODULE_0__KeplerianAbs
     }
 
     getKeplerianObjectByEpoch(epoch) {
+        this.validateEpoch(epoch);
         return this.keplerianObject;
     }
 }
@@ -3583,17 +3598,12 @@ class TrajectoryKeplerianArray extends __WEBPACK_IMPORTED_MODULE_0__KeplerianAbs
     }
 
     getKeplerianObjectByEpoch(epoch) {
-        if ((this.minEpoch === null) || (epoch <= this.minEpoch)) {
-            return this.keplerianObjects[0];
-        }
-        if ((this.maxEpoch === null) || (epoch >= this.maxEpoch)) {
-            return this.keplerianObjects[this.keplerianObjects.length - 1];
-        }
+        this.validateEpoch(epoch);
 
         let nextIdx = Math.ceil((epoch - this.minEpoch) / (this.maxEpoch - this.minEpoch) * (this.keplerianObjects.length - 1));
         let searchDirection = this.keplerianObjects[nextIdx].epoch > epoch ? -1 : 1;
 
-        while ((nextIdx < this.keplerianObjects.length) && (nextIdx > 0)) {
+        while ((nextIdx < this.keplerianObjects.length) && (nextIdx >= 0)) {
             if (this.keplerianObjects[nextIdx].epoch == epoch) {
                 return this.keplerianObjects[nextIdx];
             }
@@ -3662,7 +3672,8 @@ class TrajectoryKeplerianArray extends __WEBPACK_IMPORTED_MODULE_0__KeplerianAbs
 "use strict";
 /* WEBPACK VAR INJECTION */(function(THREE) {class LineObject extends THREE.Line {
     raycast(raycaster, intersects) {
-        const verticesCount = this.geometry.vertices.length;
+        const isBuffer = this.geometry.isBufferGeometry;
+        const verticesCount = isBuffer ? this.geometry.attributes.position.count : this.geometry.vertices.length;
         let bestIntersection;
 
         const ray = (new THREE.Ray())
@@ -3673,11 +3684,20 @@ class TrajectoryKeplerianArray extends __WEBPACK_IMPORTED_MODULE_0__KeplerianAbs
             );
 
         for (let i = 0; i < verticesCount - 1; i++) {
-            const vertex1 = (new THREE.Vector3)
-                .copy(this.geometry.vertices[i]);
-
-            const vertex2 = (new THREE.Vector3)
-                .copy(this.geometry.vertices[(i + 1) % verticesCount]);
+            let vertex1;
+            let vertex2;
+            if (isBuffer) {
+                const i1 = i * 3;
+                const i2 = ((i + 1) % verticesCount) * 3;
+                let positions = this.geometry.attributes.position.array;
+                vertex1 = new THREE.Vector3(positions[i1], positions[i1+1], positions[i1+2]);
+                vertex2 = new THREE.Vector3(positions[i2], positions[i2+1], positions[i2+2]);
+            } else {
+                vertex1 = (new THREE.Vector3)
+                    .copy(this.geometry.vertices[i]);
+                vertex2 = (new THREE.Vector3)
+                    .copy(this.geometry.vertices[(i + 1) % verticesCount]);
+            }
 
             const currentLineDirection = (new THREE.Vector3).subVectors(
                 vertex1,
@@ -3764,6 +3784,8 @@ class TrajectoryKeplerianArray extends __WEBPACK_IMPORTED_MODULE_0__KeplerianAbs
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__Abstract__ = __webpack_require__(16);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__ReferenceFrame_Factory__ = __webpack_require__(1);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__ui_TimeLine__ = __webpack_require__(21);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__ExceptionOutOfRange__ = __webpack_require__(72);
+
 
 
 
@@ -3792,18 +3814,19 @@ class TrajectoryComposite extends __WEBPACK_IMPORTED_MODULE_0__Abstract__["a" /*
     }
 
     getReferenceFrameByEpoch(epoch) {
-        const traj = this._getTrajectoryByEpoch(epoch);
-        return traj ? traj.getReferenceFrameByEpoch(epoch) : null;
+        return this._getTrajectoryByEpoch(epoch).getReferenceFrameByEpoch(epoch);
     }
 
     getStateInOwnFrameByEpoch(epoch) {
-        const traj = this._getTrajectoryByEpoch(epoch);
-        return traj ? traj.getStateInOwnFrameByEpoch(epoch) : null;
+        return this._getTrajectoryByEpoch(epoch).getStateInOwnFrameByEpoch(epoch);
+    }
+
+    getKeplerianObjectByEpoch(epoch) {
+        return this._getTrajectoryByEpoch(epoch).getKeplerianObjectByEpoch(epoch);
     }
 
     getStateByEpoch(epoch, referenceFrameOrId) {
-        const traj = this._getTrajectoryByEpoch(epoch);
-        return traj ? traj.getStateByEpoch(epoch, referenceFrameOrId) : null;
+        return this._getTrajectoryByEpoch(epoch).getStateByEpoch(epoch, referenceFrameOrId);
     }
 
     _getTrajectoryByEpoch(epoch) {
@@ -3823,12 +3846,7 @@ class TrajectoryComposite extends __WEBPACK_IMPORTED_MODULE_0__Abstract__["a" /*
             }
         }
 
-        console.log('Insufficient ephemeris data has been loaded to compute the state of ' +
-            (this.object && this.object.id) + ' (' + (this.object && this.object.name) + ') at the ephemeris epoch ' +
-            epoch + ' (' + __WEBPACK_IMPORTED_MODULE_2__ui_TimeLine__["a" /* default */].getDateByEpoch(epoch) + ').'
-        );
-
-        return null;
+        throw new __WEBPACK_IMPORTED_MODULE_3__ExceptionOutOfRange__["a" /* default */](this.object, epoch, this.minEpoch, this.maxEpoch);
     }
 
     addComponent(trajectory) {
@@ -3869,12 +3887,15 @@ class TrajectoryComposite extends __WEBPACK_IMPORTED_MODULE_0__Abstract__["a" /*
 
 class VisualTrajectoryModelAbstract extends __WEBPACK_IMPORTED_MODULE_0__ModelAbstract__["a" /* default */]
 {
-    constructor(trajectory, color) {
+    constructor(trajectory, config) {
         super();
 
         this.trajectory = trajectory;
-        this.standardColor = color;
-        this.color = color;
+        this.standardColor = config.color;
+        this.color = config.color;
+
+        this.minEpoch = config.minEpoch || trajectory.minEpoch || null;
+        this.maxEpoch = config.maxEpoch || trajectory.maxEpoch || null;
 
         this.setThreeObj(new __WEBPACK_IMPORTED_MODULE_1__LineObject__["a" /* default */](
             new THREE.Geometry(),
@@ -3883,10 +3904,10 @@ class VisualTrajectoryModelAbstract extends __WEBPACK_IMPORTED_MODULE_0__ModelAb
 
         this.point = new THREE.Mesh(
             new THREE.SphereGeometry(1, 8, 8),
-            new THREE.MeshBasicMaterial({color: color})
+            new THREE.MeshBasicMaterial({color: this.color})
         );
         this.scene.add(this.point);
-        this.pointSize = 3;
+        this.pointSize = 4;
 
         this.threeObj.userData = {trajectory: trajectory};
         sim.selection.addSelectableObject(this.threeObj);
@@ -3907,29 +3928,33 @@ class VisualTrajectoryModelAbstract extends __WEBPACK_IMPORTED_MODULE_0__ModelAb
         }
     }
 
+    getRenderingEpoch(epoch) {
+        if ((this.minEpoch !== null && epoch < this.minEpoch)
+            || (this.maxEpoch !== null && epoch > this.maxEpoch)
+        ) {
+            return null;
+        }
+
+        if (!this.trajectory.isValidAtEpoch(epoch)) {
+            if (this.trajectory.minEpoch !== null && epoch < this.trajectory.minEpoch) {
+                return this.trajectory.minEpoch;
+            }
+            if (this.trajectory.maxEpoch !== null && epoch > this.trajectory.maxEpoch) {
+                return this.trajectory.maxEpoch;
+            }
+        }
+
+        return epoch;
+    }
+
     render(epoch) {
-        if (this.trajectory.minEpoch !== null && this.trajectory.minEpoch !== false) {
-            if (epoch < this.trajectory.minEpoch) {
-                this.point.visible = false;
-                return;
-            }
-        }
-        if (this.trajectory.maxEpoch !== null && this.trajectory.maxEpoch !== false) {
-            if (epoch > this.trajectory.maxEpoch) {
-                this.point.visible = false;
-                return;
-            }
-        }
-
-        const pos = this.trajectory.getPositionByEpoch(epoch);
-
-        if (!pos) {
+        if (!this.trajectory.isValidAtEpoch(epoch)) {
             this.point.visible = false;
             return;
         }
 
         this.point.visible = true;
-        this.point.position.copy(sim.getVisualCoords(pos));
+        this.point.position.copy(sim.getVisualCoords(this.trajectory.getPositionByEpoch(epoch)));
         const scaleKoeff = this.pointSize * this.point.position.length() * sim.raycaster.getPixelAngleSize();
         this.point.scale.x = scaleKoeff;
         this.point.scale.y = scaleKoeff;
@@ -3937,13 +3962,15 @@ class VisualTrajectoryModelAbstract extends __WEBPACK_IMPORTED_MODULE_0__ModelAb
     }
 
     select() {
-        this.color = 0xFFFFFF;
-        this.point.material.color.set(this.color);
-        this.point.material.needsUpdate = true;
+        this.setColor(0xFFFFFF);
     }
 
     deselect() {
-        this.color = this.standardColor;
+        this.setColor(this.standardColor);
+    }
+
+    setColor(color) {
+        this.color = color;
         this.point.material.color.set(this.color);
         this.point.material.needsUpdate = true;
     }
@@ -3984,17 +4011,12 @@ class VisualTrajectoryModelKeplerian extends __WEBPACK_IMPORTED_MODULE_0__Abstra
     render(epoch)
     {
         super.render(epoch);
-        if (this.trajectory.minEpoch !== null && this.trajectory.minEpoch !== false) {
-            if (epoch < this.trajectory.minEpoch) {
-                this.threeObj.visible = false;
-                return;
-            }
-        }
-        if (this.trajectory.maxEpoch !== null && this.trajectory.maxEpoch !== false) {
-            if (epoch > this.trajectory.maxEpoch) {
-                this.threeObj.visible = false;
-                return;
-            }
+
+        epoch = this.getRenderingEpoch(epoch);
+
+        if (epoch === null) {
+            this.threeObj.visible = false;
+            return;
         }
 
         const keplerianObject = this.trajectory.getKeplerianObjectByEpoch(epoch);
@@ -9064,15 +9086,16 @@ class TrajectoryLoader
             trajectory.maxEpoch = config.periodEnd;
         }
 
-        if (config.rendering !== undefined) {
-            if (config.rendering.keplerianModel) {
-                visualModel = new __WEBPACK_IMPORTED_MODULE_7__visual_TrajectoryModel_Keplerian__["a" /* default */](trajectory, config.rendering.color);
-            } else if (config.rendering.pointArrayModel) {
-                visualModel = new __WEBPACK_IMPORTED_MODULE_6__visual_TrajectoryModel_PointArray__["a" /* default */](
-                    trajectory,
-                    config.rendering.color,
-                    config.rendering.pointArrayModel
-                );
+        // temporary
+        if (config.rendering) {
+            config.visual = config.rendering;
+        }
+
+        if (config.visual !== undefined) {
+            if (config.visual.keplerianModel) {
+                visualModel = new __WEBPACK_IMPORTED_MODULE_7__visual_TrajectoryModel_Keplerian__["a" /* default */](trajectory, config.visual);
+            } else if (config.visual.pointArrayModel) {
+                visualModel = new __WEBPACK_IMPORTED_MODULE_6__visual_TrajectoryModel_PointArray__["a" /* default */](trajectory, config.visual);
             }
         }
 
@@ -9173,11 +9196,9 @@ class TrajectoryLoader
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__Events__ = __webpack_require__(3);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__FunctionOfEpoch_Custom__ = __webpack_require__(10);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__algebra__ = __webpack_require__(0);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__visual_HelperAngle__ = __webpack_require__(46);
-
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__FunctionOfEpoch_Custom__ = __webpack_require__(10);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__algebra__ = __webpack_require__(0);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__visual_Angle__ = __webpack_require__(73);
 
 
 
@@ -9185,164 +9206,85 @@ class TrajectoryLoader
 class KeplerianEditor
 {
     constructor(trajectory, isEditMode) {
-        this.isEditMode = isEditMode;
+        this.isEditMode = isEditMode && (trajectory.keplerianObject !== undefined);
         this.trajectory = trajectory;
+
+        this.colorRaan = 0x7FFFD4; //lightblue
+        this.colorAop  = 0x9966CC; //violet
+        this.colorInc  = 0xB00000; //red
+        this.colorTa   = 0xFC0FC0; //pink
+
         if (sim.settings.ui.showAnglesOfSelectedOrbit) {
             this.init();
         }
-        this.raanAngleColor = 0x7FFFD4; //lightblue
-        this.aopAngleColor  = 0x9966CC; //violet
-        this.incAngleColor  = 0xB00000; //red
-        this.taAngleColor   = 0xFC0FC0; //pink
     }
 
     init() {
-        this.initAnglesListener = this.initAngles.bind(this);
-        document.addEventListener(__WEBPACK_IMPORTED_MODULE_0__Events__["a" /* default */].RENDER, this.initAnglesListener);
-    }
+        let referenceFrame = new __WEBPACK_IMPORTED_MODULE_0__FunctionOfEpoch_Custom__["a" /* default */](epoch => this.trajectory.getReferenceFrameByEpoch(epoch));
+        let position = new __WEBPACK_IMPORTED_MODULE_1__algebra__["c" /* Vector */](3);
 
-    initAngles(event) {
-        const keplerianObject = this.trajectory.getKeplerianObjectByEpoch(event.detail.epoch);
-        let that = this;
-        const originPosition = new __WEBPACK_IMPORTED_MODULE_1__FunctionOfEpoch_Custom__["a" /* default */]((epoch) => {
-            return that.trajectory.referenceFrame.getOriginPositionByEpoch(epoch)
-        });
+        this.angleRaan = new __WEBPACK_IMPORTED_MODULE_2__visual_Angle__["a" /* default */](
+            referenceFrame,
+            position,
+            new __WEBPACK_IMPORTED_MODULE_1__algebra__["a" /* Quaternion */](),
+            new __WEBPACK_IMPORTED_MODULE_0__FunctionOfEpoch_Custom__["a" /* default */](epoch => this.trajectory.getKeplerianObjectByEpoch(epoch).raan),
+            this.colorRaan,
+            1,
+            this.isEditMode ? __WEBPACK_IMPORTED_MODULE_2__visual_Angle__["a" /* default */].TYPE_SECTOR : __WEBPACK_IMPORTED_MODULE_2__visual_Angle__["a" /* default */].TYPE_ARC,
+            this.isEditMode ? value => { this.trajectory.keplerianObject.raan = value; } : null
+        );
 
-        this.calculateAdditionalParameters(keplerianObject);
+        this.angleInc = new __WEBPACK_IMPORTED_MODULE_2__visual_Angle__["a" /* default */](
+            referenceFrame,
+            position,
+            new __WEBPACK_IMPORTED_MODULE_0__FunctionOfEpoch_Custom__["a" /* default */](epoch => {
+                const ko = this.trajectory.getKeplerianObjectByEpoch(epoch);
+                return (new __WEBPACK_IMPORTED_MODULE_1__algebra__["a" /* Quaternion */](new __WEBPACK_IMPORTED_MODULE_1__algebra__["c" /* Vector */]([0,0,1]), ko.raan + Math.PI / 2))
+                    .mul_(new __WEBPACK_IMPORTED_MODULE_1__algebra__["a" /* Quaternion */](new __WEBPACK_IMPORTED_MODULE_1__algebra__["c" /* Vector */]([1,0,0]), Math.PI / 2));
+            }),
+            new __WEBPACK_IMPORTED_MODULE_0__FunctionOfEpoch_Custom__["a" /* default */](epoch => this.trajectory.getKeplerianObjectByEpoch(epoch).inc),
+            this.colorInc,
+            2,
+            this.isEditMode ? __WEBPACK_IMPORTED_MODULE_2__visual_Angle__["a" /* default */].TYPE_SECTOR : __WEBPACK_IMPORTED_MODULE_2__visual_Angle__["a" /* default */].TYPE_ARC,
+            this.isEditMode ? value => { this.trajectory.keplerianObject.inc = value; } : null
+        );
 
-        this.raanAngle = new __WEBPACK_IMPORTED_MODULE_3__visual_HelperAngle__["a" /* default */](
-            originPosition,
-            this.trajectory.referenceFrame
-                .getQuaternionByEpoch(event.detail.epoch)
-                .rotate(new __WEBPACK_IMPORTED_MODULE_2__algebra__["c" /* Vector */]([1, 0, 0])),
-            this.trajectory.referenceFrame
-                .getQuaternionByEpoch(event.detail.epoch)
-                .rotate(new __WEBPACK_IMPORTED_MODULE_2__algebra__["c" /* Vector */]([0, 0, 1])),
-            keplerianObject.raan,
-            this.raanAngleColor,
+        this.angleAop = new __WEBPACK_IMPORTED_MODULE_2__visual_Angle__["a" /* default */](
+            referenceFrame,
+            position,
+            new __WEBPACK_IMPORTED_MODULE_0__FunctionOfEpoch_Custom__["a" /* default */](epoch => {
+                const ko = this.trajectory.getKeplerianObjectByEpoch(epoch);
+                return (new __WEBPACK_IMPORTED_MODULE_1__algebra__["a" /* Quaternion */](new __WEBPACK_IMPORTED_MODULE_1__algebra__["c" /* Vector */]([0,0,1]), ko.raan))
+                    .mul_(new __WEBPACK_IMPORTED_MODULE_1__algebra__["a" /* Quaternion */](new __WEBPACK_IMPORTED_MODULE_1__algebra__["c" /* Vector */]([1,0,0]), ko.inc));
+            }),
+            new __WEBPACK_IMPORTED_MODULE_0__FunctionOfEpoch_Custom__["a" /* default */](epoch => this.trajectory.getKeplerianObjectByEpoch(epoch).aop),
+            this.colorAop,
             3,
-            true
+            this.isEditMode ? __WEBPACK_IMPORTED_MODULE_2__visual_Angle__["a" /* default */].TYPE_SECTOR : __WEBPACK_IMPORTED_MODULE_2__visual_Angle__["a" /* default */].TYPE_ARC,
+            this.isEditMode ? value => { this.trajectory.keplerianObject.aop = value; } : null
         );
 
-        this.aopAngle = new __WEBPACK_IMPORTED_MODULE_3__visual_HelperAngle__["a" /* default */](
-            originPosition,
-            this.node,
-            this.normal,
-            keplerianObject.aop,
-            this.aopAngleColor,
-            2,
-            true
+        this.angleTa = new __WEBPACK_IMPORTED_MODULE_2__visual_Angle__["a" /* default */](
+            referenceFrame,
+            position,
+            new __WEBPACK_IMPORTED_MODULE_0__FunctionOfEpoch_Custom__["a" /* default */](epoch => {
+                const ko = this.trajectory.getKeplerianObjectByEpoch(epoch);
+                return (new __WEBPACK_IMPORTED_MODULE_1__algebra__["a" /* Quaternion */](new __WEBPACK_IMPORTED_MODULE_1__algebra__["c" /* Vector */]([0,0,1]), ko.raan))
+                    .mul_(new __WEBPACK_IMPORTED_MODULE_1__algebra__["a" /* Quaternion */](new __WEBPACK_IMPORTED_MODULE_1__algebra__["c" /* Vector */]([1,0,0]), ko.inc))
+                    .mul_(new __WEBPACK_IMPORTED_MODULE_1__algebra__["a" /* Quaternion */](new __WEBPACK_IMPORTED_MODULE_1__algebra__["c" /* Vector */]([0,0,1]), ko.aop));
+            }),
+            new __WEBPACK_IMPORTED_MODULE_0__FunctionOfEpoch_Custom__["a" /* default */](epoch => this.trajectory.getKeplerianObjectByEpoch(epoch).getTrueAnomalyByEpoch(epoch)),
+            this.colorTa,
+            4,
+            __WEBPACK_IMPORTED_MODULE_2__visual_Angle__["a" /* default */].TYPE_ARC
         );
-
-        this.incAngle = new __WEBPACK_IMPORTED_MODULE_3__visual_HelperAngle__["a" /* default */](
-            originPosition,
-            this.nodePerp,
-            this.node,
-            keplerianObject.inc,
-            this.incAngleColor,
-            2,
-            true
-        );
-
-        this.taAngle = new __WEBPACK_IMPORTED_MODULE_3__visual_HelperAngle__["a" /* default */](
-            originPosition,
-            this.periapsis,
-            this.normal,
-            keplerianObject.getTrueAnomalyByEpoch(event.detail.epoch),
-            this.taAngleColor,
-            1.5,
-            true
-        );
-
-        document.removeEventListener(__WEBPACK_IMPORTED_MODULE_0__Events__["a" /* default */].RENDER, this.initAnglesListener);
-        this.updateAnglesListener = this.updateAngles.bind(this);
-        document.addEventListener(__WEBPACK_IMPORTED_MODULE_0__Events__["a" /* default */].RENDER, this.updateAnglesListener);
-
-        if ((this.trajectory.minEpoch !== null && this.trajectory.minEpoch !== false && event.detail.epoch < this.trajectory.minEpoch)
-            || (this.trajectory.maxEpoch !== null && this.trajectory.maxEpoch !== false && event.detail.epoch > this.trajectory.maxEpoch)
-        ) {
-            this.raanAngle.hide();
-            this.aopAngle.hide();
-            this.incAngle.hide();
-            this.taAngle.hide();
-        }
-    }
-
-    updateAngles(event) {
-        if ((this.trajectory.minEpoch !== null && this.trajectory.minEpoch !== false && event.detail.epoch < this.trajectory.minEpoch)
-            || (this.trajectory.maxEpoch !== null && this.trajectory.maxEpoch !== false && event.detail.epoch > this.trajectory.maxEpoch)
-        ) {
-            this.raanAngle.hide();
-            this.aopAngle.hide();
-            this.incAngle.hide();
-            this.taAngle.hide();
-            return;
-        }
-
-        const keplerianObject = this.trajectory.getKeplerianObjectByEpoch(event.detail.epoch);
-        this.calculateAdditionalParameters(keplerianObject);
-
-        this.raanAngle.resize(keplerianObject.raan);
-        this.raanAngle.rearrange(
-            this.trajectory.referenceFrame
-                .getQuaternionByEpoch(event.detail.epoch)
-                .rotate(new __WEBPACK_IMPORTED_MODULE_2__algebra__["c" /* Vector */]([1, 0, 0])),
-
-            this.trajectory.referenceFrame
-                .getQuaternionByEpoch(event.detail.epoch)
-                .rotate(new __WEBPACK_IMPORTED_MODULE_2__algebra__["c" /* Vector */]([0, 0, 1]))
-        );
-
-        this.aopAngle.resize(keplerianObject.aop);
-        this.aopAngle.rearrange(this.node, this.normal);
-
-        this.incAngle.resize(keplerianObject.inc);
-        this.incAngle.rearrange(this.nodePerp, this.node);
-
-        this.taAngle.resize(keplerianObject.getTrueAnomalyByEpoch(event.detail.epoch));
-        this.taAngle.rearrange(this.periapsis, this.normal);
-        this.raanAngle.show();
-        this.aopAngle.show();
-        this.incAngle.show();
-        this.taAngle.show();
     }
 
     remove() {
-        if (this.raanAngle) this.raanAngle.remove();
-        if (this.aopAngle)  this.aopAngle.remove();
-        if (this.incAngle)  this.incAngle.remove();
-        if (this.taAngle)   this.taAngle.remove();
-
-        document.removeEventListener(__WEBPACK_IMPORTED_MODULE_0__Events__["a" /* default */].RENDER, this.updateAnglesListener);
-    }
-
-    calculateAdditionalParameters(keplerianObject) {
-        this.nodeQuaternion = new __WEBPACK_IMPORTED_MODULE_2__algebra__["a" /* Quaternion */](new __WEBPACK_IMPORTED_MODULE_2__algebra__["c" /* Vector */]([0, 0, 1]), keplerianObject.raan);
-
-        this.node = this.nodeQuaternion.rotate(new __WEBPACK_IMPORTED_MODULE_2__algebra__["c" /* Vector */]([1, 0, 0]));
-        this.normal = (new __WEBPACK_IMPORTED_MODULE_2__algebra__["a" /* Quaternion */](this.node, keplerianObject.inc)).rotate(new __WEBPACK_IMPORTED_MODULE_2__algebra__["c" /* Vector */]([0, 0, 1]));
-        this.aopQuaternion = new __WEBPACK_IMPORTED_MODULE_2__algebra__["a" /* Quaternion */](this.normal, keplerianObject.aop);
-
-        this.periapsis = this.aopQuaternion.mul(this.nodeQuaternion).rotate(new __WEBPACK_IMPORTED_MODULE_2__algebra__["c" /* Vector */]([1, 0, 0]));
-        this.nodePerp = this.nodeQuaternion.rotate(
-            new __WEBPACK_IMPORTED_MODULE_2__algebra__["c" /* Vector */]([1, 0, 0])
-                .rotateZ(Math.PI / 2)
-        );
-        this.node = this.trajectory.referenceFrame
-            .getQuaternionByEpoch(event.detail.epoch)
-            .rotate(this.node);
-
-        this.normal = this.trajectory.referenceFrame
-            .getQuaternionByEpoch(event.detail.epoch)
-            .rotate(this.normal);
-
-        this.periapsis = this.trajectory.referenceFrame
-            .getQuaternionByEpoch(event.detail.epoch)
-            .rotate(this.periapsis);
-
-        this.nodePerp = this.trajectory.referenceFrame
-            .getQuaternionByEpoch(event.detail.epoch)
-            .rotate(this.nodePerp);
+        if (this.angleRaan) this.angleRaan.drop();
+        if (this.angleAop)  this.angleAop.drop();
+        if (this.angleInc)  this.angleInc.drop();
+        if (this.angleTa)   this.angleTa.drop();
     }
 }
 /* harmony export (immutable) */ __webpack_exports__["a"] = KeplerianEditor;
@@ -9350,347 +9292,7 @@ class KeplerianEditor
 
 
 /***/ }),
-/* 46 */
-/***/ (function(module, __webpack_exports__, __webpack_require__) {
-
-"use strict";
-/* WEBPACK VAR INJECTION */(function(THREE) {/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__VirtualPlane__ = __webpack_require__(47);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__algebra__ = __webpack_require__(0);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__core_Events__ = __webpack_require__(3);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__LineObject__ = __webpack_require__(25);
-
-
-
-
-
-const INITIAL_SEGMENTS_NUMBER = 200;
-/* unused harmony export INITIAL_SEGMENTS_NUMBER */
-
-
-class HelperAngle
-{
-    constructor(functionOfEpoch, mainAxis, normal, angleValue, color, coefficientOfAxesLengthDecrease, isArcMode, editingCallback) {
-        this.value = angleValue;
-        this.color = color;
-        this.editingCallback = editingCallback;
-        this.positionAtEpoch = functionOfEpoch;
-        this.position = sim.getVisualCoords(this.positionAtEpoch.evaluate(sim.currentEpoch));
-        this.isArcMode = isArcMode;
-        this.coefficientOfAxesLengthDecrease = coefficientOfAxesLengthDecrease ? coefficientOfAxesLengthDecrease : 1;
-
-        this.setVectors(mainAxis, normal);
-
-        this.sizeParam = sim.camera.position.mag / 2;
-
-        this.isEditMode = false;
-
-        if (this.editingCallback) {
-            this.initEditMode();
-        }
-
-        this.onRenderListener = this.onRender.bind(this);
-        document.addEventListener(__WEBPACK_IMPORTED_MODULE_2__core_Events__["a" /* default */].RENDER, this.onRenderListener);
-
-        this.onWheelListener = this.onMouseWheel.bind(this);
-        document.addEventListener('wheel', this.onWheelListener);
-
-        this.init();
-    }
-
-    initEditMode() {
-        this.isEditMode = true;
-        this.mouseDownListener = this.onMouseDown.bind(this);
-        document.addEventListener('mousedown', this.mouseDownListener);
-    }
-
-    init() {
-        if (this.isArcMode === true) {
-            this.createArcModeAngleGeometry();
-
-            let material = new THREE.LineBasicMaterial({color: this.color});
-            this.threeAngle = new __WEBPACK_IMPORTED_MODULE_3__LineObject__["a" /* default */](this.threeAnglegeometry, material);
-
-            this.createPointersGeometries();
-            this.threeMainAxis = new THREE.Line(this.threeMainAxis.geometry, material);
-            this.threeDirection = new THREE.Line(this.threeDirection.geometry, material);
-
-        } else {
-            this.createSectorModeAngleGeometry();
-
-            let material = new THREE.MeshBasicMaterial({
-                color: this.color,
-                opacity: 0.175,
-                transparent: true,
-                side: THREE.DoubleSide
-            });
-
-            this.threeAngle = new THREE.Mesh(geometry, material);
-
-            this.threeMainAxis = new THREE.ArrowHelper(
-                this.mainAxis,
-                this.position,
-                this.sizeParam / this.coefficientOfAxesLengthDecrease,
-                this.color
-            );
-
-            this.threeDirection = new THREE.ArrowHelper(
-                this.direction,
-                this.position,
-                this.sizeParam / this.coefficientOfAxesLengthDecrease,
-                this.isEditMode ? 0xc2f442 : this.color
-            );
-        }
-
-        this.calculateQuaternions();
-
-        this.threeAngle.position.copy(this.position);
-        this.threeAngle.quaternion.copy(this.quaternion);
-        sim.scene.add(this.threeAngle);
-        sim.scene.add(this.threeMainAxis);
-        sim.scene.add(this.threeDirection);
-    }
-
-    hide() {
-        this.threeAngle.visible = false;
-        this.threeMainAxis.visible = false;
-        this.threeDirection.visible = false;
-    }
-
-    show() {
-        this.threeAngle.visible = true;
-        this.threeMainAxis.visible = true;
-        this.threeDirection.visible = true;
-    }
-
-    onRender(event) {
-        if (this.threeAngle.visible == false) {
-            return;
-        }
-
-        this.position = sim.getVisualCoords(this.positionAtEpoch.evaluate(event.detail.epoch));
-
-        if (this.isArcMode === true) {
-            this.deletePointersGeometries();
-            this.createPointersGeometries();
-        } else {
-            this.threeMainAxis.position.copy(this.position);
-            this.threeDirection.position.copy(this.position);
-        }
-
-        this.threeAngle.position.copy(this.position);
-    }
-
-    resize(newValue) {
-        this.value = newValue;
-
-        this.disposeGeometry(this.threeAngle);
-
-        this.direction = this.mainAxis
-                .clone()
-                .applyAxisAngle(this.normal, this.value);
-
-        if (this.isArcMode === true) {
-            this.disposeGeometry(this.threeDirection);
-
-            this.threeDirection.geometry = new THREE.Geometry();
-            this.threeDirection.geometry.vertices.push(
-                this.position,
-                this.position.clone().add(this.direction.clone().setLength(this.sizeParam / this.coefficientOfAxesLengthDecrease))
-            );
-
-            this.createArcModeAngleGeometry();
-        } else {
-            this.threeDirection.setDirection(this.direction);
-            this.createSectorModeAngleGeometry();
-        }
-
-        if (this.editingCallback) {
-            this.editingCallback(newValue);
-        }
-    }
-
-    rearrange(newMainAxis, newNormal) {
-        this.setVectors(newMainAxis, newNormal);
-
-        if (this.isArcMode === true) {
-            this.deletePointersGeometries();
-            this.createPointersGeometries();
-        } else {
-            this.threeMainAxis.setDirection(this.mainAxis);
-            this.threeDirection.setDirection(this.direction);
-        }
-
-        this.calculateQuaternions();
-        this.threeAngle.quaternion.copy(this.quaternion);
-    }
-
-    getVirtualPlane() {
-        let mrVector = (new THREE.Vector3).crossVectors(this.normal, this.position); //logic for names is required
-        let mrCathetus = (new THREE.Vector3).crossVectors(this.normal, mrVector);
-        let cos = this.position.dot(mrCathetus) / (this.position.length() * mrCathetus.length());
-        let angle = (cos >= 0) ? Math.acos(cos) : Math.PI - Math.acos(cos);
-        let distance = this.position.length() * Math.sin(angle);
-
-        if (this.virtualPlane) {
-            this.virtualPlane.constant = -distance;
-        } else {
-            this.virtualPlane = new __WEBPACK_IMPORTED_MODULE_0__VirtualPlane__["a" /* default */](this.normal, -distance);
-        }
-
-        return this.virtualPlane;
-    }
-
-     onMouseDown(event) {
-        let intersection;
-        if (this.isArcMode === true) {
-            intersection = sim.raycaster.intersectObjects(
-                [this.threeDirection.line]
-        )[0];
-            } else {
-            intersection = sim.raycaster.intersectObjects(
-                [this.threeDirection.line, this.threeDirection.cone]
-        )[0];
-        }
-
-        if ((intersection !== undefined) && (event.button == 0)) { //check if the mouse button pressed is left
-            this.mouseUpListener = this.onMouseUp.bind(this);
-            document.addEventListener('mouseup', this.mouseUpListener);
-            this.mouseMoveListener = this.onMouseMove.bind(this);
-            sim.addEventListener('mousemove', this.mouseMoveListener, 2);
-        }
-    }
-
-    onMouseUp(event) {
-        document.removeEventListener('mouseup', this.mouseUpListener);
-        sim.removeEventListener('mousemove', this.mouseMoveListener);
-    }
-
-    onMouseMove() {
-        let intersection = sim.raycaster.intersectObjects([this.getVirtualPlane()])[0];
-        if (intersection !== undefined) { 
-            const direction = intersection.point
-                .clone()
-                .sub(this.threeAngle.position)
-                .normalize();
-
-            let newAngleValue = Math.acos((this.mainAxis).dot(direction)); // no division by lengths because direction and mainAxis are normalized (length = 1)
-            let tempVector = this.mainAxis.clone();
-            tempVector.cross(direction);
-
-            newAngleValue = (tempVector.dot(this.normal) > 0) ? newAngleValue : __WEBPACK_IMPORTED_MODULE_1__algebra__["b" /* TWO_PI */] - newAngleValue;
-            this.resize(newAngleValue);
-        }
-    }
-
-    onMouseWheel() {
-        this.sizeParam = sim.camera.position.mag / 2;
-
-        this.disposeGeometry(this.threeAngle);
-
-        if (this.isArcMode === true) {
-            this.createArcModeAngleGeometry();
-            this.deletePointersGeometries();
-            this.createPointersGeometries();
-        } else {
-            this.createSectorModeAngleGeometry();
-            this.threeMainAxis.setLength(this.sizeParam / this.coefficientOfAxesLengthDecrease, this.threeMainAxis.headLength, this.threeMainAxis.headWidth);
-            this.threeDirection.setLength(this.sizeParam / this.coefficientOfAxesLengthDecrease, this.threeDirection.headLength, this.threeDirection.headWidth);
-        }
-    }
-
-    remove() {
-        sim.scene.remove(this.threeAngle);
-        sim.scene.remove(this.threeMainAxis);
-        sim.scene.remove(this.threeDirection);
-
-        document.removeEventListener(__WEBPACK_IMPORTED_MODULE_2__core_Events__["a" /* default */].RENDER, this.onRenderListener);
-    }
-
-    createPointersGeometries() {
-        if (this.threeMainAxis === undefined){
-            this.threeMainAxis = {};
-            this.threeDirection = {}; 
-        }
-        this.threeMainAxis.geometry  = new THREE.Geometry();
-        this.threeDirection.geometry = new THREE.Geometry();
-
-        this.threeMainAxis.geometry.vertices.push(
-            this.position,
-            this.position.clone().add(this.mainAxis.clone().setLength(this.sizeParam / this.coefficientOfAxesLengthDecrease))
-        );
-
-        this.threeDirection.geometry.vertices.push(
-            this.position,
-            this.position.clone().add(this.direction.clone().setLength(this.sizeParam / this.coefficientOfAxesLengthDecrease))
-        );
-    }
-
-    deletePointersGeometries() {
-        this.disposeGeometry(this.threeMainAxis);
-        this.disposeGeometry(this.threeDirection)
-    }
-
-    setVectors(mainAxis, normal) {
-        this.mainAxis = (new THREE.Vector3).fromArray(mainAxis).normalize();
-        this.normal   = (new THREE.Vector3).fromArray(normal).normalize();
-
-        this.direction = this.mainAxis
-            .clone()
-            .applyAxisAngle(this.normal, this.value);
-    }
-
-    createArcModeAngleGeometry() {
-        if (this.threeAngle === undefined) {
-            this.threeAngle = {}
-        }
-
-        this.threeAngle.geometry = (new THREE.Geometry()).setFromPoints(
-            (new THREE.EllipseCurve(
-                0, 0,
-                this.sizeParam / (3 * this.coefficientOfAxesLengthDecrease), this.sizeParam / (3 * this.coefficientOfAxesLengthDecrease),
-                0, this.value,
-                false,
-                0
-            )).getPoints(100)
-        );
-    }
-
-    createSectorModeAngleGeometry() {
-        if (this.threeAngle === undefined) {
-            this.threeAngle = {}
-        }
-
-        this.threeAngle.geometry = new THREE.CircleGeometry(
-            this.sizeParam / this.coefficientOfAxesLengthDecrease,
-            INITIAL_SEGMENTS_NUMBER,
-            0,
-            this.value
-        );
-    }
-
-    disposeGeometry(objectOfDisposal) {
-        objectOfDisposal.geometry.dispose();
-    }
-
-    calculateQuaternions() {
-        let quaternionZ = (new THREE.Quaternion).setFromUnitVectors(
-            new THREE.Vector3(0, 0, 1),
-            this.normal
-        );
-
-        let quaternionX = (new THREE.Quaternion).setFromUnitVectors(
-            (new THREE.Vector3(1, 0, 0)).applyQuaternion(quaternionZ),
-            this.mainAxis
-        );
-
-        this.quaternion = quaternionX.multiply(quaternionZ);
-    }
-}
-/* harmony export (immutable) */ __webpack_exports__["a"] = HelperAngle;
-
-/* WEBPACK VAR INJECTION */}.call(__webpack_exports__, __webpack_require__(2)))
-
-/***/ }),
+/* 46 */,
 /* 47 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
@@ -9778,6 +9380,7 @@ class TrajectoryKeplerianPrecessing extends __WEBPACK_IMPORTED_MODULE_0__Kepleri
     }
 
     getKeplerianObjectByEpoch(epoch) {
+        this.validateEpoch(epoch);
         return this.keplerianObject.addPrecession(this.r, this.j2, epoch);
     }
 
@@ -9807,13 +9410,13 @@ class TrajectoryKeplerianPrecessing extends __WEBPACK_IMPORTED_MODULE_0__Kepleri
 
 class VisualTrajectoryModelPointArray extends __WEBPACK_IMPORTED_MODULE_0__Abstract__["a" /* default */]
 {
-    constructor(trajectory, color, modelParams) {
-        super(trajectory, color);
+    constructor(trajectory, config) {
+        super(trajectory, config);
 
-        this.referenceFrame = sim.starSystem.getReferenceFrame(modelParams.referenceFrame);
-        this.showAhead = modelParams.showAhead;
-        this.showBehind = modelParams.showBehind;
-        this.trailPeriod = modelParams.trailPeriod;
+        this.referenceFrame = sim.starSystem.getReferenceFrame(config.pointArrayModel.referenceFrame);
+        this.showAhead = config.pointArrayModel.showAhead;
+        this.showBehind = config.pointArrayModel.showBehind;
+        this.trailPeriod = config.pointArrayModel.trailPeriod;
 
         this.minCos = Math.cos(Object(__WEBPACK_IMPORTED_MODULE_1__algebra__["f" /* deg2rad */])(2));
         this.minStep = 180;
@@ -9823,15 +9426,19 @@ class VisualTrajectoryModelPointArray extends __WEBPACK_IMPORTED_MODULE_0__Abstr
     }
 
     render(epoch) {
+        super.render(epoch);
+
+        epoch = this.getRenderingEpoch(epoch);
+
+        if (epoch === null) {
+            this.threeObj.visible = false;
+            return;
+        }
+
         const endingBrightness = 0.4;
         const originPos = this.referenceFrame.getOriginPositionByEpoch(epoch);
         let points = [];
         let colors = [];
-
-        if (epoch < this.trajectory.minEpoch) {
-            this.threeObj.visible = false;
-            return;
-        }
 
         for (let i = 0; i < this.positions.length; ++i) {
             if (this.epochs[i] < epoch - this.trailPeriod) {
@@ -9995,6 +9602,7 @@ class TrajectoryStaticPosition extends __WEBPACK_IMPORTED_MODULE_0__Abstract__["
     }
 
     getStateInOwnFrameByEpoch(epoch) {
+        this.validateEpoch(epoch);
         return new __WEBPACK_IMPORTED_MODULE_1__StateVector__["a" /* default */](this.pos);
     }
 }
@@ -10798,9 +10406,7 @@ class SelectionHandler extends __WEBPACK_IMPORTED_MODULE_0__visual_ModelAbstract
             return;
         }
 
-        if (this.selectedObject) {
-            this.deselect();
-        }
+        this.deselect();
 
         if (this.bestIntersection) {
             let currentTraj = this.bestIntersection.object.userData.trajectory;
@@ -10811,6 +10417,11 @@ class SelectionHandler extends __WEBPACK_IMPORTED_MODULE_0__visual_ModelAbstract
                 this.select(currentTraj);
             }
         }
+    }
+
+    forceSelection(object) {
+        this.deselect();
+        this.select(object);
     }
 
     getSelectedObject() {
@@ -10825,6 +10436,10 @@ class SelectionHandler extends __WEBPACK_IMPORTED_MODULE_0__visual_ModelAbstract
     }
 
     deselect() {
+        if (!this.selectedObject) {
+            return;
+        }
+
         __WEBPACK_IMPORTED_MODULE_1__core_Events__["a" /* default */].dispatch(__WEBPACK_IMPORTED_MODULE_1__core_Events__["a" /* default */].DESELECT, {trajectory: this.selectedObject});
 
         this.selectedObject.deselect();
@@ -10845,6 +10460,8 @@ class SelectionHandler extends __WEBPACK_IMPORTED_MODULE_0__visual_ModelAbstract
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__Panels_Camera__ = __webpack_require__(64);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__Panels_Metrics__ = __webpack_require__(65);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__Panels_Lambert__ = __webpack_require__(67);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_4__Panels_Creation__ = __webpack_require__(75);
+
 
 
 
@@ -10853,10 +10470,11 @@ class SelectionHandler extends __WEBPACK_IMPORTED_MODULE_0__visual_ModelAbstract
 class UI
 {
     constructor() {
-        this.timePanel    = new __WEBPACK_IMPORTED_MODULE_0__Panels_Time__["a" /* default */]   ($('#timePanel'),    sim.time);
-        this.cameraPanel  = new __WEBPACK_IMPORTED_MODULE_1__Panels_Camera__["a" /* default */] ($('#cameraPanel'),  sim.camera, sim.starSystem);
-        this.metricsPanel = new __WEBPACK_IMPORTED_MODULE_2__Panels_Metrics__["a" /* default */]($('#metricsPanel'), sim.selection);
-        this.lambertPanel = new __WEBPACK_IMPORTED_MODULE_3__Panels_Lambert__["a" /* default */]($('#lambertPanel'));
+        this.timePanel     = new __WEBPACK_IMPORTED_MODULE_0__Panels_Time__["a" /* default */]    ($('#timePanel'),    sim.time);
+        this.cameraPanel   = new __WEBPACK_IMPORTED_MODULE_1__Panels_Camera__["a" /* default */]  ($('#cameraPanel'),  sim.camera, sim.starSystem);
+        this.metricsPanel  = new __WEBPACK_IMPORTED_MODULE_2__Panels_Metrics__["a" /* default */] ($('#metricsPanel'), sim.selection);
+        this.creationPanel = new __WEBPACK_IMPORTED_MODULE_4__Panels_Creation__["a" /* default */]($('#creationPanel'));
+        this.lambertPanel  = new __WEBPACK_IMPORTED_MODULE_3__Panels_Lambert__["a" /* default */] ($('#lambertPanel'));
     }
 }
 /* harmony export (immutable) */ __webpack_exports__["a"] = UI;
@@ -11112,15 +10730,19 @@ class UIPanelMetrics extends __WEBPACK_IMPORTED_MODULE_0__Panel__["a" /* default
             return;
         }
 
-        const referenceFrame = selectedObject.getReferenceFrameByEpoch(event.detail.epoch);
-        if (referenceFrame) {
-            parent = sim.starSystem.getObject(referenceFrame.originId);
-            this.jqDom.find('#relativeTo').html(parent.name);
-        }
+        try {
+            const referenceFrame = selectedObject.getReferenceFrameByEpoch(event.detail.epoch);
+            if (referenceFrame) {
+                parent = sim.starSystem.getObject(referenceFrame.originId);
+                this.jqDom.find('#relativeTo').html(parent.name);
+            }
 
-        this.updateMain     (selectedObject, event.detail.epoch, parent);
-        this.updateCartesian(selectedObject, event.detail.epoch);
-        this.updateKeplerian(selectedObject, event.detail.epoch);
+            this.updateMain(selectedObject, event.detail.epoch, parent);
+            this.updateCartesian(selectedObject, event.detail.epoch);
+            this.updateKeplerian(selectedObject, event.detail.epoch);
+        } catch (e) {
+
+        }
     }
 
     updateMain(selectedObject, epoch, parent) {
@@ -11140,7 +10762,7 @@ class UIPanelMetrics extends __WEBPACK_IMPORTED_MODULE_0__Panel__["a" /* default
         this.jqDom.find('#elements-alt' ).html(''   + (state.position.mag - surfaceAlt).toPrecision(this.precision));
         this.jqDom.find('#elements-speed' ).html('' + (state.velocity.mag * 1000).toPrecision(this.precision));
 
-        if (parent.physicalModel.j2 && parent.physicalModel.j2) {
+        if (parent.physicalModel && parent.physicalModel.j2 && parent.physicalModel.j2) {
             this.jqDom.find('#elements-precession').html('' + (
                 Object(__WEBPACK_IMPORTED_MODULE_3__algebra__["j" /* rad2deg */])(keplerianObject.getNodalPrecessionRate(parent.physicalModel.eqRadius, parent.physicalModel.j2) * 86400)
             ).toPrecision(this.precision));
@@ -12001,6 +11623,7 @@ class StarSystem
         this.referenceFrames = {};
         this.trajectories = {};
         this.objects = {};
+        this.created = 0;
     }
 
     addStars(stars) {
@@ -12400,6 +12023,390 @@ class Camera
 
 
 /* WEBPACK VAR INJECTION */}.call(__webpack_exports__, __webpack_require__(2)))
+
+/***/ }),
+/* 72 */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+class ExceptionOutOfRange
+{
+    constructor(object, epoch, minEpoch, maxEpoch) {
+        this.object = object;
+        this.epoch = epoch;
+        this.minEpoch = minEpoch;
+        this.maxEpoch = maxEpoch;
+    }
+}
+/* harmony export (immutable) */ __webpack_exports__["a"] = ExceptionOutOfRange;
+
+
+/***/ }),
+/* 73 */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+/* WEBPACK VAR INJECTION */(function(THREE) {/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__core_FunctionOfEpoch_Abstract__ = __webpack_require__(14);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__ModelAbstract__ = __webpack_require__(5);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__core_ReferenceFrame_Factory__ = __webpack_require__(1);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__VirtualPlane__ = __webpack_require__(47);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_4__algebra__ = __webpack_require__(0);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_5__Arrow__ = __webpack_require__(74);
+
+
+
+
+
+
+
+class VisualAngle extends __WEBPACK_IMPORTED_MODULE_1__ModelAbstract__["a" /* default */]
+{
+    constructor(referenceFrame, position, orientation, value, color, size, type, editingCallback) {
+        super();
+
+        this._referenceFrame = referenceFrame;
+        this._position = position;
+        this._orientation = orientation;
+        this._value = value;
+        this.color = color;
+        this.type = type;
+        this.arcSize = size;
+        this.editingCallback = editingCallback;
+        this.isEditMode = !!editingCallback;
+
+        this.orientationUpdated = false;
+        this.valueUpdated = false;
+        this.isHidden = false;
+
+        this.init();
+    }
+
+    hide() {
+        this.threeObj.visible = false;
+        this.isHidden = true;
+    }
+
+    show() {
+        this.threeObj.visible = true;
+        this.isHidden = false;
+    }
+
+    _resolve(valueOfEpoch, epoch) {
+        if (valueOfEpoch instanceof __WEBPACK_IMPORTED_MODULE_0__core_FunctionOfEpoch_Abstract__["a" /* default */]) {
+            return valueOfEpoch.evaluate(epoch);
+        }
+        return valueOfEpoch;
+    }
+
+    getReferenceFrame(epoch) {
+        return this._resolve(this._referenceFrame, epoch);
+    }
+
+    getPosition(epoch) {
+        return this._resolve(this._position, epoch);
+    }
+
+    getOrientation(epoch) {
+        return this._resolve(this._orientation, epoch);
+    }
+
+    getValue(epoch) {
+        return this._resolve(this._value, epoch);
+    }
+
+    init() {
+        this.onWheelListener = this.onMouseWheel.bind(this);
+        document.addEventListener('wheel', this.onWheelListener);
+
+        if (this.isEditMode) {
+            this.mouseDownListener = this.onMouseDown.bind(this);
+            document.addEventListener('mousedown', this.mouseDownListener);
+        }
+
+        this.size = sim.camera.position.mag / 6 * this.arcSize;
+
+        if (this.type === VisualAngle.TYPE_ARC) {
+            this.createArcObject();
+        } else {
+            this.createSectorObject();
+        }
+        this.valueUpdated = true;
+        this.orientationUpdated = true;
+    }
+
+    onMouseWheel() {
+        this.size = sim.camera.position.mag / 6 * this.arcSize;
+        this.threeObj.scale.set(this.size, this.size, this.size);
+    }
+
+    onMouseDown(event) {
+        let intersection;
+        if (this.type === VisualAngle.TYPE_ARC) {
+            intersection = sim.raycaster.intersectObjects([this.threeAngle.line])[0];
+        } else {
+            intersection = sim.raycaster.intersectObjects(
+                [this.threeAngle.children[0].line, this.threeAngle.children[0].cone]
+            )[0];
+        }
+
+        if (intersection && (event.button == 0)) { //check if the mouse button pressed is left
+            this.mouseUpListener = this.onMouseUp.bind(this);
+            document.addEventListener('mouseup', this.mouseUpListener);
+            this.mouseMoveListener = this.onMouseMove.bind(this);
+            sim.addEventListener('mousemove', this.mouseMoveListener, 2);
+        }
+    }
+
+    onMouseUp(event) {
+        document.removeEventListener('mouseup', this.mouseUpListener);
+        sim.removeEventListener('mousemove', this.mouseMoveListener);
+    }
+
+    onMouseMove() {
+        const plane = this.getVirtualPlane();
+        let intersection = sim.raycaster.intersectObjects([plane])[0];
+        if (intersection) {
+            const direction = intersection.point
+                .clone()
+                .sub(this.threeObj.position)
+                .normalize();
+            let mainAxis = new THREE.Vector3(1, 0, 0);
+            mainAxis.applyQuaternion(this.threeObj.quaternion);
+
+            let newAngleValue = Math.acos(mainAxis.dot(direction) / mainAxis.length() / direction.length()); // no division by lengths because direction and mainAxis are normalized (length = 1)
+            mainAxis.cross(direction);
+
+            this._value = (mainAxis.dot(plane.normal) > 0) ? newAngleValue : __WEBPACK_IMPORTED_MODULE_4__algebra__["b" /* TWO_PI */] - newAngleValue;
+            this.valueUpdated = true;
+            if (this.editingCallback) {
+                this.editingCallback(this._value);
+            }
+        }
+    }
+
+    getVirtualPlane() {
+        let normal = new THREE.Vector3(0, 0, 1);
+        normal.applyQuaternion(this.threeObj.quaternion);
+        const angle = Math.acos(normal.dot(this.threeObj.position) / this.threeObj.position.length() / normal.length());
+        const distance = this.threeObj.position.length() * Math.cos(angle);
+
+        if (this.virtualPlane) {
+            this.virtualPlane.normal.copy(normal);
+            this.virtualPlane.constant = distance;
+        } else {
+            this.virtualPlane = new __WEBPACK_IMPORTED_MODULE_3__VirtualPlane__["a" /* default */](normal, distance);
+        }
+
+        return this.virtualPlane;
+    }
+
+    createArcObject() {
+        let material = new THREE.LineBasicMaterial({color: this.color});
+        let threeObj = new THREE.Object3D();
+
+        this.threeArc = new THREE.Line(new THREE.Geometry(), material);
+        this.threeMainAxis = new THREE.Line(new THREE.Geometry(), material);
+        this.threeAngle = new THREE.Line(new THREE.Geometry(), material);
+
+        this.threeMainAxis.geometry.vertices.push(
+            new THREE.Vector3(0, 0, 0),
+            new THREE.Vector3(1, 0, 0),
+        );
+        this.threeAngle.geometry.vertices.push(
+            new THREE.Vector3(0, 0, 0),
+            new THREE.Vector3(1, 0, 0),
+        );
+
+        threeObj.add(this.threeArc);
+        threeObj.add(this.threeMainAxis);
+        threeObj.add(this.threeAngle);
+        threeObj.scale.set(this.size, this.size, this.size);
+
+        this.setThreeObj(threeObj);
+    }
+
+    updateArcObject(value) {
+        if (value < 0) {
+            value -= 2 * Math.PI * Math.floor(value / 2 / Math.PI);
+        }
+        // todo: optimize this
+        this.threeArc.geometry.dispose();
+        this.threeArc.geometry = new THREE.Geometry();
+        this.threeArc.geometry.setFromPoints(
+            (new THREE.EllipseCurve(
+                0, 0,
+                1 / 3,
+                1 / 3,
+                0, value,
+                false,
+                0
+            )).getPoints(Math.ceil(value * 30))
+        );
+    }
+
+    createSectorObject() {
+        let material = new THREE.MeshBasicMaterial({
+            color: this.color,
+            opacity: 0.175,
+            transparent: true,
+            side: THREE.DoubleSide
+        });
+        let threeObj = new THREE.Object3D();
+
+        this.threeArc = new THREE.Mesh(new THREE.Geometry(), material);
+        this.threeMainAxis = new __WEBPACK_IMPORTED_MODULE_5__Arrow__["a" /* default */](
+            new THREE.Vector3(1, 0, 0),
+            new THREE.Vector3(0, 0, 0),
+            1,
+            this.color
+        );
+        this.threeAngle = new THREE.Object3D();
+        this.threeAngle.add(new __WEBPACK_IMPORTED_MODULE_5__Arrow__["a" /* default */](
+            new THREE.Vector3(1, 0, 0),
+            new THREE.Vector3(0, 0, 0),
+            1,
+            this.isEditMode ? 0xc2f442 : this.color
+        ));
+
+        threeObj.add(this.threeArc);
+        threeObj.add(this.threeMainAxis);
+        threeObj.add(this.threeAngle);
+        threeObj.scale.set(this.size, this.size, this.size);
+
+        this.setThreeObj(threeObj);
+    }
+
+    updateSectorObject(value) {
+        if (value < 0) {
+            value -= 2 * Math.PI * Math.floor(value / 2 / Math.PI);
+        }
+        // todo: optimize this
+        this.threeArc.geometry.dispose();
+        this.threeArc.geometry = new THREE.CircleGeometry(
+            1,
+            Math.ceil(value * 30),
+            0,
+            value
+        );
+    }
+
+    drop() {
+        super.drop();
+        delete this.threeMainAxis;
+        delete this.threeAngle;
+        delete this.threeArc;
+        document.removeEventListener('wheel', this.onWheelListener);
+    }
+
+    render(epoch) {
+        if (this.isHidden) {
+            return;
+        }
+
+        const referenceFrame = this.getReferenceFrame(epoch);
+        const pos = referenceFrame.transformPositionByEpoch(
+            epoch,
+            this.getPosition(epoch),
+            __WEBPACK_IMPORTED_MODULE_2__core_ReferenceFrame_Factory__["a" /* RF_BASE */]
+        );
+        this.threeObj.position.copy(sim.getVisualCoords(pos));
+        this.threeObj.visible = true;
+
+        if (this.valueUpdated || this._value instanceof __WEBPACK_IMPORTED_MODULE_0__core_FunctionOfEpoch_Abstract__["a" /* default */]) {
+            const value = this.getValue(epoch);
+            if (this.type === VisualAngle.TYPE_ARC) {
+                this.updateArcObject(value);
+            } else {
+                this.updateSectorObject(value);
+            }
+            this.threeAngle.rotation.z = value;
+            this.valueUpdated = false;
+        }
+
+        if (this.orientationUpdated || this._orientation instanceof __WEBPACK_IMPORTED_MODULE_0__core_FunctionOfEpoch_Abstract__["a" /* default */]) {
+            this.threeObj.quaternion.copy(referenceFrame.getQuaternionByEpoch(epoch).mul_(this.getOrientation(epoch)).toThreejs());
+            this.orientationUpdated = false;
+        }
+    }
+}
+/* harmony export (immutable) */ __webpack_exports__["a"] = VisualAngle;
+
+
+VisualAngle.TYPE_ARC    = 'arc';
+VisualAngle.TYPE_SECTOR = 'sector';
+/* WEBPACK VAR INJECTION */}.call(__webpack_exports__, __webpack_require__(2)))
+
+/***/ }),
+/* 74 */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+/* WEBPACK VAR INJECTION */(function(THREE) {/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__LineObject__ = __webpack_require__(25);
+
+
+class ArrowObject extends THREE.ArrowHelper
+{
+    constructor(dir, origin, length, color, headLength, headWidth) {
+        super(dir, origin, length, color, headLength, headWidth);
+        this.remove(this.line);
+        this.line = new __WEBPACK_IMPORTED_MODULE_0__LineObject__["a" /* default */](this.line.geometry, this.line.material);
+        this.add(this.line);
+    }
+}
+/* harmony export (immutable) */ __webpack_exports__["a"] = ArrowObject;
+
+/* WEBPACK VAR INJECTION */}.call(__webpack_exports__, __webpack_require__(2)))
+
+/***/ }),
+/* 75 */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__Panel__ = __webpack_require__(9);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__core_EphemerisObject__ = __webpack_require__(8);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__core_Trajectory_KeplerianBasic__ = __webpack_require__(17);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__core_ReferenceFrame_Factory__ = __webpack_require__(1);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_4__visual_TrajectoryModel_Keplerian__ = __webpack_require__(28);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_5__core_KeplerianObject__ = __webpack_require__(7);
+
+
+
+
+
+
+
+class UIPanelCreation extends __WEBPACK_IMPORTED_MODULE_0__Panel__["a" /* default */] {
+    constructor(panelDom) {
+        super(panelDom);
+
+        this.jqPause = this.jqDom.find('#createOrbit');
+        this.jqPause.click(() => {
+            const center = sim.camera.orbitingPoint;
+            const object = sim.starSystem.getObject(center);
+            if (!object.physicalModel) {
+                return;
+            }
+            const sma = object.physicalModel.radius * 1.1;
+            const id = -11000000 - sim.starSystem.created;
+            sim.starSystem.created += 1;
+            let ephObject = new __WEBPACK_IMPORTED_MODULE_1__core_EphemerisObject__["a" /* default */](id, __WEBPACK_IMPORTED_MODULE_1__core_EphemerisObject__["a" /* default */].TYPE_UNKNOWN, "Created #" + sim.starSystem.created);
+            let traj = new __WEBPACK_IMPORTED_MODULE_2__core_Trajectory_KeplerianBasic__["a" /* default */](
+                __WEBPACK_IMPORTED_MODULE_3__core_ReferenceFrame_Factory__["c" /* default */].buildId(center, __WEBPACK_IMPORTED_MODULE_3__core_ReferenceFrame_Factory__["b" /* ReferenceFrame */].INERTIAL_BODY_EQUATORIAL),
+                new __WEBPACK_IMPORTED_MODULE_5__core_KeplerianObject__["a" /* default */](
+                    0, sma, 0, Math.PI / 2, 0, 0, sim.currentEpoch, object.physicalModel.mu
+                )
+            );
+            traj.setVisualModel(new __WEBPACK_IMPORTED_MODULE_4__visual_TrajectoryModel_Keplerian__["a" /* default */](traj, {color: 'yellow'}));
+
+            ephObject.setTrajectory(traj);
+            sim.starSystem.addObject(id, ephObject);
+            sim.starSystem.addTrajectory(id, traj);
+            sim.selection.forceSelection(traj);
+        });
+    }
+}
+/* harmony export (immutable) */ __webpack_exports__["a"] = UIPanelCreation;
+
 
 /***/ })
 /******/ ]);

@@ -3,13 +3,13 @@ import {deg2rad} from "../../algebra";
 
 export default class VisualTrajectoryModelPointArray extends VisualTrajectoryModelAbstract
 {
-    constructor(trajectory, color, modelParams) {
-        super(trajectory, color);
+    constructor(trajectory, config) {
+        super(trajectory, config);
 
-        this.referenceFrame = sim.starSystem.getReferenceFrame(modelParams.referenceFrame);
-        this.showAhead = modelParams.showAhead;
-        this.showBehind = modelParams.showBehind;
-        this.trailPeriod = modelParams.trailPeriod;
+        this.referenceFrame = sim.starSystem.getReferenceFrame(config.pointArrayModel.referenceFrame);
+        this.showAhead = config.pointArrayModel.showAhead;
+        this.showBehind = config.pointArrayModel.showBehind;
+        this.trailPeriod = config.pointArrayModel.trailPeriod;
 
         this.minCos = Math.cos(deg2rad(2));
         this.minStep = 180;
@@ -19,15 +19,19 @@ export default class VisualTrajectoryModelPointArray extends VisualTrajectoryMod
     }
 
     render(epoch) {
+        super.render(epoch);
+
+        epoch = this.getRenderingEpoch(epoch);
+
+        if (epoch === null) {
+            this.threeObj.visible = false;
+            return;
+        }
+
         const endingBrightness = 0.4;
         const originPos = this.referenceFrame.getOriginPositionByEpoch(epoch);
         let points = [];
         let colors = [];
-
-        if (epoch < this.trajectory.minEpoch) {
-            this.threeObj.visible = false;
-            return;
-        }
 
         for (let i = 0; i < this.positions.length; ++i) {
             if (this.epochs[i] < epoch - this.trailPeriod) {

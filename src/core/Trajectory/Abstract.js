@@ -1,6 +1,10 @@
 import StateVector from "../StateVector";
 import {RF_BASE} from "../ReferenceFrame/Factory";
 import KeplerianObject from "../KeplerianObject";
+import ExceptionOutOfRange from "./ExceptionOutOfRange";
+import FunctionOfEpochCustom from "../FunctionOfEpoch/Custom";
+import ReferenceFrameInertialDynamic from "../ReferenceFrame/InertialDynamic";
+import KeplerianEditor from "../KeplerianEditor";
 
 export default class TrajectoryAbstract
 {
@@ -17,6 +21,17 @@ export default class TrajectoryAbstract
         this.parent = null;
 
         this.referenceFrame = null;
+
+        this.orbitalReferenceFrame = new ReferenceFrameInertialDynamic(
+            new FunctionOfEpochCustom((epoch) => {
+                return this.getReferenceFrameByEpoch(epoch).getOriginStateByEpoch(epoch);
+            }),
+            new FunctionOfEpochCustom((epoch) => {
+                const quat = this.getReferenceFrameByEpoch(epoch).getQuaternionByEpoch(epoch);
+                const ko = this.getKeplerianObjectByEpoch(epoch);
+                return quat.mul_(ko.getOrbitalFrameQuaternion());
+            })
+        );
     }
 
     setReferenceFrame(referenceFrameId) {
@@ -29,9 +44,6 @@ export default class TrajectoryAbstract
 
     getKeplerianObjectByEpoch(epoch) {
         const rf = this.getReferenceFrameByEpoch(epoch);
-        if (!rf || !rf.mu) {
-            return null;
-        }
         return KeplerianObject.createFromState(this.getStateInOwnFrameByEpoch(epoch), rf.mu, epoch);
     }
 
@@ -55,13 +67,41 @@ export default class TrajectoryAbstract
 
     select() {
         this.visualModel && this.visualModel.select();
+        if (!this.parent) {
+            this.keplerianEditor = new KeplerianEditor(this, this.keplerianObject !== undefined);
+        }
     }
 
     deselect() {
         this.visualModel && this.visualModel.deselect();
+        if (this.keplerianEditor) {
+            this.keplerianEditor.remove();
+            delete this.keplerianEditor;
+        }
+    }
+
+    isValidAtEpoch(epoch) {
+        if (this.minEpoch !== null && this.minEpoch !== false) {
+            if (epoch < this.minEpoch) {
+                return false;
+            }
+        }
+        if (this.maxEpoch !== null && this.maxEpoch !== false) {
+            if (epoch > this.maxEpoch) {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    validateEpoch(epoch) {
+        if (!this.isValidAtEpoch(epoch)) {
+            throw new ExceptionOutOfRange(this.object, epoch, this.minEpoch, this.maxEpoch);
+        }
     }
 
     getStateInOwnFrameByEpoch(epoch) {
+        this.validateEpoch(epoch);
         return new StateVector();
     }
 
@@ -94,12 +134,10 @@ export default class TrajectoryAbstract
     }
 
     getPositionByEpoch(epoch, referenceFrameOrId) {
-        const state = this.getStateByEpoch(epoch, referenceFrameOrId);
-        return (state !== null) ? state.position : null;
+        return this.getStateByEpoch(epoch, referenceFrameOrId).position;
     }
 
     getVelocityByEpoch(epoch, referenceFrameOrId) {
-        const state = this.getStateByEpoch(epoch, referenceFrameOrId);
-        return (state !== null) ? state.velocity : null;
+        return this.getStateByEpoch(epoch, referenceFrameOrId).velocity;
     }
 }

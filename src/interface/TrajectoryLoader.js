@@ -57,15 +57,16 @@ export default class TrajectoryLoader
             trajectory.maxEpoch = config.periodEnd;
         }
 
-        if (config.rendering !== undefined) {
-            if (config.rendering.keplerianModel) {
-                visualModel = new VisualTrajectoryModelKeplerian(trajectory, config.rendering.color);
-            } else if (config.rendering.pointArrayModel) {
-                visualModel = new VisualTrajectoryModelPointArray(
-                    trajectory,
-                    config.rendering.color,
-                    config.rendering.pointArrayModel
-                );
+        // temporary
+        if (config.rendering) {
+            config.visual = config.rendering;
+        }
+
+        if (config.visual !== undefined) {
+            if (config.visual.keplerianModel) {
+                visualModel = new VisualTrajectoryModelKeplerian(trajectory, config.visual);
+            } else if (config.visual.pointArrayModel) {
+                visualModel = new VisualTrajectoryModelPointArray(trajectory, config.visual);
             }
         }
 

@@ -11,6 +11,7 @@ export default class TrajectoryStaticPosition extends TrajectoryAbstract
     }
 
     getStateInOwnFrameByEpoch(epoch) {
+        this.validateEpoch(epoch);
         return new StateVector(this.pos);
     }
 }

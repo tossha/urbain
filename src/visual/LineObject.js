@@ -1,6 +1,7 @@
 export default class LineObject extends THREE.Line {
     raycast(raycaster, intersects) {
-        const verticesCount = this.geometry.vertices.length;
+        const isBuffer = this.geometry.isBufferGeometry;
+        const verticesCount = isBuffer ? this.geometry.attributes.position.count : this.geometry.vertices.length;
         let bestIntersection;
 
         const ray = (new THREE.Ray())
@@ -11,11 +12,20 @@ export default class LineObject extends THREE.Line {
             );
 
         for (let i = 0; i < verticesCount - 1; i++) {
-            const vertex1 = (new THREE.Vector3)
-                .copy(this.geometry.vertices[i]);
-
-            const vertex2 = (new THREE.Vector3)
-                .copy(this.geometry.vertices[(i + 1) % verticesCount]);
+            let vertex1;
+            let vertex2;
+            if (isBuffer) {
+                const i1 = i * 3;
+                const i2 = ((i + 1) % verticesCount) * 3;
+                let positions = this.geometry.attributes.position.array;
+                vertex1 = new THREE.Vector3(positions[i1], positions[i1+1], positions[i1+2]);
+                vertex2 = new THREE.Vector3(positions[i2], positions[i2+1], positions[i2+2]);
+            } else {
+                vertex1 = (new THREE.Vector3)
+                    .copy(this.geometry.vertices[i]);
+                vertex2 = (new THREE.Vector3)
+                    .copy(this.geometry.vertices[(i + 1) % verticesCount]);
+            }
 
             const currentLineDirection = (new THREE.Vector3).subVectors(
                 vertex1,

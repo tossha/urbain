@@ -31,13 +31,7 @@ export default class TrajectoryStateArray extends TrajectoryAbstract
     }
 
     getStateInOwnFrameByEpoch(epoch) {
-        if ((this.minEpoch === null)
-            || (this.maxEpoch === null)
-            || (epoch < this.minEpoch)
-            || (this.maxEpoch < epoch)
-        ) {
-            return null;
-        }
+        this.validateEpoch(epoch);
 
         // Поиск перебором. Потом можно заменить на бинпоиск, но сейчас это неоправданно усложнит код
         for (let i = 1; i < this.states.length; ++i) {
