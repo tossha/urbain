@@ -303,6 +303,10 @@ export default class KeplerianObject
     static createFromState(state, mu, epoch) {
         epoch = epoch || 0;
 
+        if (!state) {
+            return null;
+        }
+
         const pos = state.position;
         const vel = state.velocity;
 

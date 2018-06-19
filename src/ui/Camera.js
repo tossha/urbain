@@ -1,6 +1,6 @@
 import {Quaternion, Vector} from "../algebra";
 import {ReferenceFrame, RF_BASE} from "../core/ReferenceFrame/Factory";
-import {Events} from "../core/Events";
+import Events from "../core/Events";
 import ReferenceFrameFactory from "../core/ReferenceFrame/Factory";
 
 export default class Camera
@@ -118,10 +118,7 @@ export default class Camera
             this.quaternion = this._getQuaternionByPosition(this.position);
         }
 
-        document.dispatchEvent(new CustomEvent(
-            Events.CAMERA_RF_CHANGED,
-            {detail: {old: this.referenceFrame, new: newFrame}}
-        ));
+        Events.dispatch(Events.CAMERA_RF_CHANGED, {old: this.referenceFrame, new: newFrame});
 
         this.referenceFrame = newFrame;
     }

@@ -19,7 +19,7 @@ export default class TrajectoryLoader
         let visualModel;
 
         if (type === 'keplerian') {
-            trajectory = this.createKeplerian(config);
+            trajectory = this.createKeplerianBasic(config);
         }
 
         if (type === 'keplerian_precessing') {
@@ -57,15 +57,16 @@ export default class TrajectoryLoader
             trajectory.maxEpoch = config.periodEnd;
         }
 
-        if (config.rendering !== undefined) {
-            if (config.rendering.keplerianModel) {
-                visualModel = new VisualTrajectoryModelKeplerian(trajectory, config.rendering.color);
-            } else if (config.rendering.pointArrayModel) {
-                visualModel = new VisualTrajectoryModelPointArray(
-                    trajectory,
-                    config.rendering.color,
-                    config.rendering.pointArrayModel
-                );
+        // temporary
+        if (config.rendering) {
+            config.visual = config.rendering;
+        }
+
+        if (config.visual !== undefined) {
+            if (config.visual.keplerianModel) {
+                visualModel = new VisualTrajectoryModelKeplerian(trajectory, config.visual);
+            } else if (config.visual.pointArrayModel) {
+                visualModel = new VisualTrajectoryModelPointArray(trajectory, config.visual);
             }
         }
 
@@ -108,7 +109,7 @@ export default class TrajectoryLoader
         return traj;
     }
 
-    static createKeplerian(config) {
+    static createKeplerianBasic(config) {
         return new TrajectoryKeplerianBasic(
             config.data.referenceFrame,
             this.createKeplerianObject(config.data.elements)

@@ -1,5 +1,5 @@
 import VisualModelAbstract from "../visual/ModelAbstract";
-import {Events} from "../core/Events";
+import Events from "../core/Events";
 
 export default class SelectionHandler extends VisualModelAbstract
 {
@@ -93,9 +93,7 @@ export default class SelectionHandler extends VisualModelAbstract
             return;
         }
 
-        if (this.selectedObject) {
-            this.deselect();
-        }
+        this.deselect();
 
         if (this.bestIntersection) {
             let currentTraj = this.bestIntersection.object.userData.trajectory;
@@ -108,6 +106,11 @@ export default class SelectionHandler extends VisualModelAbstract
         }
     }
 
+    forceSelection(object) {
+        this.deselect();
+        this.select(object);
+    }
+
     getSelectedObject() {
         return this.selectedObject;
     }
@@ -116,18 +119,15 @@ export default class SelectionHandler extends VisualModelAbstract
         this.selectedObject = object;
         this.selectedObject.select();
 
-        document.dispatchEvent(new CustomEvent(
-            Events.SELECT,
-            {detail: {trajectory: this.selectedObject}}
-        ));
-
+        Events.dispatch(Events.SELECT, {trajectory: this.selectedObject});
     }
 
     deselect() {
-        document.dispatchEvent(new CustomEvent(
-            Events.DESELECT,
-            {detail: {trajectory: this.selectedObject}}
-        ));
+        if (!this.selectedObject) {
+            return;
+        }
+
+        Events.dispatch(Events.DESELECT, {trajectory: this.selectedObject});
 
         this.selectedObject.deselect();
         this.selectedObject = null;
