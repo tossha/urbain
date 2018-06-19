@@ -1,5 +1,5 @@
 import VisualModelAbstract from "./ModelAbstract";
-import {Events} from "../core/Events";
+import Events from "../core/Events";
 import {Vector} from "../algebra";
 
 export default class VisualReferenceFrame extends VisualModelAbstract

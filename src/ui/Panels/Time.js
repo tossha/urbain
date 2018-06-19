@@ -1,5 +1,5 @@
 
-import {Events} from "../../core/Events";
+import Events from "../../core/Events";
 import UIPanel from "../Panel";
 
 export default class UIPanelTime extends UIPanel

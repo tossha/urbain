@@ -34,50 +34,50 @@ export default class ReferenceFrameAbstract
         return new StateVector();
     }
 
-    transformStateVectorByEpoch(epoch, state, destinationFrame) {
-        let destinationFrameObj = (destinationFrame instanceof ReferenceFrameAbstract)
-            ? destinationFrame
-            : sim.starSystem.getReferenceFrame(destinationFrame);
+    transformStateVectorByEpoch(epoch, state, destinationFrameOrId) {
+        let destinationFrame = (destinationFrameOrId instanceof ReferenceFrameAbstract)
+            ? destinationFrameOrId
+            : sim.starSystem.getReferenceFrame(destinationFrameOrId);
 
-        if (this === destinationFrameObj) {
+        if (this === destinationFrame) {
             return state;
         }
 
         if (this.id === RF_BASE) {
-            return destinationFrameObj.stateVectorFromBaseReferenceFrameByEpoch(
+            return destinationFrame.stateVectorFromBaseReferenceFrameByEpoch(
                 epoch,
                 state
             );
         }
 
-        if (destinationFrameObj.id === RF_BASE) {
+        if (destinationFrame.id === RF_BASE) {
             return this.stateVectorToBaseReferenceFrameByEpoch(epoch, state);
         }
 
-        return destinationFrameObj.stateVectorFromBaseReferenceFrameByEpoch(
+        return destinationFrame.stateVectorFromBaseReferenceFrameByEpoch(
             epoch,
             this.stateVectorToBaseReferenceFrameByEpoch(epoch, state)
         );
     }
 
-    transformPositionByEpoch(epoch, pos, destinationFrame) {
+    transformPositionByEpoch(epoch, pos, destinationFrameOrId) {
         return this.transformStateVectorByEpoch(
             epoch,
             new StateVector(pos),
-            destinationFrame
+            destinationFrameOrId
         ).position;
     }
 
-    rotateVectorByEpoch(epoch, vec, destinationFrame) {
-        let destinationFrameObj = (destinationFrame instanceof ReferenceFrameAbstract)
-            ? destinationFrame
-            : sim.starSystem.getReferenceFrame(destinationFrame);
+    rotateVectorByEpoch(epoch, vec, destinationFrameOrId) {
+        let destinationFrame = (destinationFrameOrId instanceof ReferenceFrameAbstract)
+            ? destinationFrameOrId
+            : sim.starSystem.getReferenceFrame(destinationFrameOrId);
 
-        if (this === destinationFrameObj) {
+        if (this === destinationFrame) {
             return vec.copy();
         }
 
-        return destinationFrameObj.getQuaternionByEpoch(epoch).invert_().mul_(this.getQuaternionByEpoch(epoch)).rotate(vec);
+        return destinationFrame.getQuaternionByEpoch(epoch).invert_().mul_(this.getQuaternionByEpoch(epoch)).rotate(vec);
     }
 
     stateVectorFromBaseReferenceFrameByEpoch(epoch, state) {}

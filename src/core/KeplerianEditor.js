@@ -1,168 +1,88 @@
-import {Events} from "./Events";
 import FunctionOfEpochCustom from "./FunctionOfEpoch/Custom";
 import {Quaternion, Vector} from "../algebra";
-import HelperAngle from "../visual/HelperAngle";
+import VisualAngle from "../visual/Angle";
 
 export default class KeplerianEditor
 {
     constructor(trajectory, isEditMode) {
-        this.isEditMode = isEditMode;
+        this.isEditMode = isEditMode && (trajectory.keplerianObject !== undefined);
         this.trajectory = trajectory;
+
+        this.colorRaan = 0x7FFFD4; //lightblue
+        this.colorAop  = 0x9966CC; //violet
+        this.colorInc  = 0xB00000; //red
+        this.colorTa   = 0xFC0FC0; //pink
+
         if (sim.settings.ui.showAnglesOfSelectedOrbit) {
             this.init();
         }
-        this.raanAngleColor = 0x7FFFD4; //lightblue
-        this.aopAngleColor  = 0x9966CC; //violet
-        this.incAngleColor  = 0xB00000; //red
-        this.taAngleColor   = 0xFC0FC0; //pink
     }
 
     init() {
-        this.initAnglesListener = this.initAngles.bind(this);
-        document.addEventListener(Events.RENDER, this.initAnglesListener);
-    }
+        let referenceFrame = new FunctionOfEpochCustom(epoch => this.trajectory.getReferenceFrameByEpoch(epoch));
+        let position = new Vector(3);
 
-    initAngles(event) {
-        const keplerianObject = this.trajectory.getKeplerianObjectByEpoch(event.detail.epoch);
-        let that = this;
-        const originPosition = new FunctionOfEpochCustom((epoch) => {
-            return that.trajectory.referenceFrame.getOriginPositionByEpoch(epoch)
-        });
+        this.angleRaan = new VisualAngle(
+            referenceFrame,
+            position,
+            new Quaternion(),
+            new FunctionOfEpochCustom(epoch => this.trajectory.getKeplerianObjectByEpoch(epoch).raan),
+            this.colorRaan,
+            1,
+            this.isEditMode ? VisualAngle.TYPE_SECTOR : VisualAngle.TYPE_ARC,
+            this.isEditMode ? value => { this.trajectory.keplerianObject.raan = value; } : null
+        );
 
-        this.calculateAdditionalParameters(keplerianObject);
+        this.angleInc = new VisualAngle(
+            referenceFrame,
+            position,
+            new FunctionOfEpochCustom(epoch => {
+                const ko = this.trajectory.getKeplerianObjectByEpoch(epoch);
+                return (new Quaternion(new Vector([0,0,1]), ko.raan + Math.PI / 2))
+                    .mul_(new Quaternion(new Vector([1,0,0]), Math.PI / 2));
+            }),
+            new FunctionOfEpochCustom(epoch => this.trajectory.getKeplerianObjectByEpoch(epoch).inc),
+            this.colorInc,
+            2,
+            this.isEditMode ? VisualAngle.TYPE_SECTOR : VisualAngle.TYPE_ARC,
+            this.isEditMode ? value => { this.trajectory.keplerianObject.inc = value; } : null
+        );
 
-        this.raanAngle = new HelperAngle(
-            originPosition,
-            this.trajectory.referenceFrame
-                .getQuaternionByEpoch(event.detail.epoch)
-                .rotate(new Vector([1, 0, 0])),
-            this.trajectory.referenceFrame
-                .getQuaternionByEpoch(event.detail.epoch)
-                .rotate(new Vector([0, 0, 1])),
-            keplerianObject.raan,
-            this.raanAngleColor,
+        this.angleAop = new VisualAngle(
+            referenceFrame,
+            position,
+            new FunctionOfEpochCustom(epoch => {
+                const ko = this.trajectory.getKeplerianObjectByEpoch(epoch);
+                return (new Quaternion(new Vector([0,0,1]), ko.raan))
+                    .mul_(new Quaternion(new Vector([1,0,0]), ko.inc));
+            }),
+            new FunctionOfEpochCustom(epoch => this.trajectory.getKeplerianObjectByEpoch(epoch).aop),
+            this.colorAop,
             3,
-            true
+            this.isEditMode ? VisualAngle.TYPE_SECTOR : VisualAngle.TYPE_ARC,
+            this.isEditMode ? value => { this.trajectory.keplerianObject.aop = value; } : null
         );
 
-        this.aopAngle = new HelperAngle(
-            originPosition,
-            this.node,
-            this.normal,
-            keplerianObject.aop,
-            this.aopAngleColor,
-            2,
-            true
+        this.angleTa = new VisualAngle(
+            referenceFrame,
+            position,
+            new FunctionOfEpochCustom(epoch => {
+                const ko = this.trajectory.getKeplerianObjectByEpoch(epoch);
+                return (new Quaternion(new Vector([0,0,1]), ko.raan))
+                    .mul_(new Quaternion(new Vector([1,0,0]), ko.inc))
+                    .mul_(new Quaternion(new Vector([0,0,1]), ko.aop));
+            }),
+            new FunctionOfEpochCustom(epoch => this.trajectory.getKeplerianObjectByEpoch(epoch).getTrueAnomalyByEpoch(epoch)),
+            this.colorTa,
+            4,
+            VisualAngle.TYPE_ARC
         );
-
-        this.incAngle = new HelperAngle(
-            originPosition,
-            this.nodePerp,
-            this.node,
-            keplerianObject.inc,
-            this.incAngleColor,
-            2,
-            true
-        );
-
-        this.taAngle = new HelperAngle(
-            originPosition,
-            this.periapsis,
-            this.normal,
-            keplerianObject.getTrueAnomalyByEpoch(event.detail.epoch),
-            this.taAngleColor,
-            1.5,
-            true
-        );
-
-        document.removeEventListener(Events.RENDER, this.initAnglesListener);
-        this.updateAnglesListener = this.updateAngles.bind(this);
-        document.addEventListener(Events.RENDER, this.updateAnglesListener);
-
-        if ((this.trajectory.minEpoch !== null && this.trajectory.minEpoch !== false && event.detail.epoch < this.trajectory.minEpoch)
-            || (this.trajectory.maxEpoch !== null && this.trajectory.maxEpoch !== false && event.detail.epoch > this.trajectory.maxEpoch)
-        ) {
-            this.raanAngle.hide();
-            this.aopAngle.hide();
-            this.incAngle.hide();
-            this.taAngle.hide();
-        }
-    }
-
-    updateAngles(event) {
-        if ((this.trajectory.minEpoch !== null && this.trajectory.minEpoch !== false && event.detail.epoch < this.trajectory.minEpoch)
-            || (this.trajectory.maxEpoch !== null && this.trajectory.maxEpoch !== false && event.detail.epoch > this.trajectory.maxEpoch)
-        ) {
-            this.raanAngle.hide();
-            this.aopAngle.hide();
-            this.incAngle.hide();
-            this.taAngle.hide();
-            return;
-        }
-
-        const keplerianObject = this.trajectory.getKeplerianObjectByEpoch(event.detail.epoch);
-        this.calculateAdditionalParameters(keplerianObject);
-
-        this.raanAngle.resize(keplerianObject.raan);
-        this.raanAngle.rearrange(
-            this.trajectory.referenceFrame
-                .getQuaternionByEpoch(event.detail.epoch)
-                .rotate(new Vector([1, 0, 0])),
-
-            this.trajectory.referenceFrame
-                .getQuaternionByEpoch(event.detail.epoch)
-                .rotate(new Vector([0, 0, 1]))
-        );
-
-        this.aopAngle.resize(keplerianObject.aop);
-        this.aopAngle.rearrange(this.node, this.normal);
-
-        this.incAngle.resize(keplerianObject.inc);
-        this.incAngle.rearrange(this.nodePerp, this.node);
-
-        this.taAngle.resize(keplerianObject.getTrueAnomalyByEpoch(event.detail.epoch));
-        this.taAngle.rearrange(this.periapsis, this.normal);
-        this.raanAngle.show();
-        this.aopAngle.show();
-        this.incAngle.show();
-        this.taAngle.show();
     }
 
     remove() {
-        if (this.raanAngle) this.raanAngle.remove();
-        if (this.aopAngle)  this.aopAngle.remove();
-        if (this.incAngle)  this.incAngle.remove();
-        if (this.taAngle)   this.taAngle.remove();
-
-        document.removeEventListener(Events.RENDER, this.updateAnglesListener);
-    }
-
-    calculateAdditionalParameters(keplerianObject) {
-        this.nodeQuaternion = new Quaternion(new Vector([0, 0, 1]), keplerianObject.raan);
-
-        this.node = this.nodeQuaternion.rotate(new Vector([1, 0, 0]));
-        this.normal = (new Quaternion(this.node, keplerianObject.inc)).rotate(new Vector([0, 0, 1]));
-        this.aopQuaternion = new Quaternion(this.normal, keplerianObject.aop);
-
-        this.periapsis = this.aopQuaternion.mul(this.nodeQuaternion).rotate(new Vector([1, 0, 0]));
-        this.nodePerp = this.nodeQuaternion.rotate(
-            new Vector([1, 0, 0])
-                .rotateZ(Math.PI / 2)
-        );
-        this.node = this.trajectory.referenceFrame
-            .getQuaternionByEpoch(event.detail.epoch)
-            .rotate(this.node);
-
-        this.normal = this.trajectory.referenceFrame
-            .getQuaternionByEpoch(event.detail.epoch)
-            .rotate(this.normal);
-
-        this.periapsis = this.trajectory.referenceFrame
-            .getQuaternionByEpoch(event.detail.epoch)
-            .rotate(this.periapsis);
-
-        this.nodePerp = this.trajectory.referenceFrame
-            .getQuaternionByEpoch(event.detail.epoch)
-            .rotate(this.nodePerp);
+        if (this.angleRaan) this.angleRaan.drop();
+        if (this.angleAop)  this.angleAop.drop();
+        if (this.angleInc)  this.angleInc.drop();
+        if (this.angleTa)   this.angleTa.drop();
     }
 }

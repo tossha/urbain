@@ -7,17 +7,12 @@ export default class VisualTrajectoryModelKeplerian extends VisualTrajectoryMode
     render(epoch)
     {
         super.render(epoch);
-        if (this.trajectory.minEpoch !== null && this.trajectory.minEpoch !== false) {
-            if (epoch < this.trajectory.minEpoch) {
-                this.threeObj.visible = false;
-                return;
-            }
-        }
-        if (this.trajectory.maxEpoch !== null && this.trajectory.maxEpoch !== false) {
-            if (epoch > this.trajectory.maxEpoch) {
-                this.threeObj.visible = false;
-                return;
-            }
+
+        epoch = this.getRenderingEpoch(epoch);
+
+        if (epoch === null) {
+            this.threeObj.visible = false;
+            return;
         }
 
         const keplerianObject = this.trajectory.getKeplerianObjectByEpoch(epoch);

@@ -11,6 +11,7 @@ export default class TrajectoryKeplerianPrecessing extends TrajectoryKeplerianBa
     }
 
     getKeplerianObjectByEpoch(epoch) {
+        this.validateEpoch(epoch);
         return this.keplerianObject.addPrecession(this.r, this.j2, epoch);
     }
 

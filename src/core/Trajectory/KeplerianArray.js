@@ -16,17 +16,12 @@ export default class TrajectoryKeplerianArray extends TrajectoryKeplerianAbstrac
     }
 
     getKeplerianObjectByEpoch(epoch) {
-        if ((this.minEpoch === null) || (epoch <= this.minEpoch)) {
-            return this.keplerianObjects[0];
-        }
-        if ((this.maxEpoch === null) || (epoch >= this.maxEpoch)) {
-            return this.keplerianObjects[this.keplerianObjects.length - 1];
-        }
+        this.validateEpoch(epoch);
 
         let nextIdx = Math.ceil((epoch - this.minEpoch) / (this.maxEpoch - this.minEpoch) * (this.keplerianObjects.length - 1));
         let searchDirection = this.keplerianObjects[nextIdx].epoch > epoch ? -1 : 1;
 
-        while ((nextIdx < this.keplerianObjects.length) && (nextIdx > 0)) {
+        while ((nextIdx < this.keplerianObjects.length) && (nextIdx >= 0)) {
             if (this.keplerianObjects[nextIdx].epoch == epoch) {
                 return this.keplerianObjects[nextIdx];
             }

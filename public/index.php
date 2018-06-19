@@ -258,6 +258,26 @@ require 'functions.php';
     <canvas id="timeLineCanvas"></canvas>
 </div>
 
+<div class="panel" id="creationPanel" data-panel-name="creation">
+    <table id="creationHeader" class="panelHeader">
+        <tr>
+            <td>
+                Orbit creation
+                <button class="collapseButton" data-panel-name="creation"></button>
+            </td>
+        </tr>
+    </table>
+
+    <table class="panelContent" data-panel-name="creation">
+        <tr>
+            <td>
+                <button id="createOrbit">Create</button>
+            </td>
+        </tr>
+    </table>
+
+</div>
+
 <div class="panel" id="lambertPanel" data-panel-name="lambert">
     <table id="lambertHeader" class="panelHeader">
         <tr>

@@ -8,10 +8,6 @@ export default class TrajectoryKeplerianBasic extends TrajectoryKeplerianAbstrac
         this.keplerianObject = keplerianObject;
     }
 
-    isEditable() {
-        return true;
-    }
-
     get mu() {
         return this.keplerianObject.mu;
     }
@@ -77,14 +73,7 @@ export default class TrajectoryKeplerianBasic extends TrajectoryKeplerianAbstrac
     }
 
     getKeplerianObjectByEpoch(epoch) {
+        this.validateEpoch(epoch);
         return this.keplerianObject;
-    }
-
-    static createFromState(referenceFrame, state, mu, epoch, color) {
-        return new TrajectoryKeplerianBasic(
-            referenceFrame,
-            KeplerianObject.createFromState(state, mu, epoch),
-            color
-        );
     }
 }

@@ -1,7 +1,7 @@
 import $ from "jquery";
 
 import UIPanel from "../Panel";
-import {Events} from "../../core/Events";
+import Events from "../../core/Events";
 import UIPanelVector from "./Vector";
 import {deg2rad, presentNumberWithSuffix, rad2deg} from "../../algebra";
 import EphemerisObject from "../../core/EphemerisObject";
@@ -49,15 +49,19 @@ export default class UIPanelMetrics extends UIPanel
             return;
         }
 
-        const referenceFrame = selectedObject.getReferenceFrameByEpoch(event.detail.epoch);
-        if (referenceFrame) {
-            parent = sim.starSystem.getObject(referenceFrame.originId);
-            this.jqDom.find('#relativeTo').html(parent.name);
-        }
+        try {
+            const referenceFrame = selectedObject.getReferenceFrameByEpoch(event.detail.epoch);
+            if (referenceFrame) {
+                parent = sim.starSystem.getObject(referenceFrame.originId);
+                this.jqDom.find('#relativeTo').html(parent.name);
+            }
 
-        this.updateMain     (selectedObject, event.detail.epoch, parent);
-        this.updateCartesian(selectedObject, event.detail.epoch);
-        this.updateKeplerian(selectedObject, event.detail.epoch);
+            this.updateMain(selectedObject, event.detail.epoch, parent);
+            this.updateCartesian(selectedObject, event.detail.epoch);
+            this.updateKeplerian(selectedObject, event.detail.epoch);
+        } catch (e) {
+
+        }
     }
 
     updateMain(selectedObject, epoch, parent) {
@@ -77,7 +81,7 @@ export default class UIPanelMetrics extends UIPanel
         this.jqDom.find('#elements-alt' ).html(''   + (state.position.mag - surfaceAlt).toPrecision(this.precision));
         this.jqDom.find('#elements-speed' ).html('' + (state.velocity.mag * 1000).toPrecision(this.precision));
 
-        if (parent.physicalModel.j2 && parent.physicalModel.j2) {
+        if (parent.physicalModel && parent.physicalModel.j2 && parent.physicalModel.j2) {
             this.jqDom.find('#elements-precession').html('' + (
                 rad2deg(keplerianObject.getNodalPrecessionRate(parent.physicalModel.eqRadius, parent.physicalModel.j2) * 86400)
             ).toPrecision(this.precision));

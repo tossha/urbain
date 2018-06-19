@@ -1,6 +1,6 @@
 import EventHandler from "./EventHandler";
 import {Vector} from "../algebra";
-import {Events} from "./Events";
+import Events from "./Events";
 import {ReferenceFrame} from "./ReferenceFrame/Factory";
 import TimeLine from "../ui/TimeLine";
 import StarSystemLoader from "../interface/StarSystemLoader";
@@ -52,7 +52,7 @@ export default class Simulation
 
         this.ui = new UI();
 
-        document.dispatchEvent(new CustomEvent(Events.INIT_DONE));
+        Events.dispatch(Events.INIT_DONE);
 
         StarSystemLoader.loadObjectByUrl(this.starSystem, './spacecraft/voyager1.json');
         StarSystemLoader.loadObjectByUrl(this.starSystem, './spacecraft/voyager2.json');
@@ -100,10 +100,7 @@ export default class Simulation
 
         this.camera.update(this.time.epoch);
 
-        document.dispatchEvent(new CustomEvent(
-            Events.RENDER,
-            {detail: {epoch: this.time.epoch}}
-        ));
+        Events.dispatch(Events.RENDER, {epoch: this.time.epoch});
 
         this.renderer.render(this.scene, this.camera.threeCamera);
     }
