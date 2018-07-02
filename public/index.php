@@ -336,6 +336,5 @@ require 'functions.php';
     </table>
 
 </div>
-
 </body>
 </html>
