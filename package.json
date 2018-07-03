@@ -4,8 +4,8 @@
   "description": "",
   "main": "./src/main.js",
   "scripts": {
-    "build": "webpack",
-    "watch": "webpack --watch"
+    "build": "npm i && webpack",
+    "start": "npm i && webpack --watch"
   },
   "repository": {
     "type": "git",
