@@ -31,4 +31,18 @@ module.exports = {
     watchOptions: {
         ignored: /node_modules/
     },
+    optimization: {
+        splitChunks: {
+            cacheGroups: {
+                commons: {
+                    test: /[\\/]node_modules[\\/]/,
+                    name: "vendors",
+                    chunks: 'all'
+                }
+            }
+        }
+    },
+    performance: {
+        hints: false
+    }
 };
