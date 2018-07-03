@@ -1,3 +1,5 @@
+import * as THREE from "three";
+
 export default class VirtualPlane extends THREE.Plane
 {
     raycast(raycaster, intersects) {
@@ -9,7 +11,7 @@ export default class VirtualPlane extends THREE.Plane
         let C = this.normal.z;
 
         let point = new THREE.Vector3((this.constant * A) / Math.sqrt((A * A) + (B * B) + (C * C)),
-                                      (this.constant * B) / Math.sqrt((A * A) + (B * B) + (C * C)),  
+                                      (this.constant * B) / Math.sqrt((A * A) + (B * B) + (C * C)),
                                       (this.constant * C) / Math.sqrt((A * A) + (B * B) + (C * C)));
 
         const d = point.dot(this.normal) / raycaster.ray.direction.dot(this.normal);

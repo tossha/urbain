@@ -1,3 +1,5 @@
+import * as THREE from "three";
+
 import EventHandler from "./EventHandler";
 import {Vector} from "../algebra";
 import Events from "./Events";

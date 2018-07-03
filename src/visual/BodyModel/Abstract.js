@@ -1,3 +1,5 @@
+import * as THREE from "three";
+
 import VisualModelAbstract from "../ModelAbstract";
 import VisualLabel from "../VisualLabel";
 import Events from "../../core/Events";

@@ -1,3 +1,5 @@
+import * as THREE from "three";
+
 import VisualBodyModelAbstract from "./Abstract";
 import VisualModelAbstract from "../ModelAbstract"
 

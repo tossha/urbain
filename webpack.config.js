@@ -1,5 +1,4 @@
 const path = require("path");
-const webpack = require("webpack");
 const CopyWebpackPlugin = require("copy-webpack-plugin");
 const CleanWebpackPlugin = require("clean-webpack-plugin");
 const HtmlWebpackPlugin = require("html-webpack-plugin");
@@ -13,9 +12,6 @@ module.exports = {
         filename: "[name].bundle.[hash].js"
     },
     plugins: [
-        new webpack.ProvidePlugin({
-            "THREE":       path.resolve(__dirname, "./src/vendor/three.min.js")
-        }),
         new CleanWebpackPlugin(["dist/**/*.*"]),
         new CopyWebpackPlugin([
             {
