@@ -1,3 +1,5 @@
+import * as THREE from "three";
+
 import {deg2rad, Quaternion} from "../algebra";
 import VisualModelAbstract from "./ModelAbstract";
 

@@ -1,3 +1,5 @@
+import * as THREE from "three";
+
 import VisualTrajectoryModelAbstract from "./Abstract";
 import {RF_BASE} from "../../core/ReferenceFrame/Factory";
 import {getAngleBySinCos, Vector} from "../../algebra";

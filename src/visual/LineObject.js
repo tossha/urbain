@@ -1,3 +1,5 @@
+import * as THREE from "three";
+
 export default class LineObject extends THREE.Line {
     raycast(raycaster, intersects) {
         const isBuffer = this.geometry.isBufferGeometry;

@@ -1,3 +1,5 @@
+import * as THREE from "three";
+
 import VisualBodyModelBasic from "./Basic";
 
 export default class VisualBodyModelLight extends VisualBodyModelBasic

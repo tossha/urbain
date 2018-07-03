@@ -1,3 +1,5 @@
+import * as THREE from "three";
+
 import VisualModelAbstract from "../visual/ModelAbstract";
 import Events from "../core/Events";
 
@@ -45,7 +47,7 @@ export default class SelectionHandler extends VisualModelAbstract
         if (intersections.length > 0) {
             this.bestIntersection = intersections[0];
 
-            for(var i = 1; i < intersections.length; i++) { 
+            for(var i = 1; i < intersections.length; i++) {
                 if (intersections[i].distance < this.bestIntersection.distance) {
                     this.bestIntersection = intersections[i];
                 }

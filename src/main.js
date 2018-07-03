@@ -1,3 +1,7 @@
+import $ from "jquery";
+import * as dat from "dat.gui";
+import Stats from "stats.js";
+
 import Simulation from "./core/Simulation";
 import StarSystemLoader from "./interface/StarSystemLoader";
 

@@ -1,3 +1,5 @@
+import * as THREE from "three";
+
 import VisualModelAbstract from "../ModelAbstract";
 import LineObject from "../LineObject";
 

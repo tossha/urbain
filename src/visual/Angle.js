@@ -1,3 +1,5 @@
+import * as THREE from "three";
+
 import FunctionOfEpochAbstract from "../core/FunctionOfEpoch/Abstract";
 import VisualModelAbstract from "./ModelAbstract";
 import {RF_BASE} from "../core/ReferenceFrame/Factory";
