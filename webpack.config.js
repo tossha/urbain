@@ -12,6 +12,7 @@ module.exports = {
         path: path.resolve(__dirname, "dist"),
         filename: "[name].bundle.[hash].js"
     },
+    devtool: "source-map",
     plugins: [
         new CleanWebpackPlugin(["dist/**/*.*"]),
         new CopyWebpackPlugin([
