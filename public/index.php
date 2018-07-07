@@ -24,7 +24,7 @@ require 'functions.php';
         }
 
         .dg.a {
-            float: left;
+            float: left!important;
         }
 
     </style>
