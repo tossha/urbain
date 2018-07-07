@@ -1,6 +1,3 @@
-<?php
-require 'functions.php';
-?>
 <!DOCTYPE html>
 <html>
 <head>
@@ -117,22 +114,42 @@ require 'functions.php';
                 Keplerian
             </td>
         </tr>
-
-        <?php foreach ([
-               ['Ecc', ''],
-               ['SMA', 'km'],
-               ['Inc', 'deg.'],
-               ['AoP', 'deg.'],
-               ['RAAN', 'deg.'],
-               ['TA', 'deg.'],
-               ['Period', 'days'],
-           ] as $param) { ?>
         <tr>
-            <td style="width: 60px"><?= $param[0] ?></td>
-            <td id="elements-<?= strtolower($param[0]) ?>" align="right"></td>
-            <td style="width: 60px"><?= $param[1] ?></td>
+            <td style="width: 60px">Ecc</td>
+            <td id="elements-ecc" align="right"></td>
+            <td style="width: 60px"></td>
         </tr>
-        <?php } ?>
+        <tr>
+            <td style="width: 60px">SMA</td>
+            <td id="elements-sma" align="right"></td>
+            <td style="width: 60px">km</td>
+        </tr>
+
+        <tr>
+            <td style="width: 60px">Inc</td>
+            <td id="elements-inc" align="right"></td>
+            <td style="width: 60px">deg.</td>
+        </tr>
+        <tr>
+            <td style="width: 60px">AoP</td>
+            <td id="elements-aop" align="right"></td>
+            <td style="width: 60px">deg.</td>
+        </tr>
+        <tr>
+            <td style="width: 60px">RAAN</td>
+            <td id="elements-raan" align="right"></td>
+            <td style="width: 60px">deg.</td>
+        </tr>
+        <tr>
+            <td style="width: 60px">TA</td>
+            <td id="elements-ta" align="right"></td>
+            <td style="width: 60px">deg.</td>
+        </tr>
+        <tr>
+            <td style="width: 60px">Period</td>
+            <td id="elements-period" align="right"></td>
+            <td style="width: 60px">days</td>
+        </tr>
     </table>
 
     <table class="panelContent" data-panel-name="metrics">
@@ -151,14 +168,21 @@ require 'functions.php';
                     <button class="collapseButton" data-panel-name="position_vector"></button>
                 </td>
             </tr>
-
-            <?php foreach (['x', 'y', 'z'] as $coord) { ?>
             <tr class="panelContent" data-panel-name="position_vector">
-                <td><?= $coord ?></td>
-                <td class="vec-<?= $coord ?>" align="right"></td>
+                <td>x</td>
+                <td class="vec-x" align="right"></td>
                 <td>km</td>
             </tr>
-            <?php } ?>
+            <tr class="panelContent" data-panel-name="position_vector">
+                <td>y</td>
+                <td class="vec-y" align="right"></td>
+                <td>km</td>
+            </tr>
+            <tr class="panelContent" data-panel-name="position_vector">
+                <td>z</td>
+                <td class="vec-z" align="right"></td>
+                <td>km</td>
+            </tr>
         </table>
     </div>
 
@@ -173,16 +197,25 @@ require 'functions.php';
                 </td>
             </tr>
 
-            <?php foreach (['x', 'y', 'z'] as $coord) { ?>
             <tr class="panelContent" data-panel-name="velocity_vector">
-                <td><?= $coord ?></td>
-                <td class="vec-<?= $coord ?>" align="right"></td>
+                <td>x</td>
+                <td class="vec-x" align="right"></td>
                 <td>km/s</td>
             </tr>
-            <?php } ?>
+            <tr class="panelContent" data-panel-name="velocity_vector">
+                <td>y</td>
+                <td class="vec-y" align="right"></td>
+                <td>km/s</td>
+            </tr>
+            <tr class="panelContent" data-panel-name="velocity_vector">
+                <td>z</td>
+                <td class="vec-z" align="right"></td>
+                <td>km/s</td>
+            </tr>
         </table>
     </div>
 </div>
+
 <div id="bottomPanel">
     <div class="panel" id="timePanel" data-panel-name="time">
         <table id="timeBoxHeader" class="panelHeader">
@@ -194,7 +227,7 @@ require 'functions.php';
             </tr>
         </table>
 
-        <table class="panelContent"  data-panel-name="time" style="width: 100%">
+        <table class="panelContent" data-panel-name="time" style="width: 100%">
 
             <tr>
                 <td style="width: 65px"><b>Current:</b></td>
@@ -292,15 +325,13 @@ require 'functions.php';
         <tr>
             <td><b>Origin:</b></td>
             <td>
-                <select id="originSelect">
-                </select>
+                <select id="originSelect"></select>
             </td>
         </tr>
         <tr>
             <td><b>Target:</b></td>
             <td>
-                <select id="targetSelect">
-                </select>
+                <select id="targetSelect"></select>
             </td>
         </tr>
         <tr>
@@ -311,7 +342,7 @@ require 'functions.php';
         </tr>
     </table>
 
-    <table class="panelContent"  data-panel-name="lambert" style="width: 100%; border-bottom: blue solid 1px">
+    <table class="panelContent" data-panel-name="lambert" style="width: 100%; border-bottom: blue solid 1px">
 
         <tr>
             <td><b>Departure:</b></td>

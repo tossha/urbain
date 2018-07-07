@@ -25,8 +25,7 @@ module.exports = {
             ]
         }),
         new HtmlWebpackPlugin({
-            template: path.join(__dirname, "public", "index.php"),
-            filename: path.join(__dirname, "dist", "index.php"),
+            template: path.join(__dirname, "public", "index.html"),
             inject: "body",
         }),
     ],
