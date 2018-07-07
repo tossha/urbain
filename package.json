@@ -5,7 +5,7 @@
   "main": "./src/main.js",
   "scripts": {
     "build": "npm i && webpack --mode=production",
-    "dev": "npm i && webpack --mode=development --watch",
+    "dev": "npm i && webpack-dev-server --mode=development --watch",
     "start": "npm run dev"
   },
   "repository": {
@@ -24,9 +24,10 @@
     "clean-webpack-plugin": "^0.1.19",
     "copy-webpack-plugin": "^4.5.2",
     "html-webpack-plugin": "^3.2.0",
+    "uglifyjs-webpack-plugin": "1.2.7",
     "webpack": "^4.14.0",
     "webpack-cli": "^3.0.8",
-    "uglifyjs-webpack-plugin": "1.2.7"
+    "webpack-dev-server": "^3.1.4"
   },
   "dependencies": {
     "dat.gui": "^0.7.2",
