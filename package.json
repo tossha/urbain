@@ -4,8 +4,9 @@
   "description": "",
   "main": "./src/main.js",
   "scripts": {
-    "build": "npm i && webpack -p",
-    "start": "npm i && webpack -d --watch"
+    "build": "npm i && webpack --mode=production",
+    "dev": "npm i && webpack --mode=development --watch",
+    "start": "npm run dev"
   },
   "repository": {
     "type": "git",
