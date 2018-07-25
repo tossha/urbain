@@ -6,6 +6,7 @@ import ReferenceFrameFactory, {ReferenceFrame} from "../../core/ReferenceFrame/F
 import VisualTrajectoryModelKeplerian from "../../visual/TrajectoryModel/Keplerian";
 import VisualVector from "../../visual/Vector";
 import EphemerisObject from "../../core/EphemerisObject";
+import { sim } from "../../core/Simulation";
 
 export default class UIPanelLambert extends UIPanel
 {

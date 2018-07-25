@@ -1,5 +1,5 @@
 import OrientationAbstract from "./Abstract";
-import {deg2rad, Quaternion} from "../../algebra";
+import {deg2rad, Quaternion} from "../algebra";
 
 export default class OrientationIAUModel extends OrientationAbstract
 {

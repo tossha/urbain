@@ -1,4 +1,5 @@
 import FunctionOfEpochAbstract from "./Abstract";
+import { sim } from "../Simulation";
 
 export default class FunctionOfEpochObjectState extends FunctionOfEpochAbstract
 {

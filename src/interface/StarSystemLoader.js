@@ -1,7 +1,7 @@
 import $ from "jquery";
 
 import ReferenceFrameFactory, {ReferenceFrame, RF_BASE} from "../core/ReferenceFrame/Factory";
-import {SATURN, SUN} from "../solar_system";
+import {SATURN, SUN} from "./solar_system";
 import Body from "../core/Body";
 import OrientationIAUModel from "../core/Orientation/IAUModel";
 import OrientationConstantAxis from "../core/Orientation/ConstantAxis";
@@ -74,7 +74,7 @@ export default class StarSystemLoader
                 config.visual.texture ? 32 : 12
             );
 
-            visualModel = (config.id == SUN)
+            visualModel = (config.id === SUN)
                 ? new VisualBodyModelLight(
                     visualShape,
                     config.visual.color,
@@ -84,7 +84,7 @@ export default class StarSystemLoader
                     null,
                     null
                 )
-                : ((config.id == SATURN)
+                : ((config.id === SATURN)
                         ? new VisualBodyModelRings(
                             visualShape,
                             config.visual.color,

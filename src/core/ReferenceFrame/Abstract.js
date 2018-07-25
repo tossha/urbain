@@ -1,7 +1,8 @@
-import {Quaternion, Vector} from "../../algebra";
+import {Quaternion, Vector} from "../algebra";
 import StateVector from "../StateVector";
 import {RF_BASE} from "./Factory";
 import ReferenceFrameFactory from "./Factory";
+import { sim } from "../Simulation";
 
 export default class ReferenceFrameAbstract
 {

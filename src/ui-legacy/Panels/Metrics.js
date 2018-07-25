@@ -3,8 +3,9 @@ import $ from "jquery";
 import UIPanel from "../Panel";
 import Events from "../../core/Events";
 import UIPanelVector from "./Vector";
-import {deg2rad, presentNumberWithSuffix, rad2deg} from "../../algebra";
+import {presentNumberWithSuffix, rad2deg} from "../../core/algebra";
 import EphemerisObject from "../../core/EphemerisObject";
+import { sim } from "../../core/Simulation";
 
 export default class UIPanelMetrics extends UIPanel
 {

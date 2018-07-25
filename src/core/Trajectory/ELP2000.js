@@ -1,10 +1,10 @@
-
 import TrajectoryKeplerianAbstract from "./KeplerianAbstract";
 import ReferenceFrameFactory from "../ReferenceFrame/Factory";
 import {ReferenceFrame} from "../ReferenceFrame/Factory";
-import {EARTH} from "../../solar_system";
-import {deg2rad, Vector} from "../../algebra";
+import {EARTH} from "../../interface/solar_system";
+import {deg2rad, Vector} from "../algebra";
 import StateVector from "../StateVector";
+import { sim } from "../Simulation";
 
 export default class TrajectoryELP2000 extends TrajectoryKeplerianAbstract
 {
@@ -51,7 +51,7 @@ export default class TrajectoryELP2000 extends TrajectoryKeplerianAbstract
 
         return [value, derivative];
     }
-    
+
     _calc4_9(fileIdx, t) {
         const z = this.W1 + this._p * t;
         const dz = this.dW1 + this._p;

@@ -1,13 +1,14 @@
 import FunctionOfEpochObjectState from "../FunctionOfEpoch/ObjectState";
-import {deg2rad, Quaternion, Vector} from "../../algebra";
+import {deg2rad, Quaternion, Vector} from "../algebra";
 import FunctionOfEpochCustom from "../FunctionOfEpoch/Custom";
 import ReferenceFrameBodyFixed from "./BodyFixed";
-import {EARTH} from "../../solar_system";
+import {EARTH} from "../../interface/solar_system";
 import ReferenceFrameBase from "./Base";
 import ReferenceFrameInertial from "./Inertial";
 import ReferenceFrameInertialDynamic from "./InertialDynamic";
 import Body from "../Body";
 import ReferenceFrameTopocentric from "./Topocentric";
+import { sim } from "../Simulation";
 
 export default class ReferenceFrameFactory
 {
@@ -93,7 +94,7 @@ export default class ReferenceFrameFactory
                     config.origin,
                     config.lat,
                     config.lon,
-                    height,
+                    /* height */ undefined, // TODO: We need to investigate why
                     false
                 );
             } else {

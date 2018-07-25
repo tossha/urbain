@@ -1,11 +1,11 @@
-
 import {ReferenceFrame} from "../ReferenceFrame/Factory";
-import {SUN} from "../../solar_system";
+import {SUN} from "../../interface/solar_system";
 import ReferenceFrameFactory from "../ReferenceFrame/Factory";
 import TrajectoryKeplerianAbstract from "./KeplerianAbstract";
 import KeplerianObject from "../KeplerianObject";
-import {Vector} from "../../algebra";
+import {Vector} from "../algebra";
 import StateVector from "../StateVector";
+import { sim } from "../Simulation";
 
 export default class TrajectoryVSOP87 extends TrajectoryKeplerianAbstract
 {

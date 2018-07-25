@@ -1,6 +1,6 @@
 
 import UIPanel from "../Panel";
-import {presentNumberWithSuffix, Vector} from "../../algebra";
+import {presentNumberWithSuffix, Vector} from "../../core/algebra";
 import FunctionOfEpochAbstract from "../../core/FunctionOfEpoch/Abstract";
 
 export default class UIPanelVector extends UIPanel

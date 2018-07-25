@@ -1,8 +1,7 @@
 import TrajectoryKeplerianAbstract from "./KeplerianAbstract";
-import {approximateAngle, approximateNumber} from "../../algebra";
+import {approximateAngle, approximateNumber} from "../algebra";
 import KeplerianObject from "../KeplerianObject";
 import StateVector from "../StateVector";
-import {Vector} from "../../algebra";
 
 export default class TrajectoryKeplerianArray extends TrajectoryKeplerianAbstract
 {

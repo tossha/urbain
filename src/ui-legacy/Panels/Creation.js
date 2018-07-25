@@ -4,6 +4,7 @@ import TrajectoryKeplerianBasic from "../../core/Trajectory/KeplerianBasic";
 import ReferenceFrameFactory, {ReferenceFrame} from "../../core/ReferenceFrame/Factory";
 import VisualTrajectoryModelKeplerian from "../../visual/TrajectoryModel/Keplerian";
 import KeplerianObject from "../../core/KeplerianObject";
+import { sim } from "../../core/Simulation";
 
 export default class UIPanelCreation extends UIPanel {
     constructor(panelDom) {

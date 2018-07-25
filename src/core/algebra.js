@@ -16,6 +16,8 @@ export class Vector extends Array
                 this[i] = 0;
             }
         }
+
+        Object.setPrototypeOf(this, Vector.prototype);
     }
 
     get x() {

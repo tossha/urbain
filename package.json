@@ -4,11 +4,11 @@
   "description": "",
   "main": "./src/main.js",
   "scripts": {
+    "start": "npm i && react-scripts start",
+    "build": "npm i && react-scripts build",
+    "test": "react-scripts test --env=jsdom",
     "predeploy": "npm run build",
-    "deploy": "gh-pages -d dist",
-    "build": "npm i && webpack --mode=production",
-    "dev": "npm i && webpack-dev-server --mode=development --watch",
-    "start": "npm run dev"
+    "deploy": "gh-pages -d build"
   },
   "repository": {
     "type": "git",
@@ -20,22 +20,16 @@
     "url": "https://github.com/tossha/urbain/issues"
   },
   "homepage": "https://urbain.ru/",
-  "devDependencies": {
-    "babel-cli": "^6.26.0",
-    "babel-preset-env": "^1.6.1",
-    "clean-webpack-plugin": "^0.1.19",
-    "copy-webpack-plugin": "^4.5.2",
-    "gh-pages": "^1.2.0",
-    "html-webpack-plugin": "^3.2.0",
-    "uglifyjs-webpack-plugin": "1.2.7",
-    "webpack": "^4.14.0",
-    "webpack-cli": "^3.0.8",
-    "webpack-dev-server": "^3.1.4"
-  },
   "dependencies": {
-    "dat.gui": "^0.7.2",
-    "jquery": "^3.3.1",
-    "stats.js": "^0.17.0",
-    "three": "^0.94.0"
+    "dat.gui": "0.7.2",
+    "jquery": "3.3.1",
+    "react": "16.4.1",
+    "react-dom": "16.4.1",
+    "react-scripts": "1.1.4",
+    "stats.js": "0.17.0",
+    "three": "0.94.0"
+  },
+  "devDependencies": {
+    "gh-pages": "^1.2.0"
   }
 }

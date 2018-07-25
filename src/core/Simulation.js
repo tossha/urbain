@@ -1,19 +1,19 @@
 import * as THREE from "three";
 
 import EventHandler from "./EventHandler";
-import {Vector} from "../algebra";
+import {Vector} from "./algebra";
 import Events from "./Events";
 import {ReferenceFrame} from "./ReferenceFrame/Factory";
-import TimeLine from "../ui/TimeLine";
+import TimeLine from "../ui-legacy/TimeLine";
 import StarSystemLoader from "../interface/StarSystemLoader";
 import VisualRaycaster from "../visual/Raycaster";
-import SelectionHandler from "../ui/SelectionHandler";
-import UI from "../ui/UI";
+import SelectionHandler from "../ui-legacy/SelectionHandler";
+import UI from "../ui-legacy/UI";
 import StarSystem from "./StarSystem";
-import Camera from "../ui/Camera";
+import Camera from "../ui-legacy/Camera";
 import ReferenceFrameFactory from "./ReferenceFrame/Factory";
 
-export default class Simulation
+class Simulation
 {
     constructor() {
         this.initSettings();
@@ -111,3 +111,5 @@ export default class Simulation
         return (new THREE.Vector3()).fromArray(simCoords.sub(this.camera.lastPosition));
     }
 }
+
+export const sim = new Simulation();

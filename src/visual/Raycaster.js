@@ -1,6 +1,7 @@
 import * as THREE from "three";
 
-import {deg2rad} from "../algebra";
+import {deg2rad} from "../core/algebra";
+import { sim } from "../core/Simulation";
 
 export default class VisualRaycaster
 {

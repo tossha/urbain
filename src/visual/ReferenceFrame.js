@@ -2,6 +2,7 @@ import * as THREE from "three";
 
 import VisualModelAbstract from "./ModelAbstract";
 import Events from "../core/Events";
+import { sim } from "../core/Simulation";
 
 export default class VisualReferenceFrame extends VisualModelAbstract
 {

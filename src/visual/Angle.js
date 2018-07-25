@@ -4,8 +4,9 @@ import FunctionOfEpochAbstract from "../core/FunctionOfEpoch/Abstract";
 import VisualModelAbstract from "./ModelAbstract";
 import {RF_BASE} from "../core/ReferenceFrame/Factory";
 import VirtualPlane from "./VirtualPlane";
-import {TWO_PI} from "../algebra";
+import {TWO_PI} from "../core/algebra";
 import ArrowObject from "./Arrow";
+import { sim } from "../core/Simulation";
 
 export default class VisualAngle extends VisualModelAbstract
 {

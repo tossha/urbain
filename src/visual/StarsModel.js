@@ -1,6 +1,6 @@
 import * as THREE from "three";
 
-import {deg2rad, Quaternion} from "../algebra";
+import { deg2rad, Quaternion } from "../core/algebra";
 import VisualModelAbstract from "./ModelAbstract";
 
 export default class VisualStarsModel extends VisualModelAbstract

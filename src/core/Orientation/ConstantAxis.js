@@ -1,5 +1,5 @@
 import OrientationAbstract from "./Abstract";
-import {Quaternion, Vector} from "../../algebra";
+import {Quaternion, Vector} from "../algebra";
 
 export default class OrientationConstantAxis extends OrientationAbstract
 {
