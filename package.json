@@ -30,6 +30,7 @@
     "three": "0.94.0"
   },
   "devDependencies": {
-    "gh-pages": "^1.2.0"
+    "gh-pages": "1.2.0",
+    "webpack": "3.12.0"
   }
 }
