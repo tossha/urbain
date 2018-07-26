@@ -74,7 +74,7 @@ export default class StarSystemLoader
                 config.visual.texture ? 32 : 12
             );
 
-            visualModel = (config.id === SUN)
+            visualModel = (config.id == SUN)
                 ? new VisualBodyModelLight(
                     visualShape,
                     config.visual.color,
