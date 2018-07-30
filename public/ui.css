@@ -1,3 +1,32 @@
+html {
+    width: 100%;
+    height: 100%;
+}
+
+body {
+    width: 100%;
+    height: 100%;
+    margin: 0;
+    overflow: hidden;
+}
+
+canvas {
+    width: 100%;
+    height: 100%;
+}
+
+.diagnostic-info-switcher {
+    position: absolute;
+    left: 200px;
+    top: 60px;
+    width: 245px;
+}
+
+.fps-badge {
+    margin-top: 60px;
+    height: 30px;
+}
+
 button {
     float: right;
     background-color: #666;

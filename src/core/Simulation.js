@@ -19,7 +19,7 @@ class Simulation
         this.initSettings();
     }
 
-    init(domElementId, starSystemConfig) {
+    init(viewPortDomElement, starSystemConfig) {
         this.scene = new THREE.Scene();
         this.scene.add(new THREE.AmbientLight(0xFFEFD5, 0.15));
 
@@ -27,7 +27,7 @@ class Simulation
 
         this.renderer = new THREE.WebGLRenderer({antialias: true});
         this.renderer.setSize(window.innerWidth, window.innerHeight);
-        this.domElement = document.getElementById(domElementId);
+        this.domElement = viewPortDomElement;
         this.domElement.appendChild(this.renderer.domElement);
         window.addEventListener('resize', this.onWindowResize.bind(this));
 

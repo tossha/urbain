@@ -1,7 +1,7 @@
 import React from "react";
 
-const Footer = () => (
-    <footer className="footer" />
+const Footer = ({ className }) => (
+    <footer  className={`${className} footer`} />
 );
 
 export default Footer;

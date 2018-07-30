@@ -1,16 +1,17 @@
 import React from "react";
 
+import "./app.css";
 import Header from "./header";
 import Footer from "./footer";
 
 class App extends React.Component {
     render() {
         return (
-            <React.Fragment>
-                <Header/>
-                <main>
+            <div className="app-layout">
+                <Header className="app-layout__header"/>
+                <main className="app-layout__main">
                     <div id="leftPanel" />
-                    <div id="viewport" />
+                    <div id="viewport-id" />
                     <div id="metricsPanel" className="panel" data-panel-name="metrics">
                         <table id="metricsHeader" className="panelHeader">
                             <tbody>
@@ -406,8 +407,8 @@ class App extends React.Component {
                         </table>
                     </div>
                 </main>
-                <Footer/>
-            </React.Fragment>
+                <Footer className="app-layout__footer"/>
+            </div>
         )
     }
 }

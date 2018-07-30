@@ -13,12 +13,16 @@ let statistics;
 let globalTime;
 
 export function init() {
-    const datGui = new dat.GUI();
     statistics = new Stats();
+    statistics.dom.classList.add("fps-badge");
+
     document.body.appendChild(statistics.dom);
     statistics.dom.style.display = "none";
     statistics.showStatistics = false;
 
+    const datGui = new dat.GUI();
+
+    datGui.domElement.classList.add("diagnostic-info-switcher");
     datGui.add(statistics, "showStatistics").onChange(value => {
         statistics.dom.style.display = value ? "" : "none";
     });
@@ -26,8 +30,12 @@ export function init() {
     datGui.add(sim.settings.ui, "showBodyLabels");
 
     $.getJSON("./star_systems/solar_system.json", starSystemConfig => {
-        sim.init("viewport", starSystemConfig);
-        requestAnimationFrame(firstRender);
+        const viewPort = document.getElementById("viewport-id");
+
+        if(viewPort) {
+            sim.init(viewPort, starSystemConfig);
+            requestAnimationFrame(firstRender);
+        }
     });
 }
 
