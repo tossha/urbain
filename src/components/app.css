@@ -10,7 +10,4 @@
 	height: 55px;
 }
 .app-layout__main {}
-.app-layout__footer {
-	background: #999;
-	height: 30px;
-}
+.app-layout__footer {}

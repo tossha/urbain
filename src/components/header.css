@@ -37,7 +37,14 @@
 }
 
 .main-menu__item {
-	padding: 0 20px;
+	margin: 0 10px;
+	padding: 5px 10px;
+}
+
+.main-menu__item:hover {
+	border-radius: 3px;
+	background: #36393e;
+	cursor: pointer;
 }
 
 .main-menu__item--with-caret {

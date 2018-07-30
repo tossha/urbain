@@ -17,13 +17,15 @@ canvas {
 
 .diagnostic-info-switcher {
     position: absolute;
-    left: 200px;
-    top: 60px;
+    left: 170px;
+    top: 101px;
     width: 245px;
 }
 
 .fps-badge {
     margin-top: 60px;
+    left: 420px !important;
+    top: 40px !important;
     height: 30px;
 }
 
