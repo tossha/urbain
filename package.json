@@ -21,6 +21,7 @@
   },
   "homepage": "https://urbain.ru/",
   "dependencies": {
+    "classnames": "2.2.6",
     "dat.gui": "0.7.2",
     "jquery": "3.3.1",
     "react": "16.4.1",
