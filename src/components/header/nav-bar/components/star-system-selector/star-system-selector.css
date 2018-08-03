@@ -1,0 +1,14 @@
+.star-system-selector {
+	align-items: center;
+	display: flex;
+	justify-content: space-between;
+	height: 100%;
+	padding: 0 15px;
+}
+.star-system-selector__label {
+	margin-right: 15px;
+}
+.star-system-selector__selector {
+	background: var(--black);
+	width: 173px;
+}

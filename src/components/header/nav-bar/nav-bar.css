@@ -1,0 +1,15 @@
+.nav-bar {
+	align-items: center;
+	display: flex;
+	height: 47px;
+}
+
+.nav-bar__item {
+	background: var(--dark-gray);
+	border-radius: 3px;
+	height: 100%;
+}
+
+.nav-bar__item--separated {
+	margin-left: 5px;
+}
