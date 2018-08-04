@@ -14,6 +14,7 @@ const customSelectStyles = {
         color: DEFAULT.color,
         minHeight: DEFAULT.containerHeight,
         height: DEFAULT.containerHeight,
+        minWidth: 50,
     }),
 
     control: (base) => ({
@@ -77,9 +78,10 @@ const DropdownIndicator = (props) => {
     )
 };
 
-const Select = ({ className, options, value }) => {
+const Select = ({ id, className, options, value }) => {
     return (
         <ReactSelect
+            id={id}
             className={className}
             classNamePrefix="select"
             placeholder=""

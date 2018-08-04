@@ -1,0 +1,12 @@
+.camera-panel {}
+.camera-panel__field {
+	align-items: center;
+	display: flex;
+	justify-content: space-between;
+	margin: 15px 5px;
+	background-color: #000;
+	padding: 8px;
+}
+.camera-panel__field-control {
+	font-size: 10px;
+}

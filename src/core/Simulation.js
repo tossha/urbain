@@ -29,7 +29,7 @@ class Simulation
         this.renderer.setSize(window.innerWidth, window.innerHeight);
         this.domElement = viewPortDomElement;
         this.domElement.appendChild(this.renderer.domElement);
-        window.addEventListener('resize', this.onWindowResize.bind(this));
+        window.addEventListener("resize", this.onWindowResize.bind(this));
 
         this.rendererEvents = new EventHandler(this.renderer.domElement);
 

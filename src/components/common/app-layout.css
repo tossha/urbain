@@ -1,22 +1,3 @@
-:root {
-	--black: #1a1b1e;
-	--blue: #2846ed;
-	--lightning-blue: #2a49fb;
-	--gray: #393b40;
-	--dark-gray: #25272c;
-	--blue-text: #6f88e6;
-	--white-text: #fdfdfd;
-}
-
-html {
-	font-family: Arial, sans-serif;
-	font-size: 12px;
-}
-
-*, ::after, ::before {
-	box-sizing: border-box;
-}
-
 .app-layout {
 	color: var(--white-text);
 	display: flex;
@@ -26,8 +7,10 @@ html {
 }
 
 .app-layout__main {
-	// background: aquamarine;
-
+	display: flex;
+	justify-content: space-between;
+	flex-direction: column;
+	flex-grow: 2;
 	height: 100%;
 	position: relative;
 	width: 100%;
@@ -40,7 +23,5 @@ html {
 	left: 8px;
 }
 .app-layout__footer {
-	background: #a18aff;
-	height: 20px;
-	// width: calc(100% - 16px);
+	z-index: 1;
 }
