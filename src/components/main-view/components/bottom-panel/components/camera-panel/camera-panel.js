@@ -3,7 +3,7 @@ import PropTypes from "prop-types";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome"
 
 import "./camera-panel.css";
-import Panel from "../../../common/panel";
+import Panel from "../../../../../common/panel";
 
 const CameraPanel = () => {
     return (
@@ -14,10 +14,10 @@ const CameraPanel = () => {
             titleIcon={<FontAwesomeIcon className="camera-panel__icon" icon="expand" />}
         >
             <div className="camera-panel__content">
-                <label className="camera-panel__field">
+                <label className="panel__field camera-panel__field">
                     Target: <select className="camera-panel__field-control" id="targetSelect" />
                 </label>
-                <label className="camera-panel__field">
+                <label className="panel__field camera-panel__field">
                     Frame type: <select className="camera-panel__field-control" id="rfTypeSelect" />
                 </label>
             </div>

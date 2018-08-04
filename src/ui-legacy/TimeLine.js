@@ -21,8 +21,8 @@ export default class TimeLine
         this.markDistance = 300;
         this.scaleType = "month";
 
-        this.domElement = document.getElementById("timeLineCanvas");
-        this.canvasContext = this.domElement.getContext("2d");
+        this.timeLineCanvasDomElement = document.getElementById("timeLineCanvas");
+        this.canvasContext = this.timeLineCanvasDomElement.getContext("2d");
         this.canvasRect = {};
         this.updateCanvasStyle();
 
@@ -30,10 +30,10 @@ export default class TimeLine
 
         this.updateScaleType();
 
-        this.domElement.addEventListener("mousedown",  this.onMouseDown  .bind(this));
-        window         .addEventListener("mouseup",    this.onMouseUp    .bind(this));
-        window         .addEventListener("mousemove",  this.onMouseMove  .bind(this));
-        this.domElement.addEventListener("mousewheel", this.onMouseWheel .bind(this));
+        this.timeLineCanvasDomElement.addEventListener("mousedown",  this.onMouseDown  .bind(this));
+        window                       .addEventListener("mouseup",    this.onMouseUp    .bind(this));
+        window                       .addEventListener("mousemove",  this.onMouseMove  .bind(this));
+        this.timeLineCanvasDomElement.addEventListener("mousewheel", this.onMouseWheel .bind(this));
 
         window.addEventListener('keypress', e => {
             if (e.key === ' ') {
@@ -58,7 +58,7 @@ export default class TimeLine
     tick(timePassed) {
         if (this.mouseState.leftButton) {
             this.epoch = this.leftEpoch + (this.mouseState.x
-                - this.canvasRect.left) * this.span / this.domElement.width;
+                - this.canvasRect.left) * this.span / this.timeLineCanvasDomElement.width;
         } else if (this.isTimeRunning) {
             if ((this.leftEpoch < this.epoch)
                 && (this.epoch < this.leftEpoch + this.span)
@@ -88,14 +88,14 @@ export default class TimeLine
 
     redraw() {
         this.canvasContext.fillStyle = "#222";
-        this.canvasContext.fillRect(0, 0, this.domElement.width, this.domElement.height);
+        this.canvasContext.fillRect(0, 0, this.timeLineCanvasDomElement.width, this.timeLineCanvasDomElement.height);
 
-        this.canvasContext.fillStyle = "#2FA1D6";
+        this.canvasContext.fillStyle = this.isTimeRunning ? "#2846ed" : "#393b40";
         this.drawCurrentTimeMark();
 
-        this.canvasContext.strokeStyle = "#fff";
-        this.canvasContext.fillStyle   = "#fff";
-        this.canvasContext.font        = "11pt sans-serif";
+        this.canvasContext.strokeStyle = "#fdfdfd";
+        this.canvasContext.fillStyle   = "#fdfdfd";
+        this.canvasContext.font        = "11px sans-serif";
 
         let markDate = this.roundDateUp(TimeLine.getDateByEpoch(this.leftEpoch));
         let markEpoch = TimeLine.getEpochByDate(markDate);
@@ -116,17 +116,17 @@ export default class TimeLine
     }
 
     getCanvasPositionByEpoch(epoch) {
-        return (epoch - this.leftEpoch) * this.domElement.width / this.span;
+        return (epoch - this.leftEpoch) * this.timeLineCanvasDomElement.width / this.span;
     }
 
     updateCanvasStyle() {
-        this.canvasRect = this.domElement.getBoundingClientRect();
-        this.domElement.width  = this.canvasRect.right  - this.canvasRect.left;
-        this.domElement.height = this.canvasRect.bottom - this.canvasRect.top;
+        this.canvasRect = this.timeLineCanvasDomElement.getBoundingClientRect();
+        this.timeLineCanvasDomElement.width  = this.canvasRect.right  - this.canvasRect.left;
+        this.timeLineCanvasDomElement.height = this.canvasRect.bottom - this.canvasRect.top;
     }
 
     updateScaleType() {
-        const secondsPerPeriod = this.markDistance * this.span / this.domElement.width;
+        const secondsPerPeriod = this.markDistance * this.span / this.timeLineCanvasDomElement.width;
         let bestScale = false;
 
         for (const scale in TimeLine.scales) {
@@ -148,17 +148,17 @@ export default class TimeLine
     drawMark(x, text) {
         this.canvasContext.beginPath();
         this.canvasContext.moveTo(x, 0);
-        this.canvasContext.lineTo(x, this.domElement.height / 2);
+        this.canvasContext.lineTo(x, this.timeLineCanvasDomElement.height / 2);
         this.canvasContext.stroke();
         this.canvasContext.fillText(
             text,
             x - this.canvasContext.measureText(text).width / 2,
-            this.domElement.height - 2
+            this.timeLineCanvasDomElement.height - 2
         );
     }
 
     drawCurrentTimeMark() {
-        this.canvasContext.fillRect(0, 0, this.getCanvasPositionByEpoch(this.epoch), this.domElement.height);
+        this.canvasContext.fillRect(0, 0, this.getCanvasPositionByEpoch(this.epoch), this.timeLineCanvasDomElement.height);
     }
 
     roundDateUp(date) {
@@ -291,7 +291,7 @@ export default class TimeLine
 
     onMouseMove(e) {
         if (this.mouseState.rightButton) {
-            this.leftEpoch += (this.mouseState.x - e.x) * this.span / this.domElement.width;
+            this.leftEpoch += (this.mouseState.x - e.x) * this.span / this.timeLineCanvasDomElement.width;
         }
 
         this.mouseState.x = e.x;

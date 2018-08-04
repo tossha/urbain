@@ -16,3 +16,28 @@
 }
 .panel__collapse-button {}
 .panel__content {}
+.panel__field {
+	align-items: center;
+	display: flex;
+	justify-content: space-between;
+	margin: 10px 5px 0;
+	background-color: #212226;
+	border: 1px solid #191a1e;
+	border-radius: 2px;
+	padding: 8px;
+}
+
+.panel__content button {
+	background-color: var(--black);
+	border: none;
+	cursor: pointer;
+	color: var(--white-text);
+	font-size: 11px;
+	outline: none;
+	padding: 4px 8px;
+}
+
+.panel__content button:hover,
+.panel__content button:active {
+	background-color: var(--dark-gray);
+}

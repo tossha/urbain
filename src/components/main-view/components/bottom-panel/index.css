@@ -6,7 +6,7 @@
 .bottom-panel__pause-button-container {
 	pointer-events: auto;
 	margin: 0 8px;
-	height: 45px;
+	height: 58px;
 	width: 60px;
 }
 .bottom-panel__time-line-container {
@@ -18,6 +18,6 @@
 	width: 240px;
 }
 
-.bottom-panel__time-panel {
-	width: 240px;
+.bottom-panel__time-settings-panel-container {
+	width: 300px;
 }

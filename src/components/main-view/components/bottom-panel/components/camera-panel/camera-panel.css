@@ -1,0 +1,13 @@
+.camera-panel {}
+.camera-panel__field-control {
+	font-size: 10px;
+}
+.camera-panel__icon {
+	color: #8e9092;
+	margin-left: 5px;
+	margin-right: 8px;
+	font-size: 14px;
+}
+.camera-panel__content {
+	height: 100px;
+}

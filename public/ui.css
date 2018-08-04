@@ -40,11 +40,6 @@ canvas {
     font: 13px/1.231 "Lucida Grande", Lucida, Verdana, sans-serif;
 }
 
-#timeLineCanvas {
-    height: 35px;
-    pointer-events: auto;
-}
-
 #metricsPanel {
     position: absolute;
     top: 0;
