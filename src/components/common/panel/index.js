@@ -5,6 +5,14 @@ import cn from "classnames";
 import "./index.css";
 
 class Panel extends Component {
+    constructor(props) {
+        super(props);
+
+        this.state = {
+            isCollapsed: this.props.collapsedByDefault,
+        };
+    }
+
     state = {
         isCollapsed: false,
     };
@@ -51,6 +59,7 @@ Panel.propTypes = {
     caption: PropTypes.string,
     hideCollapseButton: PropTypes.bool,
     titleIcon: PropTypes.node,
+    collapsedByDefault: PropTypes.bool,
 };
 
 Panel.defaultProps = {
@@ -58,6 +67,7 @@ Panel.defaultProps = {
     hideCollapseButton: false,
     className: "",
     id: "",
+    collapsedByDefault: false,
 };
 
 export default Panel;

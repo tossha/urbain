@@ -2,7 +2,7 @@ import React from "react";
 import cn from "classnames";
 import "./main-view.css";
 import BottomPanel from "./components/bottom-panel";
-import { CreationPanel } from "./components/creation-panel";
+import CreationPanel from "./components/creation-panel";
 import TransferCalculationPanel from "./components/transfer-calculation-panel";
 import MetricsPanel from "./components/metrics-panel/index";
 

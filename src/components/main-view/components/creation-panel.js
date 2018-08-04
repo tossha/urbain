@@ -1,26 +1,19 @@
 import React from "react";
+import Panel from "../../common/panel";
 
-export function CreationPanel() {
-    return <div className="panel" id="creationPanel" data-panel-name="creation">
-        <table id="creationHeader" className="panelHeader">
-            <tbody>
-            <tr>
-                <td>
-                    Orbit creation
-                    <button className="collapseButton" data-panel-name="creation"/>
-                </td>
-            </tr>
-            </tbody>
-        </table>
+const CreationPanel = () => (
+    <Panel
+        id="creationPanel"
+        data-panel-name="creation"
+        caption="Orbit creation"
+        collapsedByDefault
+    >
+        <div style={{ height: 44 }}>
+            <label className="panel__field">
+                Create Orbit: <button id="createOrbit">Create</button>
+            </label>
+        </div>
+    </Panel>
+);
 
-        <table className="panelContent" data-panel-name="creation">
-            <tbody>
-            <tr>
-                <td>
-                    <button id="createOrbit">Create</button>
-                </td>
-            </tr>
-            </tbody>
-        </table>
-    </div>;
-}
+export default CreationPanel;

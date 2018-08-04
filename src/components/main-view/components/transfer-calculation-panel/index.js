@@ -8,6 +8,7 @@ const TransferCalculationPanel = () =>
         id="lambertPanel"
         data-panel-name="lambert"
         caption="Transfer calculation"
+        collapsedByDefault
     >
         <table className="panelContent" data-panel-name="lambert" width="100%"
                style={{borderBottom: "blue solid 1px"}}>
