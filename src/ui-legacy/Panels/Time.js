@@ -1,5 +1,3 @@
-import $ from "jquery";
-
 import Events from "../../core/Events";
 import UIPanel from "../Panel";
 
@@ -23,13 +21,6 @@ export default class UIPanelTime extends UIPanel
             this.jqSlider.val(this.getNeededSliderValue(event.detail.new));
             this.jqScaleText.html(this.formatTimeScale(event.detail.new));
         });
-
-        this.jqPause = $('#pauseButton');
-        this.jqPause.click(() => this.timeLine.togglePause());
-        this.jqPause.html(this.timeLine.isTimeRunning ? 'Pause' : 'Resume');
-
-        document.addEventListener(Events.TIME_PAUSED,   () => this.jqPause.html('Resume'));
-        document.addEventListener(Events.TIME_UNPAUSED, () => this.jqPause.html('Pause'));
 
         this.jqDateText = this.jqDom.find('#currentDateValue');
         document.addEventListener(Events.EPOCH_CHANGED, (event) => this.updateTime(event.detail.date));

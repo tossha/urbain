@@ -3,6 +3,7 @@ import cn from "classnames";
 import "./index.css";
 import CameraPanel from "./camera-panel";
 import { TimeLine } from "./time-line";
+import PauseButton from "./components/pause-button";
 
 function BottomPanel({ className }) {
     return (
@@ -51,13 +52,13 @@ function BottomPanel({ className }) {
                 </div>
             </div>
             <div className="bottom-panel__pause-button-container">
-                <button type="button" id="pauseButton">Pause</button>
+                <PauseButton/>
             </div>
             <div className="bottom-panel__time-line-container">
                 <TimeLine/>
             </div>
             <div className="bottom-panel__camera-panel">
-                <CameraPanel />
+                <CameraPanel/>
             </div>
 
         </div>

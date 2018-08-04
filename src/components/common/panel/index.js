@@ -23,7 +23,7 @@ class Panel extends Component {
             <div id={id} className={cn("panel", className)}>
                 <header className="panel__header">
                     <div className="panel__caption">
-                        <span>{titleIcon && titleIcon}</span>
+                        {titleIcon && titleIcon}
                         {caption}
                     </div>
                     {!hideCollapseButton &&

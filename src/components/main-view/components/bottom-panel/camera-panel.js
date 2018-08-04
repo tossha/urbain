@@ -13,12 +13,14 @@ const CameraPanel = () => {
             caption="Camera"
             titleIcon={<FontAwesomeIcon className="camera-panel__icon" icon="expand" />}
         >
-            <label className="camera-panel__field">
-                Target: <select className="camera-panel__field-control" id="targetSelect" />
-            </label>
-            <label className="camera-panel__field">
-                Frame type: <select className="camera-panel__field-control" id="rfTypeSelect" />
-            </label>
+            <div className="camera-panel__content">
+                <label className="camera-panel__field">
+                    Target: <select className="camera-panel__field-control" id="targetSelect" />
+                </label>
+                <label className="camera-panel__field">
+                    Frame type: <select className="camera-panel__field-control" id="rfTypeSelect" />
+                </label>
+            </div>
         </Panel>
     );
 };
