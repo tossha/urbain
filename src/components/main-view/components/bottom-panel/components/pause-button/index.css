@@ -1,32 +1,27 @@
 .pause-button {
+	background-color: #25272c;
 	border: none;
 	border-radius: 2px;
 	color: var(--white-text);
 	cursor: pointer;
 	display: block;
 	font-size: 10px;
-	background-color: #25272c;
 	height: 100%;
+	padding: 10px;
+	text-align: center;
 	width: 100%;
 }
 
-.pause-button:hover,
-.pause-button:active,
-.pause-button:focus {
+.pause-button:hover {
 	background: var(--gray);
 }
 
-.pause-button:focus {
-	outline: none;
-}
-
 .pause-button--paused,
-.pause-button--paused:hover,
-.pause-button--paused:active,
-.pause-button--paused:focus {
+.pause-button--paused:hover {
 	background-color: var(--blue);
 }
 
-.pause-button--paused:focus {
-	outline: none;
+.pause-button__icon {
+	font-size: 14px;
+	margin: 5px 0;
 }

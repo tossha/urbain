@@ -30,8 +30,8 @@ class PauseButton extends Component {
         const { isTimeRunning } = this.state;
 
         return (
-            <button
-                type="button"
+            <span
+                role="button"
                 className={cn("pause-button", {
                     "pause-button--paused": !isTimeRunning
                 })}
@@ -41,7 +41,7 @@ class PauseButton extends Component {
                     <FontAwesomeIcon className="pause-button__icon" icon={isTimeRunning ? "pause" : "play"} />
                 </div>
                 <div>{isTimeRunning ? "Pause" : "Resume"}</div>
-            </button>
+            </span>
         );
     }
 }
