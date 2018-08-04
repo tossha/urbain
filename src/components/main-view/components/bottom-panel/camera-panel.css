@@ -10,3 +10,8 @@
 .camera-panel__field-control {
 	font-size: 10px;
 }
+.camera-panel__icon {
+	color: var(--gray);
+	margin-right: 5px;
+	height: 14px;
+}
