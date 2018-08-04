@@ -5,13 +5,15 @@
 }
 .bottom-panel__pause-button-container {
 	height: 45px;
-	width: 45px;
+	pointer-events: auto;
+	width: 60px;
 }
 .bottom-panel__camera-panel {
 	margin-left: 10px;
 	width: 240px;
 }
 .bottom-panel__time-line-container {
+	margin: 0 8px;
 	flex-grow: 2;
 	height: 45px;
 }

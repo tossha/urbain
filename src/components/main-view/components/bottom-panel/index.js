@@ -2,6 +2,7 @@ import React from "react";
 import cn from "classnames";
 import "./index.css";
 import CameraPanel from "./camera-panel";
+import { TimeLine } from "./time-line";
 
 function BottomPanel({ className }) {
     return (
@@ -50,12 +51,15 @@ function BottomPanel({ className }) {
                 </div>
             </div>
             <div className="bottom-panel__pause-button-container">
-                <button id="pauseButton" tabIndex="-1">Pause</button>
+                <button type="button" id="pauseButton">Pause</button>
             </div>
             <div className="bottom-panel__time-line-container">
-                <canvas id="timeLineCanvas"/>
+                <TimeLine/>
             </div>
-            <CameraPanel className="bottom-panel__camera-panel"/>
+            <div className="bottom-panel__camera-panel">
+                <CameraPanel />
+            </div>
+
         </div>
     );
 }

@@ -29,16 +29,6 @@ canvas {
     height: 30px;
 }
 
-button {
-    float: right;
-    background-color: #666;
-    border: 1px solid #999;
-}
-
-button:hover {
-    background-color: #999;
-}
-
 #leftPanel {
     position: absolute;
     left: 0;
@@ -83,10 +73,6 @@ button:hover {
 
 #cameraBoxHeader {
     min-width: 235px;
-}
-
-#pauseButton {
-    width: 65px;
 }
 
 .metrics {

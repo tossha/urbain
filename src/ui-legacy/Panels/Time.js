@@ -1,3 +1,5 @@
+import $ from "jquery";
+
 import Events from "../../core/Events";
 import UIPanel from "../Panel";
 
@@ -22,7 +24,7 @@ export default class UIPanelTime extends UIPanel
             this.jqScaleText.html(this.formatTimeScale(event.detail.new));
         });
 
-        this.jqPause = this.jqDom.find('#pauseButton');
+        this.jqPause = $('#pauseButton');
         this.jqPause.click(() => this.timeLine.togglePause());
         this.jqPause.html(this.timeLine.isTimeRunning ? 'Pause' : 'Resume');
 

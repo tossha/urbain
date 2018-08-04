@@ -16,14 +16,16 @@ class Panel extends Component {
     };
 
     render() {
-        const { className, caption, hideCollapseButton, children, titleIcon } = this.props;
+        const { id, className, caption, hideCollapseButton, children, titleIcon } = this.props;
         const { isCollapsed } = this.state;
 
         return (
-            <div className={cn("panel", className)}>
+            <div id={id} className={cn("panel", className)}>
                 <header className="panel__header">
-                    {titleIcon && titleIcon}
-                    <div className="panel__caption">{caption}</div>
+                    <div className="panel__caption">
+                        <span>{titleIcon && titleIcon}</span>
+                        {caption}
+                    </div>
                     {!hideCollapseButton &&
                         <button
                             type="button"
@@ -43,10 +45,11 @@ class Panel extends Component {
 }
 
 Panel.propTypes = {
+    id: PropTypes.string,
+    className: PropTypes.string,
     children: PropTypes.node,
     caption: PropTypes.string,
     hideCollapseButton: PropTypes.bool,
-    className: PropTypes.string,
     titleIcon: PropTypes.node,
 };
 
@@ -54,6 +57,7 @@ Panel.defaultProps = {
     caption: "",
     hideCollapseButton: false,
     className: "",
+    id: "",
 };
 
 export default Panel;

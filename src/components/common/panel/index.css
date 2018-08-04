@@ -10,10 +10,7 @@
 	justify-content: space-between;
 	padding: 2px 2px 2px 10px;
 }
-.panel__caption {
-	font-weight: bold;
-	text-align: center;
-}
+.panel__caption {}
 .panel__collapse-button {
 	width: 49px;
 }
