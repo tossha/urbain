@@ -1,18 +1,14 @@
 import React from "react";
+import Panel from "../../../common/panel";
+import "./index.css";
 
-export function LambertPanel() {
-    return <div className="panel" id="lambertPanel" data-panel-name="lambert">
-        <table id="lambertHeader" className="panelHeader">
-            <tbody>
-            <tr>
-                <td>
-                    Transfer calculation
-                    <button className="collapseButton" data-panel-name="lambert"/>
-                </td>
-            </tr>
-            </tbody>
-        </table>
-
+const TransferCalculationPanel = () =>
+    <Panel
+        className="transfer-calculation-panel"
+        id="lambertPanel"
+        data-panel-name="lambert"
+        caption="Transfer calculation"
+    >
         <table className="panelContent" data-panel-name="lambert" width="100%"
                style={{borderBottom: "blue solid 1px"}}>
             <tbody>
@@ -83,5 +79,6 @@ export function LambertPanel() {
             </tr>
             </tbody>
         </table>
-    </div>;
-}
+    </Panel>;
+
+export default TransferCalculationPanel;

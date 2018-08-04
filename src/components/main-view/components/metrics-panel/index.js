@@ -1,18 +1,14 @@
 import React from "react";
+import Panel from "../../../common/panel";
+import "./index.css";
 
-export function MetricsPanel() {
-    return <div id="metricsPanel" className="panel" data-panel-name="metrics">
-        <table id="metricsHeader" className="panelHeader">
-            <tbody>
-            <tr>
-                <td>
-                    Metrics
-                    <button className="collapseButton" data-panel-name="metrics"/>
-                </td>
-            </tr>
-            </tbody>
-        </table>
-
+const MetricsPanel = () => (
+    <Panel
+        id="metricsPanel"
+        data-panel-name="metrics"
+        className="metrics-panel"
+        caption="Metrics"
+    >
         <table style={{borderBottom: "blue solid 1px"}}
                width="100%"
                className="panelContent"
@@ -212,5 +208,6 @@ export function MetricsPanel() {
                 </tbody>
             </table>
         </div>
-    </div>;
-}
+    </Panel>
+);
+export default MetricsPanel;

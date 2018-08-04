@@ -3,8 +3,8 @@ import cn from "classnames";
 import "./main-view.css";
 import BottomPanel from "./components/bottom-panel";
 import { CreationPanel } from "./components/creation-panel";
-import { LambertPanel } from "./components/lambert-panel";
-import { MetricsPanel } from "./components/metrics-panel";
+import TransferCalculationPanel from "./components/transfer-calculation-panel";
+import MetricsPanel from "./components/metrics-panel/index";
 
 const MainView = ({ className, children }) => {
     return (
@@ -15,7 +15,7 @@ const MainView = ({ className, children }) => {
             <MetricsPanel/>
             <BottomPanel className="main-view__bottom-panel"/>
             <CreationPanel/>
-            <LambertPanel/>
+            <TransferCalculationPanel/>
         </main>
     );
 };
