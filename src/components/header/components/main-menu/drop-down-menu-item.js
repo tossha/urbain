@@ -14,13 +14,11 @@ class DropdownMenuItem extends Component {
     };
 
     render() {
-        const {text, selected} = this.props;
+        const { text, selected } = this.props;
 
         return (
             <li className="drop-down-menu__menu-item" onClick={this.handleClick}>
-                 <span className="drop-down-menu__menu-item-icon">
-                     {selected && <FontAwesomeIcon icon="check"/>}
-                 </span>
+                <span className="drop-down-menu__menu-item-icon">{selected && <FontAwesomeIcon icon="check" />}</span>
                 {text}
             </li>
         );

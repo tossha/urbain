@@ -11,11 +11,11 @@ class App extends React.Component {
         return (
             <React.Fragment>
                 <MainView className="app-layout__main">
-                    <Header className="app-layout__header"/>
+                    <Header className="app-layout__header" />
                 </MainView>
-                <Footer className="app-layout__footer"/>
+                <Footer className="app-layout__footer" />
             </React.Fragment>
-        )
+        );
     }
 }
 

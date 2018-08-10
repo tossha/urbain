@@ -1,6 +1,6 @@
 import React from "react";
 import PropTypes from "prop-types";
-import { TOP_MENU_ITEMS } from "../../../../store/index"
+import { TOP_MENU_ITEMS } from "../../../../store/index";
 import "./main-menu.css";
 import DropDownMenu from "./drop-down-menu";
 
@@ -9,7 +9,7 @@ function MainMenu() {
         <nav className="main-menu">
             {Object.entries(TOP_MENU_ITEMS).map(([key, menuItemLabel]) => (
                 <div key={key} className="main-menu__item main-menu__item--clickable">
-                    <DropDownMenu text={menuItemLabel}/>
+                    <DropDownMenu text={menuItemLabel} />
                 </div>
             ))}
         </nav>
@@ -17,7 +17,7 @@ function MainMenu() {
 }
 
 MainMenu.propTypes = {
-    className: PropTypes.string
+    className: PropTypes.string,
 };
 
 export default MainMenu;

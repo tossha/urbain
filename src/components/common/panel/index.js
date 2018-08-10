@@ -5,6 +5,24 @@ import cn from "classnames";
 import "./index.css";
 
 class Panel extends Component {
+    static propTypes = {
+        id: PropTypes.string,
+        className: PropTypes.string,
+        children: PropTypes.node,
+        caption: PropTypes.string,
+        hideCollapseButton: PropTypes.bool,
+        titleIcon: PropTypes.node,
+        collapsedByDefault: PropTypes.bool,
+    };
+
+    static defaultProps = {
+        caption: "",
+        hideCollapseButton: false,
+        className: "",
+        id: "",
+        collapsedByDefault: false,
+    };
+
     constructor(props) {
         super(props);
 
@@ -20,7 +38,7 @@ class Panel extends Component {
     handleToggle = () => {
         this.setState(prevState => ({
             isCollapsed: !prevState.isCollapsed,
-        }))
+        }));
     };
 
     render() {
@@ -34,40 +52,18 @@ class Panel extends Component {
                         {titleIcon && titleIcon}
                         {caption}
                     </div>
-                    {!hideCollapseButton &&
-                        <button
-                            type="button"
-                            className="panel__collapse-button"
-                            onClick={this.handleToggle}>
+                    {!hideCollapseButton && (
+                        <button type="button" className="panel__collapse-button" onClick={this.handleToggle}>
                             {isCollapsed ? "Show" : "Hide"}
-                        </button>}
+                        </button>
+                    )}
                 </header>
-                <div
-                    style={{ display: isCollapsed ? "none": "block"}}
-                    className="panel__content">
+                <div style={{ display: isCollapsed ? "none" : "block" }} className="panel__content">
                     {children}
                 </div>
             </div>
         );
     }
 }
-
-Panel.propTypes = {
-    id: PropTypes.string,
-    className: PropTypes.string,
-    children: PropTypes.node,
-    caption: PropTypes.string,
-    hideCollapseButton: PropTypes.bool,
-    titleIcon: PropTypes.node,
-    collapsedByDefault: PropTypes.bool,
-};
-
-Panel.defaultProps = {
-    caption: "",
-    hideCollapseButton: false,
-    className: "",
-    id: "",
-    collapsedByDefault: false,
-};
 
 export default Panel;

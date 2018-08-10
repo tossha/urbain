@@ -4,11 +4,11 @@ import ReactSelect, { components } from "react-select";
 const DEFAULT = {
     background: "var(--black)",
     color: "var(--white-text)",
-    containerHeight: 24
+    containerHeight: 24,
 };
 
 const customSelectStyles = {
-    container: (base) => ({
+    container: base => ({
         ...base,
         background: DEFAULT.background,
         color: DEFAULT.color,
@@ -17,7 +17,7 @@ const customSelectStyles = {
         minWidth: 50,
     }),
 
-    control: (base) => ({
+    control: base => ({
         ...base,
         background: DEFAULT.background,
         borderRadius: 0,
@@ -26,14 +26,14 @@ const customSelectStyles = {
         height: DEFAULT.containerHeight,
     }),
 
-    menu: (base) => ({
+    menu: base => ({
         ...base,
         borderRadius: 0,
         marginTop: 0,
         marginBottom: 0,
     }),
 
-    menuList: (base) => ({
+    menuList: base => ({
         ...base,
         background: "var(--dark-gray)",
     }),
@@ -45,11 +45,13 @@ const customSelectStyles = {
 
     singleValue: (base, state) => {
         const opacity = state.isDisabled ? 0.5 : 1;
-        const transition = 'opacity 300ms';
+        const transition = "opacity 300ms";
 
-        return { ...base,
+        return {
+            ...base,
             color: DEFAULT.color,
-            opacity, transition
+            opacity,
+            transition,
         };
     },
 
@@ -63,19 +65,21 @@ const customSelectStyles = {
 
     indicatorSeparator: () => ({
         display: "none",
-    })
+    }),
 };
 
-const IndicatorsContainer = (props) => {
-    return (components.IndicatorsContainer && <components.IndicatorsContainer {...props}/>)
+const IndicatorsContainer = props => {
+    return components.IndicatorsContainer && <components.IndicatorsContainer {...props} />;
 };
 
-const DropdownIndicator = (props) => {
+const DropdownIndicator = props => {
     return (
         components.DropdownIndicator && (
-            <components.DropdownIndicator {...props}><span/></components.DropdownIndicator>
+            <components.DropdownIndicator {...props}>
+                <span />
+            </components.DropdownIndicator>
         )
-    )
+    );
 };
 
 const Select = ({ id, className, options, value }) => {
@@ -89,9 +93,9 @@ const Select = ({ id, className, options, value }) => {
             isSearchable={false}
             options={options}
             defaultValue={value}
-            components={{ IndicatorsContainer, DropdownIndicator}}
+            components={{ IndicatorsContainer, DropdownIndicator }}
         />
-    )
+    );
 };
 
 export default Select;

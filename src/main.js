@@ -32,7 +32,7 @@ export function init() {
     $.getJSON("./star_systems/solar_system.json", starSystemConfig => {
         const viewPort = document.getElementById("viewport-id");
 
-        if(viewPort) {
+        if (viewPort) {
             sim.init(viewPort, starSystemConfig);
             requestAnimationFrame(firstRender);
         }

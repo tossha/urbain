@@ -10,12 +10,12 @@ const MainView = ({ className, children }) => {
     return (
         <main className={cn(className, "main-view")}>
             {children}
-            <div id="leftPanel"/>
-            <div id="viewport-id"/>
-            <MetricsPanel/>
-            <BottomPanel className="main-view__bottom-panel"/>
-            <CreationPanel/>
-            <TransferCalculationPanel/>
+            <div id="leftPanel" />
+            <div id="viewport-id" />
+            <MetricsPanel />
+            <BottomPanel className="main-view__bottom-panel" />
+            <CreationPanel />
+            <TransferCalculationPanel />
         </main>
     );
 };

@@ -14,14 +14,18 @@ class PauseButton extends Component {
     constructor(props) {
         super(props);
 
-        document.addEventListener(Events.TIME_PAUSED, () => { this.setState({isTimeRunning: false}); });
-        document.addEventListener(Events.TIME_UNPAUSED, () => { this.setState({isTimeRunning: true}); });
+        document.addEventListener(Events.TIME_PAUSED, () => {
+            this.setState({ isTimeRunning: false });
+        });
+        document.addEventListener(Events.TIME_UNPAUSED, () => {
+            this.setState({ isTimeRunning: true });
+        });
     }
 
     handleClick = () => {
         const timeLine = sim.time;
 
-        if(timeLine) {
+        if (timeLine) {
             timeLine.togglePause();
         }
     };
@@ -33,7 +37,7 @@ class PauseButton extends Component {
             <span
                 role="button"
                 className={cn("pause-button", {
-                    "pause-button--paused": !isTimeRunning
+                    "pause-button--paused": !isTimeRunning,
                 })}
                 onClick={this.handleClick}
             >

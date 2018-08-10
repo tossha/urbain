@@ -10,18 +10,17 @@ function BottomPanel({ className }) {
     return (
         <div className={cn(className, "bottom-panel")}>
             <div className="bottom-panel__time-settings-panel-container">
-                <TimeSettingsPanel/>
+                <TimeSettingsPanel />
             </div>
             <div className="bottom-panel__pause-button-container">
-                <PauseButton/>
+                <PauseButton />
             </div>
             <div className="bottom-panel__time-line-container">
-                <TimeLine/>
+                <TimeLine />
             </div>
             <div className="bottom-panel__camera-panel">
-                <CameraPanel/>
+                <CameraPanel />
             </div>
-
         </div>
     );
 }
