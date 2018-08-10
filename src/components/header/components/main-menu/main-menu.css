@@ -1,0 +1,18 @@
+.main-menu {
+	display: flex;
+	align-items: center;
+	background: var(--dark-gray);
+	border-top-right-radius: 3px;
+	border-bottom-right-radius: 3px;
+	height: 100%;
+}
+
+.main-menu__item {
+	box-sizing: border-box;
+	display: flex;
+	align-items: center;
+	margin: 0 9px;
+	padding: 0 8px;
+}
+
+.main-menu__item--clickable:hover {}

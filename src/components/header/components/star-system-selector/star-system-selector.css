@@ -1,5 +1,7 @@
 .star-system-selector {
 	align-items: center;
+	background: var(--dark-gray);
+	border-radius: 3px;
 	display: flex;
 	justify-content: space-between;
 	height: 100%;

@@ -1,5 +1,5 @@
 import React from "react";
-import Select from "../../../../common/select/select";
+import Select from "../../../common/select/select";
 import "./star-system-selector.css";
 
 const options = [
