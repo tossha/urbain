@@ -1,18 +1,23 @@
 import React from "react";
+
+import { Consumer } from "../../../../store";
 import Select from "../../../common/select/select";
 import "./star-system-selector.css";
 
-const options = [
-    { value: "Solar_System", label: "Solar System" },
-    { value: "Not_Solar_System", label: "Not Solar System" },
-];
-
 function StarSystemSelector() {
     return (
-        <div className="star-system-selector">
-            <div className="star-system-selector__label">Star system</div>
-            <Select className="star-system-selector__selector" options={options} value={options[0]} />
-        </div>
+        <Consumer>
+            {({ store }) => (
+                <div className="star-system-selector">
+                    <div className="star-system-selector__label">Star system</div>
+                    <Select
+                        className="star-system-selector__selector"
+                        options={store.starSystems}
+                        value={store.starSystems[0]}
+                    />
+                </div>
+            )}
+        </Consumer>
     );
 }
 

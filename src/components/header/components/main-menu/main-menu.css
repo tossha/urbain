@@ -11,6 +11,7 @@
 	box-sizing: border-box;
 	display: flex;
 	align-items: center;
+	height: 100%;
 	margin: 0 9px;
 	padding: 0 8px;
 }

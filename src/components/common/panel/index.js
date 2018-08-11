@@ -13,6 +13,7 @@ class Panel extends Component {
         hideCollapseButton: PropTypes.bool,
         titleIcon: PropTypes.node,
         collapsedByDefault: PropTypes.bool,
+        hidden: PropTypes.bool,
     };
 
     static defaultProps = {
@@ -21,18 +22,11 @@ class Panel extends Component {
         className: "",
         id: "",
         collapsedByDefault: false,
+        hidden: false,
     };
 
-    constructor(props) {
-        super(props);
-
-        this.state = {
-            isCollapsed: this.props.collapsedByDefault,
-        };
-    }
-
     state = {
-        isCollapsed: false,
+        isCollapsed: this.props.collapsedByDefault,
     };
 
     handleToggle = () => {
@@ -42,11 +36,11 @@ class Panel extends Component {
     };
 
     render() {
-        const { id, className, caption, hideCollapseButton, children, titleIcon } = this.props;
+        const { id, className, caption, hideCollapseButton, children, titleIcon, hidden } = this.props;
         const { isCollapsed } = this.state;
 
         return (
-            <div id={id} className={cn("panel", className)}>
+            <div id={id} className={cn(className, "panel", { "panel--hidden": hidden })}>
                 <header className="panel__header">
                     <div className="panel__caption">
                         {titleIcon && titleIcon}

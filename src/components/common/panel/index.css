@@ -4,6 +4,9 @@
 	font-family: monospace;
 	pointer-events: auto;
 }
+.panel--hidden {
+	display: none;
+}
 .panel__header {
 	align-items: center;
 	display: flex;

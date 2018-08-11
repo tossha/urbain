@@ -16,7 +16,7 @@ import ReferenceFrameFactory from "./ReferenceFrame/Factory";
 class Simulation
 {
     constructor() {
-        this.initSettings();
+        this._initSettings();
     }
 
     init(viewPortDomElement, starSystemConfig) {
@@ -71,7 +71,7 @@ class Simulation
         return TimeLine.getDateByEpoch(this.time.epoch);
     }
 
-    initSettings() {
+    _initSettings() {
         this.settings = {
             ui: {
                 showBodyLabels: true,

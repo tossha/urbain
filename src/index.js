@@ -1,27 +1,28 @@
 import React from "react";
 import ReactDOM from "react-dom";
-import { library } from "@fortawesome/fontawesome-svg-core";
-import { faExpand, faPlay, faPause, faChevronDown, faCheck } from "@fortawesome/free-solid-svg-icons";
-import { Provider, store } from "./store";
-import { init } from "./main";
 
+import { configureLibs } from "./libs";
+import { Provider } from "./store";
+import { sim } from "./core/index";
+import { createStatsBadge } from "./components/main-view/components/statistics-badge/index";
 import AppComponent from "./components/app";
+import Application from "./application";
 
-library.add(faExpand);
-library.add(faPlay);
-library.add(faPause);
-library.add(faChevronDown);
-library.add(faCheck);
+configureLibs();
 
-init();
+const statsBadge = createStatsBadge();
+const app = new Application(sim, statsBadge);
+const initialState = app.getInitialState();
+window.api = app.getApi();
 
 class App extends React.Component {
     state = {
+        stats: statsBadge,
         store: this.props.store,
-        dispatch: updatedStore => {
-            this.setState(prevSate => ({
-                store: { ...prevSate.store, ...updatedStore },
-            }));
+        updateStore: updatedStore => {
+            this.setState({
+                store: updatedStore,
+            });
         },
     };
 
@@ -34,4 +35,4 @@ class App extends React.Component {
     }
 }
 
-ReactDOM.render(<App store={store} />, document.getElementById("root"));
+ReactDOM.render(<App store={initialState} />, document.getElementById("root"));
