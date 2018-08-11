@@ -11,17 +11,10 @@ const TransferCalculationPanel = ({ className }) => (
             <Panel
                 className={cn(className, "transfer-calculation-panel")}
                 id="lambertPanel"
-                data-panel-name="lambert"
                 caption="Transfer calculation"
-                collapsedByDefault
                 hidden={!store.viewSettings.showTransferCalculationPanel}
             >
-                <table
-                    className="panelContent"
-                    data-panel-name="lambert"
-                    width="100%"
-                    style={{ borderBottom: "blue solid 1px" }}
-                >
+                <table className="panelContent" width="100%" style={{ borderBottom: "blue solid 1px" }}>
                     <tbody>
                         <tr>
                             <td>
