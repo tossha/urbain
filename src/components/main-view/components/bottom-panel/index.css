@@ -10,6 +10,7 @@
 	width: 60px;
 }
 .bottom-panel__time-line-container {
+	border-radius: 2px;
 	flex-grow: 2;
 }
 
