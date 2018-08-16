@@ -25,7 +25,6 @@
     "@fortawesome/free-solid-svg-icons": "5.2.0",
     "@fortawesome/react-fontawesome": "0.1.0",
     "classnames": "2.2.6",
-    "dat.gui": "0.7.2",
     "jquery": "3.3.1",
     "react": "16.4.2",
     "react-dom": "16.4.2",
