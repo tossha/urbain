@@ -40,11 +40,11 @@ class Panel extends Component {
         const { isCollapsed } = this.state;
 
         return (
-            <div id={id} className={cn(className, "panel", { "panel--hidden": hidden })}>
+            <div id={id} className={cn(className, "panel", "noselect", { "panel--hidden": hidden })}>
                 <header className="panel__header">
                     <div className="panel__caption">
-                        {titleIcon && titleIcon}
-                        {caption}
+                        {titleIcon && <span className="panel__caption-icon">{titleIcon}</span>}
+                        <span className="panel__caption-text">{caption}</span>
                     </div>
                     {!hideCollapseButton && (
                         <button type="button" className="panel__collapse-button" onClick={this.handleToggle}>
