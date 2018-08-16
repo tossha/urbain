@@ -1,10 +1,12 @@
 :root {
-	--black: #1a1b1e;
-	--blue: #2846ed;
+	--black: #131519;
+	--black-border: #111317;
+	--blue: #0045f2;
 	--lightning-blue: #2a49fb;
-	--gray: #393b40;
-	--dark-gray: #25272c;
-	--blue-text: #6f88e6;
+	--gray: #1f2228;
+	--dark-gray: #1a1c21;
+	--blue-text: #6d69ff;
+	--gray-text: #838485;
 	--white-text: #fdfdfd;
 }
 
@@ -24,13 +26,25 @@ body {
 	box-sizing: border-box;
 }
 
+.hidden {
+	display: none!important;
+}
+
+.noselect {
+	user-select: none;
+}
+
 button {
-	background-color: #666;
-	border: 1px solid #999;
+	background-color: var(--black);
+	border: none;
+	cursor: pointer;
+	color: var(--white-text);
+	font-size: 10px;
+	outline: none;
+	padding: 4px 8px;
 }
 
 button:hover,
-button:focus,
 button:active {
-	background-color: #999;
+	background-color: var(--gray);
 }
