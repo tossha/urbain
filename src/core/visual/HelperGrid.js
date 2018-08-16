@@ -1,7 +1,7 @@
 import * as THREE from "three";
 
 import VisualModelAbstract from "./ModelAbstract";
-import { sim } from "../core/Simulation";
+import { sim } from "../Simulation";
 
 export default class HelperGrid extends VisualModelAbstract
 {

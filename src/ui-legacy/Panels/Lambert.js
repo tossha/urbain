@@ -3,8 +3,8 @@ import $ from "jquery";
 import UIPanel from "../Panel";
 import LambertSolver from "../../core/LambertSolver";
 import ReferenceFrameFactory, {ReferenceFrame} from "../../core/ReferenceFrame/Factory";
-import VisualTrajectoryModelKeplerian from "../../visual/TrajectoryModel/Keplerian";
-import VisualVector from "../../visual/Vector";
+import VisualTrajectoryModelKeplerian from "../../core/visual/TrajectoryModel/Keplerian";
+import VisualVector from "../../core/visual/Vector";
 import EphemerisObject from "../../core/EphemerisObject";
 import { sim } from "../../core/Simulation";
 

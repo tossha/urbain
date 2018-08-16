@@ -2,10 +2,10 @@ import * as THREE from "three";
 
 import VisualModelAbstract from "../ModelAbstract";
 import VisualLabel from "../VisualLabel";
-import Events from "../../core/Events";
-import EphemerisObject from "../../core/EphemerisObject";
-import FunctionOfEpochCustom from "../../core/FunctionOfEpoch/Custom";
-import { sim } from "../../core/Simulation";
+import Events from "../../Events";
+import EphemerisObject from "../../EphemerisObject";
+import FunctionOfEpochCustom from "../../FunctionOfEpoch/Custom";
+import { sim } from "../../Simulation";
 
 export default class VisualBodyModelAbstract extends VisualModelAbstract
 {

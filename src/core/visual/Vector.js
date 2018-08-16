@@ -1,9 +1,9 @@
 import * as THREE from "three";
 
 import VisualModelAbstract from "./ModelAbstract";
-import {Quaternion, Vector} from "../core/algebra";
-import {RF_BASE} from "../core/ReferenceFrame/Factory";
-import { sim } from "../core/Simulation";
+import {Quaternion, Vector} from "../algebra";
+import {RF_BASE} from "../ReferenceFrame/Factory";
+import { sim } from "../Simulation";
 
 export default class VisualVector extends VisualModelAbstract
 {

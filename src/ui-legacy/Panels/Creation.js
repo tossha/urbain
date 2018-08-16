@@ -2,7 +2,7 @@ import UIPanel from "../Panel";
 import EphemerisObject from "../../core/EphemerisObject";
 import TrajectoryKeplerianBasic from "../../core/Trajectory/KeplerianBasic";
 import ReferenceFrameFactory, {ReferenceFrame} from "../../core/ReferenceFrame/Factory";
-import VisualTrajectoryModelKeplerian from "../../visual/TrajectoryModel/Keplerian";
+import VisualTrajectoryModelKeplerian from "../../core/visual/TrajectoryModel/Keplerian";
 import KeplerianObject from "../../core/KeplerianObject";
 import { sim } from "../../core/Simulation";
 

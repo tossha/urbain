@@ -1,8 +1,7 @@
 import * as THREE from "three";
 
-import VisualModelAbstract from "../visual/ModelAbstract";
-import Events from "../core/Events";
-import { sim } from "../core/Simulation";
+import VisualModelAbstract from "../core/visual/ModelAbstract";
+import { sim, Events } from "../core/index";
 
 export default class SelectionHandler extends VisualModelAbstract
 {

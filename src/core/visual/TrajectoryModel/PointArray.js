@@ -1,6 +1,6 @@
 import VisualTrajectoryModelAbstract from "./Abstract";
-import {deg2rad} from "../../core/algebra";
-import { sim } from "../../core/Simulation";
+import {deg2rad} from "../../algebra";
+import { sim } from "../../Simulation";
 
 export default class VisualTrajectoryModelPointArray extends VisualTrajectoryModelAbstract
 {

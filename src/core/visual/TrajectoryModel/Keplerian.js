@@ -1,9 +1,9 @@
 import * as THREE from "three";
 
 import VisualTrajectoryModelAbstract from "./Abstract";
-import {RF_BASE} from "../../core/ReferenceFrame/Factory";
-import {getAngleBySinCos, Vector} from "../../core/algebra";
-import { sim } from "../../core/Simulation";
+import {RF_BASE} from "../../ReferenceFrame/Factory";
+import {getAngleBySinCos, Vector} from "../../algebra";
+import { sim } from "../../Simulation";
 
 export default class VisualTrajectoryModelKeplerian extends VisualTrajectoryModelAbstract
 {

@@ -6,7 +6,7 @@ import Events from "./Events";
 import {ReferenceFrame} from "./ReferenceFrame/Factory";
 import TimeLine from "../ui-legacy/TimeLine";
 import StarSystemLoader from "../interface/StarSystemLoader";
-import VisualRaycaster from "../visual/Raycaster";
+import VisualRaycaster from "./visual/Raycaster";
 import SelectionHandler from "../ui-legacy/SelectionHandler";
 import UI from "../ui-legacy/UI";
 import StarSystem from "./StarSystem";
