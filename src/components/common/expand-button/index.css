@@ -1,0 +1,23 @@
+.expand-button {
+	align-items: center;
+	background-color: var(--black);
+	font-size: 8px;
+	display: flex;
+	justify-content: center;
+	cursor: pointer;
+}
+
+.expand-button:hover {
+	background-color: var(--gray);
+}
+
+.expand-button--expanded {
+	background-color: var(--blue);
+}
+.expand-button--expanded:hover {
+	background-color: var(--lightning-blue);
+}
+
+.expand-button--expanded .expand-button__icon {
+	transform: rotateZ(180deg);
+}
