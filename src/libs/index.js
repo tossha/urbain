@@ -1,5 +1,5 @@
 import { library } from "@fortawesome/fontawesome-svg-core";
-import { faExpand, faPlay, faPause, faChevronDown, faCheck } from "@fortawesome/free-solid-svg-icons";
+import { faExpand, faPlay, faPause, faChevronDown, faCheck, faBars } from "@fortawesome/free-solid-svg-icons";
 
 export function configureLibs() {
     library.add(faExpand);
@@ -7,4 +7,5 @@ export function configureLibs() {
     library.add(faPause);
     library.add(faChevronDown);
     library.add(faCheck);
+    library.add(faBars);
 }
