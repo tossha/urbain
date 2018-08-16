@@ -1,5 +1,6 @@
 import $ from "jquery";
 import { sim } from "./Simulation";
+import Events from "./Events";
 
 function init(statistics, viewPortId = "viewport-id") {
     let globalTime;
@@ -30,4 +31,5 @@ function init(statistics, viewPortId = "viewport-id") {
 export {
     init,
     sim,
+    Events,
 }

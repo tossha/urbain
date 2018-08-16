@@ -1,9 +1,8 @@
 import React, { Component } from "react";
-import cn from "classnames";
-import Events from "../../../../../../core/Events";
-import { sim } from "../../../../../../core/Simulation";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import cn from "classnames";
 
+import { sim, Events } from "../../../../../../core/index";
 import "./index.css";
 
 class PauseButton extends Component {
@@ -36,7 +35,7 @@ class PauseButton extends Component {
         return (
             <span
                 role="button"
-                className={cn("pause-button", {
+                className={cn("pause-button", "noselect", {
                     "pause-button--paused": !isTimeRunning,
                 })}
                 onClick={this.handleClick}

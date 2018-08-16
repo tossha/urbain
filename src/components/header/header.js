@@ -7,7 +7,7 @@ import StarSystemSelector from "./components/star-system-selector/star-system-se
 import MainMenu from "./components/main-menu/main-menu";
 
 const Header = ({ className }) => (
-    <header className={cn(className, "header")}>
+    <header className={cn(className, "header", "noselect")}>
         <div className="header__logo-wrapper">
             <Logo className="header__logo" />
         </div>
