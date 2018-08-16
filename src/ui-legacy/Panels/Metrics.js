@@ -37,8 +37,8 @@ export default class UIPanelMetrics extends UIPanel
             }
         });
 
-        this.positionPanel = new UIPanelVector(this.jqDom.find("table[data-panel-name='position_vector']"), null);
-        this.velocityPanel = new UIPanelVector(this.jqDom.find("table[data-panel-name='velocity_vector']"), null);
+        this.positionPanel = new UIPanelVector(this.jqDom.find(".js-metrics-panel-cartesian-position-vector"), null);
+        this.velocityPanel = new UIPanelVector(this.jqDom.find(".js-metrics-panel-cartesian-velocity-vector"), null);
 
         this.hide();
     }

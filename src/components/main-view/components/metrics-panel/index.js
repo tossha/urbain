@@ -1,216 +1,93 @@
 import React from "react";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+
 import Panel from "../../../common/panel";
 import "./index.css";
+import KeplerianView from "./components/keplerian-view";
+import CartesianVectorView from "./components/cartesian-vector-view";
 
 const MetricsPanel = () => (
-    <Panel id="metricsPanel" data-panel-name="metrics" className="metrics-panel" caption="Metrics">
-        <table
-            style={{ borderBottom: "blue solid 1px" }}
-            width="100%"
-            className="panelContent"
-            data-panel-name="metrics"
-        >
-            <tbody>
-                <tr>
-                    <td style={{ width: "110px" }}>
-                        <b>of</b>
-                    </td>
-                    <td id="metricsOf" />
-                </tr>
-                <tr>
-                    <td>
-                        <b>relative to</b>
-                    </td>
-                    <td id="relativeTo" />
-                </tr>
-            </tbody>
-        </table>
+    <Panel id="metricsPanel" className="metrics-panel" caption="Metrics" titleIcon={<FontAwesomeIcon icon="bars" />}>
+        <div className="metrics-panel__content">
+            <div className="panel__field-set">
+                <div className="panel__field">
+                    <span className="panel__field-label">Object</span>
+                    <span className="panel__field-control" id="metricsOf" />
+                </div>
+                <div className="panel__field">
+                    <span className="panel__field-label">Relative to</span>
+                    <span className="panel__field-control" id="relativeTo" />
+                </div>
+            </div>
+            <div className="panel__field-set">
+                <label className="panel__field panel__field--left-aligned">
+                    <input
+                        className="metrics-panel__angles-checker"
+                        type="checkbox"
+                        id="showAnglesOfSelectedOrbit"
+                        defaultChecked
+                    />
+                    <span className="panel__field-label">Visualize angles</span>
+                    <button className="metrics-panel__unload-object-button" type="button" id="unloadObject">
+                        Unload object
+                    </button>
+                </label>
+            </div>
+            <div className="panel__field-set">
+                <div className="panel__field panel__field-header">Main</div>
+                <div className="panel__field">
+                    <span className="panel__field-label">Orbit</span>
+                    <span className="panel__field-control" id="elements-orbit-alt" />
+                    <span className="metrics-panel__dimension">km</span>
+                </div>
+                <div className="panel__field">
+                    <span className="panel__field-label">Avg height</span>
+                    <span className="panel__field-control" id="elements-orbit-avg" />
+                    <span className="metrics-panel__dimension">km</span>
+                </div>
+                <div className="panel__field">
+                    <span className="panel__field-label">Altitude</span>
+                    <span className="panel__field-control" id="elements-alt" />
+                    <span className="metrics-panel__dimension">km</span>
+                </div>
+                <div className="panel__field">
+                    <span className="panel__field-label">Speed</span>
+                    <span className="panel__field-control" id="elements-speed" />
+                    <span className="metrics-panel__dimension">m/s</span>
+                </div>
+                <div className="panel__field">
+                    <span className="panel__field-label">Precession</span>
+                    <span className="panel__field-control" id="elements-precession" />
+                    <span className="metrics-panel__dimension">deg/day</span>
+                </div>
 
-        <table
-            style={{ borderBottom: "blue solid 1px" }}
-            width="100%"
-            className="panelContent"
-            data-panel-name="metrics"
-        >
-            <tbody>
-                <tr>
-                    <td>
-                        <label htmlFor="showAnglesOfSelectedOrbit">Visualize angles</label>
-                    </td>
-                    <td>
-                        <input type="checkbox" id="showAnglesOfSelectedOrbit" defaultChecked />
-                    </td>
-                </tr>
-                <tr>
-                    <td>&nbsp;</td>
-                    <td>
-                        <button type="button" id="unloadObject">
-                            Unload object
-                        </button>
-                    </td>
-                </tr>
-            </tbody>
-        </table>
+                <div className="panel__field" id="row-node-time" style={{ display: "none" }}>
+                    <span className="panel__field-label">Node local time</span>
+                    <span className="panel__field-control" id="elements-node-time" />
+                    <span className="metrics-panel__dimension" />
+                </div>
+            </div>
 
-        <table
-            style={{ borderBottom: "blue solid 1px" }}
-            width="100%"
-            className="panelContent"
-            data-panel-name="metrics"
-        >
-            <tbody>
-                <tr>
-                    <td colSpan="3">Main</td>
-                </tr>
-                <tr>
-                    <td style={{ width: "60px" }}>Orbit</td>
-                    <td id="elements-orbit-alt" align="right" />
-                    <td style={{ width: "60px" }}>km</td>
-                </tr>
-                <tr>
-                    <td style={{ width: "60px" }}>Avg height</td>
-                    <td id="elements-orbit-avg" align="right" />
-                    <td style={{ width: "60px" }}>km</td>
-                </tr>
-                <tr>
-                    <td style={{ width: "60px" }}>Altitude</td>
-                    <td id="elements-alt" align="right" />
-                    <td style={{ width: "60px" }}>km</td>
-                </tr>
-                <tr>
-                    <td style={{ width: "60px" }}>Speed</td>
-                    <td id="elements-speed" align="right" />
-                    <td style={{ width: "60px" }}>m/s</td>
-                </tr>
-                <tr>
-                    <td style={{ width: "60px" }}>Precession</td>
-                    <td id="elements-precession" align="right" />
-                    <td style={{ width: "60px" }}>deg/day</td>
-                </tr>
-                <tr id="row-node-time" style={{ display: "none" }}>
-                    <td style={{ width: "60px" }}>Node local time</td>
-                    <td id="elements-node-time" align="right" />
-                    <td style={{ width: "60px" }} />
-                </tr>
-            </tbody>
-        </table>
+            <div className="panel__field-set">
+                <div className="panel__field panel__field-header">Keplerian</div>
+                <KeplerianView className="panel__field" />
+            </div>
 
-        <table
-            style={{ borderBottom: "blue solid 1px" }}
-            width="100%"
-            className="panelContent"
-            data-panel-name="metrics"
-        >
-            <tbody>
-                <tr>
-                    <td colSpan="3">Keplerian</td>
-                </tr>
-                <tr>
-                    <td style={{ width: "60px" }}>Ecc</td>
-                    <td id="elements-ecc" align="right" />
-                    <td style={{ width: "60px" }} />
-                </tr>
-                <tr>
-                    <td style={{ width: "60px" }}>SMA</td>
-                    <td id="elements-sma" align="right" />
-                    <td style={{ width: "60px" }}>km</td>
-                </tr>
-
-                <tr>
-                    <td style={{ width: "60px" }}>Inc</td>
-                    <td id="elements-inc" align="right" />
-                    <td style={{ width: "60px" }}>deg.</td>
-                </tr>
-                <tr>
-                    <td style={{ width: "60px" }}>AoP</td>
-                    <td id="elements-aop" align="right" />
-                    <td style={{ width: "60px" }}>deg.</td>
-                </tr>
-                <tr>
-                    <td style={{ width: "60px" }}>RAAN</td>
-                    <td id="elements-raan" align="right" />
-                    <td style={{ width: "60px" }}>deg.</td>
-                </tr>
-                <tr>
-                    <td style={{ width: "60px" }}>TA</td>
-                    <td id="elements-ta" align="right" />
-                    <td style={{ width: "60px" }}>deg.</td>
-                </tr>
-                <tr>
-                    <td style={{ width: "60px" }}>Period</td>
-                    <td id="elements-period" align="right" />
-                    <td style={{ width: "60px" }}>days</td>
-                </tr>
-            </tbody>
-        </table>
-
-        <table className="panelContent" data-panel-name="metrics">
-            <tbody>
-                <tr>
-                    <td colSpan="6">Cartesian</td>
-                </tr>
-            </tbody>
-        </table>
-
-        <div className="panelContent" data-panel-name="metrics">
-            <table data-panel-name="position_vector" width="100%">
-                <tbody>
-                    <tr>
-                        <td style={{ width: "65px" }}>Position</td>
-                        <td className="vec-magnitude" align="right" />
-                        <td style={{ width: "60px" }}>km</td>
-                        <td style={{ width: "49px" }}>
-                            <button className="collapseButton" data-panel-name="position_vector" />
-                        </td>
-                    </tr>
-                    <tr className="panelContent" data-panel-name="position_vector">
-                        <td>x</td>
-                        <td className="vec-x" align="right" />
-                        <td>km</td>
-                    </tr>
-                    <tr className="panelContent" data-panel-name="position_vector">
-                        <td>y</td>
-                        <td className="vec-y" align="right" />
-                        <td>km</td>
-                    </tr>
-                    <tr className="panelContent" data-panel-name="position_vector">
-                        <td>z</td>
-                        <td className="vec-z" align="right" />
-                        <td>km</td>
-                    </tr>
-                </tbody>
-            </table>
-        </div>
-
-        <div className="panelContent" data-panel-name="metrics">
-            <table data-panel-name="velocity_vector" width="100%">
-                <tbody>
-                    <tr>
-                        <td style={{ width: "65px" }}>Velocity</td>
-                        <td className="vec-magnitude" align="right" />
-                        <td style={{ width: "60px" }}>km/s</td>
-                        <td style={{ width: "49px" }}>
-                            <button className="collapseButton" data-panel-name="velocity_vector" />
-                        </td>
-                    </tr>
-                    <tr className="panelContent" data-panel-name="velocity_vector">
-                        <td>x</td>
-                        <td className="vec-x" align="right" />
-                        <td>km/s</td>
-                    </tr>
-                    <tr className="panelContent" data-panel-name="velocity_vector">
-                        <td>y</td>
-                        <td className="vec-y" align="right" />
-                        <td>km/s</td>
-                    </tr>
-                    <tr className="panelContent" data-panel-name="velocity_vector">
-                        <td>z</td>
-                        <td className="vec-z" align="right" />
-                        <td>km/s</td>
-                    </tr>
-                </tbody>
-            </table>
+            <div className="panel__field-set">
+                <div className="panel__field panel__field-header">Cartesian</div>
+                <CartesianVectorView
+                    className="metrics-panel__cartesian-position-vector js-metrics-panel-cartesian-position-vector"
+                    vectorMagnitudeLabel="Position"
+                    dimension="km"
+                />
+                <CartesianVectorView
+                    className="metrics-panel__cartesian-velocity-vector js-metrics-panel-cartesian-velocity-vector"
+                    vectorMagnitudeLabel="Velocity"
+                    dimension="km/s"
+                />
+            </div>
         </div>
     </Panel>
 );
+
 export default MetricsPanel;

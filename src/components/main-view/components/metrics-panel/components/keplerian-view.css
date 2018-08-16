@@ -1,0 +1,10 @@
+.keplerian-view {}
+.keplerian-view__column {
+	width: calc(50% - 10px)
+}
+.keplerian-view__field {
+	display: flex;
+}
+.keplerian-view__field-label {
+	min-width: 30px;
+}
