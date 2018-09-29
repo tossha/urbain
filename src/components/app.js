@@ -9,12 +9,12 @@ import Footer from "./footer/footer";
 class App extends React.Component {
     render() {
         return (
-            <React.Fragment>
+            <div className="app-layout">
                 <MainView className="app-layout__main">
                     <Header className="app-layout__header" />
                 </MainView>
                 <Footer className="app-layout__footer" />
-            </React.Fragment>
+            </div>
         );
     }
 }

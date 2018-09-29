@@ -75,9 +75,9 @@ export default class UIPanelLambert extends UIPanel
         this.vector1 = new VisualVector(state1.position, referenceFrameId);
         this.vector2 = new VisualVector(state2.position, referenceFrameId);
 
-        this.jqDom.find('#deltaVEjection').html(solverResult.ejectionDeltaV.toPrecision(4) + ' km/s');
-        this.jqDom.find('#deltaVInsertion').html(solverResult.insertionDeltaV.toPrecision(4) + ' km/s');
-        this.jqDom.find('#deltaVTotal').html((solverResult.ejectionDeltaV + solverResult.insertionDeltaV).toPrecision(4) + ' km/s');
+        this.jqDom.find('#deltaVEjection').html(solverResult.ejectionDeltaV.toPrecision(4));
+        this.jqDom.find('#deltaVInsertion').html(solverResult.insertionDeltaV.toPrecision(4));
+        this.jqDom.find('#deltaVTotal').html((solverResult.ejectionDeltaV + solverResult.insertionDeltaV).toPrecision(4));
     }
 
     collapse() {
