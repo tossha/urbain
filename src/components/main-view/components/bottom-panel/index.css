@@ -3,22 +3,31 @@
 	display: flex;
 	justify-content: space-between;
 }
-.bottom-panel__pause-button-container {
-	pointer-events: auto;
-	margin: 0 8px;
-	height: 58px;
-	width: 60px;
+
+.bottom-panel__time-settings-panel {
+	margin-right: 8px;
+	min-width: 300px;
 }
+
+.bottom-panel__pause-button {
+	pointer-events: auto;
+	margin-right: 8px;
+	height: 58px;
+	min-width: 60px;
+}
+
 .bottom-panel__time-line-container {
-	border-radius: 2px;
 	flex-grow: 2;
+	height: 58px;
+	margin-right: 8px;
+	min-width: 150px;
+}
+
+.bottom-panel__time-line {
+	height: 58px;
+	width: 100%;
 }
 
 .bottom-panel__camera-panel {
-	margin-left: 8px;
-	width: 240px;
-}
-
-.bottom-panel__time-settings-panel-container {
-	width: 300px;
+	min-width: 240px;
 }

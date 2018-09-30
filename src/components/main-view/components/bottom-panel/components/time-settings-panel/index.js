@@ -1,11 +1,18 @@
 import React from "react";
 
 import Panel from "../../../../../common/panel";
+import Logo from "./logo";
 import "./index.css";
 
-function TimeSettingsPanel() {
+function TimeSettingsPanel({ className }) {
     return (
-        <Panel className="time-settings-panel" id="timePanel" data-panel-name="time" caption="Time">
+        <Panel
+            className={`time-settings-panel ${className}`}
+            id="timePanel"
+            data-panel-name="time"
+            caption="Time"
+            titleIcon={<Logo className="time-settings-panel__logo" />}
+        >
             <div className="time-settings-panel__content">
                 <label className="panel__field time-settings-panel__field">
                     <span className="panel__field-label">Current:</span>

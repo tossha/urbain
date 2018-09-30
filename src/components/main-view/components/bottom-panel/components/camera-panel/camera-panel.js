@@ -4,8 +4,14 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import "./camera-panel.css";
 import Panel from "../../../../../common/panel";
 
-const CameraPanel = () => (
-    <Panel id="cameraPanel" className="camera-panel" caption="Camera" titleIcon={<FontAwesomeIcon icon="expand" />}>
+const CameraPanel = ({ className }) => (
+    <Panel
+        id="cameraPanel"
+        className={`camera-panel ${className}`}
+        caption="Camera"
+        titleIcon={<FontAwesomeIcon icon="expand" />}
+        collapseDirection="right"
+    >
         <div className="camera-panel__content">
             <label className="panel__field camera-panel__field">
                 <span className="panel__field-label">Target:</span>

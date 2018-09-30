@@ -12,18 +12,12 @@ import StatisticsBadge from "../statistics-badge/index";
 function BottomPanel({ className }) {
     return (
         <div className={cn(className, "bottom-panel")}>
-            <div className="bottom-panel__time-settings-panel-container">
-                <TimeSettingsPanel />
-            </div>
-            <div className="bottom-panel__pause-button-container">
-                <PauseButton />
-            </div>
+            <TimeSettingsPanel className="bottom-panel__time-settings-panel" />
+            <PauseButton className="bottom-panel__pause-button" />
             <div className="bottom-panel__time-line-container">
-                <TimeLine />
+                <TimeLine className="bottom-panel__time-line" />
             </div>
-            <div className="bottom-panel__camera-panel">
-                <CameraPanel />
-            </div>
+            <CameraPanel className="bottom-panel__camera-panel" />
             <StatisticsBadge />
         </div>
     );

@@ -1,3 +1,9 @@
 .time-settings-panel {}
+.time-settings-panel.panel--collapsed {
+	min-width: 100px;
+}
+.time-settings-panel__logo {
+	margin-left: 5px;
+}
 .time-settings-panel__content {}
 .time-settings-panel__scale-slider {}

@@ -1,4 +1,7 @@
 .camera-panel {}
+.camera-panel.panel--collapsed {
+	min-width: 120px;
+}
 .camera-panel__field-control {
 	font-size: 10px;
 }

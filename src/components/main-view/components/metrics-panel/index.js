@@ -7,7 +7,13 @@ import KeplerianView from "./components/keplerian-view";
 import CartesianVectorView from "./components/cartesian-vector-view";
 
 const MetricsPanel = () => (
-    <Panel id="metricsPanel" className="metrics-panel" caption="Metrics" titleIcon={<FontAwesomeIcon icon="bars" />}>
+    <Panel
+        id="metricsPanel"
+        className="metrics-panel"
+        caption="Metrics"
+        titleIcon={<FontAwesomeIcon icon="bars" />}
+        collapseDirection="right"
+    >
         <div className="metrics-panel__content">
             <div className="panel__field-set">
                 <div className="panel__field">

@@ -2,6 +2,7 @@ import React, { Component } from "react";
 import PropTypes from "prop-types";
 import cn from "classnames";
 
+import CollapseButton from "./components/collapse-button";
 import "./index.css";
 
 class Panel extends Component {
@@ -14,6 +15,7 @@ class Panel extends Component {
         titleIcon: PropTypes.node,
         collapsedByDefault: PropTypes.bool,
         hidden: PropTypes.bool,
+        collapseDirection: PropTypes.oneOf(["right", "left"]),
     };
 
     static defaultProps = {
@@ -23,6 +25,7 @@ class Panel extends Component {
         id: "",
         collapsedByDefault: false,
         hidden: false,
+        collapseDirection: "left",
     };
 
     state = {
@@ -36,22 +39,43 @@ class Panel extends Component {
     };
 
     render() {
-        const { id, className, caption, hideCollapseButton, children, titleIcon, hidden } = this.props;
+        const {
+            id,
+            className,
+            caption,
+            hideCollapseButton,
+            children,
+            titleIcon,
+            hidden,
+            collapseDirection,
+        } = this.props;
         const { isCollapsed } = this.state;
+        const classNames = cn(
+            "panel",
+            "noselect",
+            {
+                "panel--hidden": hidden,
+                "panel--collapsed": isCollapsed,
+            },
+            className,
+        );
 
         return (
-            <div id={id} className={cn(className, "panel", "noselect", { "panel--hidden": hidden })}>
-                <header className="panel__header">
+            <div id={id} className={classNames}>
+                <div className="panel__header">
                     <div className="panel__caption">
                         {titleIcon && <span className="panel__caption-icon">{titleIcon}</span>}
                         <span className="panel__caption-text">{caption}</span>
                     </div>
                     {!hideCollapseButton && (
-                        <button type="button" className="panel__collapse-button" onClick={this.handleToggle}>
-                            {isCollapsed ? "Show" : "Hide"}
-                        </button>
+                        <CollapseButton
+                            className="panel__collapse-button"
+                            onClick={this.handleToggle}
+                            isCollapsed={isCollapsed}
+                            collapseDirection={collapseDirection}
+                        />
                     )}
-                </header>
+                </div>
                 <div style={{ display: isCollapsed ? "none" : "block" }} className="panel__content">
                     {children}
                 </div>

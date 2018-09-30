@@ -1,8 +1,8 @@
 import React from "react";
 import "./index.css";
 
-function TimeLine() {
-    return <canvas className="time-line" id="timeLineCanvas" />;
+function TimeLine({ className }) {
+    return <canvas className={`time-line ${className}`} id="timeLineCanvas" />;
 }
 
 export default TimeLine;
