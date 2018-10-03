@@ -1,14 +1,12 @@
 import * as THREE from "three";
 
 import VisualModelAbstract from "./ModelAbstract";
-import Events from "../Events";
 import { sim } from "../Simulation";
 
 export default class VisualReferenceFrame extends VisualModelAbstract
 {
     constructor(referenceFrame) {
         super();
-
         this.referenceFrame = referenceFrame;
         this.setThreeObj(new THREE.AxesHelper(1));
     }
@@ -21,12 +19,5 @@ export default class VisualReferenceFrame extends VisualModelAbstract
             this.referenceFrame.getQuaternionByEpoch(epoch).toThreejs()
         );
         this.threeObj.scale.set(scale, scale, scale);
-    }
-
-    remove() {
-        this.scene.remove(this.threeObj);
-        this.threeObj.geometry.dispose();
-        this.threeObj.remove();
-        document.removeEventListener(Events.RENDER, this.renderListener);
     }
 }

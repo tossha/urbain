@@ -14,7 +14,7 @@ export default class TrajectoryKeplerianArray extends TrajectoryKeplerianAbstrac
         this.keplerianObjects.push(keplerianObject);
     }
 
-    getKeplerianObjectByEpoch(epoch) {
+    getKeplerianObjectByEpoch(epoch, referenceFrameOrId) {
         this.validateEpoch(epoch);
 
         let nextIdx = Math.ceil((epoch - this.minEpoch) / (this.maxEpoch - this.minEpoch) * (this.keplerianObjects.length - 1));
@@ -36,11 +36,11 @@ export default class TrajectoryKeplerianArray extends TrajectoryKeplerianAbstrac
             nextIdx -= searchDirection;
         }
 
-        return this.approximateKeplerianObject(
+        return this._transformKeplerianObject(this.approximateKeplerianObject(
             this.keplerianObjects[nextIdx - 1],
             this.keplerianObjects[nextIdx],
             epoch
-        );
+        ), referenceFrameOrId);
     }
 
     approximateKeplerianObject(object1, object2, epoch) {

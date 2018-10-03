@@ -21,4 +21,18 @@ export default class StateVector
             new Vector([vx || 0, vy || 0, vz || 0])
         );
     }
+
+    copy() {
+        return new StateVector(this._position, this._velocity);
+    }
+
+    rotate_(quaternion) {
+        quaternion.rotate_(this._position);
+        quaternion.rotate_(this._velocity);
+        return this;
+    }
+
+    rotate(quaternion) {
+        return this.copy().rotate_(quaternion);
+    }
 }

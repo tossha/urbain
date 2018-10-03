@@ -19,6 +19,7 @@ export default class VisualModelAbstract
         try {
             this.render(event.detail.epoch);
         } catch (e) {
+            // console.log('Error', e);
             this.threeObj.visible = false;
         }
     }

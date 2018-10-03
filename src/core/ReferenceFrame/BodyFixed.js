@@ -18,7 +18,7 @@ export default class ReferenceFrameBodyFixed extends ReferenceFrameAbstract
     }
 
     getOriginStateByEpoch(epoch) {
-        return sim.starSystem.getTrajectory(this.origin).getStateByEpoch(epoch, RF_BASE);
+        return sim.starSystem.getObject(this.origin).trajectory.getStateByEpoch(epoch, RF_BASE);
     }
 
     getOriginPositionByEpoch(epoch) {

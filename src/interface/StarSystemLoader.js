@@ -1,6 +1,6 @@
 import $ from "jquery";
 
-import ReferenceFrameFactory, {ReferenceFrame, RF_BASE} from "../core/ReferenceFrame/Factory";
+import ReferenceFrameFactory, {ReferenceFrame, RF_BASE, RF_BASE_OBJ} from "../core/ReferenceFrame/Factory";
 import {SATURN, SUN} from "./solar_system";
 import Body from "../core/Body";
 import OrientationIAUModel from "../core/Orientation/IAUModel";
@@ -13,6 +13,7 @@ import VisualBodyModelLight from "../core/visual/BodyModel/Light";
 import VisualBodyModelRings from "../core/visual/BodyModel/Rings";
 import VisualBodyModelBasic from "../core/visual/BodyModel/Basic";
 import VisualShapeSphere from "../core/visual/Shape/Sphere";
+import Events from "../core/Events";
 
 export default class StarSystemLoader
 {
@@ -30,10 +31,10 @@ export default class StarSystemLoader
             this._loadObject(starSystem, objectConfig);
         }
 
+        Events.dispatch(Events.LOADING_BODIES_DONE);
+
         // Loading reference frames
-        starSystem.addReferenceFrame(
-            ReferenceFrameFactory.create(RF_BASE, ReferenceFrame.BASE)
-        );
+        starSystem.addReferenceFrame(RF_BASE_OBJ);
 
         for (const frame of config.referenceFrames) {
             starSystem.addReferenceFrame(
@@ -41,10 +42,14 @@ export default class StarSystemLoader
             );
         }
 
+        Events.dispatch(Events.LOADING_FRAMES_DONE);
+
         // Loading trajectories
         for (const objectConfig of config.objects) {
-            starSystem.addTrajectory(objectConfig.id, TrajectoryLoader.create(objectConfig.trajectory));
+            starSystem.getObject(objectConfig.id).setTrajectory(TrajectoryLoader.create(objectConfig.trajectory));
         }
+
+        Events.dispatch(Events.LOADING_TRAJECTORIES_DONE);
 
         // Loading stars
         starSystem.addStars(new VisualStarsModel(config.stars));
@@ -53,7 +58,7 @@ export default class StarSystemLoader
     static loadObjectByUrl(starSystem, url) {
         $.getJSON(url, (objectConfig) => {
             this._loadObject(starSystem, objectConfig);
-            starSystem.addTrajectory(objectConfig.id, TrajectoryLoader.create(objectConfig.trajectory))
+            starSystem.getObject(objectConfig.id).setTrajectory(TrajectoryLoader.create(objectConfig.trajectory));
         });
     }
 
@@ -84,7 +89,7 @@ export default class StarSystemLoader
                     null,
                     null
                 )
-                : ((config.id === SATURN)
+                : ((config.id == SATURN)
                         ? new VisualBodyModelRings(
                             visualShape,
                             config.visual.color,
@@ -120,8 +125,8 @@ export default class StarSystemLoader
             object = new Body(
                 config.id,
                 config.type || EphemerisObject.TYPE_UNKNOWN,
-                config.parentSoi || null,
                 config.name,
+                config.data,
                 visualModel,
                 physicalModel,
                 orientation
@@ -130,7 +135,8 @@ export default class StarSystemLoader
             object = new EphemerisObject(
                 config.id,
                 config.type || EphemerisObject.TYPE_UNKNOWN,
-                config.name
+                config.name,
+                config.data
             );
         }
 

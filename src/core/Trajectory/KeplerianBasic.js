@@ -7,6 +7,10 @@ export default class TrajectoryKeplerianBasic extends TrajectoryKeplerianAbstrac
         this.keplerianObject = keplerianObject;
     }
 
+    setUpdateCallback(callback) {
+        this.keplerianObject.setUpdateCallback(() => callback(this));
+    }
+
     get mu() {
         return this.keplerianObject.mu;
     }
@@ -23,12 +27,12 @@ export default class TrajectoryKeplerianBasic extends TrajectoryKeplerianAbstrac
         this.keplerianObject.sma = value;
     }
 
-    get e() {
-        return this.keplerianObject.e;
+    get ecc() {
+        return this.keplerianObject.ecc;
     }
 
-    set e(value) {
-        this.keplerianObject.e = value;
+    set ecc(value) {
+        this.keplerianObject.ecc = value;
     }
 
     get inc() {
@@ -71,8 +75,8 @@ export default class TrajectoryKeplerianBasic extends TrajectoryKeplerianAbstrac
         this.keplerianObject.epoch = value;
     }
 
-    getKeplerianObjectByEpoch(epoch) {
+    getKeplerianObjectByEpoch(epoch, referenceFrameOrId) {
         this.validateEpoch(epoch);
-        return this.keplerianObject;
+        return this._transformKeplerianObject(this.keplerianObject, referenceFrameOrId);
     }
 }

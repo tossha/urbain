@@ -5,6 +5,8 @@ import ExceptionOutOfRange from "./ExceptionOutOfRange";
 import FunctionOfEpochCustom from "../FunctionOfEpoch/Custom";
 import ReferenceFrameInertialDynamic from "../ReferenceFrame/InertialDynamic";
 import KeplerianEditor from "../KeplerianEditor";
+import {Quaternion} from "../../algebra";
+import ReferenceFrameAbstract from "../ReferenceFrame/Abstract";
 import { sim } from "../Simulation";
 
 export default class TrajectoryAbstract
@@ -23,7 +25,20 @@ export default class TrajectoryAbstract
 
         this.referenceFrame = null;
 
+        this.isEditable = false;
+        this.isSelected = false;
+
+        this.propagator = null;
+
         this.orbitalReferenceFrame = new ReferenceFrameInertialDynamic(
+            new FunctionOfEpochCustom(epoch => this.getStateByEpoch(epoch)),
+            new FunctionOfEpochCustom(epoch => {
+                const state = this.getStateInOwnFrameByEpoch(epoch);
+                return Quaternion.twoAxis(state.velocity, null, state.position);
+            }),
+        );
+
+        this.pericentricReferenceFrame = new ReferenceFrameInertialDynamic(
             new FunctionOfEpochCustom((epoch) => {
                 return this.getReferenceFrameByEpoch(epoch).getOriginStateByEpoch(epoch);
             }),
@@ -35,6 +50,10 @@ export default class TrajectoryAbstract
         );
     }
 
+    isEditableAtEpoch(epoch) {
+        return this.isEditable;
+    }
+
     setReferenceFrame(referenceFrameId) {
         this.referenceFrame = sim.starSystem.getReferenceFrame(referenceFrameId);
     }
@@ -43,9 +62,39 @@ export default class TrajectoryAbstract
         return this.referenceFrame;
     }
 
-    getKeplerianObjectByEpoch(epoch) {
-        const rf = this.getReferenceFrameByEpoch(epoch);
-        return KeplerianObject.createFromState(this.getStateInOwnFrameByEpoch(epoch), rf.mu, epoch);
+    _transformKeplerianObject(keplerianObject, destinationFrameOrId, epoch) {
+        if (destinationFrameOrId === undefined) {
+            return keplerianObject;
+        }
+
+        let destinationFrame = (destinationFrameOrId instanceof ReferenceFrameAbstract)
+            ? destinationFrameOrId
+            : sim.starSystem.getReferenceFrame(destinationFrameOrId);
+        if (epoch === undefined) {
+            epoch = keplerianObject.epoch;
+        }
+        return KeplerianObject.createFromState(
+            this.referenceFrame.transformStateVectorByEpoch(
+                epoch,
+                keplerianObject.getStateByEpoch(epoch),
+                destinationFrame
+            ),
+            destinationFrame.mu,
+            epoch
+        );
+    }
+
+    getKeplerianObjectByEpoch(epoch, referenceFrameOrId) {
+        let destinationFrame = (referenceFrameOrId instanceof ReferenceFrameAbstract)
+            ? referenceFrameOrId
+            : referenceFrameOrId !== undefined
+                ? sim.starSystem.getReferenceFrame(referenceFrameOrId)
+                : this.getReferenceFrameByEpoch(epoch);
+        return KeplerianObject.createFromState(
+            this.getStateByEpoch(epoch, destinationFrame),
+            destinationFrame.mu,
+            epoch
+        );
     }
 
     setVisualModel(visualModel) {
@@ -61,19 +110,22 @@ export default class TrajectoryAbstract
     }
 
     drop() {
+        if (this.isSelected) {
+            this.deselect();
+        }
         if (this.visualModel) {
             this.visualModel.drop();
         }
     }
 
     select() {
+        this.isSelected = true;
         this.visualModel && this.visualModel.select();
-        if (!this.parent) {
-            this.keplerianEditor = new KeplerianEditor(this, this.keplerianObject !== undefined);
-        }
+        this.keplerianEditor = new KeplerianEditor(this);
     }
 
     deselect() {
+        this.isSelected = false;
         this.visualModel && this.visualModel.deselect();
         if (this.keplerianEditor) {
             this.keplerianEditor.remove();
@@ -97,7 +149,7 @@ export default class TrajectoryAbstract
 
     validateEpoch(epoch) {
         if (!this.isValidAtEpoch(epoch)) {
-            throw new ExceptionOutOfRange(this.object, epoch, this.minEpoch, this.maxEpoch);
+            throw new ExceptionOutOfRange(this.object, this, epoch, this.minEpoch, this.maxEpoch);
         }
     }
 

@@ -1,6 +1,6 @@
-import {Vector} from "./algebra";
+import {Vector} from "./../algebra";
 
-export default class Propagator
+export default class PropagatorNBody
 {
     constructor(significantBodies, timeStep) {
         this.significantBodies = significantBodies;

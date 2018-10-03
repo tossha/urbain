@@ -17,8 +17,18 @@ export default class TrajectoryVSOP87 extends TrajectoryKeplerianAbstract
             : sim.starSystem.getObject(SUN).physicalModel.mu;
     }
 
-    getKeplerianObjectByEpoch(epoch) {
-        return KeplerianObject.createFromState(this.getStateInOwnFrameByEpoch(epoch), this.mu, epoch);
+    getKeplerianObjectByEpoch(epoch, referenceFrameOrId) {
+        return KeplerianObject.createFromState(
+            this.referenceFrame.transformStateVectorByEpoch(
+                epoch,
+                this.getStateInOwnFrameByEpoch(epoch),
+                referenceFrameOrId === undefined
+                    ? this.referenceFrame
+                    : referenceFrameOrId
+            ),
+            this.mu,
+            epoch
+        );
     }
 
     getStateInOwnFrameByEpoch(epoch) {

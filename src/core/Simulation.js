@@ -16,6 +16,9 @@ import ReferenceFrameFactory from "./ReferenceFrame/Factory";
 class Simulation
 {
     constructor() {
+        this.modules = {};
+        this.propagators = {};
+
         this._initSettings();
     }
 
@@ -25,7 +28,7 @@ class Simulation
 
         this.textureLoader = new THREE.TextureLoader();
 
-        this.renderer = new THREE.WebGLRenderer({antialias: true});
+        this.renderer = new THREE.WebGLRenderer({antialias: true, logarithmicDepthBuffer: true});
         this.renderer.setSize(window.innerWidth, window.innerHeight);
         this.domElement = viewPortDomElement;
         this.domElement.appendChild(this.renderer.domElement);
@@ -109,6 +112,27 @@ class Simulation
 
     getVisualCoords(simCoords) {
         return (new THREE.Vector3()).fromArray(simCoords.sub(this.camera.lastPosition));
+    }
+
+    getSimCoords(visualCoords) {
+        return (new Vector(visualCoords.toArray())).add_(this.camera.lastPosition);
+    }
+
+    loadModule(alias) {
+        const name = alias.charAt(0).toUpperCase() + alias.slice(1);
+        const className = 'Module' + name;
+        import('../modules/' + name + '/' + className).then((module) => {
+            this.modules[alias] = new module.default();
+            this.modules[alias].init();
+        });
+    }
+
+    addPropagator(alias, propagatorClass) {
+        this.propagators[alias] = propagatorClass;
+    }
+
+    getPropagator(alias) {
+        return this.propagators[alias];
     }
 }
 

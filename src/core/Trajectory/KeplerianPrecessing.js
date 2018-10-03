@@ -10,9 +10,12 @@ export default class TrajectoryKeplerianPrecessing extends TrajectoryKeplerianBa
         this.j2 = j2;
     }
 
-    getKeplerianObjectByEpoch(epoch) {
+    getKeplerianObjectByEpoch(epoch, referenceFrameOrId) {
         this.validateEpoch(epoch);
-        return this.keplerianObject.addPrecession(this.r, this.j2, epoch);
+        return this._transformKeplerianObject(
+            this.keplerianObject.addPrecession(this.r, this.j2, epoch),
+            referenceFrameOrId
+        );
     }
 
     static createFromState(referenceFrame, state, mu, r, j2, epoch, color) {
