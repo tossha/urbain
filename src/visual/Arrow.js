@@ -1,3 +1,5 @@
+import * as THREE from "three";
+
 import LineObject from "./LineObject";
 
 export default class ArrowObject extends THREE.ArrowHelper

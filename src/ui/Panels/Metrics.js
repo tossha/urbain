@@ -1,3 +1,4 @@
+import $ from "jquery";
 
 import UIPanel from "../Panel";
 import Events from "../../core/Events";

@@ -1,22 +1,56 @@
-const webpack = require('webpack');
-const path = require('path');
+const path = require("path");
+const CopyWebpackPlugin = require("copy-webpack-plugin");
+const CleanWebpackPlugin = require("clean-webpack-plugin");
+const HtmlWebpackPlugin = require("html-webpack-plugin");
+const UglifyJsPlugin = require("uglifyjs-webpack-plugin");
 
 module.exports = {
-    entry: './src/main.js',
-    output: {
-        path: path.resolve(__dirname, 'dist'),
-        filename: 'app.bundle.js'
+    entry: {
+        app: "./src/main.js"
     },
+    output: {
+        path: path.resolve(__dirname, "dist"),
+        filename: "[name].bundle.[hash].js"
+    },
+    devtool: "source-map",
     plugins: [
-        new webpack.ProvidePlugin({
-            '$':           path.resolve(__dirname, './src/vendor/jquery-3.2.1.min.js'),
-            'dat':         path.resolve(__dirname, './src/vendor/dat.gui.js'),
-            'Stats':       path.resolve(__dirname, './src/vendor/stats.min.js'),
-            'THREE':       path.resolve(__dirname, './src/vendor/three.min.js')
-        })
+        new CleanWebpackPlugin(["dist/**/*.*"]),
+        new CopyWebpackPlugin([
+            {
+                from: path.join(__dirname, "public"),
+            },
+        ], {
+            ignore: [
+                path.join(__dirname, "public", "index.php"),
+            ]
+        }),
+        new HtmlWebpackPlugin({
+            template: path.join(__dirname, "public", "index.html"),
+            inject: "body",
+        }),
     ],
-   // watch: true,
     watchOptions: {
         ignored: /node_modules/
+    },
+    optimization: {
+        minimizer: [
+            new UglifyJsPlugin({
+                cache: true,
+                parallel: true,
+                sourceMap: true,
+            }),
+        ],
+        splitChunks: {
+            cacheGroups: {
+                commons: {
+                    test: /[\\/]node_modules[\\/]/,
+                    name: "vendors",
+                    chunks: 'all'
+                }
+            }
+        }
+    },
+    performance: {
+        hints: false
     }
 };

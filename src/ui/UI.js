@@ -1,3 +1,5 @@
+import $ from "jquery";
+
 import UIPanelTime from "./Panels/Time";
 import UIPanelCamera from "./Panels/Camera";
 import UIPanelMetrics from "./Panels/Metrics";

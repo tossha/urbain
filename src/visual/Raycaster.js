@@ -1,3 +1,5 @@
+import * as THREE from "three";
+
 import {deg2rad} from "../algebra";
 
 export default class VisualRaycaster
@@ -23,7 +25,7 @@ export default class VisualRaycaster
     setPixelPrecision(value) {
         this.raycaster.pixelPrecision = value;
     }
-    
+
     updatePixelAngleSize() {
         this.raycaster.pixelAngleSize = deg2rad(this.camera.fov) / this.domElement.height;
     }

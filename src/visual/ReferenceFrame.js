@@ -1,12 +1,13 @@
+import * as THREE from "three";
+
 import VisualModelAbstract from "./ModelAbstract";
 import Events from "../core/Events";
-import {Vector} from "../algebra";
 
 export default class VisualReferenceFrame extends VisualModelAbstract
 {
     constructor(referenceFrame) {
         super();
-        
+
         this.referenceFrame = referenceFrame;
         this.setThreeObj(new THREE.AxesHelper(1));
     }

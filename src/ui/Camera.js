@@ -1,3 +1,5 @@
+import * as THREE from "three";
+
 import {Quaternion, Vector} from "../algebra";
 import {ReferenceFrame, RF_BASE} from "../core/ReferenceFrame/Factory";
 import Events from "../core/Events";

@@ -1,3 +1,5 @@
+import * as THREE from "three";
+
 export class Vector extends Array
 {
     constructor(dimOrArray) {

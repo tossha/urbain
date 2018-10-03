@@ -1,3 +1,4 @@
+import $ from "jquery";
 
 import UIPanel from "../Panel";
 import LambertSolver from "../../core/LambertSolver";

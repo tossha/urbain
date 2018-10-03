@@ -1,3 +1,5 @@
+import * as THREE from "three";
+
 import VisualShapeAbstract from "./Abstract";
 
 export default class VisualShapeSphere extends VisualShapeAbstract
