@@ -12,7 +12,7 @@ export default class VisualVector extends VisualModelAbstract
         if (referenceFrameId === undefined) {
             referenceFrameId = RF_BASE;
         }
-        this.referenceFrame = sim.starSystem.getReferenceFrame(referenceFrameId);
+        this.referenceFrame = window.sim.starSystem.getReferenceFrame(referenceFrameId);
         this.quaternion = Quaternion.transfer(new Vector([0,1,0]), vector);
         this.setThreeObj(new THREE.ArrowHelper(
             (new THREE.Vector3()).fromArray([1,0,0]),
@@ -23,6 +23,6 @@ export default class VisualVector extends VisualModelAbstract
 
     render(epoch) {
         this.threeObj.quaternion.copy(this.quaternion.mul(this.referenceFrame.getQuaternionByEpoch(epoch)).toThreejs());
-        this.threeObj.position.copy(sim.getVisualCoords(this.referenceFrame.getOriginPositionByEpoch(epoch)));
+        this.threeObj.position.copy(window.sim.getVisualCoords(this.referenceFrame.getOriginPositionByEpoch(epoch)));
     }
 }
