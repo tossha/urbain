@@ -1422,7 +1422,7 @@ def getVsopTrajectory(body, color, cutKm):
 			'keplerianModel': True
 		},
 		'data': {
-			'body': body,
+			'body': int(body),
 			'coefficients': data
 		}
 	}

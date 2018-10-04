@@ -1,5 +1,4 @@
 import {ReferenceFrame} from "../ReferenceFrame/Factory";
-import {SUN} from "../../interface/solar_system";
 import ReferenceFrameFactory from "../ReferenceFrame/Factory";
 import TrajectoryKeplerianAbstract from "./KeplerianAbstract";
 import KeplerianObject from "../KeplerianObject";
@@ -9,12 +8,14 @@ import { sim } from "../Simulation";
 
 export default class TrajectoryVSOP87 extends TrajectoryKeplerianAbstract
 {
+    static SUN = 10;
+
     constructor(body, coefficients) {
-        super(ReferenceFrameFactory.buildId((body == SUN) ? 0 : SUN, ReferenceFrame.INERTIAL_ECLIPTIC));
+        super(ReferenceFrameFactory.buildId((body === TrajectoryVSOP87.SUN) ? 0 : TrajectoryVSOP87.SUN, ReferenceFrame.INERTIAL_ECLIPTIC));
         this.coefficients = coefficients;
-        this.mu = (body == SUN)
+        this.mu = (body === TrajectoryVSOP87.SUN)
             ? 319.77790837966666
-            : sim.starSystem.getObject(SUN).physicalModel.mu;
+            : sim.starSystem.getObject(TrajectoryVSOP87.SUN).physicalModel.mu;
     }
 
     getKeplerianObjectByEpoch(epoch, referenceFrameOrId) {
