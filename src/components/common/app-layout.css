@@ -1,0 +1,25 @@
+.app-layout {
+	color: var(--white-text);
+	display: flex;
+	flex-direction: column;
+	height: 100%;
+	width: 100%;
+}
+
+.app-layout__main {
+	display: flex;
+	justify-content: space-between;
+	flex-direction: column;
+	flex-grow: 2;
+	position: relative;
+	width: 100%;
+}
+
+.app-layout__header {
+	background: transparent;
+	position: fixed;
+	top: 8px;
+	left: 8px;
+	z-index: 99999;
+}
+.app-layout__footer {}

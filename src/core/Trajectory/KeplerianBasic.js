@@ -1,5 +1,4 @@
 import TrajectoryKeplerianAbstract from "./KeplerianAbstract";
-import KeplerianObject from "../KeplerianObject";
 
 export default class TrajectoryKeplerianBasic extends TrajectoryKeplerianAbstract
 {

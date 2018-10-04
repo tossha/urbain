@@ -1,0 +1,25 @@
+.header {
+	align-items: center;
+	display: flex;
+	height: 47px;
+}
+.header__logo-wrapper {
+	background: var(--dark-gray);
+	border-top-left-radius: 3px;
+	border-bottom-left-radius: 3px;
+	height: 100%;
+}
+.header__logo {
+	background: url("/images/urbain-logo.png") 10px 12px no-repeat;
+	background-size: 70px;
+	border-right: 1px solid var(--gray);
+	height: 100%;
+	width: 104px
+}
+.header__top-menu {
+	height: 100%;
+}
+.header__star-system-selector {
+	height: 100%;
+	margin-left: 8px;
+}

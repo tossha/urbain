@@ -1,0 +1,12 @@
+.statistics-badge {
+	position: fixed;
+	left: 316px;
+	bottom: 76px;
+	height: 48px;
+	pointer-events: auto;
+	width: 80px;
+}
+
+.statistics-badge .stats-badge {
+	position: absolute !important;
+}

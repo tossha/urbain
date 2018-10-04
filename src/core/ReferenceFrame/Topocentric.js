@@ -1,7 +1,8 @@
 import ReferenceFrameBodyFixed from "./BodyFixed";
-import {Quaternion, Vector} from "../../algebra";
+import {Quaternion, Vector} from "../algebra";
 import {RF_BASE} from "./Factory";
 import StateVector from "../StateVector";
+import { sim } from "../Simulation";
 
 export default class ReferenceFrameTopocentric extends ReferenceFrameBodyFixed
 {

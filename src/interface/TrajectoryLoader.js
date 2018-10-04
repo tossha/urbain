@@ -4,10 +4,10 @@ import TrajectoryKeplerianBasic from "../core/Trajectory/KeplerianBasic";
 import TrajectoryKeplerianPrecessing from "../core/Trajectory/KeplerianPrecessing";
 import KeplerianObject from "../core/KeplerianObject";
 import TrajectoryComposite from "../core/Trajectory/Composite";
-import VisualTrajectoryModelPointArray from "../visual/TrajectoryModel/PointArray";
-import VisualTrajectoryModelKeplerian from "../visual/TrajectoryModel/Keplerian";
+import VisualTrajectoryModelPointArray from "../core/visual/TrajectoryModel/PointArray";
+import VisualTrajectoryModelKeplerian from "../core/visual/TrajectoryModel/Keplerian";
 import TrajectoryStaticPosition from "../core/Trajectory/StaticPosition";
-import {Vector} from "../algebra";
+import {Vector} from "../core/algebra";
 import TrajectoryVSOP87 from "../core/Trajectory/VSOP87";
 import TrajectoryELP2000 from "../core/Trajectory/ELP2000";
 

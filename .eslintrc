@@ -1,0 +1,10 @@
+{
+  "extends": "react-app",
+  "env": {
+    "es6": true
+  },
+  "plugins": ["babel", "prettier", "react"],
+  "rules": {
+    "prettier/prettier": "error"
+  }
+}

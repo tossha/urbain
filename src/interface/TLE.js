@@ -1,6 +1,7 @@
-import {deg2rad} from "../algebra";
-import TimeLine from "../ui/TimeLine";
-import {EARTH} from "../solar_system";
+import {deg2rad} from "../core/algebra";
+import TimeLine from "../ui-legacy/TimeLine";
+import {EARTH} from "./solar_system";
+import { sim } from "../core/Simulation";
 
 export default class TLE
 {

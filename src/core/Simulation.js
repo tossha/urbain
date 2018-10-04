@@ -1,25 +1,25 @@
 import * as THREE from "three";
 
 import EventHandler from "./EventHandler";
-import {Vector} from "../algebra";
+import {Vector} from "./algebra";
 import Events from "./Events";
 import {ReferenceFrame} from "./ReferenceFrame/Factory";
-import TimeLine from "../ui/TimeLine";
+import TimeLine from "../ui-legacy/TimeLine";
 import StarSystemLoader from "../interface/StarSystemLoader";
-import VisualRaycaster from "../visual/Raycaster";
-import SelectionHandler from "../ui/SelectionHandler";
-import UI from "../ui/UI";
+import VisualRaycaster from "./visual/Raycaster";
+import SelectionHandler from "../ui-legacy/SelectionHandler";
+import UI from "../ui-legacy/UI";
 import StarSystem from "./StarSystem";
-import Camera from "../ui/Camera";
+import Camera from "../ui-legacy/Camera";
 import ReferenceFrameFactory from "./ReferenceFrame/Factory";
 
-export default class Simulation
+class Simulation
 {
     constructor() {
-        this.initSettings();
+        this._initSettings();
     }
 
-    init(domElementId, starSystemConfig) {
+    init(viewPortDomElement, starSystemConfig) {
         this.scene = new THREE.Scene();
         this.scene.add(new THREE.AmbientLight(0xFFEFD5, 0.15));
 
@@ -27,9 +27,9 @@ export default class Simulation
 
         this.renderer = new THREE.WebGLRenderer({antialias: true});
         this.renderer.setSize(window.innerWidth, window.innerHeight);
-        this.domElement = document.getElementById(domElementId);
+        this.domElement = viewPortDomElement;
         this.domElement.appendChild(this.renderer.domElement);
-        window.addEventListener('resize', this.onWindowResize.bind(this));
+        window.addEventListener("resize", this.onWindowResize.bind(this));
 
         this.rendererEvents = new EventHandler(this.renderer.domElement);
 
@@ -71,7 +71,7 @@ export default class Simulation
         return TimeLine.getDateByEpoch(this.time.epoch);
     }
 
-    initSettings() {
+    _initSettings() {
         this.settings = {
             ui: {
                 showBodyLabels: true,
@@ -111,3 +111,5 @@ export default class Simulation
         return (new THREE.Vector3()).fromArray(simCoords.sub(this.camera.lastPosition));
     }
 }
+
+export const sim = new Simulation();

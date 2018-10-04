@@ -1,4 +1,5 @@
 import EphemerisObject from "./EphemerisObject";
+import { sim } from "./Simulation";
 
 export default class Body extends EphemerisObject
 {

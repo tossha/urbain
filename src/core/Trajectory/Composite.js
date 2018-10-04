@@ -1,7 +1,4 @@
-
 import TrajectoryAbstract from "./Abstract";
-import {RF_BASE} from "../ReferenceFrame/Factory";
-import TimeLine from "../../ui/TimeLine";
 import ExceptionOutOfRange from "./ExceptionOutOfRange";
 
 export default class TrajectoryComposite extends TrajectoryAbstract

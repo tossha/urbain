@@ -5,6 +5,7 @@ import ExceptionOutOfRange from "./ExceptionOutOfRange";
 import FunctionOfEpochCustom from "../FunctionOfEpoch/Custom";
 import ReferenceFrameInertialDynamic from "../ReferenceFrame/InertialDynamic";
 import KeplerianEditor from "../KeplerianEditor";
+import { sim } from "../Simulation";
 
 export default class TrajectoryAbstract
 {

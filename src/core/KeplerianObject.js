@@ -1,4 +1,4 @@
-import {getAngleBySinCos, Quaternion, Vector} from "../algebra";
+import {getAngleBySinCos, Quaternion, Vector} from "./algebra";
 import StateVector from "./StateVector";
 
 export default class KeplerianObject

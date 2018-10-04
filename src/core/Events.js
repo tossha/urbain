@@ -12,15 +12,15 @@ export default class Events
         }
         document.dispatchEvent(eventObj);
     }
-}
 
-Events.RENDER = 'urb_render';
-Events.INIT_DONE = 'urb_init_done';
-Events.SELECT = 'urb_select';
-Events.DESELECT = 'urb_deselect';
-Events.CAMERA_RF_CHANGED = 'urb_camera_rf_change';
-Events.OBJECT_ADDED = 'urb_object_added';
-Events.TIME_SCALE_CHANGED = 'urb_time_scale_change';
-Events.TIME_PAUSED = 'urb_time_paused';
-Events.TIME_UNPAUSED = 'urb_time_unpaused';
-Events.EPOCH_CHANGED = 'urb_epoch_change';
+    static RENDER = 'urb_render';
+    static INIT_DONE = 'urb_init_done';
+    static SELECT = 'urb_select';
+    static DESELECT = 'urb_deselect';
+    static CAMERA_RF_CHANGED = 'urb_camera_rf_change';
+    static OBJECT_ADDED = 'urb_object_added';
+    static TIME_SCALE_CHANGED = 'urb_time_scale_change';
+    static TIME_PAUSED = 'urb_time_paused';
+    static TIME_UNPAUSED = 'urb_time_unpaused';
+    static EPOCH_CHANGED = 'urb_epoch_change';
+}

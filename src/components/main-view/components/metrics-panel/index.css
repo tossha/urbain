@@ -1,0 +1,21 @@
+.metrics-panel {
+	min-width: 260px;
+}
+.metrics-panel__content {
+	font-size: 11px;
+}
+.metrics-panel__content .panel__field {
+	padding: 3px 8px;
+}
+.metrics-panel__angles-checker {
+	margin: 0 10px 0 0;
+}
+.metrics-panel__unload-object-button {
+	border-radius: 2px;
+	background: #3e2d33 !important;
+	margin-left: 15px;
+}
+.metrics-panel__dimension {
+	color: var(--gray-text);
+	margin-left: 4px;
+}

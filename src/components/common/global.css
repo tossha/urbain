@@ -1,0 +1,81 @@
+:root {
+	--black: #131519;
+	--black-border: #111317;
+	--blue: #0045f2;
+	--lightning-blue: #2a49fb;
+	--gray: #1f2228;
+	--dark-gray: #1a1c21;
+	--blue-text: #6d69ff;
+	--gray-text: #838485;
+	--white-text: #fdfdfd;
+}
+
+html {
+	font-family: Arial, sans-serif;
+	font-size: 12px;
+}
+
+body {
+	width: 100%;
+	height: 100%;
+	margin: 0;
+	overflow: hidden;
+}
+
+*, ::after, ::before {
+	box-sizing: border-box;
+}
+
+.hidden {
+	display: none!important;
+}
+
+.noselect {
+	user-select: none;
+}
+
+button {
+	background-color: var(--black);
+	border: none;
+	cursor: pointer;
+	color: var(--white-text);
+	font-size: 10px;
+	outline: none;
+	padding: 4px 8px;
+}
+
+button:hover,
+button:active {
+	background-color: var(--gray);
+}
+
+
+select {
+	appearance: none !important;
+	-ms-appearance: none;
+	-moz-appearance: none;
+	-webkit-appearance: none;
+	background-image: url("/images/chevron-down-solid.svg");
+	background-position: right center;
+	background-repeat: no-repeat;
+	background-size: 1.25em 10px;
+	background-color: #0e0f12;
+	border-color: #0e0f12;
+	border-radius: 2px;
+	color: #f4f4f4;
+	line-height: 1em;
+	min-height: 20px;
+	outline: none;
+	padding: 0 1.5em 0 0.3em;
+	text-indent: 0.01px;
+	text-overflow: "";
+}
+
+select::-ms-expand {
+	display: none;
+}
+
+select > option {
+	background-color: #131519;
+
+}

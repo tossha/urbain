@@ -1,0 +1,20 @@
+.cartesian-vector-view {
+	display: block;
+}
+.cartesian-vector-view__header {
+	display: flex;
+	justify-content: space-between;
+	margin-bottom: 4px;
+}
+.cartesian-vector-view__header .vector-component__label {
+	min-width: 80px;
+}
+.cartesian-vector-view__vector-components {
+	border-left: 1px solid var(--gray-text);
+	padding-left: 20px;
+}
+.cartesian-vector-view__expand-button {
+	border-radius: 3px;
+	height: 15px;
+	width: 15px;
+}

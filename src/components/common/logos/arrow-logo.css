@@ -1,0 +1,10 @@
+.arrow-logo {}
+.arrow-logo--to-right {
+	transform: rotateZ(180deg);
+}
+.arrow-logo--to-top {
+	transform: rotateZ(90deg);
+}
+.arrow-logo--to-bottom {
+	transform: rotateZ(-90deg);
+}

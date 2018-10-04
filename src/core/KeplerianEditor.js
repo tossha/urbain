@@ -1,6 +1,7 @@
 import FunctionOfEpochCustom from "./FunctionOfEpoch/Custom";
-import {Quaternion, Vector} from "../algebra";
-import VisualAngle from "../visual/Angle";
+import {Quaternion, Vector} from "./algebra";
+import VisualAngle from "./visual/Angle";
+import { sim } from "./Simulation";
 
 export default class KeplerianEditor
 {

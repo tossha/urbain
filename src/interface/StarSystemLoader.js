@@ -1,18 +1,18 @@
 import $ from "jquery";
 
 import ReferenceFrameFactory, {ReferenceFrame, RF_BASE} from "../core/ReferenceFrame/Factory";
-import {SATURN, SUN} from "../solar_system";
+import {SATURN, SUN} from "./solar_system";
 import Body from "../core/Body";
 import OrientationIAUModel from "../core/Orientation/IAUModel";
 import OrientationConstantAxis from "../core/Orientation/ConstantAxis";
 import PhysicalBodyModel from "../core/PhysicalBodyModel";
 import EphemerisObject from "../core/EphemerisObject";
 import TrajectoryLoader from "./TrajectoryLoader";
-import VisualStarsModel from "../visual/StarsModel";
-import VisualBodyModelLight from "../visual/BodyModel/Light";
-import VisualBodyModelRings from "../visual/BodyModel/Rings";
-import VisualBodyModelBasic from "../visual/BodyModel/Basic";
-import VisualShapeSphere from "../visual/Shape/Sphere";
+import VisualStarsModel from "../core/visual/StarsModel";
+import VisualBodyModelLight from "../core/visual/BodyModel/Light";
+import VisualBodyModelRings from "../core/visual/BodyModel/Rings";
+import VisualBodyModelBasic from "../core/visual/BodyModel/Basic";
+import VisualShapeSphere from "../core/visual/Shape/Sphere";
 
 export default class StarSystemLoader
 {
@@ -84,7 +84,7 @@ export default class StarSystemLoader
                     null,
                     null
                 )
-                : ((config.id == SATURN)
+                : ((config.id === SATURN)
                         ? new VisualBodyModelRings(
                             visualShape,
                             config.visual.color,

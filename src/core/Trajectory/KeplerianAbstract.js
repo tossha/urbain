@@ -1,6 +1,4 @@
-import Events from "./../Events";
 import TrajectoryAbstract from "./Abstract";
-import KeplerianEditor from "../KeplerianEditor";
 
 export default class TrajectoryKeplerianAbstract extends TrajectoryAbstract
 {

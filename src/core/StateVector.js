@@ -1,4 +1,4 @@
-import {Vector} from "../algebra";
+import {Vector} from "./algebra";
 
 export default class StateVector
 {
