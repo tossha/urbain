@@ -14,6 +14,7 @@ class DropDownMenu extends Component {
                 label: PropTypes.string.isRequired,
                 selected: PropTypes.bool.isRequired,
                 onUpdate: PropTypes.func,
+                onClick: PropTypes.func,
             }),
         ).isRequired,
         onSelect: PropTypes.func,
@@ -40,14 +41,16 @@ class DropDownMenu extends Component {
                     </span>
                     {hasOptionsToShow && (
                         <ul className="drop-down-menu__menu">
-                            {options.map(({ label, selected }) => (
-                                <DropDownMenuItem
-                                    key={label}
-                                    selected={selected}
-                                    text={label}
-                                    onClick={this.handleSelect}
-                                />
-                            ))}
+                            {options.map(({ label, selected, onClick }) => {
+                                return (
+                                    <DropDownMenuItem
+                                        key={label}
+                                        selected={selected}
+                                        text={label}
+                                        onClick={onClick || this.handleSelect}
+                                    />
+                                );
+                            })}
                         </ul>
                     )}
                 </li>
