@@ -1,5 +1,6 @@
-import { TOP_MENU_ITEMS } from "./constants";
+import { ABOUT_PAGE_URL, TOP_MENU_ITEMS } from "./constants";
 import { createContext } from "./context";
+import { openLinkInNewTab } from "./utils";
 
 class TopMenuItem {
     constructor(label, options = []) {
@@ -71,7 +72,14 @@ class Store {
             },
         ]),
         // new TopMenuItem(TOP_MENU_ITEMS.SETTINGS),
-        new TopMenuItem(TOP_MENU_ITEMS.HELP),
+        new TopMenuItem(TOP_MENU_ITEMS.HELP, [
+            {
+                label: "About",
+                onClick() {
+                    openLinkInNewTab(ABOUT_PAGE_URL);
+                },
+            },
+        ]),
     ];
 
     starSystems = [
