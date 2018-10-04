@@ -33,6 +33,7 @@ export default class EphemerisObject
 
     drop() {
         if (this.trajectory) {
+            this.trajectory.drop();
             delete this.trajectory;
         }
     }
