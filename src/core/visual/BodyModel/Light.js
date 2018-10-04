@@ -5,9 +5,14 @@ import { sim } from "../../Simulation";
 
 export default class VisualBodyModelLight extends VisualBodyModelBasic
 {
-    constructor(shape, color, texturePath, lightColor, lightIntensity, lightDistance, lightDecay) {
-        super(shape, color, texturePath);
-        this.light = new THREE.PointLight(lightColor, lightIntensity, lightDistance, lightDecay);
+    constructor(shape, config) {
+        super(shape, config);
+        this.light = new THREE.PointLight(
+            config.lightColor,
+            config.lightIntensity,
+            config.lightDistance || null,
+            config.lightDecay || null
+        );
         this.scene.add(this.light);
     }
 

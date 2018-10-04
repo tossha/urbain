@@ -6,10 +6,10 @@ import { sim } from "../../Simulation";
 
 export default class VisualBodyModelBasic extends VisualBodyModelAbstract
 {
-    constructor(shape, color, texturePath) {
-        super(shape, color);
+    constructor(shape, config) {
+        super(shape, config);
 
-        this.texturePath = texturePath;
+        this.texturePath = config.texturePath;
         this.isTextureRequested = false;
     }
 

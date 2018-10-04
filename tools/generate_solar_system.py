@@ -1056,7 +1056,7 @@ objects = [
 		'name': 'Saturn',
 		'maxError': 30000,
 		'color': 'sandybrown',
-		'texture': 'SaturnTexture.jpg&ringsColorMap.jpg&ringsAlphaMap.jpg',
+		'texture': ['SaturnTexture.jpg','ringsColorMap.jpg','ringsAlphaMap.jpg'],
 		'soi': 54600000,
 		'j2': 0.0162907 # 2007 prev source
 	},
@@ -1333,10 +1333,10 @@ def getObjectTrajectory(body, parent, parentMu, etFrom, etTo, maxError, color):
 			'pointArrayModel': {
 				'showAhead': True,
 				'showBehind': True,
-				'trailPeriod': 86400 * 6000,
+				'trailPeriod': 86400 * 365.25 * 25,
 				'referenceFrame': 1000,
 				'maxAngle': 3,
-				'minStep': 86400
+				'minStep': 86400 * 7
 			}
 		}
 	else:
@@ -1547,11 +1547,39 @@ def getBodyData(body, type, soi, name, color, texture, parent, pairing, j2, etFr
 			'radius': radius,
 			'mu': mu
 		}
-		objectData['visual'] = {
-			'radius': radius,
-			'texture': texture,
-			'color': color
-		}
+
+		if body == '10':
+			objectData['visual'] = {
+				'model': 'light',
+				'config': {
+					'radius': radius,
+					'texturePath': texture,
+					'lightColor': 0xFFFFFF,
+					'lightIntensity': 1.5,
+					'color': color
+				}
+			}
+		elif body == '699':
+			objectData['visual'] = {
+				'model': 'rings',
+				'config': {
+					'radius': radius,
+					'ringsRadius': 140220,
+					'texturePath': texture[0],
+					'ringsColorMapPath': texture[1],
+					'ringsAlphaMapPath': texture[2],
+					'color': color
+				}
+			}
+		else:
+			objectData['visual'] = {
+				'model': 'basic',
+				'config': {
+					'radius': radius,
+					'texturePath': texture,
+					'color': color
+				}
+			}
 
 		if j2:
 			objectData['physical']['j2'] = j2
@@ -1598,7 +1626,7 @@ vsopTotal = 0
 
 objectsData = getObjects(objects, etStart, etEnd)
 
-file = open('./../dist/star_systems/solar_system.json', 'w')
+file = open('./../public/star_systems/solar_system.json', 'w')
 file.write(json.dumps({
 	'id': 1,
 	'name': 'Solar System',
