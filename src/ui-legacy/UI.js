@@ -11,7 +11,7 @@ export default class UI
 {
     constructor() {
         this.timePanel     = new UIPanelTime    ($('#timePanel'),    sim.time);
-        this.cameraPanel   = new UIPanelCamera  ($('#cameraPanel'),  sim.camera, sim.starSystem);
+        this.cameraPanel   = new UIPanelCamera  ($('#cameraPanel'),  sim.camera);
         this.metricsPanel  = new UIPanelMetrics ($('#metricsPanel'), sim.selection);
         this.creationPanel = new UIPanelCreation($('#creationPanel'));
         this.lambertPanel  = new UIPanelLambert ($('#lambertPanel'));

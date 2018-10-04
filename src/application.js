@@ -3,9 +3,12 @@ import { loadTLE } from "./api";
 import { Store } from "./store";
 
 class Application {
-    constructor(sim, statsBadge) {
-        init(statsBadge);
+    constructor(sim) {
         this._store = new Store(sim);
+    }
+
+    init(statsBadge) {
+        init(statsBadge);
     }
 
     getInitialState() {

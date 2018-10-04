@@ -7,6 +7,7 @@ import VisualTrajectoryModelKeplerian from "../../core/visual/TrajectoryModel/Ke
 import VisualVector from "../../core/visual/Vector";
 import EphemerisObject from "../../core/EphemerisObject";
 import { sim } from "../../core/Simulation";
+import Events from "../../core/Events";
 
 export default class UIPanelLambert extends UIPanel
 {
@@ -26,12 +27,23 @@ export default class UIPanelLambert extends UIPanel
 
         this.jqDom.find('#useCurrentTime').click(() => this.useCurrentTime());
 
-        this.initOrigin();
-        this.initTarget();
+        this.jqOrigin = this.jqDom.find('#originSelect');
+        this.jqOrigin.on('change', () => this.changeOrigin(0|this.jqOrigin.val()));
+
+        this.jqTarget = this.jqDom.find('#targetSelect');
+        this.jqTarget.on('change', () => this.changeTarget(0|this.jqTarget.val()));
+
         this.useCurrentTime();
 
         this.origin = 399;
         this.jqOrigin.val(this.origin);
+
+        Events.addListener(Events.STAR_SYSTEM_LOADED, () => {
+            this.jqOrigin.html('');
+            this.jqTarget.html('');
+            this.updateTargetList();
+            this.updateOriginList();
+        });
     }
 
     solve() {
@@ -122,18 +134,6 @@ export default class UIPanelLambert extends UIPanel
     getNeededSliderValue(transferTime) {
         const val = Math.sqrt(Math.sqrt(transferTime / this.maxTransferTime));
         return Math.max(0, Math.min(1, val));
-    }
-
-    initOrigin() {
-        this.jqOrigin = this.jqDom.find('#originSelect');
-        this.jqOrigin.on('change', () => this.changeOrigin(0|this.jqOrigin.val()));
-        this.updateOriginList();
-    }
-
-    initTarget() {
-        this.jqTarget = this.jqDom.find('#targetSelect');
-        this.jqTarget.on('change', () => this.changeTarget(0|this.jqTarget.val()));
-        this.updateTargetList();
     }
 
     updateOriginList() {

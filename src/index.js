@@ -11,7 +11,7 @@ import Application from "./application";
 configureLibs();
 
 const statsBadge = createStatsBadge();
-const app = new Application(sim, statsBadge);
+const app = new Application(sim);
 const initialState = app.getInitialState();
 window.api = app.getApi();
 
@@ -36,3 +36,5 @@ class App extends React.Component {
 }
 
 ReactDOM.render(<App store={initialState} />, document.getElementById("root"));
+
+app.init(statsBadge);

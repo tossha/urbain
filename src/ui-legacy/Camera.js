@@ -8,7 +8,7 @@ import { sim } from "../core/Simulation";
 
 export default class Camera
 {
-    constructor(domElement, initialReferenceFrame, initialPosition) {
+    constructor(domElement) {
         this.settings = {
             fov: 60,
             animationDuration: 200,
@@ -16,6 +16,13 @@ export default class Camera
         };
 
         this.domElement = domElement;
+        this.threeCamera = new THREE.PerspectiveCamera(this.settings.fov, domElement.width / domElement.height, 1, 1e15);
+        this.threeCamera.position.fromArray([0, 0, 0]);
+
+        this.listenersAdded = false;
+    }
+
+    init(initialReferenceFrame, initialPosition) {
         this.position = initialPosition;
 
         this.referenceFrame = sim.starSystem.getReferenceFrame(initialReferenceFrame);
@@ -28,9 +35,6 @@ export default class Camera
         this.currentMousePos = new Vector([0, 0]);
         this.accountedMousePos = new Vector([0, 0]);
 
-        this.threeCamera = new THREE.PerspectiveCamera(this.settings.fov, domElement.width / domElement.height, 1, 1e15);
-        this.threeCamera.position.fromArray([0, 0, 0]);
-
         this.isMouseDown = false;
         this.isShiftDown = false;
         this.rightButtonDown = false;
@@ -38,10 +42,13 @@ export default class Camera
         this.zoomingAside = 0;
         this.isAnimnating = false;
 
-        sim.addEventListener('mousedown', this.onMouseDown.bind(this) , 1);
-        sim.addEventListener('mousemove', this.onMouseMove.bind(this) , 1);
-        sim.addEventListener('mouseup',   this.onMouseUp.bind(this)   , 1);
-        sim.addEventListener('wheel',     this.onMouseWheel.bind(this), 1);
+        if (!this.listenersAdded) {
+            sim.addEventListener('mousedown', this.onMouseDown.bind(this), 1);
+            sim.addEventListener('mousemove', this.onMouseMove.bind(this), 1);
+            sim.addEventListener('mouseup', this.onMouseUp.bind(this), 1);
+            sim.addEventListener('wheel', this.onMouseWheel.bind(this), 1);
+            this.listenersAdded = true;
+        }
     }
 
     _getQuaternionByPosition(position, pole) {

@@ -5,6 +5,6 @@ export default class ReferenceFrameBase extends ReferenceFrameAbstract
 {
     constructor() {
         super();
-        this.id = RF_BASE;
+        this.setId(RF_BASE);
     }
 }
