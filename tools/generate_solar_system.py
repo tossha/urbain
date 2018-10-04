@@ -947,6 +947,7 @@ objects = [
 		'maxError': 30000,
 		'color': 'yellow',
 		'texture': 'SunTexture.jpg',
+		'soi': 1e12,
 		'j2': 0.0000002201 # 2009 https://arxiv.org/pdf/0911.5055.pdf
 	},
 	{
@@ -956,6 +957,7 @@ objects = [
 		'maxError': 30000,
 		'color': 'azure',
 		'texture': 'MercuryTexture.jpg',
+		'soi': 112000,
 		'j2': 60
 	},
 	{
@@ -965,6 +967,7 @@ objects = [
 		'maxError': 30000,
 		'color': 'orange',
 		'texture': 'VenusTexture.jpg',
+		'soi': 616000,
 		'j2': 0.00000446 # 1977 http://adsabs.harvard.edu/full/1977SvAL....3...15Z
 	},
 	{
@@ -974,6 +977,7 @@ objects = [
 		'maxError': 30000,
 		'color': 'lightblue',
 		'texture': 'EarthTexture.jpg',
+		'soi': 924000,
 		'j2': 0.00108263
 	},
 	{
@@ -983,6 +987,7 @@ objects = [
 		'maxError': 30000,
 		'color': 'white',
 		'texture': 'MoonTexture.jpg',
+		'soi': 66100,
 		'j2': 0.00020343 # https://books.google.ru/books?id=stFpBgAAQBAJ&pg=PA250&lpg=PA250&source=bl&ots=4fQJb8V0Gg&sig=oDZdyiG4TMkCf_rDKK1wERbpbuQ&hl=ru&sa=X&ved=2ahUKEwjp_beZ-ZbbAhXThKYKHVJcBhkQ6AEwA3oECAEQOg#v=onepage&q=moon%20j2%20quadrupole%20moment%20-solar&f=false
 	},
 	{
@@ -992,6 +997,7 @@ objects = [
 		'maxError': 30000,
 		'color': 'red',
 		'texture': 'MarsTexture.jpg',
+		'soi': 576000,
 		'j2': 0.0019605 # 1995 prev source
 	},
 	{
@@ -1001,6 +1007,7 @@ objects = [
 		'maxError': 30000,
 		'color': 'burlywood',
 		'texture': 'JupiterTexture.jpg',
+		'soi': 48200000,
 		'j2': 0.0146964 # 1995 prev source
 	},
 	{
@@ -1010,6 +1017,7 @@ objects = [
 		'maxError': 30000,
 		'color': 'burlywood',
 		'texture': 'Io.jpg',
+		'soi': 7390,
 		'j2': 0.001860 # 2004 prev source
 	},
 	{
@@ -1019,6 +1027,7 @@ objects = [
 		'maxError': 30000,
 		'color': 'burlywood',
 		'texture': 'Europa.jpg',
+		'soi': 9173,
 		'j2': 0.000436 # 2004 prev source
 	},
 	{
@@ -1028,6 +1037,7 @@ objects = [
 		'maxError': 30000,
 		'color': 'burlywood',
 		'texture': 'Ganymede.jpg',
+		'soi': 9138,
 		'j2': 0.000128 # 2004 prev source
 	},
 	{
@@ -1037,6 +1047,7 @@ objects = [
 		'maxError': 30000,
 		'color': 'burlywood',
 		'texture': 'Callisto.jpg',
+		'soi': 14170,
 		'j2': 0.000033 # 2004 prev source
 	},
 	{
@@ -1046,6 +1057,7 @@ objects = [
 		'maxError': 30000,
 		'color': 'sandybrown',
 		'texture': 'SaturnTexture.jpg&ringsColorMap.jpg&ringsAlphaMap.jpg',
+		'soi': 54600000,
 		'j2': 0.0162907 # 2007 prev source
 	},
 	{
@@ -1055,6 +1067,7 @@ objects = [
 		'maxError': 30000,
 		'color': 'sandybrown',
 		'texture': 'Mimas.jpg',
+		'soi': 235,
 	},
 	{
 		'id': '602',
@@ -1063,6 +1076,7 @@ objects = [
 		'maxError': 30000,
 		'color': 'sandybrown',
 		'texture': 'Enceladus.jpg',
+		'soi': 460,
 	},
 	{
 		'id': '606',
@@ -1071,6 +1085,7 @@ objects = [
 		'maxError': 30000,
 		'color': 'sandybrown',
 		'texture': 'Titan.jpg',
+		'soi': 40856,
 	},
 	{
 		'id': '799',
@@ -1079,6 +1094,7 @@ objects = [
 		'maxError': 30000,
 		'color': 'lightskyblue',
 		'texture': 'Uranus.jpg',
+		'soi': 51800000,
 		'j2': 0.0033435 # 1995 prev source
 	},
 	{
@@ -1088,6 +1104,7 @@ objects = [
 		'maxError': 30000,
 		'color': 'steelblue',
 		'texture': 'Neptune.jpg',
+		'soi': 86800000,
 		'j2': 0.003410 # 1995 prev source
 	},
 	{
@@ -1095,7 +1112,8 @@ objects = [
 		'type': 4,
 		'name': 'Triton',
 		'maxError': 10000,
-		'color': 'steelblue'
+		'color': 'steelblue',
+		'soi': 11285,
 	},
 	{
 		'id': '9',
@@ -1284,8 +1302,6 @@ def getObjectTrajectory(body, parent, parentMu, etFrom, etTo, maxError, color):
 		lastOrbit.epoch,
 	)]
 
-	# maxError = lastOrbit.sma * 0.0005
-
 	step = 86400 * 30
 	i = 0
 
@@ -1311,14 +1327,29 @@ def getObjectTrajectory(body, parent, parentMu, etFrom, etTo, maxError, color):
 		if lastOrbit.epoch >= etEnd:
 			break
 
+	if body == '10':
+		visual = {
+			'color': color,
+			'pointArrayModel': {
+				'showAhead': True,
+				'showBehind': True,
+				'trailPeriod': 86400 * 6000,
+				'referenceFrame': 1000,
+				'maxAngle': 3,
+				'minStep': 86400
+			}
+		}
+	else:
+		visual = {
+			'color': color,
+			'keplerianModel': True
+		}
+
 	return {
 		'type': 'keplerian_array',
 		'periodStart': etFrom,
 		'periodEnd': etTo,
-		'rendering': {
-			'color': color,
-			'keplerianModel': True
-		},
+		'visual': visual,
 		'data': {
 			'referenceFrame': int(parent) * 100000 + 1000,
 			'mu': parentMu,
@@ -1386,7 +1417,7 @@ def getVsopTrajectory(body, color, cutKm):
 
 	return {
 		'type': 'vsop87',
-		'rendering': {
+		'visual': {
 			'color': color,
 			'keplerianModel': True
 		},
@@ -1451,7 +1482,7 @@ def getELP2000Trajectory(color, cutKm):
 
 	return {
 		'type': 'elp2000',
-		'rendering': {
+		'visual': {
 			'color': color,
 			'keplerianModel': True
 		},
@@ -1487,7 +1518,13 @@ def getBodyData(body, type, soi, name, color, texture, parent, pairing, j2, etFr
 	objectData = {
 		'id': body,
 		'type': type,
-		'parentSoi': parent,
+		'data': {
+			'patchedConics': {
+				'soiRadius': soi,
+				'parentSoiId': parent,
+				'childSois': []
+			}
+		},
 		'name': name,
 		'trajectory': trajectory
 	}

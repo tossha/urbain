@@ -209,19 +209,32 @@ export class Quaternion
     }
 
     static transfer(fromVector, toVector) {
-        const angle = Math.acos(fromVector.dot(toVector) / fromVector.mag / toVector.mag);
-
+        const angle = fromVector.angle(toVector);
         if (angle) {
-            return new Quaternion(
-                fromVector.cross(toVector),
-                Math.acos(fromVector.dot(toVector) / fromVector.mag / toVector.mag)
-            );
+            return new Quaternion(fromVector.cross(toVector), angle);
         } else {
-            // let result = new Quaternion();
-            // result.t = 1;
-            // result.v.set([0, 0, 0]);
             return new Quaternion();
         }
+    }
+
+    static twoAxis(x, y ,z) {
+        let normal1;
+        let normal2;
+        let quat;
+        if (x && y) {
+            normal1 = new Vector([0, 0, 1]);
+            normal2 = x.cross(y);
+        } else if (x && z) {
+            normal1 = new Vector([0, 1, 0]);
+            normal2 = z.cross(x);
+        } else if (y && z) {
+            normal1 = new Vector([1, 0, 0]);
+            normal2 = y.cross(z);
+        }
+        quat = Quaternion.transfer(normal1, normal2);
+        return x
+            ? Quaternion.transfer(quat.rotate_(new Vector([1,0,0])), x).mul_(quat)
+            : Quaternion.transfer(quat.rotate_(new Vector([0,1,0])), y).mul_(quat);
     }
 
     static slerp(q1, q2, t) {
@@ -455,6 +468,104 @@ export function getAngleBySinCos(sin, cos) {
     return (sin > 0)
         ? ang
         : (TWO_PI - ang);
+}
+
+export function angleIntervalIntersection(int1, int2) {
+    if (!int1 || !int2) {
+        return false;
+    } else if (int1[0] <= int2[0] && int2[1] <= int1[1]) {
+        return int2;
+    } else if (int2[0] <= int1[0] && int1[1] <= int2[1]) {
+        return int1;
+    } else if (int1[0] <= int2[0] && int2[0] <= int1[1]) {
+        return [int2[0], int1[1]];
+    } else if (int1[0] <= int2[1] && int2[1] <= int1[1]) {
+        return [int1[0], int2[1]];
+    }
+    return false;
+}
+
+export function getAngleIntervalsIntersection(intervals1, intervals2) {
+    let result = [];
+    if (intervals1 === false || intervals2 === false) {
+        return false;
+    }
+    if (intervals1 === true) {
+        return intervals2;
+    }
+    if (intervals2 === true) {
+        return intervals1;
+    }
+    for (let interval1 of intervals1) {
+        const int11 = [interval1[0], interval1[1] > interval1[0] ? interval1[1] : TWO_PI];
+        const int12 = interval1[1] > interval1[0] ? false : [0, interval1[1]];
+        for (let interval2 of intervals2) {
+            const int21 = [interval2[0], interval2[1] > interval2[0] ? interval2[1] : TWO_PI];
+            const int22 = interval2[1] > interval2[0] ? false : [0, interval2[1]];
+            let r;
+            if (r = angleIntervalIntersection(int11, int21))
+                result.push(r);
+            if (r = angleIntervalIntersection(int11, int22))
+                result.push(r);
+            if (r = angleIntervalIntersection(int12, int21))
+                result.push(r);
+            if (r = angleIntervalIntersection(int12, int22))
+                result.push(r);
+        }
+    }
+    return result.length ? result : false;
+}
+
+export function isInInterval(angle, interval) {
+    angle = (angle + TWO_PI) % TWO_PI;
+    if (interval[0] <= interval[1]) {
+        return (interval[0] <= angle) && (angle <= interval[1]);
+    } else {
+        return (interval[0] <= angle) || (angle <= interval[1]);
+    }
+}
+
+export function getEpochIntervalsIntersection(intervals1, intervals2) {
+    let result = [];
+    if (intervals1 === false || intervals2 === false) {
+        return false;
+    }
+    if (intervals1 === true) {
+        return intervals2;
+    }
+    if (intervals2 === true) {
+        return intervals1;
+    }
+    for (let interval1 of intervals1) {
+        const epoch1 = interval1[0];
+        const epoch2 = interval1[1];
+        for (let interval2 of intervals2) {
+            const epoch21 = interval2[0];
+            const epoch22 = interval2[1];
+            if (epoch1 <= epoch21 && epoch21 < epoch2) {
+                result.push([
+                    epoch21,
+                    epoch2 < epoch22 ? epoch2 : epoch22
+                ]);
+            } else if (epoch1 < epoch22 && epoch22 <= epoch2) {
+                result.push([
+                    epoch1,
+                    epoch22,
+                ]);
+            } else if (epoch1 < epoch21 && epoch22 < epoch2) {
+                result.push([
+                    epoch21,
+                    epoch22,
+                ]);
+            } else if (epoch21 < epoch1 && epoch2 < epoch22) {
+                result.push([
+                    epoch1,
+                    epoch2,
+                ]);
+            }
+        }
+    }
+    return result.length ? result : false;
 }
 
 export function approximateAngle(ang1, ang2, proportion) {

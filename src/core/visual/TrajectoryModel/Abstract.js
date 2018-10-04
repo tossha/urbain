@@ -13,8 +13,8 @@ export default class VisualTrajectoryModelAbstract extends VisualModelAbstract
         this.standardColor = config.color;
         this.color = config.color;
 
-        this.minEpoch = config.minEpoch || trajectory.minEpoch || null;
-        this.maxEpoch = config.maxEpoch || trajectory.maxEpoch || null;
+        this.minEpoch = (config.minEpoch !== undefined) ? config.minEpoch : (trajectory.minEpoch || null);
+        this.maxEpoch = (config.maxEpoch !== undefined) ? config.maxEpoch : (trajectory.maxEpoch || null);
 
         this.setThreeObj(new LineObject(
             new THREE.Geometry(),

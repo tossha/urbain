@@ -3,6 +3,8 @@ import * as THREE from "three";
 import VisualTrajectoryModelAbstract from "./Abstract";
 import {RF_BASE} from "../../ReferenceFrame/Factory";
 import {getAngleBySinCos, Vector} from "../../algebra";
+import FunctionOfEpochCustom from "../../FunctionOfEpoch/Custom";
+import ReferenceFrameInertial from "../../ReferenceFrame/Inertial";
 import { sim } from "../../Simulation";
 
 export default class VisualTrajectoryModelKeplerian extends VisualTrajectoryModelAbstract
@@ -11,23 +13,23 @@ export default class VisualTrajectoryModelKeplerian extends VisualTrajectoryMode
     {
         super.render(epoch);
 
-        epoch = this.getRenderingEpoch(epoch);
+        const renderingEpoch = this.getRenderingEpoch(epoch);
 
-        if (epoch === null) {
+        if (renderingEpoch === null) {
             this.threeObj.visible = false;
             return;
         }
 
-        const keplerianObject = this.trajectory.getKeplerianObjectByEpoch(epoch);
+        const keplerianObject = this.trajectory.getKeplerianObjectByEpoch(renderingEpoch);
 
         if (keplerianObject.isElliptic) {
-            this.renderEllipse(keplerianObject, epoch);
+            this.renderEllipse(keplerianObject, renderingEpoch, epoch);
         } else {
-            this.renderHyperbola(keplerianObject, epoch);
+            this.renderHyperbola(keplerianObject, renderingEpoch, epoch);
         }
     }
 
-    renderHyperbola(traj, epoch) {
+    renderHyperbola(traj, epoch, locationEpoch) {
         const endingBrightness = 0.35;
         const pointsNum = 100;
 
@@ -41,7 +43,7 @@ export default class VisualTrajectoryModelKeplerian extends VisualTrajectoryMode
             maxTa = traj.getTrueAnomalyByEpoch(this.trajectory.maxEpoch);
         }
 
-        const orbitQuaternion = this.trajectory.orbitalReferenceFrame.getQuaternionByEpoch(epoch);
+        const orbitQuaternion = this.trajectory.pericentricReferenceFrame.getQuaternionByEpoch(epoch);
         const curTa = traj.getTrueAnomalyByEpoch(epoch);
         const taCut = (maxTa - minTa) / (pointsNum + 1);
 
@@ -60,7 +62,7 @@ export default class VisualTrajectoryModelKeplerian extends VisualTrajectoryMode
         while (i < pointsNum + extraPoints) {
             let coords = traj.getOwnCoordsByTrueAnomaly(ta);
             points[i] = (new THREE.Vector2()).fromArray([coords[0], coords[1]]);
-            angs[i] = (ta > curTa) ? 0 : ((ta - minTa) / (curTa - minTa));
+            angs[i] = (ta > curTa) ? 0 : ((curTa == minTa) ? 1 : (ta - minTa) / (curTa - minTa));
             i  += 1;
             ta += taStep;
 
@@ -80,17 +82,21 @@ export default class VisualTrajectoryModelKeplerian extends VisualTrajectoryMode
         this.updateGeometry(points, angs, endingBrightness);
 
         this.threeObj.quaternion.copy(orbitQuaternion.toThreejs());
-        this.threeObj.position.copy(sim.getVisualCoords(this.trajectory.referenceFrame.getOriginPositionByEpoch(epoch)));
+        this.threeObj.position.copy(sim.getVisualCoords(this.trajectory.referenceFrame.getOriginPositionByEpoch(locationEpoch)));
     }
 
-    renderEllipse(traj, epoch) {
+    renderEllipse(traj, epoch, locationEpoch) {
         const endingBrightness = 0.35;
         const pointsNum = 100;
+        const referenceFrame = new ReferenceFrameInertial(
+            new FunctionOfEpochCustom(epoch => this.trajectory.getReferenceFrameByEpoch(epoch).getOriginStateByEpoch(locationEpoch)),
+            this.trajectory.pericentricReferenceFrame.getQuaternionByEpoch(epoch)
+        );
 
-        const orbitQuaternion = this.trajectory.orbitalReferenceFrame.getQuaternionByEpoch(epoch);
-        const cameraPosition = sim.starSystem.getReferenceFrame(RF_BASE).transformPositionByEpoch(epoch, sim.camera.lastPosition, this.trajectory.orbitalReferenceFrame);
+        const orbitQuaternion = this.trajectory.pericentricReferenceFrame.getQuaternionByEpoch(epoch);
+        const cameraPosition = sim.starSystem.getReferenceFrame(RF_BASE).transformPositionByEpoch(locationEpoch, sim.camera.lastPosition, referenceFrame);
         const visualOrigin = new Vector([cameraPosition.x, cameraPosition.y, 0]);
-        const actualVisualOrigin = this.trajectory.orbitalReferenceFrame.transformPositionByEpoch(epoch, visualOrigin, RF_BASE);
+        const actualVisualOrigin = referenceFrame.transformPositionByEpoch(locationEpoch, visualOrigin, RF_BASE);
         const ta = traj.getTrueAnomalyByEpoch(epoch);
         const sinE = visualOrigin.y / visualOrigin.mag;
         const cosE = visualOrigin.x / visualOrigin.mag;

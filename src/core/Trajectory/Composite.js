@@ -7,10 +7,12 @@ export default class TrajectoryComposite extends TrajectoryAbstract
         super();
         this.components = [];
         this.lastUsedTrajectory = null;
+        this.isSelected = false;
     }
 
     select() {
-        super.select();
+        this.isSelected = true;
+        this.visualModel && this.visualModel.select();
         this.components.map(traj => traj.select());
     }
 
@@ -23,23 +25,27 @@ export default class TrajectoryComposite extends TrajectoryAbstract
         this.components.map(traj => traj.drop());
     }
 
+    isEditableAtEpoch(epoch) {
+        return this.getComponentByEpoch(epoch).isEditableAtEpoch(epoch);
+    }
+
     getReferenceFrameByEpoch(epoch) {
-        return this._getTrajectoryByEpoch(epoch).getReferenceFrameByEpoch(epoch);
+        return this.getComponentByEpoch(epoch).getReferenceFrameByEpoch(epoch);
     }
 
     getStateInOwnFrameByEpoch(epoch) {
-        return this._getTrajectoryByEpoch(epoch).getStateInOwnFrameByEpoch(epoch);
+        return this.getComponentByEpoch(epoch).getStateInOwnFrameByEpoch(epoch);
     }
 
     getKeplerianObjectByEpoch(epoch) {
-        return this._getTrajectoryByEpoch(epoch).getKeplerianObjectByEpoch(epoch);
+        return this.getComponentByEpoch(epoch).getKeplerianObjectByEpoch(epoch);
     }
 
     getStateByEpoch(epoch, referenceFrameOrId) {
-        return this._getTrajectoryByEpoch(epoch).getStateByEpoch(epoch, referenceFrameOrId);
+        return this.getComponentByEpoch(epoch).getStateByEpoch(epoch, referenceFrameOrId);
     }
 
-    _getTrajectoryByEpoch(epoch) {
+    getComponentByEpoch(epoch) {
         if (this.lastUsedTrajectory
             && (this.lastUsedTrajectory.minEpoch <= epoch || this.lastUsedTrajectory.minEpoch === false)
             && (this.lastUsedTrajectory.maxEpoch >= epoch || this.lastUsedTrajectory.maxEpoch === false)
@@ -63,6 +69,10 @@ export default class TrajectoryComposite extends TrajectoryAbstract
         this.components.push(trajectory);
         trajectory.setParent(this);
 
+        if (this.isSelected) {
+            trajectory.select();
+        }
+
         if (this.minEpoch === null
             || (trajectory.minEpoch !== null
                 && trajectory.minEpoch !== false
@@ -78,6 +88,13 @@ export default class TrajectoryComposite extends TrajectoryAbstract
             )
         ) {
             this.maxEpoch = trajectory.maxEpoch;
+        }
+    }
+
+    clearAfterEpoch(epoch) {
+        while (this.components[this.components.length - 1].minEpoch >= epoch) {
+            this.components[this.components.length - 1].drop();
+            this.components.pop();
         }
     }
 }

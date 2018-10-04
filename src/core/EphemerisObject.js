@@ -1,12 +1,12 @@
 import { RF_BASE } from "./ReferenceFrame/Factory";
-import { sim } from "./Simulation";
 
 export default class EphemerisObject
 {
-    constructor(bodyId, type, name) {
+    constructor(bodyId, type, name, data) {
         this.id   = bodyId;
         this.type = type;
         this.name = name;
+        this.data = data || {};
     }
 
     setTrajectory(trajectory) {
@@ -33,7 +33,6 @@ export default class EphemerisObject
 
     drop() {
         if (this.trajectory) {
-            sim.starSystem.deleteTrajectory(this.id);
             delete this.trajectory;
         }
     }

@@ -1,6 +1,6 @@
 import * as THREE from "three";
 
-import FunctionOfEpochAbstract from "../FunctionOfEpoch/Abstract";
+import Constant from "../FunctionOfEpoch/Constant";
 import VisualModelAbstract from "./ModelAbstract";
 import {RF_BASE} from "../ReferenceFrame/Factory";
 import VirtualPlane from "./VirtualPlane";
@@ -26,6 +26,7 @@ export default class VisualAngle extends VisualModelAbstract
         this.orientationUpdated = false;
         this.valueUpdated = false;
         this.isHidden = false;
+        this.sizeNeedsUpdate = false;
 
         this.init();
     }
@@ -40,27 +41,20 @@ export default class VisualAngle extends VisualModelAbstract
         this.isHidden = false;
     }
 
-    _resolve(valueOfEpoch, epoch) {
-        if (valueOfEpoch instanceof FunctionOfEpochAbstract) {
-            return valueOfEpoch.evaluate(epoch);
-        }
-        return valueOfEpoch;
-    }
-
     getReferenceFrame(epoch) {
-        return this._resolve(this._referenceFrame, epoch);
+        return this._referenceFrame.evaluate(epoch);
     }
 
     getPosition(epoch) {
-        return this._resolve(this._position, epoch);
+        return this._position.evaluate(epoch);
     }
 
     getOrientation(epoch) {
-        return this._resolve(this._orientation, epoch);
+        return this._orientation.evaluate(epoch);
     }
 
     getValue(epoch) {
-        return this._resolve(this._value, epoch);
+        return this._value.evaluate(epoch);
     }
 
     init() {
@@ -84,8 +78,7 @@ export default class VisualAngle extends VisualModelAbstract
     }
 
     onMouseWheel() {
-        this.size = sim.camera.position.mag / 6 * this.arcSize;
-        this.threeObj.scale.set(this.size, this.size, this.size);
+        this.sizeNeedsUpdate = true;
     }
 
     onMouseDown(event) {
@@ -125,10 +118,10 @@ export default class VisualAngle extends VisualModelAbstract
             let newAngleValue = Math.acos(mainAxis.dot(direction) / mainAxis.length() / direction.length()); // no division by lengths because direction and mainAxis are normalized (length = 1)
             mainAxis.cross(direction);
 
-            this._value = (mainAxis.dot(plane.normal) > 0) ? newAngleValue : TWO_PI - newAngleValue;
+            this._value = new Constant((mainAxis.dot(plane.normal) > 0) ? newAngleValue : TWO_PI - newAngleValue);
             this.valueUpdated = true;
             if (this.editingCallback) {
-                this.editingCallback(this._value);
+                this.editingCallback(this._value.value);
             }
         }
     }
@@ -245,6 +238,9 @@ export default class VisualAngle extends VisualModelAbstract
         delete this.threeAngle;
         delete this.threeArc;
         document.removeEventListener('wheel', this.onWheelListener);
+        if (this.mouseDownListener) {
+            document.removeEventListener('mousedown', this.mouseDownListener);
+        }
     }
 
     render(epoch) {
@@ -261,7 +257,7 @@ export default class VisualAngle extends VisualModelAbstract
         this.threeObj.position.copy(sim.getVisualCoords(pos));
         this.threeObj.visible = true;
 
-        if (this.valueUpdated || this._value instanceof FunctionOfEpochAbstract) {
+        if (this.valueUpdated || !(this._value instanceof Constant)) {
             const value = this.getValue(epoch);
             if (this.type === VisualAngle.TYPE_ARC) {
                 this.updateArcObject(value);
@@ -272,9 +268,15 @@ export default class VisualAngle extends VisualModelAbstract
             this.valueUpdated = false;
         }
 
-        if (this.orientationUpdated || this._orientation instanceof FunctionOfEpochAbstract) {
+        if (this.orientationUpdated || !(this._orientation instanceof Constant)) {
             this.threeObj.quaternion.copy(referenceFrame.getQuaternionByEpoch(epoch).mul_(this.getOrientation(epoch)).toThreejs());
             this.orientationUpdated = false;
+        }
+
+        if (this.sizeNeedsUpdate) {
+            this.size = this.threeObj.position.length() / 6 * this.arcSize;
+            this.threeObj.scale.set(this.size, this.size, this.size);
+            this.sizeNeedsUpdate = false;
         }
     }
 }

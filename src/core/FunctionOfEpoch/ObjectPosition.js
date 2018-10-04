@@ -10,6 +10,6 @@ export default class FunctionOfEpochObjectPosition extends FunctionOfEpochAbstra
     }
 
     evaluate(epoch) {
-        return sim.starSystem.getTrajectory(this.objectId).getPositionByEpoch(epoch, this.referenceFrame);
+        return sim.starSystem.getObject(this.objectId).trajectory.getPositionByEpoch(epoch, this.referenceFrame);
     }
 }

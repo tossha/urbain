@@ -23,43 +23,43 @@ export default class LineObject extends THREE.Line {
                 vertex1 = new THREE.Vector3(positions[i1], positions[i1+1], positions[i1+2]);
                 vertex2 = new THREE.Vector3(positions[i2], positions[i2+1], positions[i2+2]);
             } else {
-                vertex1 = (new THREE.Vector3)
+                vertex1 = (new THREE.Vector3())
                     .copy(this.geometry.vertices[i]);
-                vertex2 = (new THREE.Vector3)
+                vertex2 = (new THREE.Vector3())
                     .copy(this.geometry.vertices[(i + 1) % verticesCount]);
             }
 
-            const currentLineDirection = (new THREE.Vector3).subVectors(
+            const currentLineDirection = (new THREE.Vector3()).subVectors(
                 vertex1,
                 vertex2
             );
 
-            const commonPerpendicularDirection = (new THREE.Vector3).crossVectors(
+            const commonPerpendicularDirection = (new THREE.Vector3()).crossVectors(
                 currentLineDirection,
                 ray.direction
             );
 
-            const planeNormalVector = (new THREE.Vector3).crossVectors(
+            const planeNormalVector = (new THREE.Vector3()).crossVectors(
                 ray.direction,
                 commonPerpendicularDirection
             );
 
-            let distanceCoeff = (new THREE.Vector3).subVectors(
+            let distanceCoeff = (new THREE.Vector3()).subVectors(
                 ray.origin,
                 vertex1
             ).dot(planeNormalVector);
 
             distanceCoeff /= planeNormalVector.clone().dot(currentLineDirection);
 
-            let intersectionPoint = (new THREE.Vector3).addVectors(
+            let intersectionPoint = (new THREE.Vector3()).addVectors(
                 vertex1,
                 currentLineDirection.multiplyScalar(distanceCoeff)
             );
 
-            if ((new THREE.Vector3).subVectors(
+            if ((new THREE.Vector3()).subVectors(
                     vertex1, intersectionPoint
                 ).dot(
-                    (new THREE.Vector3).subVectors(
+                    (new THREE.Vector3()).subVectors(
                         intersectionPoint, vertex2
                     )
                 ) < 0
@@ -71,8 +71,8 @@ export default class LineObject extends THREE.Line {
                         : vertex2;
             }
 
-            const currentDistance = (new THREE.Vector3).crossVectors(
-                (new THREE.Vector3).subVectors(
+            const currentDistance = (new THREE.Vector3()).crossVectors(
+                (new THREE.Vector3()).subVectors(
                     intersectionPoint,
                     ray.origin
                 ),

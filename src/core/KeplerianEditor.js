@@ -1,12 +1,14 @@
 import FunctionOfEpochCustom from "./FunctionOfEpoch/Custom";
 import {Quaternion, Vector} from "./algebra";
 import VisualAngle from "./visual/Angle";
+import Constant from "./FunctionOfEpoch/Constant";
+import VisualPlanePoint from "./visual/PlanePoint";
 import { sim } from "./Simulation";
 
 export default class KeplerianEditor
 {
-    constructor(trajectory, isEditMode) {
-        this.isEditMode = isEditMode && (trajectory.keplerianObject !== undefined);
+    constructor(trajectory) {
+        this.isEditMode = trajectory.isEditable;
         this.trajectory = trajectory;
 
         this.colorRaan = 0x7FFFD4; //lightblue
@@ -21,17 +23,17 @@ export default class KeplerianEditor
 
     init() {
         let referenceFrame = new FunctionOfEpochCustom(epoch => this.trajectory.getReferenceFrameByEpoch(epoch));
-        let position = new Vector(3);
+        let position = new Constant(new Vector(3));
 
         this.angleRaan = new VisualAngle(
             referenceFrame,
             position,
-            new Quaternion(),
+            new Constant(new Quaternion()),
             new FunctionOfEpochCustom(epoch => this.trajectory.getKeplerianObjectByEpoch(epoch).raan),
             this.colorRaan,
-            1,
+            1.5,
             this.isEditMode ? VisualAngle.TYPE_SECTOR : VisualAngle.TYPE_ARC,
-            this.isEditMode ? value => { this.trajectory.keplerianObject.raan = value; } : null
+            this.isEditMode ? value => { this.trajectory.raan = value; } : null
         );
 
         this.angleInc = new VisualAngle(
@@ -46,7 +48,7 @@ export default class KeplerianEditor
             this.colorInc,
             2,
             this.isEditMode ? VisualAngle.TYPE_SECTOR : VisualAngle.TYPE_ARC,
-            this.isEditMode ? value => { this.trajectory.keplerianObject.inc = value; } : null
+            this.isEditMode ? value => { this.trajectory.inc = value; } : null
         );
 
         this.angleAop = new VisualAngle(
@@ -59,9 +61,9 @@ export default class KeplerianEditor
             }),
             new FunctionOfEpochCustom(epoch => this.trajectory.getKeplerianObjectByEpoch(epoch).aop),
             this.colorAop,
-            3,
+            2.5,
             this.isEditMode ? VisualAngle.TYPE_SECTOR : VisualAngle.TYPE_ARC,
-            this.isEditMode ? value => { this.trajectory.keplerianObject.aop = value; } : null
+            this.isEditMode ? value => { this.trajectory.aop = value; } : null
         );
 
         this.angleTa = new VisualAngle(
@@ -75,9 +77,26 @@ export default class KeplerianEditor
             }),
             new FunctionOfEpochCustom(epoch => this.trajectory.getKeplerianObjectByEpoch(epoch).getTrueAnomalyByEpoch(epoch)),
             this.colorTa,
-            4,
+            3,
             VisualAngle.TYPE_ARC
         );
+
+        if (this.isEditMode) {
+            this.pointApoapsis = new VisualPlanePoint(
+                new Constant(this.trajectory.pericentricReferenceFrame),
+                new Vector([-this.trajectory.sma * (1 + this.trajectory.ecc), 0, 0]),
+                'red',
+                10,
+                value => {
+                    const periapsis = this.trajectory.sma * (1 - this.trajectory.ecc);
+                    const sma = (-value.x + periapsis) / 2;
+                    this.trajectory.sma = sma;
+                    this.trajectory.ecc = 1 - periapsis / sma;
+                },
+                new Vector([-1e12, 0, 0]),
+                new Vector([0, 0, 0])
+            );
+        }
     }
 
     remove() {
@@ -85,5 +104,7 @@ export default class KeplerianEditor
         if (this.angleAop)  this.angleAop.drop();
         if (this.angleInc)  this.angleInc.drop();
         if (this.angleTa)   this.angleTa.drop();
+
+        if (this.pointApoapsis) this.pointApoapsis.drop();
     }
 }

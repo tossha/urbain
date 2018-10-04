@@ -13,6 +13,18 @@ export default class Events
         document.dispatchEvent(eventObj);
     }
 
+    static addListener(event, handler) {
+        return document.addEventListener(event, handler);
+    }
+
+    static removeListener(event, handler) {
+        return document.removeEventListener(event, handler);
+    }
+
+    static LOADING_BODIES_DONE = 'urb_load_bodies_done';
+    static LOADING_FRAMES_DONE = 'urb_load_frames_done';
+    static LOADING_TRAJECTORIES_DONE = 'urb_load_traj_done';
+
     static RENDER = 'urb_render';
     static INIT_DONE = 'urb_init_done';
     static SELECT = 'urb_select';

@@ -1,5 +1,4 @@
 import ReferenceFrameFactory from "./ReferenceFrame/Factory";
-import EphemerisObject from "./EphemerisObject";
 import Body from "./Body";
 import Events from "./Events";
 
@@ -13,7 +12,6 @@ export default class StarSystem
         this.stars = null;
         this.mainObject = null;
         this.referenceFrames = {};
-        this.trajectories = {};
         this.objects = {};
         this.created = 0;
     }
@@ -34,28 +32,21 @@ export default class StarSystem
         return this.referenceFrames[id];
     }
 
-    getTrajectory(objectId) {
-        if (this.trajectories && this.trajectories[objectId]) {
-            return this.trajectories[objectId];
-        }
-        return null;
-    }
-
-    addTrajectory(objectId, trajectory) {
-        this.trajectories[objectId] = trajectory;
-        this.getObject(objectId).setTrajectory(trajectory);
-    }
-
-    deleteTrajectory(objectId) {
-        this.trajectories[objectId].drop();
-        delete this.trajectories[objectId];
+    addObject(id, body) {
+        this.objects[id] = body;
+        Events.dispatch(Events.OBJECT_ADDED, {object: body});
     }
 
     getObject(id) {
         if (this.objects[id] === undefined) {
-            this.objects[id] = new EphemerisObject(id, EphemerisObject.TYPE_UNKNOWN, 'Unknown #' + id);
+            return null;
         }
         return this.objects[id];
+    }
+
+    deleteObject(id) {
+        this.objects[id].drop();
+        delete this.objects[id];
     }
 
     getCommonParentObject(object1, object2, epoch1, epoch2) {
@@ -104,15 +95,5 @@ export default class StarSystem
             }
         }
         return bodies;
-    }
-
-    addObject(id, body) {
-        this.objects[id] = body;
-        Events.dispatch(Events.OBJECT_ADDED, {object: body});
-    }
-
-    deleteObject(id) {
-        this.objects[id].drop();
-        delete this.objects[id];
     }
 }

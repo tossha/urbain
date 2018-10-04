@@ -12,8 +12,8 @@ export default class VisualTrajectoryModelPointArray extends VisualTrajectoryMod
         this.showBehind = config.pointArrayModel.showBehind;
         this.trailPeriod = config.pointArrayModel.trailPeriod;
 
-        this.minCos = Math.cos(deg2rad(2));
-        this.minStep = 180;
+        this.minCos = Math.cos(deg2rad(config.pointArrayModel.maxAngle || 2));
+        this.minStep = config.pointArrayModel.minStep || 180;
         this.threeObj.position.set(0, 0, 0);
 
         this.initVertices();

@@ -148,6 +148,8 @@ export default class ReferenceFrameFactory
 
 export const RF_BASE = 1000;
 
+export let RF_BASE_OBJ = new ReferenceFrameBase();
+
 export const ReferenceFrame = {
     BASE: 0,
     INERTIAL_ECLIPTIC: 1,
