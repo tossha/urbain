@@ -1,7 +1,6 @@
 import $ from "jquery";
 
 import ReferenceFrameFactory, {RF_BASE_OBJ} from "../core/ReferenceFrame/Factory";
-import {SATURN, SUN} from "./solar_system";
 import Body from "../core/Body";
 import OrientationIAUModel from "../core/Orientation/IAUModel";
 import OrientationConstantAxis from "../core/Orientation/ConstantAxis";
@@ -74,35 +73,19 @@ export default class StarSystemLoader
         let orientation = null;
 
         if (config.visual) {
-            let visualShape = new VisualShapeSphere(
-                config.visual.radius,
-                config.visual.texture ? 32 : 12
+            const visualShape = new VisualShapeSphere(
+                config.visual.config.radius,
+                config.visual.config.texturePath ? 32 : 12
             );
+            const visualModelClass = {
+                'basic': VisualBodyModelBasic,
+                'light': VisualBodyModelLight,
+                'rings': VisualBodyModelRings,
+            }[config.visual.model];
 
-            visualModel = (config.id == SUN)
-                ? new VisualBodyModelLight(
-                    visualShape,
-                    config.visual.color,
-                    config.visual.texture,
-                    0xFFFFFF,
-                    1.5,
-                    null,
-                    null
-                )
-                : ((config.id == SATURN)
-                        ? new VisualBodyModelRings(
-                            visualShape,
-                            config.visual.color,
-                            config.visual.texture.split('&')[0],
-                            config.visual.texture.split('&')[1],
-                            config.visual.texture.split('&')[2]
-                        )
-                        : new VisualBodyModelBasic(
-                            visualShape,
-                            config.visual.color,
-                            config.visual.texture
-                        )
-                );
+            if (visualModelClass !== undefined) {
+                visualModel = new visualModelClass(visualShape, config.visual.config);
+            }
         }
 
         if (config.orientation) {

@@ -9,11 +9,11 @@ import { sim } from "../../Simulation";
 
 export default class VisualBodyModelAbstract extends VisualModelAbstract
 {
-    constructor(shape, color) {
+    constructor(shape, config) {
         super();
 
         this.shape = shape;   // class VisualShapeAbstract
-        this.color = color;
+        this.color = config.color;
         this.body = null; // class Body
 
         this.setThreeObj(this.getThreeObj());

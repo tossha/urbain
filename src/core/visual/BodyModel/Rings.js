@@ -6,12 +6,13 @@ import { sim } from "../../Simulation";
 
 export default class VisualBodyModelRings extends VisualBodyModelAbstract
 {
-    constructor(shape, color, texturePath, ringsColorMapPath, ringsAlphaMapPath) {
-        super(shape, color);
+    constructor(shape, config) {
+        super(shape, config);
 
-        this.texturePath = texturePath;
-        this.ringsColorMapPath = ringsColorMapPath;
-        this.ringsAlphaMapPath = ringsAlphaMapPath;
+        this.texturePath = config.texturePath;
+        this.ringsRadius = config.ringsRadius;
+        this.ringsColorMapPath = config.ringsColorMapPath;
+        this.ringsAlphaMapPath = config.ringsAlphaMapPath;
         this.isTextureRequested = false;
     }
 
