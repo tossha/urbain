@@ -22,6 +22,7 @@ export default class TrajectoryComposite extends TrajectoryAbstract
     }
 
     drop() {
+        super.drop();
         this.components.map(traj => traj.drop());
     }
 
