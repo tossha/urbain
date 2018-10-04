@@ -1,5 +1,7 @@
+import * as THREE from "three";
 import VisualModelAbstract from "./ModelAbstract";
-import FunctionOfEpochAbstract from "../core/FunctionOfEpoch/Abstract";
+import FunctionOfEpochAbstract from "../FunctionOfEpoch/Abstract";
+import { sim } from "../Simulation";
 
 export default class VisualPlane extends VisualModelAbstract
 {

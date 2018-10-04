@@ -3,8 +3,9 @@ import TrajectoryComposite from "../../core/Trajectory/Composite";
 import ReferenceFrameFactory, {ReferenceFrame} from "../../core/ReferenceFrame/Factory";
 import TrajectoryKeplerianBasic from "../../core/Trajectory/KeplerianBasic";
 import KeplerianObject from "../../core/KeplerianObject";
-import VisualTrajectoryModelKeplerian from "../../visual/TrajectoryModel/Keplerian";
-import {getAngleIntervalsIntersection, getEpochIntervalsIntersection, TWO_PI} from "../../algebra";
+import VisualTrajectoryModelKeplerian from "../../core/visual/TrajectoryModel/Keplerian";
+import {getAngleIntervalsIntersection, getEpochIntervalsIntersection, TWO_PI} from "../../core/algebra";
+import { sim } from "../../core/Simulation";
 // import VisualPoint from "../../visual/Point";
 // import Constant from "../../core/FunctionOfEpoch/Constant";
 

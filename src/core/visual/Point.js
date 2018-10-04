@@ -1,4 +1,6 @@
+import * as THREE from "three";
 import VisualModelAbstract from "./ModelAbstract";
+import { sim } from "../Simulation";
 
 export default class VisualPoint extends VisualModelAbstract
 {

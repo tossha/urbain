@@ -1,6 +1,6 @@
 import $ from "jquery";
 
-import ReferenceFrameFactory, {ReferenceFrame, RF_BASE, RF_BASE_OBJ} from "../core/ReferenceFrame/Factory";
+import ReferenceFrameFactory, {RF_BASE_OBJ} from "../core/ReferenceFrame/Factory";
 import {SATURN, SUN} from "./solar_system";
 import Body from "../core/Body";
 import OrientationIAUModel from "../core/Orientation/IAUModel";

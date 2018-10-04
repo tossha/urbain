@@ -1,5 +1,4 @@
 import { RF_BASE } from "./ReferenceFrame/Factory";
-import { sim } from "./Simulation";
 
 export default class EphemerisObject
 {

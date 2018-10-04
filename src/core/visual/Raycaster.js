@@ -43,7 +43,7 @@ export default class VisualRaycaster
     getPixelDistance(point) {
         this.raycaster.setFromCamera(this.mouse, this.camera);
 
-        const pointDirection = (new THREE.Vector3).subVectors(
+        const pointDirection = (new THREE.Vector3()).subVectors(
             point,
             sim.camera.lastPosition
         );

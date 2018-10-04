@@ -50,7 +50,7 @@ class Simulation
                 this.starSystem.mainObject,
                 ReferenceFrame.INERTIAL_BODY_EQUATORIAL
             ),
-            new Vector([30000, 30000, 10000])
+            new Vector([30000, 30000, 20000])
         );
 
         this.raycaster = new VisualRaycaster(this.renderer.domElement, this.camera.threeCamera, 7);

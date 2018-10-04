@@ -18,6 +18,8 @@ function init(statistics, viewPortId = "viewport-id") {
         requestAnimationFrame(render);
     }
 
+    sim.loadModule('patchedConics');
+
     $.getJSON("./star_systems/solar_system.json", starSystemConfig => {
         const viewPort = document.getElementById(viewPortId);
 

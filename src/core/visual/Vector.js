@@ -23,6 +23,6 @@ export default class VisualVector extends VisualModelAbstract
 
     render(epoch) {
         this.threeObj.quaternion.copy(this.quaternion.mul(this.referenceFrame.getQuaternionByEpoch(epoch)).toThreejs());
-        this.threeObj.position.copy(window.sim.getVisualCoords(this.referenceFrame.getOriginPositionByEpoch(epoch)));
+        this.threeObj.position.copy(sim.getVisualCoords(this.referenceFrame.getOriginPositionByEpoch(epoch)));
     }
 }

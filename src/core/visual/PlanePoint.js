@@ -1,7 +1,9 @@
+import * as THREE from "three";
 import VisualModelAbstract from "./ModelAbstract";
-import {RF_BASE, RF_BASE_OBJ} from "../core/ReferenceFrame/Factory";
+import {RF_BASE, RF_BASE_OBJ} from "../ReferenceFrame/Factory";
 import VirtualPlane from "./VirtualPlane";
 import {Vector} from "../algebra";
+import { sim } from "../Simulation";
 
 export default class VisualPlanePoint extends VisualModelAbstract
 {

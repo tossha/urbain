@@ -5,7 +5,7 @@ import ExceptionOutOfRange from "./ExceptionOutOfRange";
 import FunctionOfEpochCustom from "../FunctionOfEpoch/Custom";
 import ReferenceFrameInertialDynamic from "../ReferenceFrame/InertialDynamic";
 import KeplerianEditor from "../KeplerianEditor";
-import {Quaternion} from "../../algebra";
+import {Quaternion} from "../algebra";
 import ReferenceFrameAbstract from "../ReferenceFrame/Abstract";
 import { sim } from "../Simulation";
 

@@ -2,6 +2,7 @@ import Module from "../../core/Module";
 import Events from "../../core/Events";
 import Body from "../../core/Body";
 import PropagatorPatchedConics from "./PropagatorPatchedConics";
+import { sim } from "../../core/Simulation";
 
 export default class ModulePatchedConics extends Module
 {
