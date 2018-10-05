@@ -2,7 +2,6 @@ import $ from "jquery";
 
 import ReferenceFrameFactory, {RF_BASE_OBJ} from "../core/ReferenceFrame/Factory";
 import Body from "../core/Body";
-import OrientationIAUModel from "../core/Orientation/IAUModel";
 import OrientationConstantAxis from "../core/Orientation/ConstantAxis";
 import PhysicalBodyModel from "../core/PhysicalBodyModel";
 import EphemerisObject from "../core/EphemerisObject";
@@ -13,7 +12,7 @@ import VisualBodyModelRings from "../core/visual/BodyModel/Rings";
 import VisualBodyModelBasic from "../core/visual/BodyModel/Basic";
 import VisualShapeSphere from "../core/visual/Shape/Sphere";
 import Events from "../core/Events";
-import {Vector} from "../core/algebra";
+import { sim } from "../core/Simulation";
 
 export default class StarSystemLoader
 {
@@ -85,13 +84,21 @@ export default class StarSystemLoader
         }
 
         if (config.physical || config.orientation) {
-            orientation = config.orientation
-                ? new OrientationIAUModel(
-                    config.orientation[0], // right ascension
-                    config.orientation[1], // declination
-                    config.orientation[2]  // prime meridian
-                )
-                : new OrientationConstantAxis(new Vector([0, 0, 1e-10]));
+            if (!config.orientation) {
+                config.orientation = {
+                    type: 'constantAxis',
+                    config: {
+                        vector: [0, 0, 1e-11]
+                    }
+                };
+            }
+            let className;
+            if (config.orientation.type === 'constantAxis') {
+                className = OrientationConstantAxis;
+            } else {
+                className = sim.getClass(config.orientation.type);
+            }
+            orientation = new className(config.orientation.config);
         }
 
         if (config.physical) {

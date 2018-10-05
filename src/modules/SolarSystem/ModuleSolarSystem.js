@@ -4,6 +4,7 @@ import Events from "../../core/Events";
 import StarSystemLoader from "../../interface/StarSystemLoader";
 import TrajectoryELP2000 from "./Trajectory/ELP2000";
 import TrajectoryVSOP87 from "./Trajectory/VSOP87";
+import OrientationIAUModel from "./Orientation/IAUModel";
 
 export default class ModuleSolarSystem extends Module
 {
@@ -15,6 +16,7 @@ export default class ModuleSolarSystem extends Module
 
         this._addClass('TrajectoryVSOP87', TrajectoryVSOP87);
         this._addClass('TrajectoryELP2000', TrajectoryELP2000);
+        this._addClass('OrientationIAUModel', OrientationIAUModel);
     }
 
     _onSystemLoaded(event) {

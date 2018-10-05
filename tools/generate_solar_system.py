@@ -1541,7 +1541,10 @@ def getBodyData(body, type, soi, name, color, texture, parent, pairing, j2, etFr
 
 		mu = spice.bodvrd(body, "GM", 1)[1][0]
 
-		objectData['orientation'] = orientation
+		objectData['orientation'] = {
+			'type': 'SolarSystem.OrientationIAUModel',
+			'config': orientation
+		}
 		objectData['physical'] = {
 			'eqRadius': radii[0],
 			'radius': radius,

@@ -3,12 +3,13 @@ import {Quaternion, Vector} from "../algebra";
 
 export default class OrientationConstantAxis extends OrientationAbstract
 {
-    constructor(angularVelocity, initialAngle, initialEpoch) {
+    constructor(config) {
         super();
+        const angularVelocity = new Vector(config.vector);
         this.axisQuaternion = Quaternion.transfer(new Vector([0, 0, 1]), angularVelocity);
         this.angularSpeed = angularVelocity.mag;
-        this.initialAngle = initialAngle || 0;
-        this.initialEpoch = initialEpoch || 0;
+        this.initialAngle = config.angle || 0;
+        this.initialEpoch = config.epoch || 0;
     }
 
     getQuaternionByEpoch(epoch) {

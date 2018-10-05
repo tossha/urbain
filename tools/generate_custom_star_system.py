@@ -3,6 +3,21 @@ import math
 from numpy import deg2rad
 import re
 
+# Format:
+#  0 ID
+#  1 Parent
+#  2 Name
+#  3 sma
+#  4 ecc
+#  5 inc
+#  6 aop
+#  7 loan
+#  8 ma
+#  9 Radius
+# 10 mu (GM)
+# 11 rotation period
+# 12 SOI
+# 13 Color
 
 TWO_PI = 2 * math.pi
 
@@ -32,6 +47,10 @@ with open('KSP.txt') as file:
 		'physical': {
 			'radius': 261600,
 			'mu': 1172332800
+		},
+		'orientation': {
+			'type': 'constantAxis',
+			'config': {'vector': [0,0,1.4544410433286e-5]}
 		},
 		'visual': {
 			'model': 'light',
@@ -86,6 +105,10 @@ with open('KSP.txt') as file:
 			'physical': {
 				'radius': float(match[9]) / 1000,
 				'mu': float(match[10])
+			},
+			'orientation': {
+				'type': 'constantAxis',
+				'config': {'vector': [0, 0, 2 * math.pi / float(match[11])]}
 			},
 			'visual': {
 				'model': 'basic',

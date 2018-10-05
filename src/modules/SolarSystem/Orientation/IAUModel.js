@@ -1,15 +1,15 @@
-import OrientationAbstract from "./Abstract";
-import {deg2rad, Quaternion} from "../algebra";
+import OrientationAbstract from "../../../core/Orientation/Abstract";
+import {deg2rad, Quaternion} from "../../../core/algebra";
 
 export default class OrientationIAUModel extends OrientationAbstract
 {
-    constructor(rightAscensionCoefficients, declinationCoefficients, rotationCoefficients) {
+    constructor(config) {
         super();
-        this.rightAscension = rightAscensionCoefficients;
-        this.declination = declinationCoefficients;
-        this.rotation = rotationCoefficients;
+        this.rightAscension = config[0];
+        this.declination = config[1];
+        this.rotation = config[2];
 
-        this.ICRFQuaternion = new Quaternion([-1, 0, 0], deg2rad(23.4)); // needs refining
+        this.ICRFQuaternion = new Quaternion([-1, 0, 0], deg2rad(23.4)); // TODO needs refining
     }
 
     getQuaternionByEpoch(epoch) {
