@@ -3,16 +3,15 @@ import ReferenceFrameFactory from "../../../core/ReferenceFrame/Factory";
 import {ReferenceFrame} from "../../../core/ReferenceFrame/Factory";
 import {deg2rad, Vector} from "../../../core/algebra";
 import StateVector from "../../../core/StateVector";
+import ModuleSolarSystem from "../ModuleSolarSystem";
 import { sim } from "../../../core/Simulation";
 
 export default class TrajectoryELP2000 extends TrajectoryKeplerianAbstract
 {
-    static EARTH = 399;
-
     constructor(coefficients) {
-        super(ReferenceFrameFactory.buildId(TrajectoryELP2000.EARTH, ReferenceFrame.INERTIAL_ECLIPTIC));
+        super(ReferenceFrameFactory.buildId(ModuleSolarSystem.EARTH, ReferenceFrame.INERTIAL_ECLIPTIC));
         this.coefficients = coefficients;
-        this.mu = sim.starSystem.getObject(TrajectoryELP2000.EARTH).physicalModel.mu;
+        this.mu = sim.starSystem.getObject(ModuleSolarSystem.EARTH).physicalModel.mu;
         this._p = 5029.0966;
     }
 

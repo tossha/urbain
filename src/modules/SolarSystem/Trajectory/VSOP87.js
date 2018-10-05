@@ -4,18 +4,17 @@ import TrajectoryKeplerianAbstract from "../../../core/Trajectory/KeplerianAbstr
 import KeplerianObject from "../../../core/KeplerianObject";
 import {Vector} from "../../../core/algebra";
 import StateVector from "../../../core/StateVector";
+import ModuleSolarSystem from "../ModuleSolarSystem";
 import { sim } from "../../../core/Simulation";
 
 export default class TrajectoryVSOP87 extends TrajectoryKeplerianAbstract
 {
-    static SUN = 10;
-
     constructor(config) {
-        super(ReferenceFrameFactory.buildId((config.body === TrajectoryVSOP87.SUN) ? 0 : TrajectoryVSOP87.SUN, ReferenceFrame.INERTIAL_ECLIPTIC));
+        super(ReferenceFrameFactory.buildId((config.body === ModuleSolarSystem.SUN) ? 0 : ModuleSolarSystem.SUN, ReferenceFrame.INERTIAL_ECLIPTIC));
         this.coefficients = config.coefficients;
-        this.mu = (config.body === TrajectoryVSOP87.SUN)
+        this.mu = (config.body === ModuleSolarSystem.SUN)
             ? 319.77790837966666
-            : sim.starSystem.getObject(TrajectoryVSOP87.SUN).physicalModel.mu;
+            : sim.starSystem.getObject(ModuleSolarSystem.SUN).physicalModel.mu;
     }
 
     getKeplerianObjectByEpoch(epoch, referenceFrameOrId) {
