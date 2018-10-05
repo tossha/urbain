@@ -9,17 +9,23 @@ export default class ModuleSolarSystem extends Module
 {
     init() {
         sim.loadStarSystem('solar_system.json');
-        Events.addListener(Events.STAR_SYSTEM_LOADED, (event) => {
-            StarSystemLoader.loadObjectByUrl(event.detail.starSystem, './spacecraft/voyager1.json');
-            StarSystemLoader.loadObjectByUrl(event.detail.starSystem, './spacecraft/voyager2.json');
-            StarSystemLoader.loadObjectByUrl(event.detail.starSystem, './spacecraft/lro.json');
 
-            this.loadTLE(event.detail.starSystem, 25544); // ISS
-            this.loadTLE(event.detail.starSystem, 20580); // Hubble
-        });
+        this._systemLoadedListener = this._onSystemLoaded.bind(this);
+        Events.addListener(Events.STAR_SYSTEM_LOADED, this._systemLoadedListener);
 
         this._addClass('TrajectoryVSOP87', TrajectoryVSOP87);
         this._addClass('TrajectoryELP2000', TrajectoryELP2000);
+    }
+
+    _onSystemLoaded(event) {
+        StarSystemLoader.loadObjectByUrl(event.detail.starSystem, './spacecraft/voyager1.json');
+        StarSystemLoader.loadObjectByUrl(event.detail.starSystem, './spacecraft/voyager2.json');
+        StarSystemLoader.loadObjectByUrl(event.detail.starSystem, './spacecraft/lro.json');
+
+        this.loadTLE(event.detail.starSystem, 25544); // ISS
+        this.loadTLE(event.detail.starSystem, 20580); // Hubble
+
+        Events.removeListener(Events.STAR_SYSTEM_LOADED, this._systemLoadedListener);
     }
 
     loadTLE(starSystem, noradId) {

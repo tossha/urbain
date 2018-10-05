@@ -13,6 +13,7 @@ import VisualBodyModelRings from "../core/visual/BodyModel/Rings";
 import VisualBodyModelBasic from "../core/visual/BodyModel/Basic";
 import VisualShapeSphere from "../core/visual/Shape/Sphere";
 import Events from "../core/Events";
+import {Vector} from "../core/algebra";
 
 export default class StarSystemLoader
 {
@@ -83,14 +84,14 @@ export default class StarSystemLoader
             }
         }
 
-        if (config.orientation) {
+        if (config.physical || config.orientation) {
             orientation = config.orientation
                 ? new OrientationIAUModel(
                     config.orientation[0], // right ascension
                     config.orientation[1], // declination
                     config.orientation[2]  // prime meridian
                 )
-                : new OrientationConstantAxis([0, 0, 1e-10]);
+                : new OrientationConstantAxis(new Vector([0, 0, 1e-10]));
         }
 
         if (config.physical) {

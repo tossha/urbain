@@ -55,6 +55,7 @@ class Simulation
     loadStarSystem(jsonFile) {
         this.stopRendering();
         $.getJSON("./star_systems/" + jsonFile, starSystemConfig => {
+            this.starSystem && this.starSystem.unload();
             this.starSystem = new StarSystem(starSystemConfig.id);
 
             StarSystemLoader.loadFromConfig(this.starSystem, starSystemConfig);
