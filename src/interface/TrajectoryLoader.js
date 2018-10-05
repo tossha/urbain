@@ -8,8 +8,7 @@ import VisualTrajectoryModelPointArray from "../core/visual/TrajectoryModel/Poin
 import VisualTrajectoryModelKeplerian from "../core/visual/TrajectoryModel/Keplerian";
 import TrajectoryStaticPosition from "../core/Trajectory/StaticPosition";
 import {Vector} from "../core/algebra";
-import TrajectoryVSOP87 from "../core/Trajectory/VSOP87";
-import TrajectoryELP2000 from "../core/Trajectory/ELP2000";
+import { sim } from "../core/Simulation";
 
 export default class TrajectoryLoader
 {
@@ -20,34 +19,19 @@ export default class TrajectoryLoader
 
         if (type === 'keplerian') {
             trajectory = this.createKeplerianBasic(config);
-        }
-
-        if (type === 'keplerian_precessing') {
+        } else if (type === 'keplerian_precessing') {
             trajectory = this.createKeplerianPrecessing(config);
-        }
-
-        if (type === 'keplerian_array') {
+        } else if (type === 'keplerian_array') {
             trajectory = this.createKeplerianArray(config);
-        }
-
-        if (type === 'keplerian_precessing_array') {
+        } else if (type === 'keplerian_precessing_array') {
             trajectory = this.createKeplerianPrecessingArray(config);
-        }
-
-        if (type === 'composite') {
+        } else if (type === 'composite') {
             trajectory = this.createComposite(config);
-        }
-
-        if (type === 'static') {
+        } else if (type === 'static') {
             trajectory = this.createStatic(config);
-        }
-
-        if (type === 'vsop87') {
-            trajectory = this.createVSOP87(config);
-        }
-
-        if (type === 'elp2000') {
-            trajectory = this.createELP2000(config);
+        } else {
+            const className = sim.getClass(type);
+            trajectory = new className(config.data);
         }
 
         if (config.periodStart !== undefined) {
@@ -129,19 +113,6 @@ export default class TrajectoryLoader
         return new TrajectoryStaticPosition(
             config.data.referenceFrame,
             new Vector(config.data.position)
-        );
-    }
-
-    static createVSOP87(config) {
-        return new TrajectoryVSOP87(
-            config.data.body,
-            config.data.coefficients
-        );
-    }
-
-    static createELP2000(config) {
-        return new TrajectoryELP2000(
-            config.data
         );
     }
 

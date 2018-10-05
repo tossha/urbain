@@ -1,9 +1,9 @@
-import TrajectoryKeplerianAbstract from "./KeplerianAbstract";
-import ReferenceFrameFactory from "../ReferenceFrame/Factory";
-import {ReferenceFrame} from "../ReferenceFrame/Factory";
-import {deg2rad, Vector} from "../algebra";
-import StateVector from "../StateVector";
-import { sim } from "../Simulation";
+import TrajectoryKeplerianAbstract from "../../../core/Trajectory/KeplerianAbstract";
+import ReferenceFrameFactory from "../../../core/ReferenceFrame/Factory";
+import {ReferenceFrame} from "../../../core/ReferenceFrame/Factory";
+import {deg2rad, Vector} from "../../../core/algebra";
+import StateVector from "../../../core/StateVector";
+import { sim } from "../../../core/Simulation";
 
 export default class TrajectoryELP2000 extends TrajectoryKeplerianAbstract
 {

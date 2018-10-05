@@ -137,16 +137,26 @@ class Simulation
     }
 
     loadModule(alias) {
-        const name = alias.charAt(0).toUpperCase() + alias.slice(1);
-        const className = 'Module' + name;
-        import('../modules/' + name + '/' + className).then((module) => {
+        const className = 'Module' + alias;
+        import('../modules/' + alias + '/' + className).then((module) => {
             this.modules[alias] = new module.default();
             this.modules[alias].init();
         });
     }
 
     getModule(alias) {
+        if (this.modules[alias] === undefined) {
+            throw new Error('Unknown module: ' + alias);
+        }
         return this.modules[alias];
+    }
+
+    getClass(alias) {
+        const periodPos = alias.indexOf(".");
+        if (periodPos === -1) {
+            throw new Error('Incorrect class alias! Period expected in ' + alias);
+        }
+        return this.getModule(alias.substr(0, periodPos)).getClass(alias.substr(periodPos + 1));
     }
 
     addPropagator(alias, propagatorClass) {

@@ -2,6 +2,8 @@ import Module from "../../core/Module";
 import { sim } from "../../core/Simulation";
 import Events from "../../core/Events";
 import StarSystemLoader from "../../interface/StarSystemLoader";
+import TrajectoryELP2000 from "./Trajectory/ELP2000";
+import TrajectoryVSOP87 from "./Trajectory/VSOP87";
 
 export default class ModuleSolarSystem extends Module
 {
@@ -15,6 +17,9 @@ export default class ModuleSolarSystem extends Module
             this.loadTLE(event.detail.starSystem, 25544); // ISS
             this.loadTLE(event.detail.starSystem, 20580); // Hubble
         });
+
+        this._addClass('TrajectoryVSOP87', TrajectoryVSOP87);
+        this._addClass('TrajectoryELP2000', TrajectoryELP2000);
     }
 
     loadTLE(starSystem, noradId) {

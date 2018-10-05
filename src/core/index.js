@@ -23,8 +23,8 @@ function init(statistics, viewPortId = "viewport-id") {
     }
 
     sim.init(document.getElementById(viewPortId), firstRender);
-    sim.loadModule('patchedConics');
-    sim.loadModule('solarSystem');
+    sim.loadModule('PatchedConics');
+    sim.loadModule('SolarSystem');
 }
 
 export {
