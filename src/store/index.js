@@ -82,10 +82,17 @@ class Store {
         ]),
     ];
 
-    starSystems = [
-        { label: "Solar System", value: "Solar_System" },
-        { label: "KSP System", value: "KSP_System" },
-    ];
+    starSystems = [{ label: "Solar System", value: "SolarSystem" }, { label: "KSP System", value: "KSP" }];
+
+    starSystemSelectorSettings = {
+        options: this.starSystems,
+        defaultValue: this.starSystems[0],
+        onSelect: option => {
+            const { value } = option;
+
+            this._simulation.loadModule(value);
+        },
+    };
 }
 
 const { Provider, Consumer } = createContext();

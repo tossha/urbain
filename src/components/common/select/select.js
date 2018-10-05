@@ -1,4 +1,5 @@
 import React from "react";
+import PropTypes from "prop-types";
 import ReactSelect, { components } from "react-select";
 
 const DEFAULT = {
@@ -82,7 +83,7 @@ const DropdownIndicator = props => {
     );
 };
 
-const Select = ({ id, className, options, value }) => {
+const Select = ({ id, className, options, value, onSelect = () => {} }) => {
     return (
         <ReactSelect
             id={id}
@@ -94,8 +95,22 @@ const Select = ({ id, className, options, value }) => {
             options={options}
             defaultValue={value}
             components={{ IndicatorsContainer, DropdownIndicator }}
+            onChange={onSelect}
         />
     );
+};
+
+export const optionPropTypes = PropTypes.shape({
+    label: PropTypes.string,
+    value: PropTypes.string,
+});
+
+Select.propTypes = {
+    id: PropTypes.string,
+    className: PropTypes.string,
+    options: PropTypes.arrayOf(optionPropTypes).isRequired,
+    value: optionPropTypes,
+    onSelect: PropTypes.func,
 };
 
 export default Select;
