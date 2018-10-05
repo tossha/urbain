@@ -1,4 +1,3 @@
-import $ from "jquery";
 import { sim } from "./Simulation";
 import Events from "./Events";
 

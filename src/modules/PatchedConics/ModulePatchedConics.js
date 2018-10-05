@@ -17,7 +17,7 @@ export default class ModulePatchedConics extends Module
 
         for (let bodyId in ss.objects) {
             let obj = ss.objects[bodyId];
-            if (!(obj instanceof Body))
+            if (!(obj instanceof Body) || obj.data.patchedConics === undefined)
                 continue;
 
             let parent = ss.getObject(obj.data.patchedConics.parentSoiId);

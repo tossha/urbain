@@ -84,7 +84,7 @@ class Store {
 
     starSystems = [
         { label: "Solar System", value: "Solar_System" },
-        // { label: "Not Solar System", value: "Not_Solar_System" },
+        { label: "KSP System", value: "KSP_System" },
     ];
 }
 

@@ -16,6 +16,11 @@ export default class StarSystem
         this.created = 0;
     }
 
+    unload() {
+        Object.entries(this.objects).map(entry => entry[1].drop());
+        this.stars && this.stars.drop();
+    }
+
     addStars(stars) {
         this.stars = stars;
         return this;

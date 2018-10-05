@@ -13,6 +13,7 @@ with open('KSP.txt') as file:
 
 	objectsData = [{
 		'id': '10',
+		'type': 1,
 		'name': 'Kerbol',
 		'trajectory': {
 			'type': 'static',
@@ -21,19 +22,30 @@ with open('KSP.txt') as file:
 				'position': [0,0,0]
 			}
 		},
+		'data': {
+			'patchedConics': {
+				'soiRadius': 1e12,
+				'parentSoiId': 0,
+				'childSois': []
+			}
+		},
 		'physical': {
 			'radius': 261600,
 			'mu': 1172332800
 		},
 		'visual': {
-			'radius': 261600,
-			'color': 'yellow'
+			'model': 'light',
+			'config': {
+				'radius': 261600,
+				'color': 'yellow'
+			}
 		}
 	}]
 	for match in matches:
+		parent = int(match[1])
 		mu = False
 		for obj in objectsData:
-			if int(obj['id']) == int(match[1]):
+			if int(obj['id']) == parent:
 				mu = obj['physical']['mu']
 		if mu == False:
 			print('Parent', match[1], 'not found for body', match[0])
@@ -42,15 +54,16 @@ with open('KSP.txt') as file:
 
 		objectsData.append({
 			'id': match[0].strip(),
+			'type': 2 if parent == 10 else 4,
 			'name': match[2].strip(),
 			'trajectory': {
 				'type': 'keplerian',
-				'rendering': {
+				'visual': {
 					'color': match[13].strip().lower(),
 					'keplerianModel': True
 				},
 				'data': {
-					'referenceFrame': int(match[1]) * 100000 + 1000,
+					'referenceFrame': parent * 100000 + 1000,
 					'elements': [
 						float(match[4]), # ecc
 						float(match[3]) / 1000 * (1 - float(match[4])), # r per
@@ -63,18 +76,28 @@ with open('KSP.txt') as file:
 					]
 				}
 			},
+			'data': {
+				'patchedConics': {
+					'soiRadius': float(match[12]) / 1000,
+					'parentSoiId': parent,
+					'childSois': []
+				}
+			},
 			'physical': {
 				'radius': float(match[9]) / 1000,
 				'mu': float(match[10])
 			},
 			'visual': {
-				'radius': float(match[9]) / 1000,
-				'color': match[13].strip().lower()
+				'model': 'basic',
+				'config': {
+					'radius': float(match[9]) / 1000,
+					'color': match[13].strip().lower()
+				}
 			}
 		})
 
 
-file = open('./../dist/star_systems/ksp.json', 'w')
+file = open('./../public/star_systems/ksp.json', 'w')
 file.write(json.dumps({
 	'id': 2,
 	'name': 'KSP System',

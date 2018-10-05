@@ -439,9 +439,13 @@ export default class KeplerianObject
 
     getNormalVector() {
         const nodeQuaternion = new Quaternion(new Vector([0, 0, 1]), this._raan);
-        const normalQuaternion = new Quaternion(nodeQuaternion.rotate(new Vector([1, 0, 0])), this._inc);
+        const normalQuaternion = new Quaternion(nodeQuaternion.rotate_(new Vector([1, 0, 0])), this._inc);
 
-        return normalQuaternion.rotate(new Vector([0, 0, 1]));
+        return normalQuaternion.rotate_(new Vector([0, 0, 1]));
+    }
+
+    getPeriapsisVector() {
+        return this.getOrbitalFrameQuaternion().rotate_(new Vector([1, 0, 0]));
     }
 
     getOrbitalFrameQuaternion() {
@@ -469,7 +473,7 @@ export default class KeplerianObject
         const raan = Math.atan2(angMomentum.x, -angMomentum.y);
         const inc = Math.atan2((Math.sqrt(Math.pow(angMomentum.x, 2) + Math.pow(angMomentum.y, 2))) , angMomentum.z);
         const sma = (mu * pos.mag) / (2.0 * mu - pos.mag * Math.pow(vel.mag, 2));
-        const e = Math.sqrt(1.0 - (Math.pow(angMomentum.mag, 2) / (mu * sma)));
+        const e = Math.sqrt(1.0 - Math.min(1, Math.pow(angMomentum.mag, 2) / (mu * sma)));
 
         const p = pos.rotateZ(-raan).rotateX(-inc);
         const u = Math.atan2(p.y , p.x);

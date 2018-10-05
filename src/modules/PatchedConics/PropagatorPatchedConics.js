@@ -99,6 +99,10 @@ export default class PropagatorPatchedConics extends PropagatorAbstract
             const childKo = soi.trajectory.getKeplerianObjectByEpoch(epochFrom, trajectory.referenceFrame);
             const soiRadius = soi.data.patchedConics.soiRadius;
             const intervals1 = this._getPotentialApproachIntervals(childKo, ko, epochFrom, epochTo, soiRadius * this.soiSafetyCoefficient);
+            if (intervals1 === false) {
+                continue;
+            }
+
             const intervals2 = this._getPotentialApproachIntervals(ko, childKo, epochFrom, epochTo, soiRadius * this.soiSafetyCoefficient);
 /*
             if (this.debugPoints.length === 0) {
@@ -130,6 +134,9 @@ export default class PropagatorPatchedConics extends PropagatorAbstract
             let crossingFound = false;
             // console.log('Iterating...');
             for (let interval of potentialApproachIntervals) {
+                if (interval[0] > epochTo) {
+                    break;
+                }
                 if (interval[1] < epochFrom) {
                     continue;
                 }
@@ -172,7 +179,7 @@ export default class PropagatorPatchedConics extends PropagatorAbstract
                             distance = trajectory.getPositionByEpoch(t).sub_(soi.getPositionByEpoch(t)).mag - soiRadius;
                             // console.log('T Step distance', t, step, distance);
                         }
-                        // console.log('Boundary found');
+                        // console.log('Boundary found', t);
                         crossings.push({
                             epoch: t,
                             newSoi: soi
@@ -208,6 +215,10 @@ export default class PropagatorPatchedConics extends PropagatorAbstract
 
     _getPotentialApproachIntervals(keplerianObjectBase, keplerianObjectActive, epochFrom, epochTo, distance) {
         const radialTa = this._getRadialTaBounds(keplerianObjectBase, keplerianObjectActive, distance);
+        if (radialTa === false) {
+            return false;
+        }
+
         const verticalTa = this._getVerticalTaBounds(keplerianObjectBase, keplerianObjectActive, epochFrom, distance);
         let taIntervals;
 
@@ -249,6 +260,11 @@ export default class PropagatorPatchedConics extends PropagatorAbstract
                     continue;
                 }
 
+                if (epochIntervals.length > 10000) {
+                    debugger;
+                    throw new Error('Infinite loop detected');
+                }
+
                 epochIntervals.push([inEpoch, outEpoch]);
             }
             adding += period;
@@ -260,11 +276,32 @@ export default class PropagatorPatchedConics extends PropagatorAbstract
 
     _getVerticalTaBounds(keplerianObjectBase, keplerianObjectActive, epochFrom, distance) {
         // this is only to recalculate inc, raan and aop. probably can be optimized.
-        const relKeplerianObject = KeplerianObject.createFromState(
-            keplerianObjectActive.getStateByEpoch(epochFrom)
-                .rotate_(keplerianObjectBase.getOrbitalFrameQuaternion().invert_()),
+        const baseNormal = keplerianObjectBase.getNormalVector();
+        const activeNormal = keplerianObjectActive.getNormalVector();
+        const equinoxVector = keplerianObjectBase.getPeriapsisVector();
+        const raanVector = baseNormal.cross(activeNormal);
+        const periapsisVector = keplerianObjectActive.getPeriapsisVector();
+
+        const inc = baseNormal.angle(activeNormal);
+        let raan = raanVector.angle(equinoxVector);
+        if (equinoxVector.cross(raanVector).angle(baseNormal) > Math.PI / 2) {
+            raan = TWO_PI - raan;
+        }
+        let aop = raanVector.angle(periapsisVector);
+        if (raanVector.cross(periapsisVector).angle(activeNormal) > Math.PI / 2) {
+            aop = TWO_PI - aop;
+        }
+
+        const relKeplerianObject = new KeplerianObject(
+            keplerianObjectActive.ecc,
+            keplerianObjectActive.sma,
+            aop,
+            inc,
+            raan,
+            keplerianObjectActive.m0,
+            keplerianObjectActive.epoch,
             keplerianObjectActive.mu,
-            epochFrom
+            false
         );
 
         return relKeplerianObject.getPlaneCrossingTrueAnomaly(distance);

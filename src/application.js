@@ -1,5 +1,5 @@
 import { init } from "./core/index";
-import { loadTLE } from "./api";
+import { loadTLE, loadKSP } from "./api";
 import { Store } from "./store";
 
 class Application {
@@ -18,6 +18,7 @@ class Application {
     getApi() {
         return {
             loadTLE,
+            loadKSP
         };
     }
 }

@@ -26,6 +26,9 @@ export default class ReferenceFrameFactory
                     new FunctionOfEpochCustom((epoch) => {
                         const z = sim.starSystem.getObject(config.origin).orientation.getQuaternionByEpoch(epoch).rotate_(new Vector([0, 0, 1]));
                         const equinox = z.cross(new Vector([0, 0, 1]));
+                        if (equinox.mag === 0) {
+                            return new Quaternion();
+                        }
                         return Quaternion.transfer(new Vector([0, 0, 1]), z).mul_(
                             Quaternion.transfer(new Vector([1, 0, 0]), equinox)
                         );
