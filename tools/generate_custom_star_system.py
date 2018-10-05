@@ -114,7 +114,8 @@ with open('KSP.txt') as file:
 				'model': 'basic',
 				'config': {
 					'radius': float(match[9]) / 1000,
-					'color': match[13].strip().lower()
+					'color': match[13].strip().lower(),
+					'texturePath': 'ksp/' + match[2].strip() + '_biome.png'
 				}
 			}
 		})

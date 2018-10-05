@@ -24,4 +24,9 @@ export default class VisualBodyModelLight extends VisualBodyModelBasic
     getMaterial(parameters) {
         return new THREE.MeshBasicMaterial(parameters);
     }
+
+    drop() {
+        this.scene.remove(this.light);
+        super.drop();
+    }
 }
