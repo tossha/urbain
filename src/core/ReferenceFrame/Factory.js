@@ -1,8 +1,7 @@
 import FunctionOfEpochObjectState from "../FunctionOfEpoch/ObjectState";
-import {deg2rad, Quaternion, Vector} from "../algebra";
+import {Quaternion, Vector} from "../algebra";
 import FunctionOfEpochCustom from "../FunctionOfEpoch/Custom";
 import ReferenceFrameBodyFixed from "./BodyFixed";
-import {EARTH} from "../../interface/solar_system";
 import ReferenceFrameBase from "./Base";
 import ReferenceFrameInertial from "./Inertial";
 import ReferenceFrameInertialDynamic from "./InertialDynamic";
@@ -74,11 +73,6 @@ export default class ReferenceFrameFactory
             } else {
                 res = null;
             }
-        } else if (type == ReferenceFrame.ICRF && EARTH !== undefined) {
-            res = new ReferenceFrameInertial(
-                new FunctionOfEpochObjectState(EARTH, RF_BASE),
-                new Quaternion([-1, 0, 0], deg2rad(23.4))
-            );
         } else if (type == ReferenceFrame.BODY_FIXED) {
             if (sim.starSystem.getObject(config.origin) instanceof Body) {
                 res = new ReferenceFrameBodyFixed(
@@ -121,7 +115,6 @@ export default class ReferenceFrameFactory
         if ((type === ReferenceFrame.INERTIAL_ECLIPTIC)
             || (type === ReferenceFrame.INERTIAL_BODY_EQUATORIAL)
             || (type === ReferenceFrame.INERTIAL_BODY_FIXED)
-            || (type === ReferenceFrame.ICRF)
             || (type === ReferenceFrame.BODY_FIXED)
             || (type === ReferenceFrame.INERTIAL_PARENT_BODY_EQUATORIAL)
         ) {
@@ -135,7 +128,6 @@ export default class ReferenceFrameFactory
         if ((type === ReferenceFrame.INERTIAL_ECLIPTIC)
             || (type === ReferenceFrame.INERTIAL_BODY_EQUATORIAL)
             || (type === ReferenceFrame.INERTIAL_BODY_FIXED)
-            || (type === ReferenceFrame.ICRF)
             || (type === ReferenceFrame.BODY_FIXED)
             || (type === ReferenceFrame.INERTIAL_PARENT_BODY_EQUATORIAL)
         ) {
@@ -156,7 +148,7 @@ export const ReferenceFrame = {
     INERTIAL_BODY_EQUATORIAL: 2,
     INERTIAL_BODY_FIXED: 3,
     INERTIAL_TOPOCENTRIC: 4,
-    ICRF: 5,
+    // : 5, vacant
     BODY_FIXED: 6,
     TOPOCENTRIC: 7,
     INERTIAL_PARENT_BODY_EQUATORIAL: 8,
