@@ -1,5 +1,5 @@
 import * as THREE from "three";
-
+import $ from "jquery";
 import EventHandler from "./EventHandler";
 import {Vector} from "./algebra";
 import Events from "./Events";
@@ -52,28 +52,25 @@ class Simulation
         Events.dispatch(Events.INIT_DONE);
     }
 
-    loadStarSystem(starSystemConfig) {
-        this.starSystem = new StarSystem(starSystemConfig.id);
+    loadStarSystem(jsonFile) {
+        this.stopRendering();
+        $.getJSON("./star_systems/" + jsonFile, starSystemConfig => {
+            this.starSystem = new StarSystem(starSystemConfig.id);
 
-        StarSystemLoader.loadFromConfig(this.starSystem, starSystemConfig);
+            StarSystemLoader.loadFromConfig(this.starSystem, starSystemConfig);
 
-        this.camera.init(
-            ReferenceFrameFactory.buildId(
-                this.starSystem.mainObject,
-                ReferenceFrame.INERTIAL_BODY_EQUATORIAL
-            ),
-            new Vector([30000, 30000, 20000])
-        );
+            this.camera.init(
+                ReferenceFrameFactory.buildId(
+                    this.starSystem.mainObject,
+                    ReferenceFrame.INERTIAL_BODY_EQUATORIAL
+                ),
+                new Vector([30000, 30000, 20000])
+            );
 
-        StarSystemLoader.loadObjectByUrl(this.starSystem, './spacecraft/voyager1.json');
-        StarSystemLoader.loadObjectByUrl(this.starSystem, './spacecraft/voyager2.json');
-        StarSystemLoader.loadObjectByUrl(this.starSystem, './spacecraft/lro.json');
-        StarSystemLoader.loadTLE(this.starSystem, 25544); // ISS
-        StarSystemLoader.loadTLE(this.starSystem, 20580); // Hubble
+            Events.dispatch(Events.STAR_SYSTEM_LOADED, {starSystem: this.starSystem});
 
-        Events.dispatch(Events.STAR_SYSTEM_LOADED, {starSystem: this.starSystem});
-
-        this.startRendering();
+            this.startRendering();
+        });
     }
 
     startRendering() {
@@ -146,6 +143,10 @@ class Simulation
             this.modules[alias] = new module.default();
             this.modules[alias].init();
         });
+    }
+
+    getModule(alias) {
+        return this.modules[alias];
     }
 
     addPropagator(alias, propagatorClass) {

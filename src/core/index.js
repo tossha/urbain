@@ -22,12 +22,9 @@ function init(statistics, viewPortId = "viewport-id") {
         requestAnimationFrame(render);
     }
 
-    sim.loadModule('patchedConics');
     sim.init(document.getElementById(viewPortId), firstRender);
-
-    $.getJSON("./star_systems/solar_system.json", starSystemConfig => {
-        sim.loadStarSystem(starSystemConfig);
-    });
+    sim.loadModule('patchedConics');
+    sim.loadModule('solarSystem');
 }
 
 export {

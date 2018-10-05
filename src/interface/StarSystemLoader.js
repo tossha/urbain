@@ -61,11 +61,6 @@ export default class StarSystemLoader
         });
     }
 
-    static loadTLE(starSystem, noradId) {
-        const path = Math.floor(noradId / 1000);
-        this.loadObjectByUrl(starSystem, './spacecraft/' + path + '/' + noradId + '.json.gz');
-    };
-
     static _loadObject(starSystem, config) {
         let object;
         let visualModel = null;
