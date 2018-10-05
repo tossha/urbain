@@ -1416,13 +1416,13 @@ def getVsopTrajectory(body, color, cutKm):
 				data[varNum - 1][degree].append((A,B,C)) 
 
 	return {
-		'type': 'vsop87',
+		'type': 'SolarSystem.TrajectoryVSOP87',
 		'visual': {
 			'color': color,
 			'keplerianModel': True
 		},
 		'data': {
-			'body': body,
+			'body': int(body),
 			'coefficients': data
 		}
 	}
@@ -1481,7 +1481,7 @@ def getELP2000Trajectory(color, cutKm):
 				_files[i].append(koeffs)
 
 	return {
-		'type': 'elp2000',
+		'type': 'SolarSystem.TrajectoryELP2000',
 		'visual': {
 			'color': color,
 			'keplerianModel': True

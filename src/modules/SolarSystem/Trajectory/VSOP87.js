@@ -1,20 +1,20 @@
-import {ReferenceFrame} from "../ReferenceFrame/Factory";
-import {SUN} from "../../interface/solar_system";
-import ReferenceFrameFactory from "../ReferenceFrame/Factory";
-import TrajectoryKeplerianAbstract from "./KeplerianAbstract";
-import KeplerianObject from "../KeplerianObject";
-import {Vector} from "../algebra";
-import StateVector from "../StateVector";
-import { sim } from "../Simulation";
+import {ReferenceFrame} from "../../../core/ReferenceFrame/Factory";
+import ReferenceFrameFactory from "../../../core/ReferenceFrame/Factory";
+import TrajectoryKeplerianAbstract from "../../../core/Trajectory/KeplerianAbstract";
+import KeplerianObject from "../../../core/KeplerianObject";
+import {Vector} from "../../../core/algebra";
+import StateVector from "../../../core/StateVector";
+import ModuleSolarSystem from "../ModuleSolarSystem";
+import { sim } from "../../../core/Simulation";
 
 export default class TrajectoryVSOP87 extends TrajectoryKeplerianAbstract
 {
-    constructor(body, coefficients) {
-        super(ReferenceFrameFactory.buildId((body == SUN) ? 0 : SUN, ReferenceFrame.INERTIAL_ECLIPTIC));
-        this.coefficients = coefficients;
-        this.mu = (body == SUN)
+    constructor(config) {
+        super(ReferenceFrameFactory.buildId((config.body === ModuleSolarSystem.SUN) ? 0 : ModuleSolarSystem.SUN, ReferenceFrame.INERTIAL_ECLIPTIC));
+        this.coefficients = config.coefficients;
+        this.mu = (config.body === ModuleSolarSystem.SUN)
             ? 319.77790837966666
-            : sim.starSystem.getObject(SUN).physicalModel.mu;
+            : sim.starSystem.getObject(ModuleSolarSystem.SUN).physicalModel.mu;
     }
 
     getKeplerianObjectByEpoch(epoch, referenceFrameOrId) {

@@ -27,6 +27,7 @@ export default class Events
 
     static RENDER = 'urb_render';
     static INIT_DONE = 'urb_init_done';
+    static STAR_SYSTEM_LOADED = 'urb_star_system_loading_done';
     static SELECT = 'urb_select';
     static DESELECT = 'urb_deselect';
     static CAMERA_RF_CHANGED = 'urb_camera_rf_change';

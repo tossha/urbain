@@ -6,6 +6,10 @@ function init(statistics, viewPortId = "viewport-id") {
     let globalTime;
 
     function render(curTime) {
+        if (!sim.renderLoopActive) {
+            return;
+        }
+
         sim.tick((curTime - globalTime) / 1000);
 
         globalTime = curTime;
@@ -18,16 +22,9 @@ function init(statistics, viewPortId = "viewport-id") {
         requestAnimationFrame(render);
     }
 
-    sim.loadModule('patchedConics');
-
-    $.getJSON("./star_systems/solar_system.json", starSystemConfig => {
-        const viewPort = document.getElementById(viewPortId);
-
-        if (viewPort) {
-            sim.init(viewPort, starSystemConfig);
-            requestAnimationFrame(firstRender);
-        }
-    });
+    sim.init(document.getElementById(viewPortId), firstRender);
+    sim.loadModule('PatchedConics');
+    sim.loadModule('SolarSystem');
 }
 
 export {

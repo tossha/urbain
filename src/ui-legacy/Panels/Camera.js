@@ -6,40 +6,41 @@ import {ReferenceFrame} from "../../core/ReferenceFrame/Factory";
 
 export default class UIPanelCamera extends UIPanel
 {
-    constructor(panelDom, camera, starSystem) {
+    constructor(panelDom, camera) {
         super(panelDom);
 
         this.camera = camera;
-        this.starSystem = starSystem;
 
-        this.initTarget();
-        this.initFrameType();
+        this.jqTarget = this.jqDom.find('#targetSelect');
+        this.jqTarget.on('change', () => this.camera.changeOrigin(0|this.jqTarget.val()));
 
-        document.addEventListener(Events.CAMERA_RF_CHANGED, (event) => {
+        this.jqFrameType = this.jqDom.find('#rfTypeSelect');
+        this.jqFrameType.on('change', () => this.camera.changeReferenceFrameType(0|this.jqFrameType.val()));
+
+        Events.addListener(Events.STAR_SYSTEM_LOADED, (event) => {
+            this.starSystem = event.detail.starSystem;
+
+            this.jqTarget.html('');
+            this.updateTargetList();
+            this.updateTarget(this.camera.orbitingPoint);
+
+            this.updateFrameTypeList();
+            this.updateFrameType(this.camera.frameType);
+        });
+        Events.addListener(Events.CAMERA_RF_CHANGED, (event) => {
             this.updateTarget(event.detail.new.originId);
             this.updateFrameTypeList();
             this.updateFrameType(event.detail.new.type);
         });
-        document.addEventListener(Events.OBJECT_ADDED, () => {
+        Events.addListener(Events.OBJECT_ADDED, () => {
             this.updateTargetList();
         });
     }
 
-    initTarget() {
-        this.jqTarget = this.jqDom.find('#targetSelect');
-        this.jqTarget.on('change', () => this.camera.changeOrigin(0|this.jqTarget.val()));
-        this.updateTargetList();
-        this.updateTarget(this.camera.orbitingPoint);
-    }
-
-    initFrameType() {
-        this.jqFrameType = this.jqDom.find('#rfTypeSelect');
-        this.jqFrameType.on('change', () => this.camera.changeReferenceFrameType(0|this.jqFrameType.val()));
-        this.updateFrameTypeList();
-        this.updateFrameType(this.camera.frameType);
-    }
-
     updateTargetList() {
+        if (!this.starSystem) {
+            return;
+        }
         $.each(this.starSystem.getObjectNames(), (objId, objName) => {
             if (this.jqTarget.find("option[value='" + objId + "']").length === 0) {
                 this.jqTarget.append($('<option>', {value: objId}).text(objName));

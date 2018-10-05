@@ -1,5 +1,5 @@
 import * as THREE from "three";
-
+import $ from "jquery";
 import EventHandler from "./EventHandler";
 import {Vector} from "./algebra";
 import Events from "./Events";
@@ -18,11 +18,14 @@ class Simulation
     constructor() {
         this.modules = {};
         this.propagators = {};
+        this.renderLoopActive = false;
 
         this._initSettings();
     }
 
-    init(viewPortDomElement, starSystemConfig) {
+    init(viewPortDomElement, renderLoopFunction) {
+        this.renderLoopFunction = renderLoopFunction;
+
         this.scene = new THREE.Scene();
         this.scene.add(new THREE.AmbientLight(0xFFEFD5, 0.15));
 
@@ -38,32 +41,45 @@ class Simulation
 
         this.selection = new SelectionHandler();
 
-        this.starSystem = new StarSystem(starSystemConfig.id);
-
         this.time = new TimeLine(TimeLine.getEpochByDate(new Date()), 1, true);
 
-        StarSystemLoader.loadFromConfig(this.starSystem, starSystemConfig);
-
-        this.camera = new Camera(
-            this.renderer.domElement,
-            ReferenceFrameFactory.buildId(
-                this.starSystem.mainObject,
-                ReferenceFrame.INERTIAL_BODY_EQUATORIAL
-            ),
-            new Vector([30000, 30000, 20000])
-        );
+        this.camera = new Camera(this.renderer.domElement);
 
         this.raycaster = new VisualRaycaster(this.renderer.domElement, this.camera.threeCamera, 7);
 
         this.ui = new UI();
 
         Events.dispatch(Events.INIT_DONE);
+    }
 
-        StarSystemLoader.loadObjectByUrl(this.starSystem, './spacecraft/voyager1.json');
-        StarSystemLoader.loadObjectByUrl(this.starSystem, './spacecraft/voyager2.json');
-        StarSystemLoader.loadObjectByUrl(this.starSystem, './spacecraft/lro.json');
-        StarSystemLoader.loadTLE(this.starSystem, 25544); // ISS
-        StarSystemLoader.loadTLE(this.starSystem, 20580); // Hubble
+    loadStarSystem(jsonFile) {
+        this.stopRendering();
+        $.getJSON("./star_systems/" + jsonFile, starSystemConfig => {
+            this.starSystem = new StarSystem(starSystemConfig.id);
+
+            StarSystemLoader.loadFromConfig(this.starSystem, starSystemConfig);
+
+            this.camera.init(
+                ReferenceFrameFactory.buildId(
+                    this.starSystem.mainObject,
+                    ReferenceFrame.INERTIAL_BODY_EQUATORIAL
+                ),
+                new Vector([30000, 30000, 20000])
+            );
+
+            Events.dispatch(Events.STAR_SYSTEM_LOADED, {starSystem: this.starSystem});
+
+            this.startRendering();
+        });
+    }
+
+    startRendering() {
+        this.renderLoopActive = true;
+        requestAnimationFrame(this.renderLoopFunction);
+    }
+
+    stopRendering() {
+        this.renderLoopActive = false;
     }
 
     get currentEpoch() {
@@ -107,7 +123,9 @@ class Simulation
 
         Events.dispatch(Events.RENDER, {epoch: this.time.epoch});
 
-        this.renderer.render(this.scene, this.camera.threeCamera);
+        if (this.renderLoopActive) {
+            this.renderer.render(this.scene, this.camera.threeCamera);
+        }
     }
 
     getVisualCoords(simCoords) {
@@ -119,12 +137,26 @@ class Simulation
     }
 
     loadModule(alias) {
-        const name = alias.charAt(0).toUpperCase() + alias.slice(1);
-        const className = 'Module' + name;
-        import('../modules/' + name + '/' + className).then((module) => {
+        const className = 'Module' + alias;
+        import('../modules/' + alias + '/' + className).then((module) => {
             this.modules[alias] = new module.default();
             this.modules[alias].init();
         });
+    }
+
+    getModule(alias) {
+        if (this.modules[alias] === undefined) {
+            throw new Error('Unknown module: ' + alias);
+        }
+        return this.modules[alias];
+    }
+
+    getClass(alias) {
+        const periodPos = alias.indexOf(".");
+        if (periodPos === -1) {
+            throw new Error('Incorrect class alias! Period expected in ' + alias);
+        }
+        return this.getModule(alias.substr(0, periodPos)).getClass(alias.substr(periodPos + 1));
     }
 
     addPropagator(alias, propagatorClass) {
