@@ -171,10 +171,10 @@ export default class LambertSolver
 
         if (calcOriginSoi) {
             rfOrigin = sim.starSystem.getReferenceFrame(ReferenceFrameFactory.buildId(originObject.id, ReferenceFrame.INERTIAL_BODY_EQUATORIAL));
-            originSoi = originObject.getSoiRadius(departureTime);
+            originSoi = originObject.data.patchedConics.soiRadius;
         }
         if (calcTargetSoi) {
-            targetSoi = targetObject.getSoiRadius(departureTime + flightTime);
+            targetSoi = targetObject.data.patchedConics.soiRadius;
             rfTarget = sim.starSystem.getReferenceFrame(ReferenceFrameFactory.buildId(targetObject.id, ReferenceFrame.INERTIAL_BODY_EQUATORIAL));
         }
 

@@ -66,6 +66,9 @@ export default class UIPanelLambert extends UIPanel
             this.departureTime,
             this.transferTime
         );
+        if (!solverResult) {
+            return;
+        }
         const transferTrajectory = solverResult.trajectory;
         transferTrajectory.setObject(new EphemerisObject(-1, EphemerisObject.TYPE_UNKNOWN, origin.name + '->' + target.name + ' transfer'));
 
@@ -153,13 +156,7 @@ export default class UIPanelLambert extends UIPanel
     }
 
     updateTime(date) {
-        let string = date.getYear() + 1900;
-        string += '-' + ((date.getMonth() + 1) + '').padStart(2, '0');
-        string += '-' + (date.getDate() + '').padStart(2, '0');
-        string += ' ' + (date.getHours() + '').padStart(2, '0');
-        string += ':' + (date.getMinutes() + '').padStart(2, '0');
-        string += ':' + (date.getSeconds() + '').padStart(2, '0');
-        this.jqDateText.html(string);
+        this.jqDateText.html(sim.time.formatDateFull(date));
     }
 
 

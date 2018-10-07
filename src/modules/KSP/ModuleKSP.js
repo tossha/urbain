@@ -32,6 +32,8 @@ export default class ModuleKSP extends Module
             sim.time.nextRenderingDate = ModuleKSP.nextRenderingDate;
             sim.time.formatDate = ModuleKSP.formatDate;
             sim.time.formatDateFull = ModuleKSP.formatDateFull;
+
+            sim.ui.lambertPanel.useCurrentTime();
         });
     }
 

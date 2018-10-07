@@ -92,7 +92,7 @@ class Simulation
     }
 
     get currentDate() {
-        return TimeLine.getDateByEpoch(this.time.epoch);
+        return this.time.getDateByEpoch(this.time.epoch);
     }
 
     forceEpoch(epoch) {
