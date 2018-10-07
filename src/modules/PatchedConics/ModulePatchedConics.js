@@ -8,8 +8,10 @@ export default class ModulePatchedConics extends Module
 {
     init() {
         sim.addPropagator('patchedConics', PropagatorPatchedConics);
-        Events.addListener(Events.LOADING_BODIES_DONE, this.fillSoiTree);
-        return this;
+        Events.addListener(Events.STAR_SYSTEM_LOADED, this.fillSoiTree);
+        if (sim.starSystem) {
+            this.fillSoiTree();
+        }
     }
 
     fillSoiTree() {

@@ -9,14 +9,16 @@ import OrientationIAUModel from "./Orientation/IAUModel";
 export default class ModuleSolarSystem extends Module
 {
     init() {
-        sim.loadStarSystem('solar_system.json');
-
         this._systemLoadedListener = this._onSystemLoaded.bind(this);
-        Events.addListener(Events.STAR_SYSTEM_LOADED, this._systemLoadedListener);
 
         this._addClass('TrajectoryVSOP87', TrajectoryVSOP87);
         this._addClass('TrajectoryELP2000', TrajectoryELP2000);
         this._addClass('OrientationIAUModel', OrientationIAUModel);
+    }
+
+    loadStarSystem() {
+        sim.loadStarSystem('solar_system.json');
+        Events.addListener(Events.STAR_SYSTEM_LOADED, this._systemLoadedListener);
     }
 
     _onSystemLoaded(event) {

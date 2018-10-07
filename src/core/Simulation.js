@@ -12,6 +12,7 @@ import UI from "../ui-legacy/UI";
 import StarSystem from "./StarSystem";
 import Camera from "../ui-legacy/Camera";
 import ReferenceFrameFactory from "./ReferenceFrame/Factory";
+import StarSystemManager from "../interface/StarSystemManager";
 
 class Simulation
 {
@@ -19,6 +20,7 @@ class Simulation
         this.modules = {};
         this.propagators = {};
         this.renderLoopActive = false;
+        this.starSystemManager = new StarSystemManager();
 
         this._initSettings();
     }
@@ -49,11 +51,12 @@ class Simulation
 
         this.ui = new UI();
 
+        this.starSystemManager.loadDefault();
+
         Events.dispatch(Events.INIT_DONE);
     }
 
     loadStarSystem(jsonFile) {
-        this.stopRendering();
         $.getJSON("./star_systems/" + jsonFile, starSystemConfig => {
             this.starSystem && this.starSystem.unload();
             this.starSystem = new StarSystem(starSystemConfig.id);
@@ -137,11 +140,12 @@ class Simulation
         return (new Vector(visualCoords.toArray())).add_(this.camera.lastPosition);
     }
 
-    loadModule(alias) {
+    loadModule(alias, callback) {
         const className = 'Module' + alias;
         import('../modules/' + alias + '/' + className).then((module) => {
             this.modules[alias] = new module.default();
             this.modules[alias].init();
+            callback && callback(this.modules[alias]);
         });
     }
 
@@ -150,6 +154,10 @@ class Simulation
             throw new Error('Unknown module: ' + alias);
         }
         return this.modules[alias];
+    }
+
+    isModuleLoaded(alias) {
+        return this.modules[alias] !== undefined;
     }
 
     getClass(alias) {

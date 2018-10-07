@@ -3,7 +3,7 @@ import { sim } from "../../core/Simulation";
 
 export default class ModuleKSP extends Module
 {
-    init() {
+    loadStarSystem() {
         sim.loadStarSystem('ksp.json');
     }
 }
