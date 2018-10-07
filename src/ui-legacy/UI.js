@@ -10,7 +10,7 @@ import { sim } from "../core/Simulation";
 export default class UI
 {
     constructor() {
-        this.timePanel     = new UIPanelTime    ($('#timePanel'),    sim.time);
+        this.timePanel     = new UIPanelTime    ($('#timePanel'));
         this.cameraPanel   = new UIPanelCamera  ($('#cameraPanel'),  sim.camera);
         this.metricsPanel  = new UIPanelMetrics ($('#metricsPanel'), sim.selection);
         this.creationPanel = new UIPanelCreation($('#creationPanel'));

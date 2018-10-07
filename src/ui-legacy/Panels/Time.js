@@ -1,21 +1,20 @@
 import Events from "../../core/Events";
 import UIPanel from "../Panel";
+import { sim } from "../../core/Simulation"
 
 export default class UIPanelTime extends UIPanel
 {
-    constructor(panelDom, timeLine) {
+    constructor(panelDom) {
         super(panelDom);
-
-        this.timeLine = timeLine;
 
         this.maxTimeScale = 6 * 30 * 86400;
 
         this.jqSlider = this.jqDom.find('#timeScaleSlider');
-        this.jqSlider.on('input change', () => this.timeLine.setTimeScale(this.getCurrentTimeScale()));
-        this.jqSlider.val(this.getNeededSliderValue(this.timeLine.timeScale));
+        this.jqSlider.on('input change', () => sim.time.setTimeScale(this.getCurrentTimeScale()));
+        this.jqSlider.val(this.getNeededSliderValue(sim.time.timeScale));
 
         this.jqScaleText = this.jqDom.find('#timeScaleValue');
-        this.jqScaleText.html(this.formatTimeScale(this.timeLine.timeScale));
+        this.jqScaleText.html(this.formatTimeScale(sim.time.timeScale));
 
         document.addEventListener(Events.TIME_SCALE_CHANGED, (event) => {
             this.jqSlider.val(this.getNeededSliderValue(event.detail.new));
@@ -25,18 +24,12 @@ export default class UIPanelTime extends UIPanel
         this.jqDateText = this.jqDom.find('#currentDateValue');
         document.addEventListener(Events.EPOCH_CHANGED, (event) => this.updateTime(event.detail.date));
 
-        this.jqDom.find('#setRealTimeScale').click(() => this.timeLine.setTimeScale(1));
-        this.jqDom.find('#useCurrentTime').click(() => this.timeLine.useCurrentTime());
+        this.jqDom.find('#setRealTimeScale').click(() => sim.time.setTimeScale(1));
+        this.jqDom.find('#useCurrentTime').click(() => sim.time.useCurrentTime());
     }
 
     updateTime(date) {
-        let string = date.getYear() + 1900;
-        string += '-' + ((date.getMonth() + 1) + '').padStart(2, '0');
-        string += '-' + (date.getDate() + '').padStart(2, '0');
-        string += ' ' + (date.getHours() + '').padStart(2, '0');
-        string += ':' + (date.getMinutes() + '').padStart(2, '0');
-        string += ':' + (date.getSeconds() + '').padStart(2, '0');
-        this.jqDateText.html(string);
+        this.jqDateText.html(sim.time.formatDateFull(date));
     }
 
     /**

@@ -9,27 +9,25 @@ import OrientationIAUModel from "./Orientation/IAUModel";
 export default class ModuleSolarSystem extends Module
 {
     init() {
-        this._systemLoadedListener = this._onSystemLoaded.bind(this);
-
         this._addClass('TrajectoryVSOP87', TrajectoryVSOP87);
         this._addClass('TrajectoryELP2000', TrajectoryELP2000);
         this._addClass('OrientationIAUModel', OrientationIAUModel);
     }
 
     loadStarSystem() {
-        sim.loadStarSystem('solar_system.json');
-        Events.addListener(Events.STAR_SYSTEM_LOADED, this._systemLoadedListener);
+        sim.loadStarSystem('solar_system.json', starSystem => this._onSystemLoaded(starSystem));
     }
 
-    _onSystemLoaded(event) {
-        StarSystemLoader.loadObjectByUrl(event.detail.starSystem, './spacecraft/voyager1.json');
-        StarSystemLoader.loadObjectByUrl(event.detail.starSystem, './spacecraft/voyager2.json');
-        StarSystemLoader.loadObjectByUrl(event.detail.starSystem, './spacecraft/lro.json');
+    _onSystemLoaded(starSystem) {
+        StarSystemLoader.loadObjectByUrl(starSystem, './spacecraft/voyager1.json');
+        StarSystemLoader.loadObjectByUrl(starSystem, './spacecraft/voyager2.json');
+        StarSystemLoader.loadObjectByUrl(starSystem, './spacecraft/lro.json');
 
-        this.loadTLE(event.detail.starSystem, 25544); // ISS
-        this.loadTLE(event.detail.starSystem, 20580); // Hubble
+        this.loadTLE(starSystem, 25544); // ISS
+        this.loadTLE(starSystem, 20580); // Hubble
 
-        Events.removeListener(Events.STAR_SYSTEM_LOADED, this._systemLoadedListener);
+        sim.time.initValues();
+        sim.time.useCurrentTime();
     }
 
     loadTLE(starSystem, noradId) {
