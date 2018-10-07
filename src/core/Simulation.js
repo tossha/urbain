@@ -43,7 +43,7 @@ class Simulation
 
         this.selection = new SelectionHandler();
 
-        this.time = new TimeLine(TimeLine.getEpochByDate(new Date()), 1, true);
+        this.time = new TimeLine(0, 1, true);
 
         this.camera = new Camera(this.renderer.domElement);
 
@@ -56,7 +56,7 @@ class Simulation
         Events.dispatch(Events.INIT_DONE);
     }
 
-    loadStarSystem(jsonFile) {
+    loadStarSystem(jsonFile, onLoadFinish) {
         $.getJSON("./star_systems/" + jsonFile, starSystemConfig => {
             this.starSystem && this.starSystem.unload();
             this.starSystem = new StarSystem(starSystemConfig.id);
@@ -71,6 +71,7 @@ class Simulation
                 new Vector([30000, 30000, 20000])
             );
 
+            onLoadFinish && onLoadFinish(this.starSystem);
             Events.dispatch(Events.STAR_SYSTEM_LOADED, {starSystem: this.starSystem});
 
             this.startRendering();
@@ -92,6 +93,10 @@ class Simulation
 
     get currentDate() {
         return TimeLine.getDateByEpoch(this.time.epoch);
+    }
+
+    forceEpoch(epoch) {
+        return this.time.forceEpoch(epoch);
     }
 
     _initSettings() {
