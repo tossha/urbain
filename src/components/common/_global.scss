@@ -42,25 +42,26 @@ button {
 	font-size: 10px;
 	outline: none;
 	padding: 4px 8px;
-}
 
-button:hover,
-button:active {
-	background-color: var(--gray);
+	&:hover,
+	&:active {
+		background-color: var(--gray);
+	}
 }
-
 
 select {
+	$color: #0e0f12;
+
 	appearance: none !important;
 	-ms-appearance: none;
 	-moz-appearance: none;
 	-webkit-appearance: none;
+	background-color: $color;
 	background-image: url("/images/chevron-down-solid.svg");
 	background-position: right center;
 	background-repeat: no-repeat;
 	background-size: 1.25em 10px;
-	background-color: #0e0f12;
-	border-color: #0e0f12;
+	border-color: $color;
 	border-radius: 2px;
 	color: #f4f4f4;
 	line-height: 1em;
@@ -69,13 +70,12 @@ select {
 	padding: 0 1.5em 0 0.3em;
 	text-indent: 0.01px;
 	text-overflow: "";
-}
 
-select::-ms-expand {
-	display: none;
-}
+	&::-ms-expand {
+		display: none;
+	}
 
-select > option {
-	background-color: #131519;
-
+	& > option {
+		background-color: #131519;
+	}
 }

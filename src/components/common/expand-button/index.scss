@@ -1,0 +1,26 @@
+.expand-button {
+	$b: &;
+
+	align-items: center;
+	background-color: var(--black);
+	font-size: 8px;
+	display: flex;
+	justify-content: center;
+	cursor: pointer;
+
+	&:hover {
+		background-color: var(--gray);
+	}
+
+	&--expanded {
+		background-color: var(--blue);
+
+		&:hover {
+			background-color: var(--lightning-blue);
+		}
+
+		& #{$b}__icon {
+			transform: rotateZ(180deg);
+		}
+	}
+}
