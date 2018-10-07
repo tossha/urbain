@@ -8,6 +8,7 @@ import KeplerianEditor from "../KeplerianEditor";
 import {Quaternion} from "../algebra";
 import ReferenceFrameAbstract from "../ReferenceFrame/Abstract";
 import { sim } from "../Simulation";
+import Events from "../Events";
 
 export default class TrajectoryAbstract
 {
@@ -29,6 +30,8 @@ export default class TrajectoryAbstract
         this.isSelected = false;
 
         this.propagator = null;
+
+        this.showOrbitAnglesListener = this._onShowOrbitAnglesChange.bind(this);
 
         this.orbitalReferenceFrame = new ReferenceFrameInertialDynamic(
             new FunctionOfEpochCustom(epoch => this.getStateByEpoch(epoch)),
@@ -122,6 +125,7 @@ export default class TrajectoryAbstract
         this.isSelected = true;
         this.visualModel && this.visualModel.select();
         this.keplerianEditor = new KeplerianEditor(this);
+        Events.addListener(Events.SHOW_ORBIT_ANGLES_CHANGED, this.showOrbitAnglesListener);
     }
 
     deselect() {
@@ -130,6 +134,15 @@ export default class TrajectoryAbstract
         if (this.keplerianEditor) {
             this.keplerianEditor.remove();
             delete this.keplerianEditor;
+            Events.removeListener(Events.SHOW_ORBIT_ANGLES_CHANGED, this.showOrbitAnglesListener);
+        }
+    }
+
+    _onShowOrbitAnglesChange(event) {
+        if (event.detail.value) {
+            this.keplerianEditor.init();
+        } else {
+            this.keplerianEditor.remove();
         }
     }
 

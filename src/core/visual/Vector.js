@@ -12,7 +12,7 @@ export default class VisualVector extends VisualModelAbstract
         if (referenceFrameId === undefined) {
             referenceFrameId = RF_BASE;
         }
-        this.referenceFrame = window.sim.starSystem.getReferenceFrame(referenceFrameId);
+        this.referenceFrame = sim.starSystem.getReferenceFrame(referenceFrameId);
         this.quaternion = Quaternion.transfer(new Vector([0,1,0]), vector);
         this.setThreeObj(new THREE.ArrowHelper(
             (new THREE.Vector3()).fromArray([1,0,0]),

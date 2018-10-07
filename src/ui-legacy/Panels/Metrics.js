@@ -27,14 +27,7 @@ export default class UIPanelMetrics extends UIPanel
         });
         this.jqDom.find('#showAnglesOfSelectedOrbit').on('change', function() {
             sim.settings.ui.showAnglesOfSelectedOrbit = this.checked;
-            if (!selection.getSelectedObject()) {
-                return;
-            }
-            if (this.checked) {
-                selection.getSelectedObject().keplerianEditor.init();
-            } else {
-                selection.getSelectedObject().keplerianEditor.remove();
-            }
+            Events.dispatch(Events.SHOW_ORBIT_ANGLES_CHANGED, {value: this.checked});
         });
 
         this.positionPanel = new UIPanelVector(this.jqDom.find(".js-metrics-panel-cartesian-position-vector"), null);
