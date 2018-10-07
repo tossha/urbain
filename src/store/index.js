@@ -27,6 +27,12 @@ class TopMenuItem {
 class Store {
     constructor(simulation) {
         this._simulation = simulation;
+
+        this.starSystemSelectorSettings = {
+            options: this._simulation.starSystemManager.list,
+            defaultValue: this._simulation.starSystemManager.list[0],
+            onSelect: item => this._simulation.starSystemManager.loadByIdx(item.idx)
+        };
     }
 
     viewSettings = {
@@ -81,18 +87,6 @@ class Store {
             },
         ]),
     ];
-
-    starSystems = [{ label: "Solar System", value: "SolarSystem" }, { label: "KSP System", value: "KSP" }];
-
-    starSystemSelectorSettings = {
-        options: this.starSystems,
-        defaultValue: this.starSystems[0],
-        onSelect: option => {
-            const { value } = option;
-
-            this._simulation.loadModule(value);
-        },
-    };
 }
 
 const { Provider, Consumer } = createContext();
