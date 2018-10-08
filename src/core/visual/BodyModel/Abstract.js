@@ -1,7 +1,7 @@
 import * as THREE from "three";
 
 import VisualModelAbstract from "../ModelAbstract";
-import VisualLabel from "../VisualLabel";
+import VisualLabel from "../Label";
 import Events from "../../Events";
 import EphemerisObject from "../../EphemerisObject";
 import FunctionOfEpochCustom from "../../FunctionOfEpoch/Custom";

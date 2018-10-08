@@ -4,13 +4,13 @@ import VisualModelAbstract from "./ModelAbstract";
 import { sim } from "../Simulation";
 
 export default class VisualLabel extends VisualModelAbstract {
-    constructor(functionOfEpoch, parameters) {
+    constructor(positionOfEpoch, parameters) {
         super();
 
         this.visible = true;
 
         this.parameters = Object.assign({}, VisualLabel.DEFAULT_SETTINGS, parameters);
-        this.functionOfEpoch = functionOfEpoch;
+        this.positionOfEpoch = positionOfEpoch;
 
         this.canvas = document.createElement('canvas');
 
@@ -49,7 +49,7 @@ export default class VisualLabel extends VisualModelAbstract {
             return;
         }
 
-        this.threeObj.position.copy(sim.getVisualCoords(this.functionOfEpoch.evaluate(epoch)));
+        this.threeObj.position.copy(sim.getVisualCoords(this.positionOfEpoch.evaluate(epoch)));
 
         const distance = this.threeObj.position.length();
 
