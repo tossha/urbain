@@ -63,7 +63,7 @@ export default class TrajectoryComposite extends TrajectoryAbstract
             }
         }
 
-        throw new ExceptionOutOfRange(this.object, epoch, this.minEpoch, this.maxEpoch);
+        throw new ExceptionOutOfRange(this.object, this, epoch, this.minEpoch, this.maxEpoch);
     }
 
     addComponent(trajectory) {
@@ -96,6 +96,10 @@ export default class TrajectoryComposite extends TrajectoryAbstract
         while (this.components[this.components.length - 1].minEpoch >= epoch) {
             this.components[this.components.length - 1].drop();
             this.components.pop();
+        }
+        while (this.flightEvents[this.flightEvents.length - 1].epoch >= epoch) {
+            this.flightEvents[this.flightEvents.length - 1].drop();
+            this.flightEvents.pop();
         }
     }
 }
