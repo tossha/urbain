@@ -74,7 +74,7 @@ export default class VisualTrajectoryModelAbstract extends VisualModelAbstract
 
         this.point.visible = true;
         this.point.position.copy(sim.getVisualCoords(this.trajectory.getPositionByEpoch(epoch)));
-        const scaleKoeff = this.pointSize * this.point.position.length() * sim.raycaster.getPixelAngleSize();
+        const scaleKoeff = this.pointSize * this.point.position.length() * this.pixelAngleSize;
         this.point.scale.x = scaleKoeff;
         this.point.scale.y = scaleKoeff;
         this.point.scale.z = scaleKoeff;

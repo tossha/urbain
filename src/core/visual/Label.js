@@ -58,7 +58,7 @@ export default class VisualLabel extends VisualModelAbstract {
         this.threeObj.scale.y = this.canvas.height * scaleCoeff;
 
         this.threeObj.visible = 1 < Math.max(this.threeObj.scale.x, this.threeObj.scale.y) /
-            (distance * sim.raycaster.getPixelAngleSize()) / 2;
+            (distance * this.pixelAngleSize) / 2;
     }
 
     calculateScaleCoeff(distance, scaling) {

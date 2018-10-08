@@ -1,6 +1,5 @@
 import * as THREE from "three";
 import VisualModelAbstract from "./ModelAbstract";
-import { sim } from "../Simulation";
 
 export default class VisualPoint extends VisualModelAbstract
 {
@@ -18,7 +17,7 @@ export default class VisualPoint extends VisualModelAbstract
     render(epoch) {
         this.setPosition(this.positionOfEpoch.evaluate(epoch));
 
-        const scaleKoeff = this.size * this.threeObj.position.length() * sim.raycaster.getPixelAngleSize();
+        const scaleKoeff = this.size * this.threeObj.position.length() * this.pixelAngleSize;
         this.threeObj.scale.x = scaleKoeff;
         this.threeObj.scale.y = scaleKoeff;
         this.threeObj.scale.z = scaleKoeff;

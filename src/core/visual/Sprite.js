@@ -1,6 +1,7 @@
 import * as THREE from "three";
 
 import VisualModelAbstract from "./ModelAbstract";
+import { sim } from '../Simulation';
 
 export default class VisualSprite extends VisualModelAbstract {
     constructor(positionOfEpoch, texture, verticalAlign, horizontalAlign, scale) {
@@ -8,7 +9,7 @@ export default class VisualSprite extends VisualModelAbstract {
 
         this.positionOfEpoch = positionOfEpoch;
 
-        new THREE.TextureLoader().load(texture, texture => {
+        sim.textureLoader.load(texture, texture => {
             scale = scale || 1;
             this.setThreeObj(new THREE.Sprite(new THREE.SpriteMaterial(
                 {map: texture, sizeAttenuation: false, color: 0x0099AA}

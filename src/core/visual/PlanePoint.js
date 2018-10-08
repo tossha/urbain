@@ -130,7 +130,7 @@ export default class VisualPlanePoint extends VisualModelAbstract
             RF_BASE
         ));
 
-        const scaleKoeff = this.size * this.threeObj.position.length() * sim.raycaster.getPixelAngleSize();
+        const scaleKoeff = this.size * this.threeObj.position.length() * this.pixelAngleSize;
         this.threeObj.scale.x = scaleKoeff;
         this.threeObj.scale.y = scaleKoeff;
         this.threeObj.scale.z = scaleKoeff;
