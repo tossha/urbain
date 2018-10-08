@@ -6,7 +6,7 @@
   "scripts": {
     "start": "npm i && react-scripts start",
     "build": "npm i && react-scripts build",
-    "test": "react-scripts test --env=jsdom",
+    "test": "react-scripts test",
     "predeploy": "npm run build",
     "deploy": "gh-pages -d build"
   },
@@ -20,25 +20,35 @@
     "url": "https://github.com/tossha/urbain/issues"
   },
   "homepage": "https://urbain.ru/",
+  "engines": {
+    "node": ">=8.12.0 <9.0.0",
+    "npm": ">=6.4.1"
+  },
   "dependencies": {
-    "@fortawesome/fontawesome-svg-core": "1.2.2",
-    "@fortawesome/free-solid-svg-icons": "5.2.0",
-    "@fortawesome/react-fontawesome": "0.1.0",
+    "@fortawesome/fontawesome-svg-core": "1.2.4",
+    "@fortawesome/free-solid-svg-icons": "5.3.1",
+    "@fortawesome/react-fontawesome": "0.1.3",
     "classnames": "2.2.6",
     "jquery": "3.3.1",
-    "react": "16.4.2",
-    "react-dom": "16.4.2",
-    "react-scripts": "1.1.4",
-    "react-select": "2.0.0",
+    "react": "16.5.2",
+    "react-dom": "16.5.2",
+    "react-scripts": "2.0.4",
+    "react-select": "2.1.0",
     "stats.js": "0.17.0",
-    "three": "0.94.0"
+    "three": "0.97.0"
   },
   "devDependencies": {
-    "eslint-plugin-babel": "5.1.0",
-    "eslint-plugin-prettier": "2.6.2",
-    "gh-pages": "1.2.0",
-    "prettier": "1.14.2",
-    "prop-types": "15.6.2",
-    "webpack": "3.12.0"
-  }
+    "eslint-plugin-babel": "5.2.1",
+    "eslint-plugin-prettier": "3.0.0",
+    "gh-pages": "2.0.1",
+    "node-sass": "^4.9.3",
+    "prettier": "1.14.3",
+    "prop-types": "15.6.2"
+  },
+  "browserslist": [
+    ">0.2%",
+    "not dead",
+    "not ie <= 11",
+    "not op_mini all"
+  ]
 }

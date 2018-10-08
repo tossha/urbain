@@ -1,7 +1,6 @@
 import React from "react";
 
-import "./common/global.css";
-import "./common/app-layout.css";
+import "./common/app-layout.scss";
 import Header from "./header/header";
 import MainView from "./main-view/main-view";
 import Footer from "./footer/footer";

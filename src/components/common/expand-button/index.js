@@ -3,7 +3,7 @@ import PropTypes from "prop-types";
 import cn from "classnames";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 
-import "./index.css";
+import "./index.scss";
 
 function ExpandButton({ className, onClick, expanded = false }) {
     return (
