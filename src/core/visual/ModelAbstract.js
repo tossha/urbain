@@ -15,6 +15,10 @@ export default class VisualModelAbstract
         document.addEventListener(Events.RENDER, this.renderListener);
     }
 
+    setPosition(simCoords) {
+        this.threeObj.position.copy(sim.getVisualCoords(simCoords));
+    }
+
     _onRender(event) {
         try {
             this.render(event.detail.epoch);

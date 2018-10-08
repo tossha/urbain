@@ -254,7 +254,7 @@ export default class VisualAngle extends VisualModelAbstract
             this.getPosition(epoch),
             RF_BASE
         );
-        this.threeObj.position.copy(sim.getVisualCoords(pos));
+        this.setPosition(pos);
         this.threeObj.visible = true;
 
         if (this.valueUpdated || !(this._value instanceof Constant)) {

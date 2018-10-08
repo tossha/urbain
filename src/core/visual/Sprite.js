@@ -1,7 +1,6 @@
 import * as THREE from "three";
 
 import VisualModelAbstract from "./ModelAbstract";
-import { sim } from "../Simulation";
 
 export default class VisualSprite extends VisualModelAbstract {
     constructor(positionOfEpoch, texture, verticalAlign, horizontalAlign, scale) {
@@ -35,6 +34,6 @@ export default class VisualSprite extends VisualModelAbstract {
     }
 
     render(epoch) {
-        this.threeObj.position.copy(sim.getVisualCoords(this.positionOfEpoch.evaluate(epoch)));
+        this.setPosition(this.positionOfEpoch.evaluate(epoch));
     }
 }

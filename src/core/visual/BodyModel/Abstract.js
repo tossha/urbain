@@ -2,7 +2,6 @@ import * as THREE from "three";
 
 import VisualModelAbstract from "../ModelAbstract";
 import VisualLabel from "../Label";
-import Events from "../../Events";
 import EphemerisObject from "../../EphemerisObject";
 import FunctionOfEpochCustom from "../../FunctionOfEpoch/Custom";
 import { sim } from "../../Simulation";
@@ -69,7 +68,7 @@ export default class VisualBodyModelAbstract extends VisualModelAbstract
         if (this.label) {
             this.label.visible = sim.settings.ui.showBodyLabels;
         }
-        this.threeObj.position.copy(sim.getVisualCoords(this.body.getPositionByEpoch(epoch)));
+        this.setPosition(this.body.getPositionByEpoch(epoch));
         this.threeObj.quaternion.copy(
             this.body.orientation.getQuaternionByEpoch(epoch).toThreejs()
         );

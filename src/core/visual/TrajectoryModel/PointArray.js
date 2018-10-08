@@ -68,7 +68,7 @@ export default class VisualTrajectoryModelPointArray extends VisualTrajectoryMod
         this.threeObj.visible = true;
         this.updateGeometry(points, colors, endingBrightness);
 
-        this.threeObj.position.copy(sim.getVisualCoords(originPos));
+        this.setPosition(originPos);
         this.threeObj.quaternion.copy(this.referenceFrame.getQuaternionByEpoch(epoch).toThreejs());
 
         super.render(epoch);

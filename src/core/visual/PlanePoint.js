@@ -124,12 +124,10 @@ export default class VisualPlanePoint extends VisualModelAbstract
             this.mouseMoved = false;
         }
 
-        this.threeObj.position.copy(sim.getVisualCoords(
-            this.getReferenceFrame(epoch).transformPositionByEpoch(
-                epoch,
-                this._value,
-                RF_BASE
-            )
+        this.setPosition(this.getReferenceFrame(epoch).transformPositionByEpoch(
+            epoch,
+            this._value,
+            RF_BASE
         ));
 
         const scaleKoeff = this.size * this.threeObj.position.length() * sim.raycaster.getPixelAngleSize();

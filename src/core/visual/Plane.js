@@ -1,7 +1,6 @@
 import * as THREE from "three";
 import VisualModelAbstract from "./ModelAbstract";
 import FunctionOfEpochAbstract from "../FunctionOfEpoch/Abstract";
-import { sim } from "../Simulation";
 
 export default class VisualPlane extends VisualModelAbstract
 {
@@ -39,6 +38,6 @@ export default class VisualPlane extends VisualModelAbstract
 
     render(epoch) {
         this.threeObj.quaternion.copy(this.getQuaternion(epoch).toThreejs());
-        this.threeObj.position.copy(sim.getVisualCoords(this.getPosition(epoch)));
+        this.setPosition(this.getPosition(epoch));
     }
 }

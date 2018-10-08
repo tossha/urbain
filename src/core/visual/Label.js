@@ -49,7 +49,7 @@ export default class VisualLabel extends VisualModelAbstract {
             return;
         }
 
-        this.threeObj.position.copy(sim.getVisualCoords(this.positionOfEpoch.evaluate(epoch)));
+        this.setPosition(this.positionOfEpoch.evaluate(epoch));
 
         const distance = this.threeObj.position.length();
 
