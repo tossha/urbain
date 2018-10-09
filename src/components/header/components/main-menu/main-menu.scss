@@ -1,0 +1,40 @@
+@import "../../../common/variables";
+
+.main-menu {
+	$radius: 3px;
+
+	align-items: center;
+	background: $dark-gray;
+	border-top-right-radius: $radius;
+	border-bottom-right-radius: $radius;
+	color: $white-text;
+	display: flex;
+	height: 100%;
+	padding: 0 1rem;
+
+	&__item {
+		display: flex;
+		box-sizing: content-box;
+		align-items: center;
+		height: 100%;
+		margin: 0 1rem;
+	}
+
+	&__link {
+		padding: $default-gap-size 1rem;
+	}
+
+	&__clickable-zone {
+		box-sizing: content-box;
+		display: flex;
+		align-items: center;
+		border-radius: $radius;
+		cursor: pointer;
+		height: 2rem;
+
+		&:hover {
+			background-color: $gray;
+			color: #fff;
+		}
+	}
+}

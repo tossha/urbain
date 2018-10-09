@@ -1,0 +1,70 @@
+@import "../../../../common/variables";
+
+.drop-down-menu {
+	$menu: &;
+
+	align-items: center;
+	display: inline-flex;
+	position: relative;
+	list-style: none none;
+	height: 200%;
+	margin: 0;
+	padding: 0;
+
+	&:hover {
+		#{$menu}__menu {
+			display: block;
+		}
+
+		#{$menu}__toggler {
+			border-radius: $border-radius;
+			background: $gray;
+			cursor: pointer;
+		}
+
+		#{$menu}__caret{
+			color: $white-text;
+		}
+	}
+
+	&__menu {
+		border: $gray 1px solid;
+		background-color: $black;
+		display: none;
+		left: 0;
+		list-style: none none;
+		margin: 11px 0 0 0;
+		padding: 0;
+		min-width: 100px;
+		position: absolute;
+		z-index: 99999;
+	}
+
+	&__menu-item {
+		display: flex;
+		padding: 8px;
+		cursor: pointer;
+		width: 100%;
+		white-space: nowrap;
+
+		&:hover {
+			background: $gray;
+		}
+	}
+
+	&__menu-item-icon {
+		min-width: 35px;
+	}
+
+	&__toggler {
+		display: flex;
+		padding: 5px $default-gap-size;
+	}
+
+	&__caret {
+		color: $gray-text;
+		font-size: 10px;
+		margin-left: $default-gap-size;
+		margin-top: 2px;
+	}
+}

@@ -1,10 +1,40 @@
-import { ABOUT_PAGE_URL, TOP_MENU_ITEMS } from "./constants";
+import { HELP_PAGE_URL, TOP_MENU_ITEMS } from "./constants";
 import { createContext } from "./context";
-import { openLinkInNewTab } from "./utils";
 
-class TopMenuItem {
-    constructor(label, options = []) {
+export const MenuItemType = {
+    NONE: 0,
+    LINK: 1,
+    DROPDOWN: 2,
+};
+
+class MenuItem {
+    constructor(label, type = MenuItemType.NONE) {
         this.label = label;
+        this.type = type;
+    }
+
+    get isClickable() {
+        return true;
+    }
+}
+
+class LinkMenuItem extends MenuItem {
+    constructor(label, { href = "", target = "_self" } = {}) {
+        super(label, MenuItemType.LINK);
+
+        this.href = href;
+        this.target = target;
+    }
+
+    get isClickable() {
+        return Boolean(this.href);
+    }
+}
+
+class DropDownMenuItem extends MenuItem {
+    constructor(label, options = []) {
+        super(label, MenuItemType.DROPDOWN);
+
         this.options = options;
     }
 
@@ -27,12 +57,6 @@ class TopMenuItem {
 class Store {
     constructor(simulation) {
         this._simulation = simulation;
-
-        this.starSystemSelectorSettings = {
-            options: this._simulation.starSystemManager.list,
-            defaultValue: this._simulation.starSystemManager.list[0],
-            onSelect: item => this._simulation.starSystemManager.loadByIdx(item.idx)
-        };
     }
 
     viewSettings = {
@@ -43,7 +67,7 @@ class Store {
     };
 
     topMenu = [
-        new TopMenuItem(TOP_MENU_ITEMS.SIMULATION, [
+        new DropDownMenuItem(TOP_MENU_ITEMS.SIMULATION, [
             {
                 label: "Orbit creation panel",
                 selected: this.viewSettings.showOrbitCreationPanel,
@@ -59,8 +83,8 @@ class Store {
                 },
             },
         ]),
-        new TopMenuItem(TOP_MENU_ITEMS.EDIT),
-        new TopMenuItem(TOP_MENU_ITEMS.VIEW, [
+        new LinkMenuItem(TOP_MENU_ITEMS.EDIT),
+        new DropDownMenuItem(TOP_MENU_ITEMS.VIEW, [
             {
                 label: "Body Labels",
                 selected: this.viewSettings.showBodyLabels,
@@ -77,16 +101,21 @@ class Store {
                 },
             },
         ]),
-        // new TopMenuItem(TOP_MENU_ITEMS.SETTINGS),
-        new TopMenuItem(TOP_MENU_ITEMS.HELP, [
-            {
-                label: "About",
-                onClick() {
-                    openLinkInNewTab(ABOUT_PAGE_URL);
-                },
-            },
-        ]),
+        new LinkMenuItem(TOP_MENU_ITEMS.HELP, {
+            href: HELP_PAGE_URL,
+            target: "_blank",
+        }),
     ];
+
+    get starSystemSelectorSettings() {
+        const { starSystemManager } = this._simulation;
+
+        return {
+            options: starSystemManager.starSystems,
+            defaultValue: starSystemManager.defaultStarSystem,
+            onSelect: item => starSystemManager.loadByIdx(item.idx),
+        };
+    }
 }
 
 const { Provider, Consumer } = createContext();

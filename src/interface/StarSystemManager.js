@@ -1,40 +1,63 @@
-
 import StarSystemEntry from "./StarSystemEntry";
 
-export default class StarSystemManager
-{
+export default class StarSystemManager {
     constructor() {
-        this.list = [];
+        this._starSystems = [];
+        this._loadedIdx = null;
 
         // The first one loads by default
-        this.add('solar_system', 'SolarSystem', 'Solar System');
-        this.add('ksp', 'KSP', 'KSP System');
+        this.add("solar_system", "SolarSystem", "Solar System");
+        this.add("ksp", "KSP", "KSP System");
+    }
 
-        this.loadedIdx = false;
+    get starSystems() {
+        return this._starSystems;
+    }
+
+    get defaultStarSystemIdx() {
+        return 0;
+    }
+
+    get defaultStarSystem() {
+        return this._starSystems[this.defaultStarSystemIdx];
     }
 
     add(alias, module, label) {
-        this.list.push(new StarSystemEntry(
-            this.list.length,
-            alias,
-            label,
-            module
-        ));
+        const idx = this._starSystems.length;
+
+        this._starSystems.push(new StarSystemEntry(idx, alias, label, module));
     }
 
     loadDefault() {
-        this.loadByIdx(0);
+        this.loadByIdx(this.defaultStarSystemIdx);
     }
 
     loadByIdx(idx) {
-        this.list[idx].load();
-        this.loadedIdx = idx;
+        if (idx === this._loadedIdx) {
+            return;
+        }
+
+        const starSystem = this._findStarSystemByIdx(idx);
+
+        if (!starSystem) {
+            return;
+        }
+
+        starSystem.load();
+        this._loadedIdx = idx;
     }
 
     getCurrentStarSystem() {
-        if (this.loadedIdx === false) {
-            return false;
+        if (this._loadedIdx === null) {
+            return undefined;
         }
-        return this.list[this.loadedIdx];
+
+        return this._starSystems[this._loadedIdx];
+    }
+
+    _findStarSystemByIdx(idx) {
+        // TODO: Add idx validation
+
+        return this._starSystems[idx];
     }
 }

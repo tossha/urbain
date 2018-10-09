@@ -18,7 +18,7 @@ class Application {
     getApi() {
         return {
             loadTLE,
-            loadKSP
+            loadKSP,
         };
     }
 }
