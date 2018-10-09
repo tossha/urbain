@@ -2,9 +2,9 @@ import React, { Component } from "react";
 import PropTypes from "prop-types";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 
-import { Consumer } from "../../../../store";
+import { Consumer } from "../../../../../store/index";
 import DropDownMenuItem from "./drop-down-menu-item";
-import "./drop-down-menu.css";
+import "./drop-down-menu.scss";
 
 class DropDownMenu extends Component {
     static propTypes = {
@@ -12,7 +12,7 @@ class DropDownMenu extends Component {
         options: PropTypes.arrayOf(
             PropTypes.shape({
                 label: PropTypes.string.isRequired,
-                selected: PropTypes.bool.isRequired,
+                selected: PropTypes.bool,
                 onUpdate: PropTypes.func,
                 onClick: PropTypes.func,
             }),

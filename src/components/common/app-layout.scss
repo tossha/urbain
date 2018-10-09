@@ -1,7 +1,7 @@
 @import "global";
 
 .app-layout {
-	color: var(--white-text);
+	color: $white-text;
 	display: flex;
 	flex-direction: column;
 	height: 100%;

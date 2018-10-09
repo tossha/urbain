@@ -1,0 +1,31 @@
+@import "../common/variables";
+
+.header {
+	align-items: center;
+	display: flex;
+	height: 47px;
+
+	&__logo-wrapper {
+		background: $dark-gray;
+		border-top-left-radius: $border-radius;
+		border-bottom-left-radius: $border-radius;
+		height: 100%;
+	}
+
+	&__logo {
+		background: url("/images/urbain-logo.png") 10px 12px no-repeat;
+		background-size: 70px;
+		border-right: 1px solid $gray;
+		height: 100%;
+		width: 104px
+	}
+
+	&__top-menu {
+		height: 100%;
+	}
+
+	&__star-system-selector {
+		height: 100%;
+		margin-left: $default-gap-size;
+	}
+}

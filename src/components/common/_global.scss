@@ -1,13 +1,15 @@
+@import "variables";
+
 :root {
-	--black: #131519;
-	--black-border: #111317;
-	--blue: #0045f2;
-	--lightning-blue: #2a49fb;
-	--gray: #1f2228;
-	--dark-gray: #1a1c21;
-	--blue-text: #6d69ff;
-	--gray-text: #838485;
-	--white-text: #fdfdfd;
+	--black: #{$black};
+	--black-border: #{$black-border};
+	--blue: #{$blue};
+	--lightning-blue: #{$lightning-blue};
+	--gray: #{$gray};
+	--dark-gray: #{$dark-gray};
+	--blue-text: #{$blue-text};
+	--gray-text: #{$gray-text};
+	--white-text: #{$white-text};
 }
 
 html {
@@ -22,12 +24,14 @@ body {
 	overflow: hidden;
 }
 
-*, ::after, ::before {
+*,
+::after,
+::before {
 	box-sizing: border-box;
 }
 
 .hidden {
-	display: none!important;
+	display: none !important;
 }
 
 .noselect {
@@ -35,17 +39,17 @@ body {
 }
 
 button {
-	background-color: var(--black);
+	background-color: $black;
 	border: none;
 	cursor: pointer;
-	color: var(--white-text);
+	color: $white-text;
 	font-size: 10px;
 	outline: none;
 	padding: 4px 8px;
 
 	&:hover,
 	&:active {
-		background-color: var(--gray);
+		background-color: $gray;
 	}
 }
 
@@ -63,7 +67,7 @@ select {
 	background-size: 1.25em 10px;
 	border-color: $color;
 	border-radius: 2px;
-	color: #f4f4f4;
+	color: $white;
 	line-height: 1em;
 	min-height: 20px;
 	outline: none;
@@ -77,5 +81,15 @@ select {
 
 	& > option {
 		background-color: #131519;
+	}
+}
+
+a {
+	color: $white-text;
+	text-decoration: none;
+
+	&:hover,
+	&:visited {
+		color: $white-text;
 	}
 }
