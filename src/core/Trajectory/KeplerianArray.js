@@ -46,8 +46,8 @@ export default class TrajectoryKeplerianArray extends TrajectoryKeplerianAbstrac
     approximateKeplerianObject(object1, object2, epoch) {
         const proportion = (epoch - object1.epoch) / (object2.epoch - object1.epoch);
 
-        if ((0.95 < object1.e && object1.e < 1.05)
-            || (0.95 < object2.e && object2.e < 1.05)
+        if ((0.95 < object1.ecc && object1.ecc < 1.05)
+            || (0.95 < object2.ecc && object2.ecc < 1.05)
             || (object1.isElliptic !== object2.isElliptic)
         ) {
             const state1 = object1.getStateByEpoch(epoch);
@@ -67,7 +67,7 @@ export default class TrajectoryKeplerianArray extends TrajectoryKeplerianAbstrac
             : approximateNumber(object1.getMeanAnomalyByEpoch(epoch), object2.getMeanAnomalyByEpoch(epoch), proportion);
 
         return new KeplerianObject(
-            approximateNumber(object1.e, object2.e, proportion),
+            approximateNumber(object1.ecc, object2.ecc, proportion),
             approximateNumber(object1.sma, object2.sma, proportion),
             approximateAngle(object1.aop, object2.aop, proportion),
             approximateAngle(object1.inc, object2.inc, proportion),

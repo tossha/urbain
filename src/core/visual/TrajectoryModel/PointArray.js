@@ -7,13 +7,13 @@ export default class VisualTrajectoryModelPointArray extends VisualTrajectoryMod
     constructor(trajectory, config) {
         super(trajectory, config);
 
-        this.referenceFrame = sim.starSystem.getReferenceFrame(config.pointArrayModel.referenceFrame);
-        this.showAhead = config.pointArrayModel.showAhead;
-        this.showBehind = config.pointArrayModel.showBehind;
-        this.trailPeriod = config.pointArrayModel.trailPeriod;
+        this.referenceFrame = sim.starSystem.getReferenceFrame(config.referenceFrame);
+        this.showAhead = config.showAhead;
+        this.showBehind = config.showBehind;
+        this.trailPeriod = config.trailPeriod;
 
-        this.minCos = Math.cos(deg2rad(config.pointArrayModel.maxAngle || 2));
-        this.minStep = config.pointArrayModel.minStep || 180;
+        this.minCos = Math.cos(deg2rad(config.maxAngle || 2));
+        this.minStep = config.minStep || 180;
         this.threeObj.position.set(0, 0, 0);
 
         this.initVertices();

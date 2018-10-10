@@ -97,7 +97,7 @@ export default class TrajectoryComposite extends TrajectoryAbstract
             this.components[this.components.length - 1].drop();
             this.components.pop();
         }
-        while (this.flightEvents[this.flightEvents.length - 1].epoch >= epoch) {
+        while (this.flightEvents.length && this.flightEvents[this.flightEvents.length - 1].epoch >= epoch) {
             this.flightEvents[this.flightEvents.length - 1].drop();
             this.flightEvents.pop();
         }

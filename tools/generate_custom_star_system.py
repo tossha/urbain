@@ -78,8 +78,11 @@ with open('KSP.txt') as file:
 			'trajectory': {
 				'type': 'keplerian',
 				'visual': {
-					'color': match[13].strip().lower(),
-					'keplerianModel': True
+					'model': 'keplerian',
+					'config': {
+						'color': match[13].strip().lower(),
+						'showFull': True
+					}
 				},
 				'data': {
 					'referenceFrame': parent * 100000 + 1000,

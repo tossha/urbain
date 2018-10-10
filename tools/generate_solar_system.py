@@ -1329,8 +1329,9 @@ def getObjectTrajectory(body, parent, parentMu, etFrom, etTo, maxError, color):
 
 	if body == '10':
 		visual = {
-			'color': color,
-			'pointArrayModel': {
+			'model': 'pointArray',
+			'config': {
+				'color': color,
 				'showAhead': True,
 				'showBehind': True,
 				'trailPeriod': 86400 * 365.25 * 25,
@@ -1341,8 +1342,11 @@ def getObjectTrajectory(body, parent, parentMu, etFrom, etTo, maxError, color):
 		}
 	else:
 		visual = {
-			'color': color,
-			'keplerianModel': True
+			'model': 'keplerian',
+			'config': {
+				'color': color,
+				'showFull': True
+			}
 		}
 
 	return {
@@ -1418,8 +1422,11 @@ def getVsopTrajectory(body, color, cutKm):
 	return {
 		'type': 'SolarSystem.TrajectoryVSOP87',
 		'visual': {
-			'color': color,
-			'keplerianModel': True
+			'model': 'keplerian',
+			'config': {
+				'color': color,
+				'showFull': True
+			}
 		},
 		'data': {
 			'body': int(body),
@@ -1483,8 +1490,11 @@ def getELP2000Trajectory(color, cutKm):
 	return {
 		'type': 'SolarSystem.TrajectoryELP2000',
 		'visual': {
-			'color': color,
-			'keplerianModel': True
+			'model': 'keplerian',
+			'config': {
+				'color': color,
+				'showFull': True
+			}
 		},
 		'data': _files
 	}

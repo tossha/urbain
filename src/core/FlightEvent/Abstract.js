@@ -12,4 +12,6 @@ export default class FlightEventAbstract
     get epoch() {
         return this._epoch;
     }
+
+    drop() {}
 }
