@@ -57,7 +57,7 @@ export default class VisualBodyModelRings extends VisualBodyModelAbstract
         super.render(epoch);
         if (!this.isTextureRequested
             && this.texturePath
-            && this.shape.getMaxDimension() / this.threeObj.position.length() > sim.raycaster.getPixelAngleSize()
+            && this.shape.getMaxDimension() / this.threeObj.position.length() > this.pixelAngleSize
         ) {
             this.isTextureRequested = true;
             sim.textureLoader.load(

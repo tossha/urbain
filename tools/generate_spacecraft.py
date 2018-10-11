@@ -6,17 +6,17 @@ import sys
 
 from matplotlib import pyplot as plt
 
-# spice.loadKernel('kernels/de430.bsp')
+spice.loadKernel('kernels/de430.bsp')
 spice.loadKernel('naif0012.tls')
 spice.loadKernel('pck00010.tpc')
 spice.loadKernel('gm_de431.tpc')
 
-# spice.loadKernel('kernels/spacecraft/voyager/voyager_1.ST+1991_a54418u.merged.bsp')
-# spice.loadKernel('kernels/spacecraft/voyager/voyager_2.ST+1992_m05208u.merged.bsp')
+spice.loadKernel('kernels/spacecraft/voyager/voyager_1.ST+1991_a54418u.merged.bsp')
+spice.loadKernel('kernels/spacecraft/voyager/voyager_2.ST+1992_m05208u.merged.bsp')
 
-# spice.loadKernel('kernels/spacecraft/lro/lrorg_2009169_2010001_v01.bsp')
-# spice.loadKernel('kernels/spacecraft/lro/lroevnt_2009173_2009180_v01.bes')
-# spice.loadKernel('kernels/spacecraft/lro/de421.bsp')
+spice.loadKernel('kernels/spacecraft/lro/lrorg_2009169_2010001_v01.bsp')
+spice.loadKernel('kernels/spacecraft/lro/lroevnt_2009173_2009180_v01.bes')
+spice.loadKernel('kernels/spacecraft/lro/de421.bsp')
 
 spice.loadKernel('kernels/spacecraft/tesla/tesla1.bsp')
 
@@ -300,7 +300,7 @@ def getObjectTrajectory(body, parent, etFrom, etTo, maxError, renderingConfig, i
 	}
 
 	if renderingConfig:
-		result['rendering'] = renderingConfig
+		result['visual'] = renderingConfig
 
 	return result
 
@@ -315,7 +315,7 @@ def createCompositeTrajectory(body, renderingConfig, parts):
 				spice.str2et(part['from'] + ' TDB'),
 				spice.str2et(part['to'] + ' TDB'),
 				part['error'],
-				part['rendering'] if 'rendering' in part else None,
+				part['visual'] if 'visual' in part else None,
 				part['step'] if 'step' in part else 60
 			)
 		)
@@ -328,7 +328,7 @@ def createCompositeTrajectory(body, renderingConfig, parts):
 	}
 
 	if renderingConfig:
-		result['rendering'] = renderingConfig
+		result['visual'] = renderingConfig
 
 	return result
 
@@ -463,12 +463,13 @@ voyager2traj = (
 )
 
 voyagerRendering = {
-	'color': 'green',
-	'pointArrayModel': {
-	'showAhead': False,
-	'showBehind': True,
-	'trailPeriod': 86400 * 250,
-	'referenceFrame': 1000,
+	'model': 'pointArray',
+	'config': {
+		'color': 'green',
+		'showAhead': False,
+		'showBehind': False,
+		'trailPeriod': 86400 * 1000,
+		'referenceFrame': 1000,
 	}
 }
 
@@ -479,9 +480,10 @@ lroTraj = (
 		'to':   	'2009 JUN 22 21:00:00.000',
 		'error': 	30,
 		'step':     600,
-		'rendering':{
-			'color': 'white',
-			'pointArrayModel': {
+		'visual': {
+			'model': 'pointArray',
+			'config': {
+				'color': 'white',
 				'showAhead': False,
 				'showBehind': True,
 				'trailPeriod': 86400 * 3,
@@ -495,18 +497,21 @@ lroTraj = (
 		'to':   	'2009 DEC 31 23:01:06.183',
 		'error': 	30,
 		'step':     600,
-		'rendering':{
-			'color': 'white',
-			'keplerianModel': True
+		'visual': {
+			'model': 'keplerian',
+			'config': {
+				'color': 'white'
+			}
 		}
 	},
 )
 
 lroRendering = {
-	'color': 'white',
-	'pointArrayModel': {
+	'model': 'pointArray',
+	'config': {
+		'color': 'white',
 		'showAhead': False,
-		'showBehind': True,
+		'showBehind': False,
 		'trailPeriod': 86400 * 3,
 		'referenceFrame': 39901000,
 	}
@@ -532,9 +537,9 @@ teslaTraj = (
 	},
 )
 
-# createSpacecraftFile('voyager1.json', '-31', 'Voyager 1', voyagerRendering, voyager1traj)
-# createSpacecraftFile('voyager2.json', '-32', 'Voyager 2', voyagerRendering, voyager2traj)
+createSpacecraftFile('./../public/spacecraft/voyager1.json', '-31', 'Voyager 1', voyagerRendering, voyager1traj)
+# createSpacecraftFile('./../public/spacecraft/voyager2.json', '-32', 'Voyager 2', voyagerRendering, voyager2traj)
 
-# createSpacecraftFile('./../dist/spacecraft/lro.json', '-85', 'LRO', False, lroTraj)
+# createSpacecraftFile('./../public/spacecraft/lro.json', '-85', 'LRO', False, lroTraj)
 
-createSpacecraftFile('./../dist/spacecraft/tesla.json', '-10000001', 'TeslaRoadster', False, teslaTraj)
+# createSpacecraftFile('./../dist/spacecraft/tesla.json', '-10000001', 'TeslaRoadster', False, teslaTraj)

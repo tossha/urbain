@@ -1,14 +1,20 @@
 import * as THREE from "three";
 
 import VisualTrajectoryModelAbstract from "./Abstract";
-import {RF_BASE} from "../../ReferenceFrame/Factory";
-import {getAngleBySinCos, Vector} from "../../algebra";
+import {RF_BASE, RF_BASE_OBJ} from "../../ReferenceFrame/Factory";
+import {acosSigned, TWO_PI, Vector} from "../../algebra";
 import FunctionOfEpochCustom from "../../FunctionOfEpoch/Custom";
 import ReferenceFrameInertial from "../../ReferenceFrame/Inertial";
 import { sim } from "../../Simulation";
+import Constant from "../../FunctionOfEpoch/Constant";
 
 export default class VisualTrajectoryModelKeplerian extends VisualTrajectoryModelAbstract
 {
+    constructor(trajectory, config) {
+        super(trajectory, config);
+        this.showFull = !!config.showFull;
+    }
+
     render(epoch)
     {
         super.render(epoch);
@@ -29,6 +35,12 @@ export default class VisualTrajectoryModelKeplerian extends VisualTrajectoryMode
         }
     }
 
+    /**
+     *
+     * @param traj {KeplerianObject} - orbit to be rendered
+     * @param epoch {float} - moment in time that specifies the position in orbit relative to its reference frame
+     * @param locationEpoch {float} - moment in time that specifies the position of the reference frame
+     */
     renderHyperbola(traj, epoch, locationEpoch) {
         const endingBrightness = 0.35;
         const pointsNum = 100;
@@ -82,69 +94,101 @@ export default class VisualTrajectoryModelKeplerian extends VisualTrajectoryMode
         this.updateGeometry(points, angs, endingBrightness);
 
         this.threeObj.quaternion.copy(orbitQuaternion.toThreejs());
-        this.threeObj.position.copy(sim.getVisualCoords(this.trajectory.referenceFrame.getOriginPositionByEpoch(locationEpoch)));
+        this.setPosition(this.trajectory.referenceFrame.getOriginPositionByEpoch(locationEpoch));
     }
 
+    /**
+     *
+     * @param traj {KeplerianObject} - orbit to be rendered
+     * @param epoch {float} - moment in time that specifies the position in orbit relative to its reference frame
+     * @param locationEpoch {float} - moment in time that specifies the position of the reference frame
+     */
     renderEllipse(traj, epoch, locationEpoch) {
         const endingBrightness = 0.35;
         const pointsNum = 100;
-        const referenceFrame = new ReferenceFrameInertial(
-            new FunctionOfEpochCustom(epoch => this.trajectory.getReferenceFrameByEpoch(epoch).getOriginStateByEpoch(locationEpoch)),
-            this.trajectory.pericentricReferenceFrame.getQuaternionByEpoch(epoch)
-        );
 
         const orbitQuaternion = this.trajectory.pericentricReferenceFrame.getQuaternionByEpoch(epoch);
-        const cameraPosition = sim.starSystem.getReferenceFrame(RF_BASE).transformPositionByEpoch(locationEpoch, sim.camera.lastPosition, referenceFrame);
-        const visualOrigin = new Vector([cameraPosition.x, cameraPosition.y, 0]);
-        const actualVisualOrigin = referenceFrame.transformPositionByEpoch(locationEpoch, visualOrigin, RF_BASE);
-        const ta = traj.getTrueAnomalyByEpoch(epoch);
-        const sinE = visualOrigin.y / visualOrigin.mag;
-        const cosE = visualOrigin.x / visualOrigin.mag;
-        const cameraTrueAnomaly = getAngleBySinCos(sinE, cosE);
-        const toClosestPoint = traj.getOwnCoordsByTrueAnomaly(cameraTrueAnomaly)                // not really closest
-            .sub(cameraPosition).mag;
-        const toFarthestPoint = traj.getOwnCoordsByTrueAnomaly(cameraTrueAnomaly + Math.PI)     // not really farthest
-            .sub(cameraPosition).mag;
-        let cameraAngle = Math.acos(
-            (traj.e + Math.cos(cameraTrueAnomaly)) / (1 + traj.e * Math.cos(cameraTrueAnomaly))
-        );
-        let ang = Math.acos(
-            (traj.e + Math.cos(ta)) / (1 + traj.e * Math.cos(ta))
+
+        // Main working RF. We take reference frame of the object
+        // at epoch and look at its position at locationEpoch
+        const referenceFrame = new ReferenceFrameInertial(
+            new Constant(this.trajectory.getReferenceFrameByEpoch(epoch).getOriginStateByEpoch(locationEpoch)),
+            orbitQuaternion
         );
 
-        if (ta > Math.PI) {
-            ang = 2 * Math.PI - ang;
-        }
-        if (cameraTrueAnomaly > Math.PI) {
-            cameraAngle = 2 * Math.PI - cameraAngle;
+        // Camera position relative to main reference frame
+        const relativeCameraPosition = RF_BASE_OBJ.transformPositionByEpoch(locationEpoch, sim.camera.lastPosition, referenceFrame);
+
+        // Camera position projected onto the plane of the orbit, relative to main reference frame
+        const projectedRelativeCameraPosition = new Vector([relativeCameraPosition.x, relativeCameraPosition.y, 0]);
+
+        // Camera position projected onto the plane of the orbit, in global coordinates
+        const projectedCameraPosition = referenceFrame.transformPositionByEpoch(locationEpoch, projectedRelativeCameraPosition, RF_BASE_OBJ);
+
+        // True anomaly of the camera
+        const cameraTrueAnomaly = acosSigned(
+            projectedRelativeCameraPosition.x / projectedRelativeCameraPosition.mag,
+            projectedRelativeCameraPosition.y
+        );
+
+        const toClosestPoint = traj.getOwnCoordsByTrueAnomaly(cameraTrueAnomaly)                // not really closest
+            .sub_(relativeCameraPosition).mag;
+        const toFarthestPoint = traj.getOwnCoordsByTrueAnomaly(cameraTrueAnomaly + Math.PI)     // not really farthest
+            .sub_(relativeCameraPosition).mag;
+
+        let cameraAngle = traj.getEccentricAnomalyByTrueAnomaly(cameraTrueAnomaly);
+        let ang = traj.getEccentricAnomalyByEpoch(epoch);
+        let maxAnglePart = 1;
+
+        // if there's less then one orbit left
+        if (!this.showFull
+            && this.trajectory.maxEpoch !== false
+            && this.trajectory.maxEpoch !== null
+            && (this.trajectory.maxEpoch - epoch) < traj.period
+        ) {
+            // rendering a part of ellipse
+            const maxAng = traj.getEccentricAnomalyByEpoch(this.trajectory.maxEpoch);
+            maxAnglePart = (((maxAng - ang) + TWO_PI) % TWO_PI) / TWO_PI;
         }
 
         const ellipsePoints = this.getEllipsePoints(
             new THREE.EllipseCurve(
-                -traj.sma * traj.e - visualOrigin.x,
-                -visualOrigin.y,
+                -traj.sma * traj.ecc - projectedRelativeCameraPosition.x,
+                -projectedRelativeCameraPosition.y,
                 traj.sma,
-                traj.sma * Math.sqrt(1 - traj.e * traj.e),
+                traj.sma * Math.sqrt(1 - traj.ecc * traj.ecc),
                 ang,
-                2 * Math.PI + ang - 0.0000000000001,  // protection from rounding errors
+                TWO_PI + ang - 1e-13,  // protection from rounding errors
                 false,
                 0
             ),
             pointsNum,
-            ((cameraAngle - ang) / (2 * Math.PI) + 1) % 1,
-            toFarthestPoint / toClosestPoint
+            ((cameraAngle - ang) / TWO_PI + 1) % 1,
+            toFarthestPoint / toClosestPoint,
+            maxAnglePart
         );
         this.threeObj.visible = true;
         this.updateGeometry(ellipsePoints.coords, ellipsePoints.angs, endingBrightness);
 
         this.threeObj.quaternion.copy(orbitQuaternion.toThreejs());
-        this.threeObj.position.copy(sim.getVisualCoords(actualVisualOrigin));
+        this.setPosition(projectedCameraPosition);
     }
 
-    getEllipsePoints(curve, pointsNum, densityCenter, proportion) {
+    /**
+     *
+     * @param curve {EllipseCurve} - instance of THREE.EllipseCurve
+     * @param pointsNum {int} - number of points to get (or less, if maxAnglePart is less than 1)
+     * @param densityCenter {number} - part of the angle (from 0 to 1) closest to the camera,
+     *                                which means this area should have more points
+     * @param proportion {number} - point density difference between densityCenter and
+     *                              the opposite side of the ellipse
+     * @param maxAnglePart {number} - must be between 0 and 1, where 1 means two pi.
+     * @returns {{coords: Array, angs: Array}}
+     */
+    getEllipsePoints(curve, pointsNum, densityCenter, proportion, maxAnglePart) {
         let nearSegmentSize = 0.25;
         if (proportion > 30) {
-            nearSegmentSize = 1 / ((Math.min(proportion, 530) - 30) / 60 + 4);
+            nearSegmentSize = 1 / Math.min(proportion / 60 + 3.5, 12);
             proportion = 30;
         }
 
@@ -155,28 +199,45 @@ export default class VisualTrajectoryModelKeplerian extends VisualTrajectoryMode
         const segmentsFar    = Math.floor(segments / (proportion + 2 * Math.sqrt(proportion) + 1));
         const segmentsMedium = Math.floor(Math.sqrt(proportion) * segmentsFar);
         const segmentsNear   = segments - segmentsFar - 2 * segmentsMedium;
-        let curPos = densityCenter - nearSegmentSize / 2;
+        let segmentBounds = [0,0,0,0,0];
+        let segmentSteps = [
+            nearSegmentSize/segmentsNear,
+            otherSegmentsSize/segmentsMedium,
+            otherSegmentsSize/segmentsFar,
+            otherSegmentsSize/segmentsMedium
+        ];
+        let curPos = 0;
 
-        if (curPos < 0) {
-            curPos += 1;
+        segmentBounds[0] = densityCenter - nearSegmentSize / 2;
+        if (segmentBounds[0] < 0)
+            segmentBounds[0] += 1;
+        segmentBounds[1] = segmentBounds[0] + nearSegmentSize;
+        if (segmentBounds[1] > 1)
+            segmentBounds[1] -= 1;
+        for (let i = 2; i <= 4; ++i) {
+            segmentBounds[i] = segmentBounds[i - 1] + otherSegmentsSize;
+            if (segmentBounds[i] > 1)
+                segmentBounds[i] -= 1;
         }
-        coords.push(curve.getPoint(curPos));
-        angs.push(curPos);
 
-        for (const partSize of [[segmentsNear, nearSegmentSize], [segmentsMedium, otherSegmentsSize], [segmentsFar, otherSegmentsSize], [segmentsMedium, otherSegmentsSize]]) {
-            for (let i = 0; i < partSize[0]; ++i) {
-                curPos += partSize[1] / partSize[0];
-                if (curPos > 1) {
-                    coords.push(curve.getPoint(1));
-                    angs.push(1);
-                    coords.push(curve.getPoint(0));
-                    angs.push(0);
-                    curPos -= 1;
+        while (curPos < maxAnglePart) {
+            coords.push(curve.getPoint(curPos));
+            angs.push(curPos);
+            let i = 0;
+            while (i < 4) {
+                if ((segmentBounds[i+1] > segmentBounds[i]
+                    && (segmentBounds[i] <= curPos && curPos < segmentBounds[i+1]))
+                    || (segmentBounds[i+1] < segmentBounds[i]
+                        && (segmentBounds[i] <= curPos || curPos < segmentBounds[i+1]))
+                ) {
+                    break;
                 }
-                coords.push(curve.getPoint(curPos));
-                angs.push(curPos);
+                ++i;
             }
+            curPos += segmentSteps[i];
         }
+        coords.push(curve.getPoint(maxAnglePart));
+        angs.push(maxAnglePart);
 
         return {
             coords: coords,

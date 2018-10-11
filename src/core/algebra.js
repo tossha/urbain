@@ -463,9 +463,9 @@ export function rad2deg(radians) {
     return radians * 180 / Math.PI;
 }
 
-export function getAngleBySinCos(sin, cos) {
+export function acosSigned(cos, sinSign) {
     const ang = Math.acos(cos);
-    return (sin > 0)
+    return (sinSign > 0)
         ? ang
         : (TWO_PI - ang);
 }

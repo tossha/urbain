@@ -1,12 +1,11 @@
 import * as THREE from "three";
 import VisualModelAbstract from "./ModelAbstract";
-import { sim } from "../Simulation";
 
 export default class VisualPoint extends VisualModelAbstract
 {
-    constructor(position, color, size) {
+    constructor(positionOfEpoch, color, size) {
         super();
-        this.position = position;
+        this.positionOfEpoch = positionOfEpoch;
         this.color = color;
         this.size = size;
         this.setThreeObj(new THREE.Mesh(
@@ -16,9 +15,9 @@ export default class VisualPoint extends VisualModelAbstract
     }
 
     render(epoch) {
-        this.threeObj.position.copy(sim.getVisualCoords(this.position.evaluate(epoch)));
+        this.setPosition(this.positionOfEpoch.evaluate(epoch));
 
-        const scaleKoeff = this.size * this.threeObj.position.length() * sim.raycaster.getPixelAngleSize();
+        const scaleKoeff = this.size * this.threeObj.position.length() * this.pixelAngleSize;
         this.threeObj.scale.x = scaleKoeff;
         this.threeObj.scale.y = scaleKoeff;
         this.threeObj.scale.z = scaleKoeff;

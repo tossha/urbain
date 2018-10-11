@@ -35,8 +35,7 @@ export default class HelperGrid extends VisualModelAbstract
     }
 
     render(epoch) {
-        let pos = this.referenceFrame.getOriginPositionByEpoch(epoch);
-        this.threeObj.position.copy(sim.getVisualCoords(pos));
+        this.setPosition(this.referenceFrame.getOriginPositionByEpoch(epoch));
         this.threeObj.quaternion.copy(this.referenceFrame.getQuaternionByEpoch(epoch).toThreejs())
     }
 

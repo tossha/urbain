@@ -15,6 +15,14 @@ export default class VisualModelAbstract
         document.addEventListener(Events.RENDER, this.renderListener);
     }
 
+    setPosition(simCoords) {
+        this.threeObj.position.copy(sim.getVisualCoords(simCoords));
+    }
+
+    get pixelAngleSize() {
+        return sim.raycaster.getPixelAngleSize();
+    }
+
     _onRender(event) {
         try {
             this.render(event.detail.epoch);

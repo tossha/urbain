@@ -31,6 +31,8 @@ export default class TrajectoryAbstract
 
         this.propagator = null;
 
+        this.flightEvents = [];
+
         this.showOrbitAnglesListener = this._onShowOrbitAnglesChange.bind(this);
 
         this.orbitalReferenceFrame = new ReferenceFrameInertialDynamic(
@@ -51,6 +53,10 @@ export default class TrajectoryAbstract
                 return quat.mul_(ko.getOrbitalFrameQuaternion());
             })
         );
+    }
+
+    addFlightEvent(flightEvent) {
+        this.flightEvents.push(flightEvent);
     }
 
     isEditableAtEpoch(epoch) {

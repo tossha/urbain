@@ -51,6 +51,16 @@ export default class TrajectoryLoader
                 visualModel = new VisualTrajectoryModelKeplerian(trajectory, config.visual);
             } else if (config.visual.pointArrayModel) {
                 visualModel = new VisualTrajectoryModelPointArray(trajectory, config.visual);
+            } else {
+                let className;
+                if (config.visual.model === 'keplerian') {
+                    className = VisualTrajectoryModelKeplerian;
+                } else if (config.visual.model === 'pointArray') {
+                    className = VisualTrajectoryModelPointArray;
+                } else {
+                    className = sim.getClass(config.visual.model);
+                }
+                visualModel = new className(trajectory, config.visual.config);
             }
         }
 

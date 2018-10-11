@@ -1,4 +1,4 @@
-import {getAngleBySinCos, Vector, Quaternion, newtonSolve} from "./algebra";
+import {acosSigned, Vector, Quaternion, newtonSolve} from "./algebra";
 import KeplerianObject from "./KeplerianObject";
 import EphemerisObject from "./EphemerisObject";
 import ReferenceFrameFactory, {ReferenceFrame} from "./ReferenceFrame/Factory";
@@ -368,9 +368,9 @@ export default class LambertSolver
             const temp = Math.sqrt((x0 - x) * (x0 - x) + (y0 - y) * (y0 - y));
             const fx = (x0 - x) / temp;
             const fy = (y0 - y) / temp;
-            ta1 = getAngleBySinCos(
-                signSinTransferAngle * ((x0 + d) * fy - y0 * fx) / r1,
-                -((x0 + d) * fx + y0 * fy) / r1
+            ta1 = acosSigned(
+                -((x0 + d) * fx + y0 * fy) / r1,
+                signSinTransferAngle * ((x0 + d) * fy - y0 * fx)
             );
             sma = E * (x - x0) / 2;
             e = temp / 2 / sma;
@@ -442,8 +442,8 @@ export default class LambertSolver
         const fx = (x0 - x) / temp;
         const fy = (y0 - y) / temp;
         const cosTa1 = -((x0 + d) * fx + y0 * fy) / r1;
-        const sinTa1 = Math.sign(Math.sin(alpha)) * ((x0 + d) * fy - y0 * fx) / r1;
-        const ta1 = getAngleBySinCos(sinTa1, cosTa1);
+        const sinTa1 = Math.sign(Math.sin(alpha)) * ((x0 + d) * fy - y0 * fx); // TODO optimize
+        const ta1 = acosSigned(cosTa1, sinTa1);
         const n = Math.sqrt(mu/a/a/a);
         const E1 = this.getEccentricAnomalyByTrueAnomaly(ta1, e);
         let E2 = this.getEccentricAnomalyByTrueAnomaly(ta1 + alpha, e);
@@ -456,9 +456,9 @@ export default class LambertSolver
     static getEccentricAnomalyByTrueAnomaly(ta, ecc) {
         if (ecc < 1) {
             const cos = Math.cos(ta);
-            return getAngleBySinCos(
-                Math.sqrt(1 - ecc * ecc) * Math.sin(ta) / (1 + ecc * cos),
-                (ecc + cos) / (1 + ecc * cos)
+            return acosSigned(
+                (ecc + cos) / (1 + ecc * cos),
+                Math.sin(ta) // TODO optimize
             );
         } else {
             return 2 * Math.atanh(Math.tan(ta / 2) / Math.sqrt((ecc + 1) / (ecc - 1)));

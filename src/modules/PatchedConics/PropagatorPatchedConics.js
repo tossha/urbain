@@ -6,6 +6,7 @@ import KeplerianObject from "../../core/KeplerianObject";
 import VisualTrajectoryModelKeplerian from "../../core/visual/TrajectoryModel/Keplerian";
 import {getAngleIntervalsIntersection, getEpochIntervalsIntersection, TWO_PI} from "../../core/algebra";
 import { sim } from "../../core/Simulation";
+import FlightEventSOIChange from "../../core/FlightEvent/SOIChange";
 // import VisualPoint from "../../visual/Point";
 // import Constant from "../../core/FunctionOfEpoch/Constant";
 
@@ -48,10 +49,15 @@ export default class PropagatorPatchedConics extends PropagatorAbstract
             nextComponent = this._findNextTrajectory(lastComponent, epoch, stopCondition.epoch);
             if (nextComponent) {
                 // console.log('Component found', nextComponent);
-                trajectory.addComponent(nextComponent);
-                epoch = nextComponent.epoch;
+                trajectory.addComponent(nextComponent.trajectory);
+                trajectory.addFlightEvent(new FlightEventSOIChange(
+                    nextComponent.trajectory.epoch,
+                    nextComponent.oldSoi,
+                    nextComponent.newSoi
+                ));
+                epoch = nextComponent.trajectory.epoch;
                 lastComponent.maxEpoch = epoch;
-                lastComponent = nextComponent;
+                lastComponent = nextComponent.trajectory;
             }
         } while (nextComponent && epoch < stopCondition.epoch);
     }
@@ -69,7 +75,11 @@ export default class PropagatorPatchedConics extends PropagatorAbstract
             ? ownSoiCrossing
             : childSoiCrossing;
 
-        return this._createExtensionTrajectory(trajectory, nextSoiCrossing.newSoi, nextSoiCrossing.epoch);
+        return {
+            trajectory: this._createExtensionTrajectory(trajectory, nextSoiCrossing.newSoi, nextSoiCrossing.epoch),
+            oldSoi: soi,
+            newSoi: nextSoiCrossing.newSoi
+        };
     }
 
     _findOwnSoiCrossing(parent, trajectory, epochFrom) {
