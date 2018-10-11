@@ -38,7 +38,7 @@ body {
 	user-select: none;
 }
 
-button {
+@mixin button-styles() {
 	background-color: $black;
 	border: none;
 	cursor: pointer;
@@ -56,6 +56,10 @@ button {
 		cursor: default;
 		opacity: 0.5;
 	}
+}
+
+button {
+	@include button-styles;
 }
 
 select {

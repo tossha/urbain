@@ -1,0 +1,83 @@
+@import "~intro.js/introjs.css";
+
+@import "../common/global";
+@import "../common/variables";
+
+.introjs-helperNumberLayer {
+	display: none;
+}
+
+.urbain-tutorial-wizard {
+	$button-margin: 30px;
+
+	border-radius: $border-radius;
+	padding: 20px;
+	max-width: 580px;
+
+	.introjs-tooltiptext {
+		font-size: 1.05rem;
+		line-height: 1.5rem;
+		padding-bottom: 2rem;
+		text-align: justify;
+	}
+
+	.introjs-progress {
+		border-radius: 2px;
+		margin-bottom: 10px;
+	}
+
+	.introjs-progressbar {
+		background-color: $blue;
+	}
+
+	.introjs-tooltipbuttons {
+		display: flex;
+		flex-direction: row-reverse;
+		justify-content: space-between;
+	}
+
+	.introjs-button {
+		@include button-styles;
+
+		background: $lightning-blue none;
+		box-sizing: border-box;
+		font-size: 1rem;
+		padding: 5px 20px;
+		text-shadow: none;
+		text-align: center;
+		width: calc(50% - #{$button-margin} / 2);
+
+		&:hover,
+		&:active {
+			background-color: $blue;
+		}
+
+		&:focus {
+			background: $lightning-blue none;
+		}
+	}
+
+	.introjs-skipbutton {
+		display: none;
+
+		&.introjs-donebutton {
+			display: inline-block;
+			order: 2;
+		}
+	}
+
+	.introjs-prevbutton {
+		order: 3;
+	}
+
+	.introjs-nextbutton {
+		order: 2;
+	}
+
+	&__content {
+		&--wide {
+			width: 400px
+		}
+	}
+
+}
