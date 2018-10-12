@@ -11,7 +11,7 @@ export async function findSatellites(noradId, launchDate) {
         }
 
         if (launchDate) {
-            params["fields[launch_date][value]"] = noradId;
+            params["fields[launch_date][value]"] = launchDate;
             params["fields[launch_date][relation]"] = "=";
         }
 

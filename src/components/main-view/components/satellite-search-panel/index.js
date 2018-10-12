@@ -75,7 +75,7 @@ class SatelliteSearchPanel extends React.Component {
                                                         type="number"
                                                         value={satId}
                                                         step={1}
-                                                        placeholder="NORAD ID min='1' max='43000+'"
+                                                        placeholder="NORAD ID"
                                                         min="1"
                                                         onChange={this.handleSatIdChange}
                                                     />
@@ -109,7 +109,11 @@ class SatelliteSearchPanel extends React.Component {
                                 <div className="panel__field-set">
                                     <div className="panel__field panel__field-header">Satellites</div>
                                     <div className="panel__field">
-                                        <SatellitesGrid satellites={satellites} onSatelliteLoad={store.loadSatellite} />
+                                        <SatellitesGrid
+                                            satellites={satellites}
+                                            onSatelliteLoad={store.loadSatellite}
+                                            onSatelliteUnload={store.unloadSatellite}
+                                        />
                                     </div>
                                 </div>
                             )}

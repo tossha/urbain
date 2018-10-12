@@ -126,8 +126,12 @@ class Store {
         };
     }
 
-    loadSatellite = satelliteId => {
-        this._loadTLE(satelliteId);
+    loadSatellite = noradId => {
+        this._loadTLE(noradId);
+    };
+
+    unloadSatellite = noradId => {
+        this._simulation.starSystem.deleteObject(-(100000 + (0|noradId)));
     };
 }
 
