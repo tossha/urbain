@@ -51,6 +51,11 @@ button {
 	&:active {
 		background-color: $gray;
 	}
+
+	&:disabled {
+		cursor: default;
+		opacity: 0.5;
+	}
 }
 
 select {

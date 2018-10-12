@@ -1,0 +1,40 @@
+@import "../../../common/variables";
+
+.satellite-search-panel {
+
+}
+
+.searcher {
+	align-items: center;
+	display: flex;
+
+	&__filter {
+		display: flex;
+	}
+
+	&__input {
+		font-size: 10px;
+		width: 100%;
+		padding-left: $default-gap-size;
+		height: 20px;
+	}
+
+	&__search-button {
+		padding-left: 10px;
+		padding-right: 10px;
+	}
+
+	&__search-button-wrapper {
+		margin: 0 $default-gap-size;
+	}
+
+	&__column {
+		margin: 0 $default-gap-size;
+	}
+}
+
+.satellites-grid {
+	border: 1px solid $white;
+	width: 100%;
+	text-align: center;
+}
