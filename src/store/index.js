@@ -126,9 +126,9 @@ class Store {
         };
     }
 
-    loadSatellite = (satelliteId) => {
+    loadSatellite = satelliteId => {
         this._loadTLE(satelliteId);
-    }
+    };
 }
 
 const { Provider, Consumer } = createContext();
