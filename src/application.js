@@ -4,7 +4,7 @@ import { Store } from "./store";
 
 class Application {
     constructor(sim) {
-        this._store = new Store(sim);
+        this._store = new Store(sim, loadTLE);
     }
 
     init(statsBadge) {

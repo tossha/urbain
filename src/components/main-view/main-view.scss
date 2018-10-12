@@ -1,0 +1,41 @@
+@import "../common/variables";
+
+.main-view {
+	position: relative;
+
+	&__bottom-panel {
+		position: absolute;
+		bottom: 0;
+		left: 0;
+		pointer-events: none;
+		padding: 8px;
+		width: 100%;
+	}
+
+	&__left-side-bar {
+		position: absolute;
+		top: 65px;
+		width: 320px;
+	}
+
+	&__right-side-bar {
+		position: absolute;
+		top: 65px;
+		right: 0;
+		width: 290px;
+	}
+
+	&__creation-panel {
+		margin-bottom: 10px;
+	}
+
+	&__transfer-calculation-panel {}
+
+	&__satellite-search-panel {
+		max-width: calc(520px - #{$default-gap-size} * 2);
+		min-width: 400px;
+		top: $default-gap-size;
+		right: $default-gap-size;
+		position: absolute;
+	}
+}

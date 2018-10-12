@@ -55,8 +55,9 @@ class DropDownMenuItem extends MenuItem {
 }
 
 class Store {
-    constructor(simulation) {
+    constructor(simulation, loadTLE) {
         this._simulation = simulation;
+        this._loadTLE = loadTLE;
     }
 
     viewSettings = {
@@ -64,6 +65,7 @@ class Store {
         showBodyLabels: true,
         showOrbitCreationPanel: false,
         showTransferCalculationPanel: false,
+        showSatelliteSearchPanel: false,
     };
 
     topMenu = [
@@ -100,6 +102,13 @@ class Store {
                     this.viewSettings.showStatistics = selected;
                 },
             },
+            {
+                label: "Satellite search panel",
+                selected: this.viewSettings.showSatelliteSearchPanel,
+                onUpdate: ({ selected }) => {
+                    this.viewSettings.showSatelliteSearchPanel = selected;
+                },
+            },
         ]),
         new LinkMenuItem(TOP_MENU_ITEMS.HELP, {
             href: HELP_PAGE_URL,
@@ -115,6 +124,10 @@ class Store {
             defaultValue: starSystemManager.defaultStarSystem,
             onSelect: item => starSystemManager.loadByIdx(item.idx),
         };
+    }
+
+    loadSatellite = (satelliteId) => {
+        this._loadTLE(satelliteId);
     }
 }
 
