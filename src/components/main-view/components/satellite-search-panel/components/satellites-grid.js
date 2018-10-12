@@ -7,15 +7,28 @@ import Satellite from "../satelite";
 class LoadButton extends Component {
     static propTypes = {
         onLoad: PropTypes.func.isRequired,
+        onUnload: PropTypes.func.isRequired,
         satelliteId: PropTypes.string.isRequired,
+    };
+
+    state = {
+        isLoaded: false
     };
 
     handleLoad = () => {
         this.props.onLoad(this.props.satelliteId);
+        this.setState({isLoaded: true});
+    };
+
+    handleUnload = () => {
+        this.props.onUnload(this.props.satelliteId);
+        this.setState({isLoaded: false});
     };
 
     render() {
-        return <Button text="Load" onClick={this.handleLoad} />;
+        return this.state.isLoaded
+            ? <Button text="Unload" onClick={this.handleUnload} />
+            : <Button text="Load" onClick={this.handleLoad} />;
     }
 }
 
@@ -23,10 +36,12 @@ class SatellitesGrid extends React.Component {
     static propTypes = {
         satellites: PropTypes.arrayOf(PropTypes.instanceOf(Satellite)).isRequired,
         onSatelliteLoad: PropTypes.func.isRequired,
+        onSatelliteUnload: PropTypes.func.isRequired,
     };
 
     render() {
         return (
+            <div className="satellites-grid-container">
             <table className="satellites-grid">
                 <thead className="satellites-grid__head">
                     <tr>
@@ -50,13 +65,14 @@ class SatellitesGrid extends React.Component {
                                 <td>{intlDes}</td>
                                 <td>{launchDate}</td>
                                 <td>
-                                    <LoadButton satelliteId={noradId} onLoad={this.props.onSatelliteLoad} />
+                                    <LoadButton satelliteId={noradId} onLoad={this.props.onSatelliteLoad} onUnload={this.props.onSatelliteUnload} />
                                 </td>
                             </tr>
                         );
                     })}
                 </tbody>
             </table>
+            </div>
         );
     }
 }

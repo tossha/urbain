@@ -61,8 +61,8 @@ export default class UIPanelMetrics extends UIPanel
     updateMain(selectedObject, epoch, parent) {
         const keplerianObject = selectedObject.getKeplerianObjectByEpoch(epoch);
         const sma = keplerianObject.sma;
-        const per = sma * (1 - keplerianObject.e);
-        const apo = sma * (1 + keplerianObject.e);
+        const per = sma * (1 - keplerianObject.ecc);
+        const apo = sma * (1 + keplerianObject.ecc);
         const surfaceAlt = parent.physicalModel ? parent.physicalModel.radius : 0;
         const state = selectedObject.getStateInOwnFrameByEpoch(epoch);
 
@@ -90,7 +90,7 @@ export default class UIPanelMetrics extends UIPanel
 
     updateKeplerian(selectedObject, epoch) {
         const keplerianObject = selectedObject.getKeplerianObjectByEpoch(epoch);
-        this.jqDom.find('#elements-ecc' ).html('' +        ( keplerianObject.e   ).toPrecision(this.precision));
+        this.jqDom.find('#elements-ecc' ).html('' +        ( keplerianObject.ecc ).toPrecision(this.precision));
         this.jqDom.find('#elements-sma' ).html('' + presentNumberWithSuffix(keplerianObject.sma));
         this.jqDom.find('#elements-inc' ).html('' + rad2deg( keplerianObject.inc ).toPrecision(this.precision));
         this.jqDom.find('#elements-aop' ).html('' + rad2deg( keplerianObject.aop ).toPrecision(this.precision));
