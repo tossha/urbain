@@ -131,7 +131,7 @@ class Store {
     };
 
     unloadSatellite = noradId => {
-        this._simulation.starSystem.deleteObject(-(100000 + (0|noradId)));
+        this._simulation.starSystem.deleteObject(-(100000 + (0 | noradId)));
     };
 }
 
