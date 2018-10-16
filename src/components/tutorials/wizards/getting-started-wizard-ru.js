@@ -1,7 +1,7 @@
-import { GETTING_STARTED_WIZARD_RU } from "./wizard-ids";
+import { getRus, GETTING_STARTED_WIZARD } from "./wizard-ids";
 
 const gettingStartedWizardRu = {
-    wizardId: GETTING_STARTED_WIZARD_RU,
+    wizardId: getRus(GETTING_STARTED_WIZARD),
     nextLabel: "Далее",
     prevLabel: "Назад",
     steps: [

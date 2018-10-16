@@ -1,7 +1,7 @@
-import { GETTING_STARTED_WIZARD_ENG } from "./wizard-ids";
+import { GETTING_STARTED_WIZARD, getEng } from "./wizard-ids";
 
 const gettingStartedWizardRu = {
-    wizardId: GETTING_STARTED_WIZARD_ENG,
+    wizardId: getEng(GETTING_STARTED_WIZARD),
     steps: [
         {
             intro: `
