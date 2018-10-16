@@ -1,7 +1,7 @@
-import { GETTING_STARTED_WIZARD } from "./wizard-ids";
+import { GETTING_STARTED_WIZARD_ENG } from "./wizard-ids";
 
-const gettingStartedWizard = {
-    wizardId: GETTING_STARTED_WIZARD,
+const gettingStartedWizardRu = {
+    wizardId: GETTING_STARTED_WIZARD_ENG,
     steps: [
         {
             intro: `
@@ -51,4 +51,4 @@ const gettingStartedWizard = {
     ],
 };
 
-export default gettingStartedWizard;
+export default gettingStartedWizardRu;

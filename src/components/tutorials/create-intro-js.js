@@ -1,9 +1,11 @@
 import introJs from "intro.js";
 
-export function createIntroJs({ steps }) {
+export function createIntroJs({ steps, nextLabel = "Next", prevLabel = "Back" }) {
     const intro = introJs();
     intro.setOptions({
         steps,
+        nextLabel,
+        prevLabel,
         hideNext: true,
         hidePrev: true,
         showBullets: false,
