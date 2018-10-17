@@ -142,7 +142,7 @@ export default class LambertSolver
             return null;
         }
 
-        const parentObject = sim.starSystem.getCommonParentObject(originObject.id, targetObject.id, departureTime, departureTime + flightTime);
+        const parentObject = sim.getModule('PatchedConics').getCommonParent(originObject.id, targetObject.id);
 
         if (!(parentObject instanceof Body)) {
             return null;

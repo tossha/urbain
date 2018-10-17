@@ -37,7 +37,9 @@ export default class TrajectoryVSOP87 extends TrajectoryKeplerianAbstract
         let velocity = new Vector(3);
 
         for (let varNum in this.coefficients) {
+            varNum = 0|varNum;
             for (let degree in this.coefficients[varNum]) {
+                degree = 0|degree;
                 let posSum = 0;
                 let diffSum = 0;
                 const tPowDegree = Math.pow(T, degree);

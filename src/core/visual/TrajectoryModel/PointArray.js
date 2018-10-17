@@ -19,6 +19,18 @@ export default class VisualTrajectoryModelPointArray extends VisualTrajectoryMod
         this.initVertices();
     }
 
+    select() {
+        super.select();
+        this.showAhead = true;
+        this.showBehind = true;
+    }
+
+    deselect() {
+        super.deselect();
+        this.showAhead = this.config.showAhead;
+        this.showBehind = this.config.showBehind;
+    }
+
     render(epoch) {
         super.render(epoch);
 

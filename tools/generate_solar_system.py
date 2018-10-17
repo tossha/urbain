@@ -1531,7 +1531,7 @@ def getBodyData(body, type, soi, name, color, texture, parent, pairing, j2, etFr
 		'data': {
 			'patchedConics': {
 				'soiRadius': soi,
-				'parentSoiId': parent,
+				'parentSoiId': int(parent),
 				'childSois': []
 			}
 		},
