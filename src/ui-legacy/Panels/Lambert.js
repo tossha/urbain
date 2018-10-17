@@ -41,17 +41,25 @@ export default class UIPanelLambert extends UIPanel
         Events.addListener(Events.STAR_SYSTEM_LOADED, () => {
             this.jqOrigin.html('');
             this.jqTarget.html('');
-            this.updateTargetList();
-            this.updateOriginList();
+            const listData = this.buildListData();
+            if (listData) {
+                this.updateList(this.jqTarget, listData);
+                this.updateList(this.jqOrigin, listData);
+            }
         });
     }
 
     solve() {
-        if (!this.origin || !this.target) {
+        if (!this.origin || !this.target || this.origin === this.target) {
             return;
         }
 
-        const parentObject = sim.starSystem.getCommonParentObject(this.origin, this.target, this.departureTime, this.departureTime + this.transferTime);
+        const parentObject = sim.getModule('PatchedConics').getCommonParent(this.origin, this.target);
+
+        if (parentObject === null || parentObject.id == this.origin || parentObject.id == this.target) {
+            return;
+        }
+
         const referenceFrameId = ReferenceFrameFactory.buildId(parentObject.id, ReferenceFrame.INERTIAL_ECLIPTIC);
         const origin = sim.starSystem.getObject(this.origin);
         const target = sim.starSystem.getObject(this.target);
@@ -115,12 +123,30 @@ export default class UIPanelLambert extends UIPanel
 
     changeOrigin(newOrigin) {
         this.origin = newOrigin;
+        this.updateSliderScale();
         this.solve();
     }
 
     changeTarget(newTarget) {
         this.target = newTarget;
+        this.updateSliderScale();
         this.solve();
+    }
+
+    updateSliderScale() {
+        if (!this.origin || !this.target || this.origin === this.target) {
+            return;
+        }
+
+        const periods = sim.getModule('PatchedConics').getRelativePeriod(this.origin, this.target, this.departureTime);
+
+        if (periods === null) {
+            return;
+        }
+
+        this.maxTransferTime = Math.max(periods.period1, periods.period2);
+        this.jqSlider.val(this.getNeededSliderValue((periods.period1 + periods.period2) / 4));
+        this.changeTransferTime(this.getCurrentTransferTime());
     }
 
     changeTransferTime(newTransferTime) {
@@ -139,20 +165,29 @@ export default class UIPanelLambert extends UIPanel
         return Math.max(0, Math.min(1, val));
     }
 
-    updateOriginList() {
-        $.each(sim.starSystem.getObjectNames(), (objId, objName) => {
-            if (this.jqOrigin.find("option[value='" + objId + "']").length === 0) {
-                this.jqOrigin.append($('<option>', {value: objId}).text(objName));
-            }
-        });
+    buildListData() {
+        const root = sim.getModule('PatchedConics').getRootSoi();
+
+        if (!root) {
+            return null;
+        }
+
+        return this.buildSoiTreeData(root, 0);
     }
 
-    updateTargetList() {
-        $.each(sim.starSystem.getObjectNames(), (objId, objName) => {
-            if (this.jqTarget.find("option[value='" + objId + "']").length === 0) {
-                this.jqTarget.append($('<option>', {value: objId}).text(objName));
-            }
-        });
+    buildSoiTreeData(soiObject, level) {
+        let result = [{id: soiObject.id, level: level, name: soiObject.name}];
+        for (let child of soiObject.data.patchedConics.childSois) {
+            result = result.concat(this.buildSoiTreeData(child, level + 1));
+        }
+        return result;
+    }
+
+    updateList(jqList, data) {
+        const indent = '&nbsp;&nbsp;&nbsp;';
+        for (let entry of data) {
+            jqList.append($('<option>', {value: entry.id}).html(indent.repeat(entry.level) + entry.name));
+        }
     }
 
     updateTime(date) {

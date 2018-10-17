@@ -10,8 +10,8 @@ export default class VisualTrajectoryModelAbstract extends VisualModelAbstract
         super();
 
         this.trajectory = trajectory;
-        this.standardColor = config.color;
         this.color = config.color;
+        this.config = config;
 
         this.minEpoch = (config.minEpoch !== undefined) ? config.minEpoch : (trajectory.minEpoch || null);
         this.maxEpoch = (config.maxEpoch !== undefined) ? config.maxEpoch : (trajectory.maxEpoch || null);
@@ -85,7 +85,7 @@ export default class VisualTrajectoryModelAbstract extends VisualModelAbstract
     }
 
     deselect() {
-        this.setColor(this.standardColor);
+        this.setColor(this.config.color);
     }
 
     setColor(color) {
