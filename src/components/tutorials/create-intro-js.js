@@ -1,11 +1,12 @@
 import introJs from "intro.js";
 
-export function createIntroJs({ steps, nextLabel = "Next", prevLabel = "Back" }) {
+export function createIntroJs({ steps, nextLabel = "Next", prevLabel = "Back", doneLabel = "OK, got it" }) {
     const intro = introJs();
     intro.setOptions({
         steps,
         nextLabel,
         prevLabel,
+        doneLabel,
         hideNext: true,
         hidePrev: true,
         showBullets: false,
@@ -15,7 +16,6 @@ export function createIntroJs({ steps, nextLabel = "Next", prevLabel = "Back" })
         tooltipClass: "urbain-tutorial-wizard",
         exitOnOverlayClick: false,
         disableInteraction: true,
-        doneLabel: "OK, got it",
     });
 
     return intro;

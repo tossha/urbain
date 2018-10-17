@@ -3,7 +3,7 @@ import { render, unmountComponentAtNode } from "react-dom";
 
 import "./index.scss";
 
-export function showDialog(idRus, idEng) {
+export function showLangSelectorDialog(langs) {
     let rootNode = document.createElement("div");
     document.body.appendChild(rootNode);
 
@@ -16,33 +16,25 @@ export function showDialog(idRus, idEng) {
     };
 
     return new Promise(resolve => {
-        const handleNextRus = () => {
-            removeDialog();
-            resolve(idRus);
-        };
-
-        const handleNextEng = () => {
-            removeDialog();
-            resolve(idEng);
-        };
-
         render(
             <div className="language-selector-wrapper">
                 <div className="language-selector">
-                    <div className="language-selector__column">
-                        <div className="language-selector__content">Привет!</div>
+                    {langs.map(({ id, description, buttonLabel }) => {
+                        const handleNext = () => {
+                            removeDialog();
+                            resolve(id);
+                        };
 
-                        <button className="language-selector__button" onClick={handleNextRus}>
-                            Далее
-                        </button>
-                    </div>
-                    <div className="language-selector__column">
-                        <div className="language-selector__content">Hello!</div>
+                        return (
+                            <div key={id} className="language-selector__row">
+                                <span className="language-selector__content">{description}</span>
 
-                        <button className="language-selector__button" onClick={handleNextEng}>
-                            Next
-                        </button>
-                    </div>
+                                <button className="language-selector__button" onClick={handleNext}>
+                                    {buttonLabel}
+                                </button>
+                            </div>
+                        );
+                    })}
                 </div>
             </div>,
             rootNode,

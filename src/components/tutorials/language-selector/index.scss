@@ -24,10 +24,10 @@
 .language-selector {
 	background-color: $white;
 	border-radius: $border-radius;
-	display: flex;
 	min-width: 300px;
 	max-width: 580px;
 
+	padding: 10px 20px;
 	position: absolute;
 
 	top: 50%;
@@ -35,13 +35,20 @@
 	transform: translateX(-50%) translateY(-50%);
 	z-index: 9999999;
 
-	&__column {
-		padding: 20px;
-		max-width: 50%;
+	&__row {
+		align-items: center;
+		border-bottom: 1px solid $gray-text;
+		display: flex;
+		justify-content: space-between;
+		padding: 10px 0;
+
+		&:last-child {
+			border-bottom: none;
+		}
 	}
 
 	&__content {
-		margin-bottom: 10px;
+		margin-right: 10px;
 	}
 
 	&__button {
@@ -49,5 +56,6 @@
 		@include urbain-tutorial-wizard-button-default;
 
 		display: block;
+		min-width: 80px;
 	}
 }

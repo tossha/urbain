@@ -1,15 +1,17 @@
-import { GETTING_STARTED_WIZARD, getEng } from "./wizard-ids";
+import { GETTING_STARTED_WIZARD, getEng } from "../wizard-ids";
 
 const gettingStartedWizardRu = {
     wizardId: getEng(GETTING_STARTED_WIZARD),
     steps: [
         {
+            intro: "This is our cool Time line",
+            element: ".time-line",
+            position: "top",
+        },
+        {
             intro: `
                 <div class="urbain-tutorial-wizard__content--wide">
-                     Urbain: traversing the Solar System <br>
-                     <br> 
-                     And very looooong text below<br> 
-                     <br>                 
+                     The explanation how to control the camera view<br><br>                 
                      Lorem ipsum dolor sit amet, consectetur adipiscing elit.
                      Pellentesque posuere finibus purus, sit amet malesuada turpis 
                      tristique non. Aliquam gravida enim ac sollicitudin lacinia. 
@@ -23,26 +25,11 @@ const gettingStartedWizardRu = {
             position: "auto",
         },
         {
-            intro: `
-                <iframe 
-                    width="560" height="315" 
-                    src="https://www.youtube.com/embed/2K5YZQVtFnY" 
-                    frameborder="0" allow="autoplay; encrypted-media" allowfullscreen>                    
-                </iframe>
-            `,
-
-            position: "top",
-        },
-        {
             intro: "This is Time Settings panel",
             element: ".time-settings-panel",
             position: "top",
         },
-        {
-            intro: "This is Time line",
-            element: ".time-line",
-            position: "top",
-        },
+
         {
             intro: "This is Camera panel",
             element: ".camera-panel",
