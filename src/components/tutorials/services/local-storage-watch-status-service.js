@@ -9,6 +9,17 @@ class LocalStorageWatchStatusService {
         return !this._getWatchedWizards().some(id => id === wizardId);
     }
 
+    markAsWatched(wizardId) {
+        if (!this.canWatch(wizardId)) {
+            return;
+        }
+        const wizards = this._getWatchedWizards();
+
+        wizards.push(wizardId);
+
+        this._saveStatuses(wizards);
+    }
+
     _getWatchedWizards() {
         const wizardIdsRawString = this._storage.getItem(LocalStorageWatchStatusService.KEY);
 

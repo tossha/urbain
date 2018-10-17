@@ -1,6 +1,6 @@
 import introJs from "intro.js";
 
-export function createIntroJs({ steps, nextLabel = "Next", prevLabel = "Back", doneLabel = "OK, got it" }) {
+export function createIntroJs({ steps, nextLabel = "Next", prevLabel = "Back", doneLabel = "OK, got it" }, config) {
     const intro = introJs();
     intro.setOptions({
         steps,
@@ -16,6 +16,10 @@ export function createIntroJs({ steps, nextLabel = "Next", prevLabel = "Back", d
         tooltipClass: "urbain-tutorial-wizard",
         exitOnOverlayClick: false,
         disableInteraction: true,
+    });
+
+    intro.oncomplete(() => {
+        config.onComplete();
     });
 
     return intro;
