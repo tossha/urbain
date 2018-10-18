@@ -18,9 +18,8 @@ export function createIntroJs({ steps, nextLabel = "Next", prevLabel = "Back", d
         disableInteraction: true,
     });
 
-    intro.oncomplete(() => {
-        config.onComplete();
-    });
+    config.onComplete && intro.oncomplete(config.onComplete);
+    config.onStep && intro.onchange(config.onStep);
 
     return intro;
 }
