@@ -21,7 +21,8 @@ export default class VisualPlanePoint extends VisualModelAbstract
         this.isEditMode = !!editingCallback;
 
         this.isHidden = false;
-        this.mouseMoved = false;
+
+        this.lastEpoch = 0;
 
         this.init();
     }
@@ -69,7 +70,7 @@ export default class VisualPlanePoint extends VisualModelAbstract
             this.mouseUpListener = this.onMouseUp.bind(this);
             document.addEventListener('mouseup', this.mouseUpListener);
             this.mouseMoveListener = this.onMouseMove.bind(this);
-            sim.addEventListener('mousemove', this.mouseMoveListener, 2);
+            sim.addEventListener('mousemove', this.mouseMoveListener, 3);
         }
     }
 
@@ -79,20 +80,22 @@ export default class VisualPlanePoint extends VisualModelAbstract
     }
 
     onMouseMove() {
-        this.mouseMoved = true;
+        this.updateValue(this.lastEpoch);
     }
 
     updateValue(epoch) {
         const plane = this.getVirtualPlane(epoch);
         let intersection = sim.raycaster.intersectObjects([plane])[0];
         if (intersection) {
+            const minBound = this.minBound(epoch);
+            const maxBound = this.maxBound(epoch);
             this._value = RF_BASE_OBJ.transformPositionByEpoch(epoch, sim.getSimCoords(intersection.point), this.getReferenceFrame(epoch));
 
             for (let idx of [0,1,2]) {
-                if (this._value[idx] < this.minBound[idx]) {
-                    this._value[idx] = this.minBound[idx];
-                } else if (this._value[idx] > this.maxBound[idx]) {
-                    this._value[idx] = this.maxBound[idx];
+                if (minBound[idx] !== false && this._value[idx] < minBound[idx]) {
+                    this._value[idx] = minBound[idx];
+                } else if (maxBound[idx] !== false && this._value[idx] > maxBound[idx]) {
+                    this._value[idx] = maxBound[idx];
                 }
             }
 
@@ -119,10 +122,7 @@ export default class VisualPlanePoint extends VisualModelAbstract
     }
 
     render(epoch) {
-        if (this.mouseMoved) {
-            this.updateValue(epoch);
-            this.mouseMoved = false;
-        }
+        this.lastEpoch = epoch;
 
         this.setPosition(this.getReferenceFrame(epoch).transformPositionByEpoch(
             epoch,

@@ -22,6 +22,7 @@ export default class VisualAngle extends VisualModelAbstract
         this.arcSize = size;
         this.editingCallback = editingCallback;
         this.isEditMode = !!editingCallback;
+        this.bounds = [0, TWO_PI];
 
         this.orientationUpdated = false;
         this.valueUpdated = false;
@@ -29,6 +30,10 @@ export default class VisualAngle extends VisualModelAbstract
         this.sizeNeedsUpdate = false;
 
         this.init();
+    }
+
+    setBounds(minValue, maxValue) {
+        this.bounds = [minValue, maxValue];
     }
 
     hide() {
@@ -115,13 +120,28 @@ export default class VisualAngle extends VisualModelAbstract
             let mainAxis = new THREE.Vector3(1, 0, 0);
             mainAxis.applyQuaternion(this.threeObj.quaternion);
 
+            const oldAngleValue = this._value.value;
             let newAngleValue = Math.acos(mainAxis.dot(direction) / mainAxis.length() / direction.length()); // no division by lengths because direction and mainAxis are normalized (length = 1)
             mainAxis.cross(direction);
 
-            this._value = new Constant((mainAxis.dot(plane.normal) > 0) ? newAngleValue : TWO_PI - newAngleValue);
-            this.valueUpdated = true;
-            if (this.editingCallback) {
-                this.editingCallback(this._value.value);
+            newAngleValue = (mainAxis.dot(plane.normal) > 0) ? newAngleValue : TWO_PI - newAngleValue;
+
+            if (newAngleValue < this.bounds[0] || newAngleValue > this.bounds[1]) {
+                const lowDiff  = (this.bounds[0] - newAngleValue + TWO_PI) % TWO_PI;
+                const highDiff = (newAngleValue - this.bounds[1] + TWO_PI) % TWO_PI;
+                if (lowDiff <= highDiff) {
+                    newAngleValue = this.bounds[0];
+                } else {
+                    newAngleValue = this.bounds[1];
+                }
+            }
+
+            if (newAngleValue !== oldAngleValue) {
+                this._value.value = newAngleValue;
+                this.valueUpdated = true;
+                if (this.editingCallback) {
+                    this.editingCallback(this._value.value);
+                }
             }
         }
     }
