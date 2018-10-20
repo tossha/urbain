@@ -111,6 +111,20 @@ export default class KeplerianEditor
                 () => [0, 0, 0],
                 () => [this.trajectory.sma * (1 + this.trajectory.ecc), 0, 0]
             );
+            this.angleTaEditing = new VisualAngle(
+                referenceFrame,
+                position,
+                new FunctionOfEpochCustom((epoch) => (new Quaternion(new Vector([0,0,1]), this.trajectory.raan))
+                        .mul_(new Quaternion(new Vector([1,0,0]), this.trajectory.inc))
+                        .mul_(new Quaternion(new Vector([0,0,1]), this.trajectory.aop))),
+                new Constant(this.trajectory.ta),
+                this.colorTa,
+                3,
+                VisualAngle.TYPE_SECTOR,
+                value => { this.trajectory.ta = value; }
+            );
+            this.angleTaEditing.customPriority = -1;
+
         }
     }
 
@@ -119,6 +133,7 @@ export default class KeplerianEditor
         this.angleAop && this.angleAop.drop();
         this.angleInc && this.angleInc.drop();
         this.angleTa && this.angleTa.drop();
+        this.angleTaEditing && this.angleTaEditing.drop();
 
         this.pointApoapsis && this.pointApoapsis.drop();
         this.pointPeriapsis && this.pointPeriapsis.drop();

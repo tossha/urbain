@@ -23,6 +23,7 @@ export default class VisualAngle extends VisualModelAbstract
         this.editingCallback = editingCallback;
         this.isEditMode = !!editingCallback;
         this.bounds = [0, TWO_PI];
+        this.customPriority = 0;
 
         this.orientationUpdated = false;
         this.valueUpdated = false;
@@ -100,7 +101,7 @@ export default class VisualAngle extends VisualModelAbstract
             this.mouseUpListener = this.onMouseUp.bind(this);
             document.addEventListener('mouseup', this.mouseUpListener);
             this.mouseMoveListener = this.onMouseMove.bind(this);
-            sim.addEventListener('mousemove', this.mouseMoveListener, 2);
+            sim.addEventListener('mousemove', this.mouseMoveListener, 2 + this.customPriority / 100);
         }
     }
 
