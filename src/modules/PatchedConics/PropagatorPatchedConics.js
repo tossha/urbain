@@ -3,10 +3,11 @@ import TrajectoryComposite from "../../core/Trajectory/Composite";
 import ReferenceFrameFactory, {ReferenceFrame} from "../../core/ReferenceFrame/Factory";
 import TrajectoryKeplerianBasic from "../../core/Trajectory/KeplerianBasic";
 import KeplerianObject from "../../core/KeplerianObject";
-import VisualTrajectoryModelKeplerian from "../../core/visual/TrajectoryModel/Keplerian";
+import VisualTrajectoryModelKeplerian from "../../core/visual/Trajectory/Keplerian";
 import {getAngleIntervalsIntersection, getEpochIntervalsIntersection, TWO_PI} from "../../core/algebra";
 import { sim } from "../../core/Simulation";
-import FlightEventSOIChange from "../../core/FlightEvent/SOIChange";
+import FlightEventSOIArrival from "./FlightEvent/SOIArrival";
+import FlightEventSOIDeparture from "./FlightEvent/SOIDeparture";
 // import VisualPoint from "../../visual/Point";
 // import Constant from "../../core/FunctionOfEpoch/Constant";
 
@@ -33,7 +34,7 @@ export default class PropagatorPatchedConics extends PropagatorAbstract
 
         let lastComponent = trajectory.getComponentByEpoch(epochFrom);
         let epoch = Math.max(epochFrom, lastComponent.epoch);
-        let nextComponent;
+        let nextComponentData;
 
         lastComponent.maxEpoch = false;
 /*
@@ -46,20 +47,28 @@ export default class PropagatorPatchedConics extends PropagatorAbstract
 
         do {
             // console.log('Looking for next component...');
-            nextComponent = this._findNextTrajectory(lastComponent, epoch, stopCondition.epoch);
-            if (nextComponent) {
-                // console.log('Component found', nextComponent);
-                trajectory.addComponent(nextComponent.trajectory);
-                trajectory.addFlightEvent(new FlightEventSOIChange(
-                    nextComponent.trajectory.epoch,
-                    nextComponent.oldSoi,
-                    nextComponent.newSoi
+            nextComponentData = this._findNextTrajectory(lastComponent, epoch, stopCondition.epoch);
+            if (nextComponentData) {
+                // console.log('Component found', nextComponentData);
+                trajectory.addComponent(nextComponentData.trajectory);
+
+                lastComponent.addFlightEvent(new FlightEventSOIDeparture(
+                    nextComponentData.epoch,
+                    nextComponentData.oldSoi,
+                    nextComponentData.newSoi
                 ));
-                epoch = nextComponent.trajectory.epoch;
+
+                epoch = nextComponentData.epoch;
                 lastComponent.maxEpoch = epoch;
-                lastComponent = nextComponent.trajectory;
+                lastComponent = nextComponentData.trajectory;
+
+                lastComponent.addFlightEvent(new FlightEventSOIArrival(
+                    nextComponentData.epoch,
+                    nextComponentData.oldSoi,
+                    nextComponentData.newSoi
+                ));
             }
-        } while (nextComponent && epoch < stopCondition.epoch);
+        } while (nextComponentData && epoch < stopCondition.epoch);
     }
 
     _findNextTrajectory(trajectory, epochFrom, epochTo) {
@@ -78,7 +87,8 @@ export default class PropagatorPatchedConics extends PropagatorAbstract
         return {
             trajectory: this._createExtensionTrajectory(trajectory, nextSoiCrossing.newSoi, nextSoiCrossing.epoch),
             oldSoi: soi,
-            newSoi: nextSoiCrossing.newSoi
+            newSoi: nextSoiCrossing.newSoi,
+            epoch: nextSoiCrossing.epoch
         };
     }
 
@@ -229,7 +239,7 @@ export default class PropagatorPatchedConics extends PropagatorAbstract
             return false;
         }
 
-        const verticalTa = this._getVerticalTaBounds(keplerianObjectBase, keplerianObjectActive, epochFrom, distance);
+        const verticalTa = this._getVerticalTaBounds(keplerianObjectBase, keplerianObjectActive, distance);
         let taIntervals;
 
         if (verticalTa) {
@@ -284,7 +294,7 @@ export default class PropagatorPatchedConics extends PropagatorAbstract
         return epochIntervals;
     }
 
-    _getVerticalTaBounds(keplerianObjectBase, keplerianObjectActive, epochFrom, distance) {
+    _getVerticalTaBounds(keplerianObjectBase, keplerianObjectActive, distance) {
         // this is only to recalculate inc, raan and aop. probably can be optimized.
         const baseNormal = keplerianObjectBase.getNormalVector();
         const activeNormal = keplerianObjectActive.getNormalVector();
@@ -382,7 +392,7 @@ export default class PropagatorPatchedConics extends PropagatorAbstract
         // TODO refactor this
         traj.setVisualModel(new VisualTrajectoryModelKeplerian(
             traj,
-            {color: originalTrajectory.visualModel.standardColor, minEpoch: null, maxEpoch: null}
+            {color: originalTrajectory.visualModel.config.color, minEpoch: false, maxEpoch: 'copy'}
         ));
 
         return traj;

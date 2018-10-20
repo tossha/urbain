@@ -255,7 +255,6 @@ export default class VisualAngle extends VisualModelAbstract
             RF_BASE
         );
         this.setPosition(pos);
-        this.threeObj.visible = true;
 
         if (this.valueUpdated || !(this._value instanceof Constant)) {
             const value = this.getValue(epoch);
