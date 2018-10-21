@@ -39,7 +39,7 @@ export default class UIPanelCreation extends UIPanel {
             pTraj.isEditable = true;
             pTraj.propagator = new propagatorClass();
 
-            traj.setUpdateCallback(() => {pTraj.propagator.propagate(pTraj, traj.keplerianObject.epoch, {epoch: traj.keplerianObject.epoch + traj.keplerianObject.period})});
+            traj.setUpdateCallback(() => {pTraj.propagator.propagate(pTraj, traj.keplerianObject.epoch)});
             ephObject.setTrajectory(pTraj);
             sim.starSystem.addObject(id, ephObject);
             sim.selection.forceSelection(ephObject.trajectory);

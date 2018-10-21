@@ -96,5 +96,10 @@ export default class TrajectoryComposite extends TrajectoryAbstract
         while (this.flightEvents.length && this.flightEvents[this.flightEvents.length - 1].epoch >= epoch) {
             this.flightEvents.pop();
         }
+        for (let component of this.components) {
+            if (component.maxEpoch === false || component.maxEpoch > epoch) {
+                component.clearAfterEpoch(epoch);
+            }
+        }
     }
 }

@@ -76,6 +76,16 @@ export default class VisualTrajectoryAbstract extends VisualModelAbstract
         });
     }
 
+    removeFlightEvent(flightEvent) {
+        for (let i in this.flightEvents) {
+            if (this.flightEvents[i].event === flightEvent) {
+                this.flightEvents[i].model.drop();
+                this.flightEvents.splice(i, 1);
+                break;
+            }
+        }
+    }
+
     updateGeometry(points, colorMults, endingBrightness) {
         const mainColor = new THREE.Color(this.color);
         this.threeObj.geometry.dispose();

@@ -75,6 +75,18 @@ export default class TrajectoryAbstract
         this.visualModel && this.visualModel.addFlightEvent(flightEvent);
     }
 
+    clearAfterEpoch(epoch) {
+        let newEvents = [];
+        for (let event of this.flightEvents) {
+            if (event.epoch <= epoch) {
+                newEvents.push(event);
+            } else {
+                this.visualModel && this.visualModel.removeFlightEvent(event);
+            }
+        }
+        this.flightEvents = newEvents;
+    }
+
     isEditableAtEpoch(epoch) {
         return this.isEditable;
     }
