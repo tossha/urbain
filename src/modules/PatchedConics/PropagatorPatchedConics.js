@@ -42,10 +42,10 @@ export default class PropagatorPatchedConics extends PropagatorAbstract
         // console.log('Propagating...');
 
         do {
-            // console.log('Looking for next component...');
+            // console.log('\tLooking for next component...');
             nextComponentData = this._findNextTrajectory(lastComponent, epoch + 1);
             if (nextComponentData) {
-                // console.log('Component found', nextComponentData);
+                // console.log('\tComponent found', nextComponentData);
                 trajectory.addComponent(nextComponentData.trajectory);
 
                 lastComponent.addFlightEvent(new FlightEventSOIDeparture(
@@ -65,6 +65,7 @@ export default class PropagatorPatchedConics extends PropagatorAbstract
                 ));
             }
         } while (nextComponentData);
+        // console.log('Propagation ended');
     }
 
     _findNextTrajectory(trajectory, epochFrom) {
@@ -167,7 +168,7 @@ export default class PropagatorPatchedConics extends PropagatorAbstract
             // see an encounter and be sure that it's a closest one
             potentialApproachIntervals.sort((i1, i2) => (i1[0] < i2[0]) ? -1 : (i1[0] > i2[0] ? 1 : 0));
 
-            // console.log('Iterating...');
+            // console.log('\t\tIteration started, SOI', soiRadius);
             for (let interval of potentialApproachIntervals) {
                 if (interval[0] > epochTo) {
                     break;
@@ -193,31 +194,37 @@ export default class PropagatorPatchedConics extends PropagatorAbstract
                     return states[0].position.sub_(states[1]._position).mag;
                 };
                 // Distance derivative - rate of change of the distance between two objects
-                const getDR = (states) => {
-                    return states[0]._position.mag * states[0].velocity.projectOn_(states[0]._position)
-                        + states[1]._position.mag * states[1].velocity.projectOn_(states[1]._position)
-                        - states[1]._position.dot(states[0]._velocity)
-                        - states[0]._position.dot(states[1]._velocity);
+                const getDR = (states, r) => {
+                    return (states[0]._position.mag * states[0]._velocity.projectionOn(states[0]._position)
+                          + states[1]._position.mag * states[1]._velocity.projectionOn(states[1]._position)
+                          - states[1]._position.dot(states[0]._velocity)
+                          - states[0]._position.dot(states[1]._velocity)) / r;
                 };
                 const getStates = (t) => [
                     trajectory.getStateInOwnFrameByEpoch(t),
                     soi.getStateByEpoch(t, trajectory.referenceFrame)
                 ];
 
+                // console.log('\t\t\tInterval', interval[1] - interval[0], 'step', step);
+
                 // Purpose of this loop is to find a point inside soi
                 // (epoch t2) and a point outside the soi (epoch t1),
                 // where t1 < t2, or establish that there's no such point.
                 while (t < interval[1]) {
                     let states = getStates(t);
+                    let r = getR(states);
 
-                    if (getR(states) < soiRadius) {
+                    // console.log('\t\t\t\tStep start, t:', t - interval[0], 'R', r, 'dR', getDR(states, r), 'R+1', getR(getStates(t+1)));
+
+                    if (r < soiRadius) {
                         t1 = t - step;
                         t2 = t;
                         found = true;
+                        // console.log('\t\t\t\t\tFound 1');
                         break;
                     }
 
-                    let dR = getDR(states);
+                    let dR = getDR(states, r);
 
                     // If the distance was decreasing on the last step and now it's increasing
                     // then we just passed local minimum, so wee need to find it and check.
@@ -228,25 +235,37 @@ export default class PropagatorPatchedConics extends PropagatorAbstract
                         t1 = t - step;
                         t2 = t;
                         let t0, dR0;
+                        let dR1 = prevDR; // dR1 is always negative
+                        let dR2 = dR;     // dR1 is always positive
+
+                        // console.log('\t\t\t\t\tPassed minimum, looking for it');
 
                         do {
-                            t0 = (t1 + t2) / 2;
+                            t0 = t1 + (t2 - t1) * dR1 / (dR1 - dR2);
 
                             states = getStates(t0);
+                            r = getR(states);
 
-                            if (getR(states) < soiRadius) {
+                            // console.log('\t\t\t\t\t\tt0', t0, 'R', r, 'dR', getDR(states, r));
+
+                            if (r < soiRadius) {
                                 t2 = t0;
                                 found = true;
+                                // console.log('\t\t\t\t\t\t\tFound 2');
                                 break;
                             }
 
-                            dR0 = getDR(states);
+                            dR0 = getDR(states, r);
 
                             if (dR0 > 0) {
                                 t2 = t0;
+                                dR2 = dR0;
                             } else {
                                 t1 = t0;
+                                dR1 = dR0;
                             }
+
+                            // console.log('\t\t\t\t\t\tt1', t1, 't2', t2);
                         // Local minimum condition:
                         // distance derivative is smaller than 1 mm/s
                         // or t2 - t1 is smaller than 1 second
@@ -255,6 +274,8 @@ export default class PropagatorPatchedConics extends PropagatorAbstract
                         if (found) {
                             break;
                         }
+
+                        // console.log('\t\t\t\t\tMinimum is greater than soiRadius');
                     }
 
                     prevDR = dR;
@@ -281,8 +302,8 @@ export default class PropagatorPatchedConics extends PropagatorAbstract
                 }
 
                 let d;
-                let d1 = getR(getStates(t1)) - soiRadius; // d1 > 0
-                let d2 = getR(getStates(t2)) - soiRadius; // d2 < 0
+                let d1 = getR(getStates(t1)) - soiRadius; // d1 is always positive
+                let d2 = getR(getStates(t2)) - soiRadius; // d2 is always negative
 
                 do {
                     t = t1 + (t2 - t1) * d1 / (d1 - d2);

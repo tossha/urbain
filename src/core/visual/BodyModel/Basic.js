@@ -29,8 +29,10 @@ export default class VisualBodyModelBasic extends VisualBodyModelAbstract
             sim.textureLoader.load(
                 VisualModelAbstract.texturePath + this.texturePath,
                 (txt) => {
-                    this.threeObj.material.dispose();
-                    this.threeObj.material = this.getMaterial({map: txt});
+                    if (this.threeObj) {
+                        this.threeObj.material.dispose();
+                        this.threeObj.material = this.getMaterial({map: txt});
+                    }
                 },
                 undefined,
                 function(err) {

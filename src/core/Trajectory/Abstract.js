@@ -65,7 +65,7 @@ export default class TrajectoryAbstract
     addFlightEvent(flightEvent) {
         if (flightEvent instanceof FlightEventSOIDeparture || flightEvent instanceof FlightEventSOIArrival) {
             for (let event of this.flightEvents) {
-                if (event.constructor.name === flightEvent.constructor.name) {
+                if (event.constructor === flightEvent.constructor) {
                     event.copy(flightEvent);
                     return;
                 }

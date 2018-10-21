@@ -164,6 +164,10 @@ export class Vector extends Array
         return this.copy().projectOn_(v);
     }
 
+    projectionOn(v) {
+        return this.dot(v.unit());
+    }
+
     rotate(axis, angle) {
         return this.copy().rotate_(axis, angle);
     }

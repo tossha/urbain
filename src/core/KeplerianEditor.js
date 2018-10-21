@@ -35,6 +35,7 @@ export default class KeplerianEditor
             this.isEditMode ? VisualAngle.TYPE_SECTOR : VisualAngle.TYPE_ARC,
             this.isEditMode ? value => { this.trajectory.raan = value; } : null
         );
+        this.angleRaan.customPriority = 4;
 
         this.angleInc = new VisualAngle(
             referenceFrame,
@@ -51,6 +52,7 @@ export default class KeplerianEditor
             this.isEditMode ? value => { this.trajectory.inc = value; } : null
         );
         this.angleInc.setBounds(0, Math.PI);
+        this.angleInc.customPriority = 3;
 
         this.angleAop = new VisualAngle(
             referenceFrame,
@@ -66,6 +68,7 @@ export default class KeplerianEditor
             this.isEditMode ? VisualAngle.TYPE_SECTOR : VisualAngle.TYPE_ARC,
             this.isEditMode ? value => { this.trajectory.aop = value; } : null
         );
+        this.angleAop.customPriority = 2;
 
         this.angleTa = new VisualAngle(
             referenceFrame,
@@ -123,7 +126,7 @@ export default class KeplerianEditor
                 VisualAngle.TYPE_SECTOR,
                 value => { this.trajectory.ta = value; }
             );
-            this.angleTaEditing.customPriority = -1;
+            this.angleTaEditing.customPriority = 1;
 
         }
     }
