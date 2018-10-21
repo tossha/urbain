@@ -34,6 +34,10 @@ export default class LineObject extends THREE.Line {
                 vertex2
             );
 
+            if (currentLineDirection.length() === 0) {
+                continue;
+            }
+
             const commonPerpendicularDirection = (new THREE.Vector3()).crossVectors(
                 currentLineDirection,
                 ray.direction

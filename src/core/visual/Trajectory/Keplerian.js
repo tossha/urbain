@@ -8,7 +8,7 @@ import ReferenceFrameInertial from "../../ReferenceFrame/Inertial";
 import { sim } from "../../Simulation";
 import Constant from "../../FunctionOfEpoch/Constant";
 
-export default class VisualTrajectoryModelKeplerian extends VisualTrajectoryModelAbstract
+export default class VisualTrajectoryKeplerian extends VisualTrajectoryModelAbstract
 {
     constructor(trajectory, config) {
         super(trajectory, config);
@@ -19,56 +19,55 @@ export default class VisualTrajectoryModelKeplerian extends VisualTrajectoryMode
     {
         super.render(epoch);
 
-        const renderingEpoch = this.getRenderingEpoch(epoch);
+        const positionEpoch = this.getPositionEpoch(epoch);
 
-        if (renderingEpoch === null) {
+        if (positionEpoch === false) {
             this.threeObj.visible = false;
             return;
         }
 
-        const keplerianObject = this.trajectory.getKeplerianObjectByEpoch(renderingEpoch);
+        const keplerianObject = this.trajectory.getKeplerianObjectByEpoch(positionEpoch);
 
         if (keplerianObject.isElliptic) {
-            this.renderEllipse(keplerianObject, renderingEpoch, epoch);
+            this.renderEllipse(keplerianObject, positionEpoch, epoch);
         } else {
-            this.renderHyperbola(keplerianObject, renderingEpoch, epoch);
+            this.renderHyperbola(keplerianObject, positionEpoch, epoch);
         }
     }
 
     /**
      *
      * @param traj {KeplerianObject} - orbit to be rendered
-     * @param epoch {float} - moment in time that specifies the position in orbit relative to its reference frame
-     * @param locationEpoch {float} - moment in time that specifies the position of the reference frame
+     * @param positionEpoch {float} - moment in time that specifies the position in orbit relative to its reference frame
+     * @param frameEpoch {float} - moment in time that specifies the position of the reference frame
      */
-    renderHyperbola(traj, epoch, locationEpoch) {
+    renderHyperbola(traj, positionEpoch, frameEpoch) {
         const endingBrightness = 0.35;
         const pointsNum = 100;
 
-        let maxTa = traj.getAsymptoteTa();
+        let maxTa = traj.getAsymptoteTa() - 0.02;
         let minTa = -maxTa;
 
-        if (this.trajectory.minEpoch !== null && this.trajectory.minEpoch !== false) {
+        if (this.trajectory.minEpoch !== false) {
             minTa = traj.getTrueAnomalyByEpoch(this.trajectory.minEpoch);
         }
-        if (this.trajectory.maxEpoch !== null && this.trajectory.maxEpoch !== false) {
+        if (this.trajectory.maxEpoch !== false) {
             maxTa = traj.getTrueAnomalyByEpoch(this.trajectory.maxEpoch);
         }
 
-        const orbitQuaternion = this.trajectory.pericentricReferenceFrame.getQuaternionByEpoch(epoch);
-        const curTa = traj.getTrueAnomalyByEpoch(epoch);
-        const taCut = (maxTa - minTa) / (pointsNum + 1);
+        const orbitQuaternion = this.trajectory.pericentricReferenceFrame.getQuaternionByEpoch(positionEpoch);
+        const curTa = traj.getTrueAnomalyByEpoch(positionEpoch);
 
         let points = [];
         let angs = [];
-        let ta = minTa + taCut;
+        let ta = minTa;
         let i = 0;
 
         if (ta > (minTa + curTa) / 2) {
             ta = (minTa + curTa) / 2;
         }
 
-        const taStep = (Math.max(maxTa - taCut, curTa) - ta) / (pointsNum - 1);
+        const taStep = (Math.max(maxTa, curTa) - ta) / (pointsNum - 1);
         let extraPoints = 0;
 
         while (i < pointsNum + extraPoints) {
@@ -90,40 +89,39 @@ export default class VisualTrajectoryModelKeplerian extends VisualTrajectoryMode
             }
         }
 
-        this.threeObj.visible = true;
         this.updateGeometry(points, angs, endingBrightness);
 
         this.threeObj.quaternion.copy(orbitQuaternion.toThreejs());
-        this.setPosition(this.trajectory.referenceFrame.getOriginPositionByEpoch(locationEpoch));
+        this.setPosition(this.trajectory.referenceFrame.getOriginPositionByEpoch(frameEpoch));
     }
 
     /**
      *
      * @param traj {KeplerianObject} - orbit to be rendered
-     * @param epoch {float} - moment in time that specifies the position in orbit relative to its reference frame
-     * @param locationEpoch {float} - moment in time that specifies the position of the reference frame
+     * @param positionEpoch {float} - moment in time that specifies the position in orbit relative to its reference frame
+     * @param frameEpoch {float} - moment in time that specifies the position of the reference frame
      */
-    renderEllipse(traj, epoch, locationEpoch) {
+    renderEllipse(traj, positionEpoch, frameEpoch) {
         const endingBrightness = 0.35;
         const pointsNum = 100;
 
-        const orbitQuaternion = this.trajectory.pericentricReferenceFrame.getQuaternionByEpoch(epoch);
+        const orbitQuaternion = this.trajectory.pericentricReferenceFrame.getQuaternionByEpoch(positionEpoch);
 
         // Main working RF. We take reference frame of the object
         // at epoch and look at its position at locationEpoch
         const referenceFrame = new ReferenceFrameInertial(
-            new Constant(this.trajectory.getReferenceFrameByEpoch(epoch).getOriginStateByEpoch(locationEpoch)),
+            new Constant(this.trajectory.getReferenceFrameByEpoch(positionEpoch).getOriginStateByEpoch(frameEpoch)),
             orbitQuaternion
         );
 
         // Camera position relative to main reference frame
-        const relativeCameraPosition = RF_BASE_OBJ.transformPositionByEpoch(locationEpoch, sim.camera.lastPosition, referenceFrame);
+        const relativeCameraPosition = RF_BASE_OBJ.transformPositionByEpoch(frameEpoch, sim.camera.lastPosition, referenceFrame);
 
         // Camera position projected onto the plane of the orbit, relative to main reference frame
         const projectedRelativeCameraPosition = new Vector([relativeCameraPosition.x, relativeCameraPosition.y, 0]);
 
         // Camera position projected onto the plane of the orbit, in global coordinates
-        const projectedCameraPosition = referenceFrame.transformPositionByEpoch(locationEpoch, projectedRelativeCameraPosition, RF_BASE_OBJ);
+        const projectedCameraPosition = referenceFrame.transformPositionByEpoch(frameEpoch, projectedRelativeCameraPosition, RF_BASE_OBJ);
 
         // True anomaly of the camera
         const cameraTrueAnomaly = acosSigned(
@@ -137,14 +135,14 @@ export default class VisualTrajectoryModelKeplerian extends VisualTrajectoryMode
             .sub_(relativeCameraPosition).mag;
 
         let cameraAngle = traj.getEccentricAnomalyByTrueAnomaly(cameraTrueAnomaly);
-        let ang = traj.getEccentricAnomalyByEpoch(epoch);
+        let ang = traj.getEccentricAnomalyByEpoch(positionEpoch);
         let maxAnglePart = 1;
 
         // if there's less then one orbit left
         if (!this.showFull
             && this.trajectory.maxEpoch !== false
             && this.trajectory.maxEpoch !== null
-            && (this.trajectory.maxEpoch - epoch) < traj.period
+            && (this.trajectory.maxEpoch - positionEpoch) < traj.period
         ) {
             // rendering a part of ellipse
             const maxAng = traj.getEccentricAnomalyByEpoch(this.trajectory.maxEpoch);
@@ -167,7 +165,7 @@ export default class VisualTrajectoryModelKeplerian extends VisualTrajectoryMode
             toFarthestPoint / toClosestPoint,
             maxAnglePart
         );
-        this.threeObj.visible = true;
+
         this.updateGeometry(ellipsePoints.coords, ellipsePoints.angs, endingBrightness);
 
         this.threeObj.quaternion.copy(orbitQuaternion.toThreejs());

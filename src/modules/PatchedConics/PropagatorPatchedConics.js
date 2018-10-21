@@ -3,10 +3,12 @@ import TrajectoryComposite from "../../core/Trajectory/Composite";
 import ReferenceFrameFactory, {ReferenceFrame} from "../../core/ReferenceFrame/Factory";
 import TrajectoryKeplerianBasic from "../../core/Trajectory/KeplerianBasic";
 import KeplerianObject from "../../core/KeplerianObject";
-import VisualTrajectoryModelKeplerian from "../../core/visual/TrajectoryModel/Keplerian";
+import VisualTrajectoryModelKeplerian from "../../core/visual/Trajectory/Keplerian";
 import {getAngleIntervalsIntersection, getEpochIntervalsIntersection, TWO_PI} from "../../core/algebra";
 import { sim } from "../../core/Simulation";
-import FlightEventSOIChange from "../../core/FlightEvent/SOIChange";
+import FlightEventSOIArrival from "./FlightEvent/SOIArrival";
+import FlightEventSOIDeparture from "./FlightEvent/SOIDeparture";
+import EphemerisObject from "../../core/EphemerisObject";
 // import VisualPoint from "../../visual/Point";
 // import Constant from "../../core/FunctionOfEpoch/Constant";
 
@@ -15,25 +17,20 @@ export default class PropagatorPatchedConics extends PropagatorAbstract
     constructor() {
         super();
         this.soiSafetyCoefficient = 1.5;
-        this.maxStep = 3600;
-        this.minStepCount = 100;
         this.maxPatchError = 1e-3; // 1 meter
         // this.debugPoints = [];
     }
 
-    propagate(trajectory, epochFrom, stopCondition) {
+    propagate(trajectory, epochFrom) {
         if (!trajectory instanceof TrajectoryComposite) {
             throw new Error('Patched conics propagation requires TrajectoryComposite instance');
-        }
-        if (!stopCondition.epoch) {
-            throw new Error('Patched conics propagation requires epoch in stop condition');
         }
 
         trajectory.clearAfterEpoch(epochFrom);
 
         let lastComponent = trajectory.getComponentByEpoch(epochFrom);
         let epoch = Math.max(epochFrom, lastComponent.epoch);
-        let nextComponent;
+        let nextComponentData;
 
         lastComponent.maxEpoch = false;
 /*
@@ -46,26 +43,36 @@ export default class PropagatorPatchedConics extends PropagatorAbstract
 
         do {
             // console.log('Looking for next component...');
-            nextComponent = this._findNextTrajectory(lastComponent, epoch, stopCondition.epoch);
-            if (nextComponent) {
-                // console.log('Component found', nextComponent);
-                trajectory.addComponent(nextComponent.trajectory);
-                trajectory.addFlightEvent(new FlightEventSOIChange(
-                    nextComponent.trajectory.epoch,
-                    nextComponent.oldSoi,
-                    nextComponent.newSoi
+            nextComponentData = this._findNextTrajectory(lastComponent, epoch + 1);
+            if (nextComponentData) {
+                // console.log('Component found', nextComponentData);
+                trajectory.addComponent(nextComponentData.trajectory);
+
+                lastComponent.addFlightEvent(new FlightEventSOIDeparture(
+                    nextComponentData.epoch,
+                    nextComponentData.oldSoi,
+                    nextComponentData.newSoi
                 ));
-                epoch = nextComponent.trajectory.epoch;
+
+                epoch = nextComponentData.epoch;
                 lastComponent.maxEpoch = epoch;
-                lastComponent = nextComponent.trajectory;
+                lastComponent = nextComponentData.trajectory;
+
+                lastComponent.addFlightEvent(new FlightEventSOIArrival(
+                    nextComponentData.epoch,
+                    nextComponentData.oldSoi,
+                    nextComponentData.newSoi
+                ));
             }
-        } while (nextComponent && epoch < stopCondition.epoch);
+        } while (nextComponentData);
     }
 
-    _findNextTrajectory(trajectory, epochFrom, epochTo) {
+    _findNextTrajectory(trajectory, epochFrom) {
         const soi = sim.starSystem.getObject(trajectory.referenceFrame.originId);
-        const ownSoiCrossing   = this._findOwnSoiCrossing  (soi, trajectory, epochFrom);
-        const childSoiCrossing = this._findChildSoiCrossing(soi, trajectory, epochFrom, epochTo);
+        const childSoiCrossing = this._findChildSoiCrossing(soi, trajectory, epochFrom, epochFrom + trajectory.period);
+        const ownSoiCrossing   = (soi.type !== EphemerisObject.TYPE_STAR)
+            ? this._findOwnSoiCrossing(soi, trajectory, epochFrom)
+            : false;
 
         if (childSoiCrossing === false && ownSoiCrossing === false) {
             return false;
@@ -78,7 +85,8 @@ export default class PropagatorPatchedConics extends PropagatorAbstract
         return {
             trajectory: this._createExtensionTrajectory(trajectory, nextSoiCrossing.newSoi, nextSoiCrossing.epoch),
             oldSoi: soi,
-            newSoi: nextSoiCrossing.newSoi
+            newSoi: nextSoiCrossing.newSoi,
+            epoch: nextSoiCrossing.epoch
         };
     }
 
@@ -104,6 +112,23 @@ export default class PropagatorPatchedConics extends PropagatorAbstract
     _findChildSoiCrossing(parent, trajectory, epochFrom, epochTo) {
         const ko = trajectory.keplerianObject;
         let crossings = [];
+
+        if (ko.isHyperbolic && epochFrom === epochTo) {
+            let maxDistance = 0;
+            for (let soi of parent.data.patchedConics.childSois) {
+                const distance = soi.trajectory
+                    .getKeplerianObjectByEpoch(epochFrom, trajectory.referenceFrame)
+                    .getApoapsisRadius() + soi.data.patchedConics.soiRadius * this.soiSafetyCoefficient;
+                if (distance > maxDistance) {
+                    maxDistance = distance;
+                }
+            }
+            if (maxDistance === 0) {
+                return false;
+            }
+            const ta = ko.getSphereCrossingTrueAnomaly(maxDistance);
+            epochTo = ko.getEpochByTrueAnomaly(ta[0]);
+        }
 
         for (let soi of parent.data.patchedConics.childSois) {
             const childKo = soi.trajectory.getKeplerianObjectByEpoch(epochFrom, trajectory.referenceFrame);
@@ -135,13 +160,13 @@ export default class PropagatorPatchedConics extends PropagatorAbstract
                 continue;
             }
             if (potentialApproachIntervals === true) {
-                // TODO optimize this case
                 potentialApproachIntervals = [[epochFrom, epochTo]];
             }
 
+            // Sorting the intervals so we can break the loop when we
+            // see an encounter and be sure that it's a closest one
             potentialApproachIntervals.sort((i1, i2) => (i1[0] < i2[0]) ? -1 : (i1[0] > i2[0] ? 1 : 0));
 
-            let crossingFound = false;
             // console.log('Iterating...');
             for (let interval of potentialApproachIntervals) {
                 if (interval[0] > epochTo) {
@@ -156,58 +181,131 @@ export default class PropagatorPatchedConics extends PropagatorAbstract
                 if (interval[1] > epochTo) {
                     interval[1] = epochTo;
                 }
-                let isFirstStep = true;
-                let step = Math.min(this.maxStep, (interval[1] - interval[0]) / this.minStepCount);
-                let t = interval[0];
-                let prevDistance = 0;
-                // console.log('Iterating interval...', interval[1] - interval[0], step);
+                let step = (ko.isElliptic && childKo.isElliptic)
+                    ? Math.min(Math.min(ko.period, childKo.period), interval[1] - interval[0]) / 10
+                    : (interval[1] - interval[0]) / 10;
+                let t1, t2, t = interval[0];
+                let prevDR = false;
+                let found = false;
+
+                // Distance between two objects
+                const getR = (states) => {
+                    return states[0].position.sub_(states[1]._position).mag;
+                };
+                // Distance derivative - rate of change of the distance between two objects
+                const getDR = (states) => {
+                    return states[0]._position.mag * states[0].velocity.projectOn_(states[0]._position)
+                        + states[1]._position.mag * states[1].velocity.projectOn_(states[1]._position)
+                        - states[1]._position.dot(states[0]._velocity)
+                        - states[0]._position.dot(states[1]._velocity);
+                };
+                const getStates = (t) => [
+                    trajectory.getStateInOwnFrameByEpoch(t),
+                    soi.getStateByEpoch(t, trajectory.referenceFrame)
+                ];
+
+                // Purpose of this loop is to find a point inside soi
+                // (epoch t2) and a point outside the soi (epoch t1),
+                // where t1 < t2, or establish that there's no such point.
                 while (t < interval[1]) {
-                    let distance = trajectory.getPositionByEpoch(t).sub_(soi.getPositionByEpoch(t)).mag - soiRadius;
-                    // console.log('T Distance', t, distance);
-                    if (distance < 0) { // found a point in time when we are inside SOI
-                        // console.log('Found');
-                        if (isFirstStep) {
-                            // console.log('Iterating forward');
-                            do {
-                                t += step;
-                                if (t > interval[1]) {
-                                    t = interval[1];
-                                }
-                                distance = trajectory.getPositionByEpoch(t).sub_(soi.getPositionByEpoch(t)).mag - soiRadius;
-                            } while (distance < 0 && t < interval[1]);
-                            // console.log('Distance', distance);
-                            if (distance < 0) {
-                                break;
-                            }
-                            continue;
-                        }
-                        // console.log('Looking for boundary');
-                        while (Math.abs(distance) > this.maxPatchError) { // looking for SOI crossing time now
-                            step *= distance / (prevDistance - distance);
-                            t += step;
-                            prevDistance = distance;
-                            distance = trajectory.getPositionByEpoch(t).sub_(soi.getPositionByEpoch(t)).mag - soiRadius;
-                            // console.log('T Step distance', t, step, distance);
-                        }
-                        // console.log('Boundary found', t);
-                        crossings.push({
-                            epoch: t,
-                            newSoi: soi
-                        });
-                        crossingFound = true;
+                    let states = getStates(t);
+
+                    if (getR(states) < soiRadius) {
+                        t1 = t - step;
+                        t2 = t;
+                        found = true;
                         break;
                     }
-                    prevDistance = distance;
-                    isFirstStep = false;
+
+                    let dR = getDR(states);
+
+                    // If the distance was decreasing on the last step and now it's increasing
+                    // then we just passed local minimum, so wee need to find it and check.
+                    // We're looking for the minimum in a loop. We break that loop when we
+                    // find a distance smaller than soiRadius or we find the minimum and
+                    // it's bigger than soiRadius which means there's no encounter.
+                    if (prevDR !== false && prevDR < 0 && dR > 0) {
+                        t1 = t - step;
+                        t2 = t;
+                        let t0, dR0;
+
+                        do {
+                            t0 = (t1 + t2) / 2;
+
+                            states = getStates(t0);
+
+                            if (getR(states) < soiRadius) {
+                                t2 = t0;
+                                found = true;
+                                break;
+                            }
+
+                            dR0 = getDR(states);
+
+                            if (dR0 > 0) {
+                                t2 = t0;
+                            } else {
+                                t1 = t0;
+                            }
+                        // Local minimum condition:
+                        // distance derivative is smaller than 1 mm/s
+                        // or t2 - t1 is smaller than 1 second
+                        } while (Math.abs(dR0) > 1e-6 && (t2 - t1 > 1));
+
+                        if (found) {
+                            break;
+                        }
+                    }
+
+                    prevDR = dR;
                     t += step;
+                } // iterating interval end
+
+                // At his point we have three relevant variables:
+                // `found` indicates whether or not we found a point
+                // inside soi, and if we did we have epoch `t2` inside
+                // soi and `t1` outside soi where `t1` < `t2`. Also, `t1`
+                // may be less than `interval[0]`, which means we
+                // encountered a point inside soi on the very first step
+
+                if (!found) {
+                    continue;
                 }
 
-                if (crossingFound) {
+                if (t1 < interval[0]) {
+                    crossings.push({
+                        epoch: interval[0],
+                        newSoi: soi
+                    });
                     break;
                 }
-                // console.log('Crossing not found');
-            }
-        }
+
+                let d;
+                let d1 = getR(getStates(t1)) - soiRadius; // d1 > 0
+                let d2 = getR(getStates(t2)) - soiRadius; // d2 < 0
+
+                do {
+                    t = t1 + (t2 - t1) * d1 / (d1 - d2);
+
+                    d = getR(getStates(t)) - soiRadius;
+
+                    if (d < 0) {
+                        t2 = t;
+                        d2 = d;
+                    } else {
+                        t1 = t;
+                        d1 = d;
+                    }
+                } while (Math.abs(d) > this.maxPatchError);
+
+                crossings.push({
+                    epoch: t,
+                    newSoi: soi
+                });
+                break;
+
+            } // intervals loop end
+        } // soi loop end
 
         if (!crossings.length) {
             return false;
@@ -229,7 +327,7 @@ export default class PropagatorPatchedConics extends PropagatorAbstract
             return false;
         }
 
-        const verticalTa = this._getVerticalTaBounds(keplerianObjectBase, keplerianObjectActive, epochFrom, distance);
+        const verticalTa = this._getVerticalTaBounds(keplerianObjectBase, keplerianObjectActive, distance);
         let taIntervals;
 
         if (verticalTa) {
@@ -271,7 +369,6 @@ export default class PropagatorPatchedConics extends PropagatorAbstract
                 }
 
                 if (epochIntervals.length > 10000) {
-                    debugger;
                     throw new Error('Infinite loop detected');
                 }
 
@@ -284,7 +381,7 @@ export default class PropagatorPatchedConics extends PropagatorAbstract
         return epochIntervals;
     }
 
-    _getVerticalTaBounds(keplerianObjectBase, keplerianObjectActive, epochFrom, distance) {
+    _getVerticalTaBounds(keplerianObjectBase, keplerianObjectActive, distance) {
         // this is only to recalculate inc, raan and aop. probably can be optimized.
         const baseNormal = keplerianObjectBase.getNormalVector();
         const activeNormal = keplerianObjectActive.getNormalVector();
@@ -382,7 +479,7 @@ export default class PropagatorPatchedConics extends PropagatorAbstract
         // TODO refactor this
         traj.setVisualModel(new VisualTrajectoryModelKeplerian(
             traj,
-            {color: originalTrajectory.visualModel.standardColor, minEpoch: null, maxEpoch: null}
+            {color: originalTrajectory.visualModel.config.color, minEpoch: false, maxEpoch: 'copy'}
         ));
 
         return traj;

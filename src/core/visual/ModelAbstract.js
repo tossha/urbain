@@ -16,7 +16,12 @@ export default class VisualModelAbstract
     }
 
     setPosition(simCoords) {
-        this.threeObj.position.copy(sim.getVisualCoords(simCoords));
+        if (simCoords) {
+            this.threeObj.visible = true;
+            this.threeObj.position.copy(sim.getVisualCoords(simCoords));
+        } else {
+            this.threeObj.visible = false;
+        }
     }
 
     get pixelAngleSize() {
@@ -43,7 +48,7 @@ export default class VisualModelAbstract
             });
             delete this.threeObj;
         }
-        document.removeEventListener(Events.RENDER, this.renderListener);
+        this.renderListener && document.removeEventListener(Events.RENDER, this.renderListener);
     }
 }
 

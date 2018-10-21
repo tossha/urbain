@@ -134,6 +134,12 @@ export class Vector extends Array
         return this.div_(this.mag);
     }
 
+    projectOn_(v) {
+        let unit = v.unit();
+        this.set(unit.mul_(this.dot(unit)));
+        return this;
+    }
+
     add(vec) {
         return this.copy().add_(vec);
     }
@@ -152,6 +158,10 @@ export class Vector extends Array
 
     unit() {
         return this.copy().unit_();
+    }
+
+    projectOn(v) {
+        return this.copy().projectOn_(v);
     }
 
     rotate(axis, angle) {

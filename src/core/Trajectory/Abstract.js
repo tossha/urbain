@@ -9,12 +9,19 @@ import {Quaternion} from "../algebra";
 import ReferenceFrameAbstract from "../ReferenceFrame/Abstract";
 import { sim } from "../Simulation";
 import Events from "../Events";
+import FlightEventSOIDeparture from "../../modules/PatchedConics/FlightEvent/SOIDeparture";
+import FlightEventSOIArrival from "../../modules/PatchedConics/FlightEvent/SOIArrival";
 
+/**
+ * Fields:
+ *  minEpoch/  - (float) time limits where the trajectory is defined
+ *  maxEpoch     (false) there is no limit
+ */
 export default class TrajectoryAbstract
 {
     constructor() {
-        this.minEpoch = null;
-        this.maxEpoch = null;
+        this.minEpoch = false;
+        this.maxEpoch = false;
 
         this.cachedEpoch = null;
         this.cachedState = null;
@@ -56,7 +63,28 @@ export default class TrajectoryAbstract
     }
 
     addFlightEvent(flightEvent) {
+        if (flightEvent instanceof FlightEventSOIDeparture || flightEvent instanceof FlightEventSOIArrival) {
+            for (let event of this.flightEvents) {
+                if (event.constructor.name === flightEvent.constructor.name) {
+                    event.copy(flightEvent);
+                    return;
+                }
+            }
+        }
         this.flightEvents.push(flightEvent);
+        this.visualModel && this.visualModel.addFlightEvent(flightEvent);
+    }
+
+    clearAfterEpoch(epoch) {
+        let newEvents = [];
+        for (let event of this.flightEvents) {
+            if (event.epoch <= epoch) {
+                newEvents.push(event);
+            } else {
+                this.visualModel && this.visualModel.removeFlightEvent(event);
+            }
+        }
+        this.flightEvents = newEvents;
     }
 
     isEditableAtEpoch(epoch) {
@@ -153,17 +181,8 @@ export default class TrajectoryAbstract
     }
 
     isValidAtEpoch(epoch) {
-        if (this.minEpoch !== null && this.minEpoch !== false) {
-            if (epoch < this.minEpoch) {
-                return false;
-            }
-        }
-        if (this.maxEpoch !== null && this.maxEpoch !== false) {
-            if (epoch > this.maxEpoch) {
-                return false;
-            }
-        }
-        return true;
+        return (this.minEpoch === false || epoch >= this.minEpoch)
+            && (this.maxEpoch === false || epoch <= this.maxEpoch);
     }
 
     validateEpoch(epoch) {
@@ -177,7 +196,7 @@ export default class TrajectoryAbstract
         return new StateVector();
     }
 
-    getStateByEpoch(epoch, referenceFrameOrId) {
+    getStateByEpoch(epoch, referenceFrameOrId, frameEpoch = null) {
         let state;
 
         if (this.referenceFrame === null) {
@@ -202,14 +221,10 @@ export default class TrajectoryAbstract
             return null;
         }
 
-        return this.referenceFrame.transformStateVectorByEpoch(epoch, state, referenceFrameOrId);
+        return this.referenceFrame.transformStateVectorByEpoch((frameEpoch === null) ? epoch : frameEpoch, state, referenceFrameOrId);
     }
 
-    getPositionByEpoch(epoch, referenceFrameOrId) {
-        return this.getStateByEpoch(epoch, referenceFrameOrId).position;
-    }
-
-    getVelocityByEpoch(epoch, referenceFrameOrId) {
-        return this.getStateByEpoch(epoch, referenceFrameOrId).velocity;
+    getPositionByEpoch(epoch, referenceFrameOrId, frameEpoch = null) {
+        return this.getStateByEpoch(epoch, referenceFrameOrId, frameEpoch).position;
     }
 }

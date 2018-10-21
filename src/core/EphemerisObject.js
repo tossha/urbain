@@ -27,6 +27,10 @@ export default class EphemerisObject
         return rf.originId;
     }
 
+    getStateByEpoch(epoch, referenceFrame) {
+        return this.trajectory.getStateByEpoch(epoch, referenceFrame || RF_BASE);
+    }
+
     getPositionByEpoch(epoch, referenceFrame) {
         return this.trajectory.getPositionByEpoch(epoch, referenceFrame || RF_BASE);
     }

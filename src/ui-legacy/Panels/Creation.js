@@ -2,7 +2,7 @@ import UIPanel from "../Panel";
 import EphemerisObject from "../../core/EphemerisObject";
 import TrajectoryKeplerianBasic from "../../core/Trajectory/KeplerianBasic";
 import ReferenceFrameFactory, {ReferenceFrame} from "../../core/ReferenceFrame/Factory";
-import VisualTrajectoryModelKeplerian from "../../core/visual/TrajectoryModel/Keplerian";
+import VisualTrajectoryModelKeplerian from "../../core/visual/Trajectory/Keplerian";
 import KeplerianObject from "../../core/KeplerianObject";
 import TrajectoryComposite from "../../core/Trajectory/Composite";
 import { sim } from "../../core/Simulation";
@@ -39,7 +39,7 @@ export default class UIPanelCreation extends UIPanel {
             pTraj.isEditable = true;
             pTraj.propagator = new propagatorClass();
 
-            traj.setUpdateCallback(() => {pTraj.propagator.propagate(pTraj, traj.keplerianObject.epoch, {epoch: traj.keplerianObject.epoch + traj.keplerianObject.period})});
+            traj.setUpdateCallback(() => {pTraj.propagator.propagate(pTraj, traj.keplerianObject.epoch)});
             ephObject.setTrajectory(pTraj);
             sim.starSystem.addObject(id, ephObject);
             sim.selection.forceSelection(ephObject.trajectory);

@@ -75,6 +75,10 @@ export default class TrajectoryKeplerianBasic extends TrajectoryKeplerianAbstrac
         this.keplerianObject.epoch = value;
     }
 
+    get period() {
+        return this.keplerianObject.period;
+    }
+
     getKeplerianObjectByEpoch(epoch, referenceFrameOrId) {
         this.validateEpoch(epoch);
         return this._transformKeplerianObject(this.keplerianObject, referenceFrameOrId);

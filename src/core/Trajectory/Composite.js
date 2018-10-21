@@ -48,16 +48,14 @@ export default class TrajectoryComposite extends TrajectoryAbstract
 
     getComponentByEpoch(epoch) {
         if (this.lastUsedTrajectory
-            && (this.lastUsedTrajectory.minEpoch <= epoch || this.lastUsedTrajectory.minEpoch === false)
-            && (this.lastUsedTrajectory.maxEpoch >= epoch || this.lastUsedTrajectory.maxEpoch === false)
+            && (this.lastUsedTrajectory.minEpoch === false || this.lastUsedTrajectory.minEpoch <= epoch)
+            && (this.lastUsedTrajectory.maxEpoch === false || this.lastUsedTrajectory.maxEpoch >= epoch)
         ) {
             return this.lastUsedTrajectory;
         }
 
         for (let trajectory of this.components) {
-            if ((trajectory.minEpoch <= epoch || trajectory.minEpoch === false)
-                && (trajectory.maxEpoch >= epoch || trajectory.maxEpoch === false)
-            ) {
+            if (trajectory.isValidAtEpoch(epoch)) {
                 this.lastUsedTrajectory = trajectory;
                 return trajectory;
             }
@@ -74,17 +72,15 @@ export default class TrajectoryComposite extends TrajectoryAbstract
             trajectory.select();
         }
 
-        if (this.minEpoch === null
-            || (trajectory.minEpoch !== null
-                && trajectory.minEpoch !== false
+        if (this.minEpoch === false
+            || (trajectory.minEpoch !== false
                 && this.minEpoch > trajectory.minEpoch
             )
         ) {
             this.minEpoch = trajectory.minEpoch;
         }
-        if (this.maxEpoch === null
-            || (trajectory.maxEpoch !== null
-                && trajectory.maxEpoch !== false
+        if (this.maxEpoch === false
+            || (trajectory.maxEpoch !== false
                 && this.maxEpoch < trajectory.maxEpoch
             )
         ) {
@@ -98,8 +94,12 @@ export default class TrajectoryComposite extends TrajectoryAbstract
             this.components.pop();
         }
         while (this.flightEvents.length && this.flightEvents[this.flightEvents.length - 1].epoch >= epoch) {
-            this.flightEvents[this.flightEvents.length - 1].drop();
             this.flightEvents.pop();
+        }
+        for (let component of this.components) {
+            if (component.maxEpoch === false || component.maxEpoch > epoch) {
+                component.clearAfterEpoch(epoch);
+            }
         }
     }
 }

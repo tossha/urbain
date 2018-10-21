@@ -2,7 +2,7 @@ import VisualTrajectoryModelAbstract from "./Abstract";
 import {deg2rad} from "../../algebra";
 import { sim } from "../../Simulation";
 
-export default class VisualTrajectoryModelPointArray extends VisualTrajectoryModelAbstract
+export default class VisualTrajectoryPointArray extends VisualTrajectoryModelAbstract
 {
     constructor(trajectory, config) {
         super(trajectory, config);
@@ -34,9 +34,9 @@ export default class VisualTrajectoryModelPointArray extends VisualTrajectoryMod
     render(epoch) {
         super.render(epoch);
 
-        epoch = this.getRenderingEpoch(epoch);
+        const positionEpoch = this.getPositionEpoch(epoch);
 
-        if (epoch === null) {
+        if (positionEpoch === false) {
             this.threeObj.visible = false;
             return;
         }
@@ -47,29 +47,29 @@ export default class VisualTrajectoryModelPointArray extends VisualTrajectoryMod
         let colors = [];
 
         for (let i = 0; i < this.positions.length; ++i) {
-            if (this.epochs[i] < epoch - this.trailPeriod) {
+            if (this.epochs[i] < positionEpoch - this.trailPeriod) {
                 if (this.showBehind) {
                     points.push(this.positions[i]);
                     colors.push(0);
                 }
-                if (this.epochs[i+1] > epoch - this.trailPeriod) {
+                if (this.epochs[i+1] > positionEpoch - this.trailPeriod) {
                     points.push(
-                        this.trajectory.getPositionByEpoch(epoch - this.trailPeriod, this.referenceFrame)
+                        this.trajectory.getPositionByEpoch(positionEpoch - this.trailPeriod, this.referenceFrame)
                     );
                     colors.push(0);
                 }
-            } else if (this.epochs[i] < epoch) {
+            } else if (this.epochs[i] < positionEpoch) {
                 points.push(this.positions[i]);
-                colors.push(1 - (epoch - this.epochs[i]) / this.trailPeriod);
-            } else if (this.epochs[i] > epoch && this.showAhead) {
+                colors.push(1 - (positionEpoch - this.epochs[i]) / this.trailPeriod);
+            } else if (this.epochs[i] > positionEpoch && this.showAhead) {
                 points.push(this.positions[i]);
                 colors.push(0);
             }
 
-            if ((this.epochs[i] < epoch)
-                && (this.epochs[i+1] >= epoch)
+            if ((this.epochs[i] < positionEpoch)
+                && (this.epochs[i+1] >= positionEpoch)
             ) {
-                const pos = this.trajectory.getPositionByEpoch(epoch, this.referenceFrame);
+                const pos = this.trajectory.getPositionByEpoch(positionEpoch, this.referenceFrame);
                 points.push(pos);
                 points.push(pos);
                 colors.push(1);
@@ -77,13 +77,10 @@ export default class VisualTrajectoryModelPointArray extends VisualTrajectoryMod
             }
         }
 
-        this.threeObj.visible = true;
         this.updateGeometry(points, colors, endingBrightness);
 
-        this.setPosition(originPos);
         this.threeObj.quaternion.copy(this.referenceFrame.getQuaternionByEpoch(epoch).toThreejs());
-
-        super.render(epoch);
+        this.setPosition(originPos);
     }
 
     findPointByEpoch(epoch) {

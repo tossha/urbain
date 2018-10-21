@@ -3,38 +3,79 @@ import * as THREE from "three";
 import VisualModelAbstract from "./ModelAbstract";
 import { sim } from '../Simulation';
 
-export default class VisualSprite extends VisualModelAbstract {
-    constructor(positionOfEpoch, texture, verticalAlign, horizontalAlign, scale) {
+export default class VisualSprite extends VisualModelAbstract
+{
+    constructor(positionOfEpoch, texturePath, color, verticalAlign, horizontalAlign, scale) {
         super();
-
         this.positionOfEpoch = positionOfEpoch;
+        this.verticalAlign = verticalAlign;
+        this.horizontalAlign = horizontalAlign;
+        this.scale = scale || 1;
+        this.color = color || 0xFFFFFF;
+        this.loadTexture(texturePath);
+    }
 
-        sim.textureLoader.load(texture, texture => {
-            scale = scale || 1;
-            this.setThreeObj(new THREE.Sprite(new THREE.SpriteMaterial(
-                {map: texture, sizeAttenuation: false, color: 0x0099AA}
-            )));
-            this.threeObj.scale.set(
-                texture.image.width / 800 * scale, // god knows why 800, but it works...
-                texture.image.height / 800 * scale,
-                1
-            );
-            this.threeObj.center.set(
-                horizontalAlign === 'right'
-                    ? 0
-                    : horizontalAlign === 'left'
-                        ? 1
-                        : 0.5,
-                verticalAlign === 'top'
-                    ? 0
-                    : verticalAlign === 'bottom'
-                        ? 1
-                        : 0.5
-            );
+    loadTexture(texturePath) {
+        texturePath && sim.textureLoader.load(texturePath, texture => {
+            this.setTexture(texture);
         });
     }
 
+    setTexture(textureObj) {
+        if (this.dropped)
+            return;
+
+        this.setThreeObj(new THREE.Sprite(new THREE.SpriteMaterial(
+            {map: textureObj, sizeAttenuation: false, color: this.color}
+        )));
+        this.setScale(this.scale);
+        this.threeObj.center.set(
+            this.horizontalAlign === 'right'
+                ? 0
+                : this.horizontalAlign === 'left'
+                ? 1
+                : 0.5,
+            this.verticalAlign === 'top'
+                ? 0
+                : this.verticalAlign === 'bottom'
+                ? 1
+                : 0.5
+        );
+    }
+
+    setScale(scale) {
+        this.scale = scale;
+        this.threeObj.scale.set(
+            this.threeObj.material.map.image.width / 800 * this.scale, // god knows why 800, but it works...
+            this.threeObj.material.map.image.height / 800 * this.scale,
+            1
+        );
+    }
+
+    setColor(color) {
+        this.color = color;
+        this.threeObj.material.color.set(this.color);
+        this.threeObj.material.needsUpdate = true;
+    }
+
+    setPositionOfEpoch(positionOfEpoch) {
+        this.positionOfEpoch = positionOfEpoch;
+    }
+
+    hide() {
+        this.threeObj.visible = false;
+    }
+
+    show() {
+        this.threeObj.visible = true;
+    }
+
     render(epoch) {
-        this.setPosition(this.positionOfEpoch.evaluate(epoch));
+        this.positionOfEpoch && this.setPosition(this.positionOfEpoch.evaluate(epoch));
+    }
+
+    drop() {
+        super.drop();
+        this.dropped = true;
     }
 }

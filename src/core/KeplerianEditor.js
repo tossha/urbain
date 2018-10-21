@@ -50,6 +50,7 @@ export default class KeplerianEditor
             this.isEditMode ? VisualAngle.TYPE_SECTOR : VisualAngle.TYPE_ARC,
             this.isEditMode ? value => { this.trajectory.inc = value; } : null
         );
+        this.angleInc.setBounds(0, Math.PI);
 
         this.angleAop = new VisualAngle(
             referenceFrame,
@@ -86,25 +87,55 @@ export default class KeplerianEditor
                 new Constant(this.trajectory.pericentricReferenceFrame),
                 new Vector([-this.trajectory.sma * (1 + this.trajectory.ecc), 0, 0]),
                 'red',
-                10,
+                8,
                 value => {
                     const periapsis = this.trajectory.sma * (1 - this.trajectory.ecc);
                     const sma = (-value.x + periapsis) / 2;
                     this.trajectory.sma = sma;
                     this.trajectory.ecc = 1 - periapsis / sma;
                 },
-                new Vector([-1e12, 0, 0]),
-                new Vector([0, 0, 0])
+                () => [false, 0, 0],
+                () => [-this.trajectory.sma * (1 - this.trajectory.ecc), 0, 0]
             );
+            this.pointPeriapsis = new VisualPlanePoint(
+                new Constant(this.trajectory.pericentricReferenceFrame),
+                new Vector([this.trajectory.sma * (1 - this.trajectory.ecc), 0, 0]),
+                'blue',
+                8,
+                value => {
+                    const apoapsis = this.trajectory.sma * (1 + this.trajectory.ecc);
+                    const sma = (value.x + apoapsis) / 2;
+                    this.trajectory.sma = sma;
+                    this.trajectory.ecc = apoapsis / sma - 1;
+                },
+                () => [0, 0, 0],
+                () => [this.trajectory.sma * (1 + this.trajectory.ecc), 0, 0]
+            );
+            this.angleTaEditing = new VisualAngle(
+                referenceFrame,
+                position,
+                new FunctionOfEpochCustom((epoch) => (new Quaternion(new Vector([0,0,1]), this.trajectory.raan))
+                        .mul_(new Quaternion(new Vector([1,0,0]), this.trajectory.inc))
+                        .mul_(new Quaternion(new Vector([0,0,1]), this.trajectory.aop))),
+                new Constant(this.trajectory.ta),
+                this.colorTa,
+                3,
+                VisualAngle.TYPE_SECTOR,
+                value => { this.trajectory.ta = value; }
+            );
+            this.angleTaEditing.customPriority = -1;
+
         }
     }
 
     remove() {
-        if (this.angleRaan) this.angleRaan.drop();
-        if (this.angleAop)  this.angleAop.drop();
-        if (this.angleInc)  this.angleInc.drop();
-        if (this.angleTa)   this.angleTa.drop();
+        this.angleRaan && this.angleRaan.drop();
+        this.angleAop && this.angleAop.drop();
+        this.angleInc && this.angleInc.drop();
+        this.angleTa && this.angleTa.drop();
+        this.angleTaEditing && this.angleTaEditing.drop();
 
-        if (this.pointApoapsis) this.pointApoapsis.drop();
+        this.pointApoapsis && this.pointApoapsis.drop();
+        this.pointPeriapsis && this.pointPeriapsis.drop();
     }
 }

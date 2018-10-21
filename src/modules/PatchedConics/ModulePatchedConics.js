@@ -4,6 +4,8 @@ import EphemerisObject from "../../core/EphemerisObject";
 import Body from "../../core/Body";
 import PropagatorPatchedConics from "./PropagatorPatchedConics";
 import { sim } from "../../core/Simulation";
+import VisualFlightEventSOIArrival from "./visual/FlightEvent/SOIArrival";
+import VisualFlightEventSOIDeparture from "./visual/FlightEvent/SOIDeparture";
 
 export default class ModulePatchedConics extends Module
 {
@@ -15,6 +17,9 @@ export default class ModulePatchedConics extends Module
         if (sim.starSystem) {
             this.fillSoiTree();
         }
+
+        VisualFlightEventSOIArrival.preloadTexture();
+        VisualFlightEventSOIDeparture.preloadTexture();
     }
 
     fillSoiTree() {
