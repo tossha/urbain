@@ -6,7 +6,7 @@ import StepHandlerService from "./services/step-handler-service";
 async function showWizard(
     wizardId,
     watchStatusService = new LocalStorageWatchStatusService(window.localStorage),
-    stepHandlerService = new StepHandlerService('tutorial_', 'duration_tut_')
+    stepHandlerService = new StepHandlerService("tutorial_", "duration_tut_"),
 ) {
     if (!watchStatusService.canWatch(wizardId)) {
         return;
