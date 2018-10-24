@@ -5,6 +5,11 @@ export default class FlightEventAbstract
 
     constructor(epoch) {
         this._epoch = epoch;
+        this._updateCallback = false;
+    }
+
+    onUpdate(callback) {
+        this._updateCallback = callback;
     }
 
     copy(flightEvent) {
@@ -13,6 +18,7 @@ export default class FlightEventAbstract
 
     set epoch(epoch) {
         this._epoch = epoch;
+        this._updateCallback && this._updateCallback(this);
     }
 
     get epoch() {
