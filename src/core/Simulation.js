@@ -58,6 +58,7 @@ class Simulation
 
     loadStarSystem(jsonFile, onLoadFinish) {
         $.getJSON("./star_systems/" + jsonFile, starSystemConfig => {
+            this.selection.deselect();
             this.starSystem && this.starSystem.unload();
             this.starSystem = new StarSystem(starSystemConfig.id);
 

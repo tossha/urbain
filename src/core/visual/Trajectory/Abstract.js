@@ -41,7 +41,7 @@ export default class VisualTrajectoryAbstract extends VisualModelAbstract
         this.scene.add(this.point);
         this.pointSize = 4;
 
-        this.threeObj.userData = {trajectory: trajectory};
+        this.threeObj.userData = {selectionObject: () => this.trajectory.object};
         sim.selection.addSelectableObject(this.threeObj);
     }
 

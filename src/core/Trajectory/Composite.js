@@ -26,6 +26,11 @@ export default class TrajectoryComposite extends TrajectoryAbstract
         this.components.map(traj => traj.drop());
     }
 
+    setObject(object) {
+        super.setObject(object);
+        this.components.map(traj => traj.setObject(object));
+    }
+
     isEditableAtEpoch(epoch) {
         return this.getComponentByEpoch(epoch).isEditableAtEpoch(epoch);
     }
@@ -67,6 +72,7 @@ export default class TrajectoryComposite extends TrajectoryAbstract
     addComponent(trajectory) {
         this.components.push(trajectory);
         trajectory.setParent(this);
+        trajectory.setObject(this.object);
 
         if (this.isSelected) {
             trajectory.select();

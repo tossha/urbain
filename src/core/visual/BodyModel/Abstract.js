@@ -50,6 +50,8 @@ export default class VisualBodyModelAbstract extends VisualModelAbstract
                         : VisualLabel.DEFAULT_SETTINGS.scaling
             }
         );
+        this.threeObj.userData = {selectionObject: obj};
+        sim.selection.addSelectableObject(this.threeObj);
     }
 
     getMaterial(parameters) {
@@ -60,6 +62,8 @@ export default class VisualBodyModelAbstract extends VisualModelAbstract
         if (this.label) {
             this.label.drop();
         }
+
+        sim.selection.removeSelectableObject(this.threeObj);
 
         super.drop();
     }

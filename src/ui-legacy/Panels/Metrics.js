@@ -37,22 +37,22 @@ export default class UIPanelMetrics extends UIPanel
     }
 
     render(event) {
-        const selectedObject = this.selection.getSelectedObject();
+        const selectedTrajectory = this.selection.getSelectedObject().trajectory;
         let parent = null;
-        if (!selectedObject) {
+        if (!selectedTrajectory) {
             return;
         }
 
         try {
-            const referenceFrame = selectedObject.getReferenceFrameByEpoch(event.detail.epoch);
+            const referenceFrame = selectedTrajectory.getReferenceFrameByEpoch(event.detail.epoch);
             if (referenceFrame) {
                 parent = sim.starSystem.getObject(referenceFrame.originId);
                 this.jqDom.find('#relativeTo').html(parent.name);
             }
 
-            this.updateMain(selectedObject, event.detail.epoch, parent);
-            this.updateCartesian(selectedObject, event.detail.epoch);
-            this.updateKeplerian(selectedObject, event.detail.epoch);
+            this.updateMain(selectedTrajectory, event.detail.epoch, parent);
+            this.updateCartesian(selectedTrajectory, event.detail.epoch);
+            this.updateKeplerian(selectedTrajectory, event.detail.epoch);
         } catch (e) {
 
         }
@@ -102,7 +102,7 @@ export default class UIPanelMetrics extends UIPanel
     handleSelect() {
         this.show();
 
-        const object = this.selection.getSelectedObject().object;
+        const object = this.selection.getSelectedObject();
         if (object) {
             $('#metricsOf').html(object.name);
         } else {

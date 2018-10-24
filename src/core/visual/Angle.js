@@ -72,7 +72,7 @@ export default class VisualAngle extends VisualModelAbstract
             document.addEventListener('mousedown', this.mouseDownListener);
         }
 
-        this.size = sim.camera.position.mag / 6 * this.arcSize;
+        this.sizeNeedsUpdate = true;
 
         if (this.type === VisualAngle.TYPE_ARC) {
             this.createArcObject();
