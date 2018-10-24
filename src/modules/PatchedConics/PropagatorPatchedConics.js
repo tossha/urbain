@@ -189,11 +189,11 @@ export default class PropagatorPatchedConics extends PropagatorAbstract
                 let prevDR = false;
                 let found = false;
 
-                // Distance between two objects
+                // Distance between two objects, km
                 const getR = (states) => {
                     return states[0].position.sub_(states[1]._position).mag;
                 };
-                // Distance derivative - rate of change of the distance between two objects
+                // Distance derivative - rate of change of the distance between two objects, km/s
                 const getDR = (states, r) => {
                     return (states[0]._position.mag * states[0]._velocity.projectionOn(states[0]._position)
                           + states[1]._position.mag * states[1]._velocity.projectionOn(states[1]._position)
