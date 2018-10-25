@@ -440,6 +440,10 @@ export default class KeplerianObject
         return this.getOrbitalFrameQuaternion().rotate_(new Vector([1, 0, 0]));
     }
 
+    /**
+     *
+     * @returns {Quaternion}
+     */
     getOrbitalFrameQuaternion() {
         return (new Quaternion(new Vector([0, 0, 1]), this._raan))
             .mul_(new Quaternion(new Vector([1, 0, 0]), this._inc))

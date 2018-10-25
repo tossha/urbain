@@ -4,11 +4,13 @@ import ReferenceFrameFactory, {ReferenceFrame} from "../../core/ReferenceFrame/F
 import TrajectoryKeplerianBasic from "../../core/Trajectory/KeplerianBasic";
 import KeplerianObject from "../../core/KeplerianObject";
 import VisualTrajectoryModelKeplerian from "../../core/visual/Trajectory/Keplerian";
-import {getAngleIntervalsIntersection, getEpochIntervalsIntersection, TWO_PI} from "../../core/algebra";
+import {getAngleIntervalsIntersection, getEpochIntervalsIntersection, Quaternion, TWO_PI} from "../../core/algebra";
 import { sim } from "../../core/Simulation";
 import FlightEventSOIArrival from "./FlightEvent/SOIArrival";
 import FlightEventSOIDeparture from "./FlightEvent/SOIDeparture";
 import EphemerisObject from "../../core/EphemerisObject";
+import TrajectoryDynamic from "../../core/Trajectory/Dynamic";
+import FlightEventImpulsiveBurn from "../../core/FlightEvent/ImpulsiveBurn";
 // import VisualPoint from "../../visual/Point";
 // import Constant from "../../core/FunctionOfEpoch/Constant";
 
@@ -22,12 +24,15 @@ export default class PropagatorPatchedConics extends PropagatorAbstract
     }
 
     propagate(trajectory, epochFrom) {
-        if (!trajectory instanceof TrajectoryComposite) {
-            throw new Error('Patched conics propagation requires TrajectoryComposite instance');
+        if (!trajectory instanceof TrajectoryDynamic) {
+            throw new Error('Patched conics propagation requires TrajectoryDynamic instance');
         }
 
         trajectory.clearAfterEpoch(epochFrom);
 
+        let burns = trajectory.flightEvents.filter(event => event instanceof FlightEventImpulsiveBurn);
+        let curBurn = 0;
+        let nextBurnTime = burns.length > 0 ? burns[0].epoch : false;
         let lastComponent = trajectory.getComponentByEpoch(epochFrom);
         let epoch = Math.max(epochFrom, lastComponent.epoch);
         let nextComponentData;
@@ -43,7 +48,7 @@ export default class PropagatorPatchedConics extends PropagatorAbstract
 
         do {
             // console.log('\tLooking for next component...');
-            nextComponentData = this._findNextTrajectory(lastComponent, epoch + 1);
+            nextComponentData = this._findNextTrajectory(lastComponent, epoch + 1, nextBurnTime);
             if (nextComponentData) {
                 // console.log('\tComponent found', nextComponentData);
                 trajectory.addComponent(nextComponentData.trajectory);
@@ -63,17 +68,33 @@ export default class PropagatorPatchedConics extends PropagatorAbstract
                     nextComponentData.oldSoi,
                     nextComponentData.newSoi
                 ));
+            } else if (nextBurnTime !== false) {
+                lastComponent.maxEpoch = nextBurnTime;
+                lastComponent = this._createAfterBurnTrajectory(lastComponent, burns[curBurn].vector, nextBurnTime);
+                trajectory.addComponent(lastComponent);
+                nextComponentData = true;
+
+                curBurn += 1;
+                nextBurnTime = (burns[curBurn] !== undefined) ? burns[curBurn].epoch : false;
             }
+
         } while (nextComponentData);
         // console.log('Propagation ended');
     }
 
-    _findNextTrajectory(trajectory, epochFrom) {
+    _findNextTrajectory(trajectory, epochFrom, epochTo) {
         const soi = sim.starSystem.getObject(trajectory.referenceFrame.originId);
-        const childSoiCrossing = this._findChildSoiCrossing(soi, trajectory, epochFrom, epochFrom + trajectory.period);
         const ownSoiCrossing   = (soi.type !== EphemerisObject.TYPE_STAR)
             ? this._findOwnSoiCrossing(soi, trajectory, epochFrom)
             : false;
+        const childSoiCrossing = this._findChildSoiCrossing(
+            soi,
+            trajectory,
+            epochFrom,
+            (epochTo === false)
+                ? epochFrom + trajectory.period
+                : epochTo
+        );
 
         if (childSoiCrossing === false && ownSoiCrossing === false) {
             return false;
@@ -83,8 +104,12 @@ export default class PropagatorPatchedConics extends PropagatorAbstract
             ? ownSoiCrossing
             : childSoiCrossing;
 
+        if (epochTo !== false && nextSoiCrossing.epoch > epochTo) {
+            return false;
+        }
+
         return {
-            trajectory: this._createExtensionTrajectory(trajectory, nextSoiCrossing.newSoi, nextSoiCrossing.epoch),
+            trajectory: this._createNextSoiTrajectory(trajectory, nextSoiCrossing.newSoi, nextSoiCrossing.epoch),
             oldSoi: soi,
             newSoi: nextSoiCrossing.newSoi,
             epoch: nextSoiCrossing.epoch
@@ -478,7 +503,7 @@ export default class PropagatorPatchedConics extends PropagatorAbstract
             && keplerianObjectActive.getApoapsisRadius()  > r1;
     }
 
-    _createExtensionTrajectory(originalTrajectory, newSoiBody, epoch) {
+    _createNextSoiTrajectory(originalTrajectory, newSoiBody, epoch) {
         let newReferenceFrame = sim.starSystem.getReferenceFrame(ReferenceFrameFactory.buildId(newSoiBody.id, ReferenceFrame.INERTIAL_ECLIPTIC));
         let newSoiState = newReferenceFrame.stateVectorFromBaseReferenceFrameByEpoch(
             epoch,
@@ -495,7 +520,6 @@ export default class PropagatorPatchedConics extends PropagatorAbstract
         );
         traj.minEpoch = epoch;
         traj.maxEpoch = false;
-        traj.isEditable = false;
 
         // TODO refactor this
         traj.setVisualModel(new VisualTrajectoryModelKeplerian(
@@ -506,4 +530,30 @@ export default class PropagatorPatchedConics extends PropagatorAbstract
         return traj;
     }
 
+    _createAfterBurnTrajectory(originalTrajectory, impulseVector, epoch) {
+        let state = originalTrajectory.getStateInOwnFrameByEpoch(epoch);
+        state._velocity.add_(
+            Quaternion.twoAxis(state._velocity, null, state._position)
+                .rotate_(impulseVector)
+        );
+
+        let traj = new TrajectoryKeplerianBasic(
+            originalTrajectory.referenceFrame.id,
+            KeplerianObject.createFromState(
+                state,
+                originalTrajectory.mu,
+                epoch
+            )
+        );
+        traj.minEpoch = epoch;
+        traj.maxEpoch = false;
+
+        // TODO refactor this
+        traj.setVisualModel(new VisualTrajectoryModelKeplerian(
+            traj,
+            {color: originalTrajectory.visualModel.config.color, minEpoch: false, maxEpoch: 'copy'}
+        ));
+
+        return traj;
+    }
 }

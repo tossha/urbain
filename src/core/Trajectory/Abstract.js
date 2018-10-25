@@ -35,8 +35,7 @@ export default class TrajectoryAbstract
 
         this.isEditable = false;
         this.isSelected = false;
-
-        this.propagator = null;
+        this.clickHandler = null;
 
         this.flightEvents = [];
 
@@ -45,8 +44,9 @@ export default class TrajectoryAbstract
         this.orbitalReferenceFrame = new ReferenceFrameInertialDynamic(
             new FunctionOfEpochCustom(epoch => this.getStateByEpoch(epoch)),
             new FunctionOfEpochCustom(epoch => {
+                const quat = this.getReferenceFrameByEpoch(epoch).getQuaternionByEpoch(epoch);
                 const state = this.getStateInOwnFrameByEpoch(epoch);
-                return Quaternion.twoAxis(state.velocity, null, state.position);
+                return quat.mul_(Quaternion.twoAxis(state._velocity, null, state._position));
             }),
         );
 
@@ -62,6 +62,15 @@ export default class TrajectoryAbstract
         );
     }
 
+    onClick(handler) {
+        this.clickHandler = handler;
+        this.visualModel && this.visualModel.onClick(handler);
+    }
+
+    onUpdate(handler) {
+        return null;
+    }
+
     addFlightEvent(flightEvent) {
         if (flightEvent instanceof FlightEventSOIDeparture || flightEvent instanceof FlightEventSOIArrival) {
             for (let event of this.flightEvents) {
@@ -71,7 +80,17 @@ export default class TrajectoryAbstract
                 }
             }
         }
-        this.flightEvents.push(flightEvent);
+        let found = false;
+        for (let i in this.flightEvents) {
+            if (this.flightEvents[i].epoch > flightEvent.epoch) {
+                this.flightEvents.splice(i, 0, flightEvent);
+                found = true;
+                break;
+            }
+        }
+        if (!found) {
+            this.flightEvents.push(flightEvent);
+        }
         this.visualModel && this.visualModel.addFlightEvent(flightEvent);
     }
 
@@ -85,10 +104,6 @@ export default class TrajectoryAbstract
             }
         }
         this.flightEvents = newEvents;
-    }
-
-    isEditableAtEpoch(epoch) {
-        return this.isEditable;
     }
 
     setReferenceFrame(referenceFrameId) {
@@ -136,6 +151,10 @@ export default class TrajectoryAbstract
 
     setVisualModel(visualModel) {
         this.visualModel = visualModel;
+        this.clickHandler && this.visualModel.onClick(this.clickHandler);
+        for (let event of this.flightEvents) {
+            this.visualModel.addFlightEvent(event);
+        }
     }
 
     setParent(parent) {

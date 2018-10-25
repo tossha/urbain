@@ -7,12 +7,15 @@ import FunctionOfEpochCustom from "../../FunctionOfEpoch/Custom";
 import ReferenceFrameInertial from "../../ReferenceFrame/Inertial";
 import { sim } from "../../Simulation";
 import Constant from "../../FunctionOfEpoch/Constant";
+import StateVector from "../../StateVector";
 
 export default class VisualTrajectoryKeplerian extends VisualTrajectoryModelAbstract
 {
     constructor(trajectory, config) {
         super(trajectory, config);
         this.showFull = !!config.showFull;
+        this.lastPositionEpoch = false;
+        this.lastFrameEpoch = false;
     }
 
     render(epoch)
@@ -26,6 +29,9 @@ export default class VisualTrajectoryKeplerian extends VisualTrajectoryModelAbst
             return;
         }
 
+        this.lastPositionEpoch = positionEpoch;
+        this.lastFrameEpoch = epoch;
+
         const keplerianObject = this.trajectory.getKeplerianObjectByEpoch(positionEpoch);
 
         if (keplerianObject.isElliptic) {
@@ -33,6 +39,14 @@ export default class VisualTrajectoryKeplerian extends VisualTrajectoryModelAbst
         } else {
             this.renderHyperbola(keplerianObject, positionEpoch, epoch);
         }
+    }
+
+    getEpochByPoint(point) {
+        const frame = this.trajectory.getReferenceFrameByEpoch(this.lastFrameEpoch);
+        let framePos = frame.stateVectorFromBaseReferenceFrameByEpoch(this.lastFrameEpoch, new StateVector(point))._position;
+        const keplerianObject = this.trajectory.getKeplerianObjectByEpoch(this.lastPositionEpoch);
+        keplerianObject.getOrbitalFrameQuaternion().invert_().rotate_(framePos);
+        return keplerianObject.getEpochByTrueAnomaly(Math.atan2(framePos.y, framePos.x));
     }
 
     /**
@@ -92,7 +106,7 @@ export default class VisualTrajectoryKeplerian extends VisualTrajectoryModelAbst
         this.updateGeometry(points, angs, endingBrightness);
 
         this.threeObj.quaternion.copy(orbitQuaternion.toThreejs());
-        this.setPosition(this.trajectory.referenceFrame.getOriginPositionByEpoch(frameEpoch));
+        this.setPosition(this.trajectory.getReferenceFrameByEpoch(frameEpoch).getOriginPositionByEpoch(frameEpoch));
     }
 
     /**

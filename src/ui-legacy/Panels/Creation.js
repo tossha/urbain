@@ -4,8 +4,9 @@ import TrajectoryKeplerianBasic from "../../core/Trajectory/KeplerianBasic";
 import ReferenceFrameFactory, {ReferenceFrame} from "../../core/ReferenceFrame/Factory";
 import VisualTrajectoryModelKeplerian from "../../core/visual/Trajectory/Keplerian";
 import KeplerianObject from "../../core/KeplerianObject";
-import TrajectoryComposite from "../../core/Trajectory/Composite";
+import TrajectoryDynamic from "../../core/Trajectory/Dynamic";
 import { sim } from "../../core/Simulation";
+import VisualTrajectoryDynamic from "../../core/visual/Trajectory/Dynamic";
 
 export default class UIPanelCreation extends UIPanel {
     constructor(panelDom) {
@@ -21,7 +22,7 @@ export default class UIPanelCreation extends UIPanel {
             const sma = object.physicalModel.radius * 2;
             const id = -11000000 - sim.starSystem.created;
             sim.starSystem.created += 1;
-            let ephObject = new EphemerisObject(id, EphemerisObject.TYPE_UNKNOWN, "Created #" + sim.starSystem.created);
+
             let traj = new TrajectoryKeplerianBasic(
                 ReferenceFrameFactory.buildId(center, ReferenceFrame.INERTIAL_BODY_EQUATORIAL),
                 new KeplerianObject(
@@ -31,20 +32,18 @@ export default class UIPanelCreation extends UIPanel {
             traj.setVisualModel(new VisualTrajectoryModelKeplerian(traj, {color: 'yellow'}));
             traj.minEpoch = false;
             traj.maxEpoch = false;
-            traj.isEditable = true;
 
-            let pTraj = new TrajectoryComposite();
             const propagatorClass = sim.getPropagator('patchedConics');
+            let pTraj = new TrajectoryDynamic(new propagatorClass());
+            pTraj.setVisualModel(new VisualTrajectoryDynamic(pTraj, {color: 0xFFFFFF}));
             pTraj.addComponent(traj);
-            pTraj.isEditable = true;
-            pTraj.propagator = new propagatorClass();
 
-            traj.setUpdateCallback(() => {pTraj.propagator.propagate(pTraj, traj.keplerianObject.epoch)});
+            let ephObject = new EphemerisObject(id, EphemerisObject.TYPE_UNKNOWN, "Created #" + sim.starSystem.created);
             ephObject.setTrajectory(pTraj);
             sim.starSystem.addObject(id, ephObject);
             sim.selection.forceSelection(ephObject);
 
-            pTraj.propagator.propagate(pTraj, traj.keplerianObject.epoch, {epoch: traj.keplerianObject.epoch + traj.keplerianObject.period});
+            pTraj.propagate(traj.epoch);
         });
     }
 }

@@ -101,16 +101,20 @@ export default class SelectionHandler extends VisualModelAbstract
             return;
         }
 
-        this.deselect();
+        if (!this.bestIntersection) {
+            this.deselect();
+            return;
+        }
 
-        if (this.bestIntersection) {
-            let selectionObject = this.bestIntersection.object.userData.selectionObject;
-            if (selectionObject instanceof Function) {
-                selectionObject = selectionObject();
-            }
-            if (selectionObject && selectionObject !== wasSelected) {
-                this.select(selectionObject);
-            }
+        let selectionObject = this.bestIntersection.object.userData.selectionObject;
+        if (selectionObject instanceof Function) {
+            selectionObject = selectionObject();
+        }
+        if (selectionObject && selectionObject !== wasSelected) {
+            this.deselect();
+            this.select(selectionObject);
+        } else if (selectionObject && this.bestIntersection.object.userData.onClick) {
+            this.bestIntersection.object.userData.onClick(this.bestIntersection);
         }
     }
 

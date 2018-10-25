@@ -10,6 +10,7 @@ export default class FlightEventAbstract
 
     onUpdate(callback) {
         this._updateCallback = callback;
+        return this;
     }
 
     copy(flightEvent) {

@@ -7,8 +7,9 @@ export default class TrajectoryKeplerianBasic extends TrajectoryKeplerianAbstrac
         this.keplerianObject = keplerianObject;
     }
 
-    setUpdateCallback(callback) {
+    onUpdate(callback) {
         this.keplerianObject.setUpdateCallback(() => callback(this));
+        return this;
     }
 
     get mu() {

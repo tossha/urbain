@@ -1,5 +1,6 @@
 
 import FlightEventAbstract from "./Abstract";
+import VisualFlightEventImpulsiveBurn from "../visual/FlightEvent/ImpulsiveBurn";
 
 /**
  * Public fields:
@@ -10,6 +11,8 @@ import FlightEventAbstract from "./Abstract";
  */
 export default class FlightEventImpulsiveBurn extends FlightEventAbstract
 {
+    static VISUAL_CLASS = VisualFlightEventImpulsiveBurn;
+
     constructor(epoch, vector) {
         super(epoch);
         this._vector = vector;

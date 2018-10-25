@@ -21,7 +21,7 @@ export default class UIPanelMetrics extends UIPanel
         document.addEventListener(Events.DESELECT, this.handleDeselect.bind(this));
 
         this.jqDom.find('#unloadObject').on('click', function() {
-            let wasSelected = selection.getSelectedObject().object;
+            let wasSelected = selection.getSelectedObject();
             selection.deselect();
             sim.starSystem.deleteObject(wasSelected.id);
         });

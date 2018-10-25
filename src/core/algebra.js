@@ -231,7 +231,7 @@ export class Quaternion
         }
     }
 
-    static twoAxis(x, y ,z) {
+    static twoAxis(x, y, z) {
         let normal1;
         let normal2;
         let quat;
@@ -313,6 +313,10 @@ export class Quaternion
         return Math.sqrt(this.quadrance());
     }
 
+    /**
+     *
+     * @returns {Quaternion}
+     */
     invert_() {
         let quadrance = this.quadrance();
         this.t /= quadrance;

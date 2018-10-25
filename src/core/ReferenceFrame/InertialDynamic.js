@@ -8,6 +8,10 @@ export default class ReferenceFrameInertialDynamic extends ReferenceFrameInertia
         this.quaternionOfEpoch = quaternionOfEpoch;
     }
 
+    /**
+     * @param epoch
+     * @return {Quaternion}
+     */
     getQuaternionByEpoch(epoch) {
         return this.quaternionOfEpoch.evaluate(epoch);
     }
