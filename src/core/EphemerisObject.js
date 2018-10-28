@@ -35,6 +35,14 @@ export default class EphemerisObject
         return this.trajectory.getPositionByEpoch(epoch, referenceFrame || RF_BASE);
     }
 
+    select() {
+        this.trajectory && this.trajectory.select();
+    }
+
+    deselect() {
+        this.trajectory && this.trajectory.deselect();
+    }
+
     drop() {
         if (this.trajectory) {
             this.trajectory.drop();

@@ -27,6 +27,12 @@ export default class SelectionHandler extends VisualModelAbstract
         this.mouseMoveListener = this.onMouseMove.bind(this);
     }
 
+    /**
+     *
+     * @param object - must be a three.js object with its userData.selectionObject
+     *                 property set to object (or a function returning that object)
+     *                 that will be selected (and its select() method will be called)
+     */
     addSelectableObject(object) {
         this.selectableObjects.push(object);
     }
@@ -95,16 +101,20 @@ export default class SelectionHandler extends VisualModelAbstract
             return;
         }
 
-        this.deselect();
+        if (!this.bestIntersection) {
+            this.deselect();
+            return;
+        }
 
-        if (this.bestIntersection) {
-            let currentTraj = this.bestIntersection.object.userData.trajectory;
-            while (currentTraj.parent) {
-                currentTraj = currentTraj.parent;
-            }
-            if (currentTraj !== wasSelected) {
-                this.select(currentTraj);
-            }
+        let selectionObject = this.bestIntersection.object.userData.selectionObject;
+        if (selectionObject instanceof Function) {
+            selectionObject = selectionObject();
+        }
+        if (selectionObject && selectionObject !== wasSelected) {
+            this.deselect();
+            this.select(selectionObject);
+        } else if (selectionObject && this.bestIntersection.object.userData.onClick) {
+            this.bestIntersection.object.userData.onClick(this.bestIntersection);
         }
     }
 
@@ -121,7 +131,7 @@ export default class SelectionHandler extends VisualModelAbstract
         this.selectedObject = object;
         this.selectedObject.select();
 
-        Events.dispatch(Events.SELECT, {trajectory: this.selectedObject});
+        Events.dispatch(Events.SELECT, {object: this.selectedObject});
     }
 
     deselect() {
@@ -129,7 +139,7 @@ export default class SelectionHandler extends VisualModelAbstract
             return;
         }
 
-        Events.dispatch(Events.DESELECT, {trajectory: this.selectedObject});
+        Events.dispatch(Events.DESELECT, {object: this.selectedObject});
 
         this.selectedObject.deselect();
         this.selectedObject = null;

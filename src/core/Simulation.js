@@ -13,6 +13,7 @@ import StarSystem from "./StarSystem";
 import Camera from "../ui-legacy/Camera";
 import ReferenceFrameFactory from "./ReferenceFrame/Factory";
 import StarSystemManager from "../interface/StarSystemManager";
+import VisualFlightEventImpulsiveBurn from "./visual/FlightEvent/ImpulsiveBurn";
 
 class Simulation
 {
@@ -53,11 +54,14 @@ class Simulation
 
         this.starSystemManager.loadDefault();
 
+        VisualFlightEventImpulsiveBurn.preloadTexture();
+
         Events.dispatch(Events.INIT_DONE);
     }
 
     loadStarSystem(jsonFile, onLoadFinish) {
         $.getJSON("./star_systems/" + jsonFile, starSystemConfig => {
+            this.selection.deselect();
             this.starSystem && this.starSystem.unload();
             this.starSystem = new StarSystem(starSystemConfig.id);
 

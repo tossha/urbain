@@ -7,15 +7,18 @@ import { sim } from '../../Simulation';
 export default class VisualFlightEventAbstract extends VisualSprite
 {
     static _texture = null;
-
-    static _getTextureName() {}
+    static _textureName = null;
+    static _alignVertical = 'center';
+    static _alignHorizontal = 'center';
 
     static preloadTexture() {
-        sim.textureLoader.load('images/' + this._getTextureName(), texture => {this._texture = texture});
+        sim.textureLoader.load('images/' + this._textureName, texture => {this._texture = texture});
     }
 
     constructor(trajectory, flightEvent, color) {
-        super(null, null, color, 'center', 'center');
+        super(null, null, color);
+
+        this.setAlign(this.constructor._alignVertical, this.constructor._alignHorizontal);
 
         this._flightEvent = flightEvent;
         this._trajectory = trajectory;
@@ -29,7 +32,7 @@ export default class VisualFlightEventAbstract extends VisualSprite
         if (this.constructor._texture) {
             this.setTexture(this.constructor._texture);
         } else {
-            this.loadTexture('images/' + this.constructor._getTextureName());
+            this.loadTexture('images/' + this.constructor._textureName);
         }
     }
 }

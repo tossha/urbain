@@ -3,7 +3,5 @@ import VisualFlightEventAbstract from "../../../../core/visual/FlightEvent/Abstr
 
 export default class VisualFlightEventSOIDeparture extends VisualFlightEventAbstract
 {
-    static _getTextureName() {
-        return 'soi_out.png';
-    }
+    static _textureName = 'soi_out.png';
 }

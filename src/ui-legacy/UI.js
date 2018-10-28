@@ -5,6 +5,7 @@ import UIPanelCamera from "./Panels/Camera";
 import UIPanelMetrics from "./Panels/Metrics";
 import UIPanelLambert from "./Panels/Lambert";
 import UIPanelCreation from "./Panels/Creation";
+import UIPanelManeuver from "./Panels/Maneuver";
 import { sim } from "../core/Simulation";
 
 export default class UI
@@ -15,5 +16,6 @@ export default class UI
         this.metricsPanel  = new UIPanelMetrics ($('#metricsPanel'), sim.selection);
         this.creationPanel = new UIPanelCreation($('#creationPanel'));
         this.lambertPanel  = new UIPanelLambert ($('#lambertPanel'));
+        this.maneuverPanel = new UIPanelManeuver($('#maneuverPanel'));
     }
 }

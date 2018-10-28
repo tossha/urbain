@@ -22,7 +22,7 @@ export default class KeplerianObject
     }
 
     setUpdateCallback(callback) {
-        this.updateCallback = callback;
+        this._updateCallback = callback;
     }
 
     copy() {
@@ -48,7 +48,7 @@ export default class KeplerianObject
     set mu(value) {
         this._mu = value;
         this.updateMeanMotion();
-        this.updateCallback && this.updateCallback();
+        this._updateCallback && this._updateCallback();
     }
 
     get sma() {
@@ -58,7 +58,7 @@ export default class KeplerianObject
     set sma(value) {
         this._sma = value;
         this.updateMeanMotion();
-        this.updateCallback && this.updateCallback();
+        this._updateCallback && this._updateCallback();
     }
 
     get ecc() {
@@ -67,7 +67,7 @@ export default class KeplerianObject
 
     set ecc(value) {
         this._ecc = value;
-        this.updateCallback && this.updateCallback();
+        this._updateCallback && this._updateCallback();
     }
 
     get inc() {
@@ -76,7 +76,7 @@ export default class KeplerianObject
 
     set inc(value) {
         this._inc = value;
-        this.updateCallback && this.updateCallback();
+        this._updateCallback && this._updateCallback();
     }
 
     get raan() {
@@ -85,7 +85,7 @@ export default class KeplerianObject
 
     set raan(value) {
         this._raan = value;
-        this.updateCallback && this.updateCallback();
+        this._updateCallback && this._updateCallback();
     }
 
     get aop() {
@@ -94,7 +94,7 @@ export default class KeplerianObject
 
     set aop(value) {
         this._aop = value;
-        this.updateCallback && this.updateCallback();
+        this._updateCallback && this._updateCallback();
     }
 
     get ta() {
@@ -103,7 +103,7 @@ export default class KeplerianObject
 
     set ta(value) {
         this.m0 = this.getMeanAnomalyByTrueAnomaly(value);
-        this.updateCallback && this.updateCallback();
+        this._updateCallback && this._updateCallback();
     }
 
     get epoch() {
@@ -112,7 +112,7 @@ export default class KeplerianObject
 
     set epoch(value) {
         this._epoch = value;
-        this.updateCallback && this.updateCallback();
+        this._updateCallback && this._updateCallback();
     }
 
     get period() {
@@ -440,6 +440,10 @@ export default class KeplerianObject
         return this.getOrbitalFrameQuaternion().rotate_(new Vector([1, 0, 0]));
     }
 
+    /**
+     *
+     * @returns {Quaternion}
+     */
     getOrbitalFrameQuaternion() {
         return (new Quaternion(new Vector([0, 0, 1]), this._raan))
             .mul_(new Quaternion(new Vector([1, 0, 0]), this._inc))

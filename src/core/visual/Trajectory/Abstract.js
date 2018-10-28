@@ -29,6 +29,10 @@ export default class VisualTrajectoryAbstract extends VisualModelAbstract
         this._minEpoch = (config.minEpoch !== undefined) ? config.minEpoch : (trajectory.minEpoch || false);
         this._maxEpoch = (config.maxEpoch !== undefined) ? config.maxEpoch : (trajectory.maxEpoch || false);
 
+        if (this.constructor.NO_THREE_OBJ) {
+            return;
+        }
+
         this.setThreeObj(new LineObject(
             new THREE.Geometry(),
             new THREE.LineBasicMaterial({vertexColors: THREE.VertexColors})
@@ -41,7 +45,7 @@ export default class VisualTrajectoryAbstract extends VisualModelAbstract
         this.scene.add(this.point);
         this.pointSize = 4;
 
-        this.threeObj.userData = {trajectory: trajectory};
+        this.threeObj.userData = {selectionObject: () => this.trajectory.object};
         sim.selection.addSelectableObject(this.threeObj);
     }
 
@@ -57,6 +61,22 @@ export default class VisualTrajectoryAbstract extends VisualModelAbstract
             : this._maxEpoch;
     }
 
+    getEpochByPoint(point) {
+        return null;
+    }
+
+    /**
+     *
+     * @param handler {Function} - this function is called when user clicks on the trajectory.
+     *                             Epoch that corresponds to the point under the mouse is passed
+     *                             as the only argument.
+     */
+    onClick(handler) {
+        this.threeObj.userData.onClick = (intersection) => handler(
+            this.getEpochByPoint(sim.getSimCoords(intersection.point))
+        );
+    }
+
     initFlightEvents() {
         this.flightEvents = [];
         for (let event of this.trajectory.flightEvents) {
@@ -66,10 +86,15 @@ export default class VisualTrajectoryAbstract extends VisualModelAbstract
 
     addFlightEvent(flightEvent) {
         const className = flightEvent.getVisualClass();
+        if (!className) {
+            return;
+        }
+        
         let model = new className(this.trajectory, flightEvent, this.color);
         if (!this.trajectory.isSelected) {
             model.setScale(0.5);
         }
+        flightEvent.visualModel = model;
         this.flightEvents.push({
             event: flightEvent,
             model: model
@@ -155,29 +180,33 @@ export default class VisualTrajectoryAbstract extends VisualModelAbstract
 
     setColor(color) {
         this.color = color;
-        this.point.material.color.set(this.color);
-        this.point.material.needsUpdate = true;
+        if (this.point) {
+            this.point.material.color.set(this.color);
+            this.point.material.needsUpdate = true;
+        }
         for (let event of this.flightEvents) {
             event.model.setColor(color);
         }
     }
 
     drop() {
-        sim.selection.removeSelectableObject(this.threeObj);
+        this.threeObj && sim.selection.removeSelectableObject(this.threeObj);
 
         for (let event of this.flightEvents) {
             event.model.drop();
         }
         delete this.flightEvents;
 
-        this.scene.remove(this.point);
-        if (this.point.geometry) {
-            this.point.geometry.dispose();
+        if (this.point) {
+            this.scene.remove(this.point);
+            if (this.point.geometry) {
+                this.point.geometry.dispose();
+            }
+            if (this.point.material) {
+                this.point.material.dispose();
+            }
+            delete this.point;
         }
-        if (this.point.material) {
-            this.point.material.dispose();
-        }
-        delete this.point;
 
         super.drop();
     }

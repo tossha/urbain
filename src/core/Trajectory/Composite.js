@@ -7,7 +7,6 @@ export default class TrajectoryComposite extends TrajectoryAbstract
         super();
         this.components = [];
         this.lastUsedTrajectory = null;
-        this.isSelected = false;
     }
 
     select() {
@@ -26,8 +25,9 @@ export default class TrajectoryComposite extends TrajectoryAbstract
         this.components.map(traj => traj.drop());
     }
 
-    isEditableAtEpoch(epoch) {
-        return this.getComponentByEpoch(epoch).isEditableAtEpoch(epoch);
+    setObject(object) {
+        super.setObject(object);
+        this.components.map(traj => traj.setObject(object));
     }
 
     getReferenceFrameByEpoch(epoch) {
@@ -42,8 +42,8 @@ export default class TrajectoryComposite extends TrajectoryAbstract
         return this.getComponentByEpoch(epoch).getKeplerianObjectByEpoch(epoch);
     }
 
-    getStateByEpoch(epoch, referenceFrameOrId) {
-        return this.getComponentByEpoch(epoch).getStateByEpoch(epoch, referenceFrameOrId);
+    getStateByEpoch(epoch, referenceFrameOrId, frameEpoch = null) {
+        return this.getComponentByEpoch(epoch).getStateByEpoch(epoch, referenceFrameOrId, frameEpoch);
     }
 
     getComponentByEpoch(epoch) {
@@ -67,6 +67,7 @@ export default class TrajectoryComposite extends TrajectoryAbstract
     addComponent(trajectory) {
         this.components.push(trajectory);
         trajectory.setParent(this);
+        trajectory.setObject(this.object);
 
         if (this.isSelected) {
             trajectory.select();
@@ -93,13 +94,11 @@ export default class TrajectoryComposite extends TrajectoryAbstract
             this.components[this.components.length - 1].drop();
             this.components.pop();
         }
-        while (this.flightEvents.length && this.flightEvents[this.flightEvents.length - 1].epoch >= epoch) {
-            this.flightEvents.pop();
-        }
         for (let component of this.components) {
             if (component.maxEpoch === false || component.maxEpoch > epoch) {
                 component.clearAfterEpoch(epoch);
             }
         }
+        this.lastUsedTrajectory = null;
     }
 }

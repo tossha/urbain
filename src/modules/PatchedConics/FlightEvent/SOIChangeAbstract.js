@@ -5,13 +5,14 @@ export default class FlightEventSOIChangeAbstract extends FlightEventAbstract
 {
     constructor(epoch, oldSoi, newSoi) {
         super(epoch);
-        this.oldSoi = oldSoi;
-        this.newSoi = newSoi;
+        this.oldSoi = oldSoi || false;
+        this.newSoi = newSoi || false;
     }
 
-    copy(flightEvent) {
-        super.copy(flightEvent);
+    set(flightEvent) {
+        super.set(flightEvent);
         this.oldSoi = flightEvent.oldSoi;
         this.newSoi = flightEvent.newSoi;
+        return this;
     }
 }

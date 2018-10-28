@@ -13,6 +13,7 @@ import VisualBodyModelBasic from "../core/visual/BodyModel/Basic";
 import VisualShapeSphere from "../core/visual/Shape/Sphere";
 import Events from "../core/Events";
 import { sim } from "../core/Simulation";
+import {STAR_SYSTEM_BARYCENTER} from "../core/StarSystem";
 
 export default class StarSystemLoader
 {
@@ -23,7 +24,10 @@ export default class StarSystemLoader
         // Loading main object
         starSystem.mainObject = config.mainObject;
 
-        starSystem.addObject(0, new EphemerisObject(0, EphemerisObject.TYPE_POINT, 'Star system barycenter'));
+        starSystem.addObject(
+            STAR_SYSTEM_BARYCENTER,
+            new EphemerisObject(STAR_SYSTEM_BARYCENTER, EphemerisObject.TYPE_POINT, 'Star system barycenter')
+        );
 
         // Loading objects
         for (const objectConfig of config.objects) {
