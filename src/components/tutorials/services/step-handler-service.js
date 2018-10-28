@@ -1,5 +1,4 @@
 class StepHandlerService {
-
     constructor(goalPrefix, durationPrefix) {
         this._goalPrefix = goalPrefix;
         this._durationPrefix = durationPrefix;
@@ -9,8 +8,9 @@ class StepHandlerService {
     }
 
     handleStep(nextStepIdx) {
-        if (this._stepStartTimes[nextStepIdx] !== undefined)
+        if (!this._metrika || this._stepStartTimes[nextStepIdx] !== undefined) {
             return;
+        }
 
         const stepName = this._goalPrefix + nextStepIdx;
 
@@ -23,7 +23,7 @@ class StepHandlerService {
 
         const durationName = this._durationPrefix + (nextStepIdx - 1);
         this._metrika.reachGoal(stepName, {
-            [durationName]: this._stepStartTimes[nextStepIdx] - this._stepStartTimes[nextStepIdx - 1]
+            [durationName]: this._stepStartTimes[nextStepIdx] - this._stepStartTimes[nextStepIdx - 1],
         });
     }
 }
