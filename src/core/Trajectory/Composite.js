@@ -99,5 +99,6 @@ export default class TrajectoryComposite extends TrajectoryAbstract
                 component.clearAfterEpoch(epoch);
             }
         }
+        this.lastUsedTrajectory = null;
     }
 }

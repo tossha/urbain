@@ -35,7 +35,7 @@ export default class UIPanelCreation extends UIPanel {
 
             const propagatorClass = sim.getPropagator('patchedConics');
             let pTraj = new TrajectoryDynamic(new propagatorClass());
-            pTraj.setVisualModel(new VisualTrajectoryDynamic(pTraj, {color: 0xFFFFFF}));
+            pTraj.setVisualModel(new VisualTrajectoryDynamic(pTraj, {color: 'yellow'}));
             pTraj.addComponent(traj);
 
             let ephObject = new EphemerisObject(id, EphemerisObject.TYPE_UNKNOWN, "Created #" + sim.starSystem.created);

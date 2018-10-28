@@ -30,12 +30,12 @@ export default class PropagatorPatchedConics extends PropagatorAbstract
 
         trajectory.clearAfterEpoch(epochFrom);
 
-        let burns = trajectory.flightEvents.filter(event => event instanceof FlightEventImpulsiveBurn);
+        let burns = trajectory.flightEvents.filter(event => event instanceof FlightEventImpulsiveBurn && event.epoch >= epochFrom);
         let curBurn = 0;
         let nextBurnTime = burns.length > 0 ? burns[0].epoch : false;
         let lastComponent = trajectory.getComponentByEpoch(epochFrom);
         let epoch = Math.max(epochFrom, lastComponent.epoch);
-        let nextComponentData;
+        let nextComponentData = false;
 
         lastComponent.maxEpoch = false;
 /*
@@ -48,7 +48,10 @@ export default class PropagatorPatchedConics extends PropagatorAbstract
 
         do {
             // console.log('\tLooking for next component...');
-            nextComponentData = this._findNextTrajectory(lastComponent, epoch + 1, nextBurnTime);
+            if (nextBurnTime !== epoch) {
+                nextComponentData = this._findNextTrajectory(lastComponent, epoch + 1, nextBurnTime);
+            }
+
             if (nextComponentData) {
                 // console.log('\tComponent found', nextComponentData);
                 trajectory.addComponent(nextComponentData.trajectory);

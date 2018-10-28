@@ -15,18 +15,26 @@ export default class FlightEventImpulsiveBurn extends FlightEventAbstract
 
     constructor(epoch, vector) {
         super(epoch);
-        this._vector = vector;
-        this.deltaV = vector.mag;
+        this._vector = vector || false;
+        this.deltaV = vector ? vector.mag : 0;
     }
 
-    _update() {
+    _update(old) {
         this.deltaV = this._vector.mag;
-        this._updateCallback && this._updateCallback(this);
+        this._updateCallback && this._updateCallback(this, old);
+    }
+
+    set(flightEvent) {
+        super.set(flightEvent);
+        this._vector = flightEvent.vector;
+        this.deltaV = this._vector.mag;
+        return this;
     }
 
     set vector(vector) {
+        const old = this.copy();
         this._vector = vector;
-        this._update();
+        this._update(old);
     }
 
     get vector() {
@@ -34,8 +42,9 @@ export default class FlightEventImpulsiveBurn extends FlightEventAbstract
     }
 
     set prograde(value) {
+        const old = this.copy();
         this._vector[0] = value;
-        this._update();
+        this._update(old);
     }
 
     get prograde() {
@@ -43,8 +52,9 @@ export default class FlightEventImpulsiveBurn extends FlightEventAbstract
     }
 
     set normal(value) {
+        const old = this.copy();
         this._vector[1] = value;
-        this._update();
+        this._update(old);
     }
 
     get normal() {
@@ -52,8 +62,9 @@ export default class FlightEventImpulsiveBurn extends FlightEventAbstract
     }
 
     set radial(value) {
+        const old = this.copy();
         this._vector[2] = value;
-        this._update();
+        this._update(old);
     }
 
     get radial() {

@@ -4,7 +4,7 @@ export default class FlightEventAbstract
     static VISUAL_CLASS = null;
 
     constructor(epoch) {
-        this._epoch = epoch;
+        this._epoch = epoch || false;
         this._updateCallback = false;
     }
 
@@ -13,13 +13,19 @@ export default class FlightEventAbstract
         return this;
     }
 
-    copy(flightEvent) {
+    set(flightEvent) {
         this._epoch = flightEvent._epoch;
+        return this;
+    }
+
+    copy() {
+        return (new this.constructor()).set(this);
     }
 
     set epoch(epoch) {
+        const old = this.copy();
         this._epoch = epoch;
-        this._updateCallback && this._updateCallback(this);
+        this._updateCallback && this._updateCallback(this, old);
     }
 
     get epoch() {

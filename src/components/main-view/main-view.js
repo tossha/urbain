@@ -8,6 +8,7 @@ import TransferCalculationPanel from "./components/transfer-calculation-panel";
 import MetricsPanel from "./components/metrics-panel/index";
 import SatelliteSearchPanel from "./components/satellite-search-panel";
 import SideBar from "../common/side-bar";
+import ManeuverPanel from "./components/maneuver-panel/index";
 
 const MainView = ({ className, children }) => {
     return (
@@ -16,6 +17,7 @@ const MainView = ({ className, children }) => {
             {children}
             <SideBar className="main-view__left-side-bar">
                 <CreationPanel className="main-view__creation-panel" />
+                <ManeuverPanel className="main-view__maneuver-panel" />
                 <TransferCalculationPanel className="main-view__transfer-calculation-panel" />
             </SideBar>
             <SideBar className="main-view__right-side-bar" right>

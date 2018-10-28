@@ -12,6 +12,7 @@ export default class TrajectoryDynamic extends TrajectoryComposite
     constructor(propagator) {
         super();
         this.propagator = propagator;
+        this.updateHandlers = [];
     }
 
     /**
@@ -31,12 +32,27 @@ export default class TrajectoryDynamic extends TrajectoryComposite
                 pointEpoch,
                 new Vector([0, 0, 0])
             )).onUpdate(
-                event => this.propagate(event.epoch)
+                (newEvent, oldEvent) => this.propagate(Math.min(oldEvent.epoch, newEvent.epoch))
             ));
+            this.updateHandlers.map(h => h(this));
         });
     }
 
     propagate(startEpoch) {
         this.propagator.propagate(this, startEpoch);
+        this.updateHandlers.map(h => h(this));
+    }
+
+    onUpdate(handler) {
+        this.updateHandlers.push(handler);
+    }
+
+    removeListener(handler) {
+        for (let i in this.updateHandlers) {
+            if (this.updateHandlers[i] === handler) {
+                this.updateHandlers = this.updateHandlers.splice(i, 1);
+                break;
+            }
+        }
     }
 }
