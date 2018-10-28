@@ -65,6 +65,10 @@
 	justify-content: flex-start;
 }
 
+.panel__field--centered {
+	justify-content: space-between;
+}
+
 .panel__field-set {
 	display: block;
 }
@@ -92,6 +96,11 @@
 .panel__field-label {
 	color: var(--gray-text);
 	min-width: 80px;
+}
+
+.panel__field-label-small {
+	color: var(--gray-text);
+	min-width: 40px;
 }
 
 .panel__field-control {}
