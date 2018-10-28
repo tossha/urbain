@@ -6,6 +6,7 @@ export default class FlightEventAbstract
     constructor(epoch) {
         this._epoch = epoch || false;
         this._updateCallback = false;
+        this._visualModel = null;
     }
 
     onUpdate(callback) {
@@ -30,6 +31,14 @@ export default class FlightEventAbstract
 
     get epoch() {
         return this._epoch;
+    }
+
+    set visualModel(model) {
+        this._visualModel = model;
+    }
+
+    get visualModel() {
+        return this._visualModel;
     }
 
     getVisualClass() {

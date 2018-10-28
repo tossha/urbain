@@ -84,8 +84,12 @@ export default class UIPanelManeuver extends UIPanel {
         if (newIdx < 0 || newIdx >= this.burns.length) {
             return;
         }
+        if (this.burn) {
+            this.burn.visualModel.setScale(1);
+        }
         this.burnIdx = newIdx;
         this.burn = this.burns[this.burnIdx];
+        this.burn.visualModel.setScale(2);
 
         this.update();
         this.jqDom.find('#burn-name').html('Burn #' + (this.burnIdx + 1));
@@ -95,6 +99,7 @@ export default class UIPanelManeuver extends UIPanel {
         if (this.trajectory) {
             this.trajectory.removeListener(this.updateHandler);
             delete this.trajectory;
+            delete this.burn;
             this.hide();
         }
     }

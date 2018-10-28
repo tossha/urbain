@@ -13,6 +13,7 @@ import StarSystem from "./StarSystem";
 import Camera from "../ui-legacy/Camera";
 import ReferenceFrameFactory from "./ReferenceFrame/Factory";
 import StarSystemManager from "../interface/StarSystemManager";
+import VisualFlightEventImpulsiveBurn from "./visual/FlightEvent/ImpulsiveBurn";
 
 class Simulation
 {
@@ -52,6 +53,8 @@ class Simulation
         this.ui = new UI();
 
         this.starSystemManager.loadDefault();
+
+        VisualFlightEventImpulsiveBurn.preloadTexture();
 
         Events.dispatch(Events.INIT_DONE);
     }

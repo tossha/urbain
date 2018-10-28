@@ -31,11 +31,16 @@ export default class TrajectoryDynamic extends TrajectoryComposite
             this.addFlightEvent((new FlightEventImpulsiveBurn(
                 pointEpoch,
                 new Vector([0, 0, 0])
-            )).onUpdate(
-                (newEvent, oldEvent) => this.propagate(Math.min(oldEvent.epoch, newEvent.epoch))
-            ));
+            )).onUpdate((newEvent, oldEvent) => {
+                this.sortManeuvers();
+                this.propagate(Math.min(oldEvent.epoch, newEvent.epoch));
+            }));
             this.updateHandlers.map(h => h(this));
         });
+    }
+
+    sortManeuvers() {
+        this.flightEvents.sort((e1, e2) => (e1.epoch < e2.epoch) ? -1 : (e1.epoch > e2.epoch ? 1 : 0));
     }
 
     propagate(startEpoch) {

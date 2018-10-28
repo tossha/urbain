@@ -94,6 +94,7 @@ export default class VisualTrajectoryAbstract extends VisualModelAbstract
         if (!this.trajectory.isSelected) {
             model.setScale(0.5);
         }
+        flightEvent.visualModel = model;
         this.flightEvents.push({
             event: flightEvent,
             model: model

@@ -8,8 +8,8 @@ export default class VisualSprite extends VisualModelAbstract
     constructor(positionOfEpoch, texturePath, color, verticalAlign, horizontalAlign, scale) {
         super();
         this.positionOfEpoch = positionOfEpoch;
-        this.verticalAlign = verticalAlign;
-        this.horizontalAlign = horizontalAlign;
+        this.verticalAlign = verticalAlign || 'center';
+        this.horizontalAlign = horizontalAlign || 'center';
         this.scale = scale || 1;
         this.color = color || 0xFFFFFF;
         this.loadTexture(texturePath);
@@ -29,7 +29,11 @@ export default class VisualSprite extends VisualModelAbstract
             {map: textureObj, sizeAttenuation: false, color: this.color}
         )));
         this.setScale(this.scale);
-        this.threeObj.center.set(
+        this.updateCenter();
+    }
+
+    updateCenter() {
+        this.threeObj && this.threeObj.center.set(
             this.horizontalAlign === 'right'
                 ? 0
                 : this.horizontalAlign === 'left'
@@ -56,6 +60,12 @@ export default class VisualSprite extends VisualModelAbstract
         this.color = color;
         this.threeObj.material.color.set(this.color);
         this.threeObj.material.needsUpdate = true;
+    }
+
+    setAlign(vertical, horizontal) {
+        this.verticalAlign = vertical;
+        this.horizontalAlign = horizontal;
+        this.updateCenter();
     }
 
     setPositionOfEpoch(positionOfEpoch) {
