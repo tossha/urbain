@@ -535,11 +535,13 @@ export function getAngleIntervalsIntersection(intervals1, intervals2) {
 }
 
 export function isInInterval(angle, interval) {
+    const int1 = (interval[0] + TWO_PI) % TWO_PI;
+    const int2 = (interval[1] + TWO_PI) % TWO_PI;
     angle = (angle + TWO_PI) % TWO_PI;
-    if (interval[0] <= interval[1]) {
-        return (interval[0] <= angle) && (angle <= interval[1]);
+    if (int1 <= int2) {
+        return (int1 <= angle) && (angle <= int2);
     } else {
-        return (interval[0] <= angle) || (angle <= interval[1]);
+        return (int1 <= angle) || (angle <= int2);
     }
 }
 

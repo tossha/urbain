@@ -26,6 +26,10 @@ export default class VisualTrajectoryAbstract extends VisualModelAbstract
 
         this.initFlightEvents();
 
+        this._markers = {};
+        this._defaultMarkerScale  = 0.5;
+        this._selectedMarkerScale = 1;
+
         this._minEpoch = (config.minEpoch !== undefined) ? config.minEpoch : (trajectory.minEpoch || false);
         this._maxEpoch = (config.maxEpoch !== undefined) ? config.maxEpoch : (trajectory.maxEpoch || false);
 
@@ -169,12 +173,18 @@ export default class VisualTrajectoryAbstract extends VisualModelAbstract
         for (let event of this.flightEvents) {
             event.model.setScale(1);
         }
+        for (let k in this._markers) {
+            this._markers[k].setScale(this._selectedMarkerScale);
+        }
     }
 
     deselect() {
         this.setColor(this.config.color);
         for (let event of this.flightEvents) {
             event.model.setScale(0.5);
+        }
+        for (let k in this._markers) {
+            this._markers[k].setScale(this._defaultMarkerScale);
         }
     }
 
@@ -187,11 +197,17 @@ export default class VisualTrajectoryAbstract extends VisualModelAbstract
         for (let event of this.flightEvents) {
             event.model.setColor(color);
         }
+        for (let k in this._markers) {
+            this._markers[k].setColor(color);
+        }
     }
 
     drop() {
         this.threeObj && sim.selection.removeSelectableObject(this.threeObj);
 
+        for (let k in this._markers) {
+            this._markers[k].drop();
+        }
         for (let event of this.flightEvents) {
             event.model.drop();
         }

@@ -1,13 +1,14 @@
 import * as THREE from "three";
 
 import VisualTrajectoryModelAbstract from "./Abstract";
-import {RF_BASE, RF_BASE_OBJ} from "../../ReferenceFrame/Factory";
-import {acosSigned, TWO_PI, Vector} from "../../algebra";
-import FunctionOfEpochCustom from "../../FunctionOfEpoch/Custom";
+import {RF_BASE_OBJ} from "../../ReferenceFrame/Factory";
+import {acosSigned, isInInterval, TWO_PI, Vector} from "../../algebra";
 import ReferenceFrameInertial from "../../ReferenceFrame/Inertial";
 import { sim } from "../../Simulation";
 import Constant from "../../FunctionOfEpoch/Constant";
 import StateVector from "../../StateVector";
+import VisualMarkerPericenter from "../Marker/Pericenter";
+import VisualMarkerApocenter from "../Marker/Apocenter";
 
 export default class VisualTrajectoryKeplerian extends VisualTrajectoryModelAbstract
 {
@@ -16,10 +17,13 @@ export default class VisualTrajectoryKeplerian extends VisualTrajectoryModelAbst
         this.showFull = !!config.showFull;
         this.lastPositionEpoch = false;
         this.lastFrameEpoch = false;
+        this._markers.per = new VisualMarkerPericenter(this.threeObj, this.config.color);
+        this._markers.apo = new VisualMarkerApocenter(this.threeObj, this.config.color);
+        this._markers.per.setScale(0.5);
+        this._markers.apo.setScale(0.5);
     }
 
-    render(epoch)
-    {
+    render(epoch) {
         super.render(epoch);
 
         const positionEpoch = this.getPositionEpoch(epoch);
@@ -107,6 +111,14 @@ export default class VisualTrajectoryKeplerian extends VisualTrajectoryModelAbst
 
         this.threeObj.quaternion.copy(orbitQuaternion.toThreejs());
         this.setPosition(this.trajectory.getReferenceFrameByEpoch(frameEpoch).getOriginPositionByEpoch(frameEpoch));
+
+        this._markers.apo.hide();
+        if (curTa > 0 && curTa < Math.PI) {
+            this._markers.per.hide();
+        } else {
+            this._markers.per.show();
+            this._markers.per.setPosition(new THREE.Vector3(traj.getPeriapsisRadius(), 0, 0));
+        }
     }
 
     /**
@@ -152,6 +164,11 @@ export default class VisualTrajectoryKeplerian extends VisualTrajectoryModelAbst
         let ang = traj.getEccentricAnomalyByEpoch(positionEpoch);
         let maxAnglePart = 1;
 
+        this._markers.per.show();
+        this._markers.per.setPosition(new THREE.Vector3(traj.getPeriapsisRadius() - projectedRelativeCameraPosition.x, -projectedRelativeCameraPosition.y, 0));
+        this._markers.apo.show();
+        this._markers.apo.setPosition(new THREE.Vector3(-traj.getApoapsisRadius() - projectedRelativeCameraPosition.x, -projectedRelativeCameraPosition.y, 0));
+
         // if there's less then one orbit left
         if (!this.showFull
             && this.trajectory.maxEpoch !== false
@@ -161,6 +178,15 @@ export default class VisualTrajectoryKeplerian extends VisualTrajectoryModelAbst
             // rendering a part of ellipse
             const maxAng = traj.getEccentricAnomalyByEpoch(this.trajectory.maxEpoch);
             maxAnglePart = (((maxAng - ang) + TWO_PI) % TWO_PI) / TWO_PI;
+
+            const maxMa = traj.getMeanAnomalyByEpoch(this.trajectory.maxEpoch);
+            const curMa = traj.getMeanAnomalyByEpoch(positionEpoch);
+            if (!isInInterval(0, [curMa, maxMa])) {
+                this._markers.per.hide();
+            }
+            if (!isInInterval(Math.PI, [curMa, maxMa])) {
+                this._markers.apo.hide();
+            }
         }
 
         const ellipsePoints = this.getEllipsePoints(

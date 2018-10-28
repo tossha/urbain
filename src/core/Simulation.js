@@ -14,6 +14,8 @@ import Camera from "../ui-legacy/Camera";
 import ReferenceFrameFactory from "./ReferenceFrame/Factory";
 import StarSystemManager from "../interface/StarSystemManager";
 import VisualFlightEventImpulsiveBurn from "./visual/FlightEvent/ImpulsiveBurn";
+import VisualMarkerApocenter from "./visual/Marker/Apocenter";
+import VisualMarkerPericenter from "./visual/Marker/Pericenter";
 
 class Simulation
 {
@@ -55,6 +57,8 @@ class Simulation
         this.starSystemManager.loadDefault();
 
         VisualFlightEventImpulsiveBurn.preloadTexture();
+        VisualMarkerPericenter.preloadTexture();
+        VisualMarkerApocenter.preloadTexture();
 
         Events.dispatch(Events.INIT_DONE);
     }
