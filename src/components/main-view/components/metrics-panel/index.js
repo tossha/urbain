@@ -2,7 +2,7 @@ import React from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 
 import Panel from "../../../common/panel";
-import "./index.css";
+import "./index.scss";
 import KeplerianView from "./components/keplerian-view";
 import CartesianVectorView from "./components/cartesian-vector-view";
 
@@ -44,33 +44,33 @@ const MetricsPanel = () => (
                 <div className="panel__field">
                     <span className="panel__field-label">Orbit</span>
                     <span className="panel__field-control" id="elements-orbit-alt" />
-                    <span className="metrics-panel__dimension">km</span>
+                    <span className="panel__dimension">km</span>
                 </div>
                 <div className="panel__field">
                     <span className="panel__field-label">Avg height</span>
                     <span className="panel__field-control" id="elements-orbit-avg" />
-                    <span className="metrics-panel__dimension">km</span>
+                    <span className="panel__dimension">km</span>
                 </div>
                 <div className="panel__field">
                     <span className="panel__field-label">Altitude</span>
                     <span className="panel__field-control" id="elements-alt" />
-                    <span className="metrics-panel__dimension">km</span>
+                    <span className="panel__dimension">km</span>
                 </div>
                 <div className="panel__field">
                     <span className="panel__field-label">Speed</span>
                     <span className="panel__field-control" id="elements-speed" />
-                    <span className="metrics-panel__dimension">m/s</span>
+                    <span className="panel__dimension">m/s</span>
                 </div>
                 <div className="panel__field">
                     <span className="panel__field-label">Precession</span>
                     <span className="panel__field-control" id="elements-precession" />
-                    <span className="metrics-panel__dimension">deg/day</span>
+                    <span className="panel__dimension">deg/day</span>
                 </div>
 
                 <div className="panel__field" id="row-node-time" style={{ display: "none" }}>
                     <span className="panel__field-label">Node local time</span>
                     <span className="panel__field-control" id="elements-node-time" />
-                    <span className="metrics-panel__dimension" />
+                    <span className="panel__dimension" />
                 </div>
             </div>
 

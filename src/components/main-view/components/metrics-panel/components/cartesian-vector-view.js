@@ -4,7 +4,7 @@ import cn from "classnames";
 
 import VectorComponentView from "./vector-component-view";
 import ExpandButton from "../../../../common/expand-button/index";
-import "./cartesian-vector-view.css";
+import "./cartesian-vector-view.scss";
 
 class CartesianVectorView extends Component {
     static propTypes = {
@@ -32,7 +32,7 @@ class CartesianVectorView extends Component {
 
         return (
             <div className={cn(className, "panel__field cartesian-vector-view")}>
-                <header className="cartesian-vector-view__header">
+                <div className="cartesian-vector-view__header">
                     <VectorComponentView
                         label={vectorMagnitudeLabel}
                         valueClassName="vec-magnitude"
@@ -43,7 +43,7 @@ class CartesianVectorView extends Component {
                         expanded={isExpanded}
                         onClick={this.handleToggle}
                     />
-                </header>
+                </div>
                 <div className={cn("cartesian-vector-view__vector-components", { hidden: !isExpanded })}>
                     <VectorComponentView label="x" valueClassName="vec-x" dimension={dimension} />
                     <VectorComponentView label="y" valueClassName="vec-y" dimension={dimension} />

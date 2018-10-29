@@ -1,0 +1,11 @@
+@import "../../../../common/variables";
+
+.vector-component {
+	align-items: center;
+	display: flex;
+	justify-content: flex-start;
+
+	&__label {
+		min-width: 3rem;
+	}
+}

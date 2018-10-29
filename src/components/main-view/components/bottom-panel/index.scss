@@ -1,0 +1,35 @@
+@import "../../../common/variables";
+
+.bottom-panel {
+	align-items: flex-end;
+	display: flex;
+	justify-content: space-between;
+
+	&__time-settings-panel {
+		margin-right: $default-gap-size;
+		min-width: 25rem;
+	}
+
+	&__pause-button {
+		pointer-events: auto;
+		margin-right: $default-gap-size;
+		height: 6rem;
+		min-width: 6rem;
+	}
+
+	&__time-line-container {
+		flex-grow: 2;
+		height: 6rem;
+		margin-right: $default-gap-size;
+		min-width: 15rem;
+	}
+
+	&__time-line {
+		height: 6rem;
+		width: 100%;
+	}
+
+	&__camera-panel {
+		min-width: 24rem;
+	}
+}

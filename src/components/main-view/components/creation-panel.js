@@ -1,6 +1,7 @@
 import React from "react";
 
 import Panel from "../../common/panel";
+import Button from "../../common/button";
 import { Consumer } from "../../../store";
 
 const CreationPanel = ({ className }) => (
@@ -13,10 +14,11 @@ const CreationPanel = ({ className }) => (
                 caption="Orbit creation"
                 hidden={!store.viewSettings.showOrbitCreationPanel}
             >
-                <div style={{ height: 44 }}>
-                    <label className="panel__field">
-                        Create Orbit: <button id="createOrbit">Create</button>
-                    </label>
+                <div className="panel__field">
+                    <span>Create Orbit</span>
+                    <Button className="panel__button" id="createOrbit">
+                        Create
+                    </Button>
                 </div>
             </Panel>
         )}

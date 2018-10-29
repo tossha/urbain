@@ -2,10 +2,11 @@
 
 .panel {
 	background-color: $gray;
-	border-radius: 2px;
-	font-family: monospace;
+	border-radius: $border-radius;
+	font-size: 1.1rem;
+	// font-family: monospace;
 	pointer-events: auto;
-	padding-bottom: 5px;
+	// padding-bottom: 5px;
 
 	&--hidden {
 		display: none;
@@ -15,9 +16,10 @@
 
 	&__header {
 		align-items: center;
+		border-bottom: 1px solid $dark-gray;
 		display: flex;
 		justify-content: space-between;
-		padding: 2px;
+		padding: $border-radius;
 	}
 
 	&__caption {
@@ -26,40 +28,31 @@
 	}
 
 	&__caption-icon {
-		color: #8e9092;
-		margin-top: 0;
-		margin-left: 5px;
-		margin-bottom: 0;
-		font-size: 13px;
+		color: $gray-text;
+		margin-left: 0.5rem;
 	}
 
 	&__caption-text {
-		margin-left: 8px;
+		margin-left: 0.8rem;
 	}
 
 	&__collapse-button {
-		border-radius: 2px;
-		margin-top: 3px;
-		margin-right: 3px;
-		padding: 2px 5px;
-
-		:hover,
-		:active {
-			background-color: #2d2f35;
-		}
-
+		margin-right: 0.3rem;
 	}
 
-	&__content {}
+	&__content {
+		color: $gray-text;
+		padding: 0.4rem;
+	}
 
 	&__field {
 		align-items: center;
 		display: flex;
-		margin: 10px 5px 0;
+		margin-bottom: 0.8rem;
 		background-color: $dark-gray;
 		border: 1px solid $black-border;
-		border-radius: 2px;
-		padding: 8px;
+		border-radius: $border-radius;
+		padding: $default-gap-size;
 		position: relative;
 
 		&--left-aligned {
@@ -69,50 +62,71 @@
 		&--centered {
 			justify-content: space-between;
 		}
+
+		&:last-child {
+			margin-bottom: 0;
+		}
+	}
+
+	&__field-label {
+		min-width: 8rem; // TODO: Remove me and use normal by default after adding Field component
+
+		&--normal {
+			min-width: 8rem;
+		}
+
+		&--middle {
+			min-width: 6rem;
+		}
+
+		&--small {
+			min-width: 4rem;
+		}
 	}
 
 	&__field-set {
 		display: block;
+		margin-bottom: $default-gap-size;
+
+		&:last-child {
+			margin-bottom: 0;
+		}
 
 		.panel__field {
 			border-bottom: none;
 			border-top: none;
 			border-radius: 0;
-			margin-top: 0;
+			margin-bottom: 0;
 		}
 
 		.panel__field:first-child {
-			border-top-left-radius: 2px;
-			border-top-right-radius: 2px;
-			border-top: 1px solid #191a1e;
-			margin-top: 10px;
+			border-top-left-radius: $border-radius;
+			border-top-right-radius: $border-radius;
+			border-top: 1px solid $black-border;
 		}
 
 		.panel__field:last-child {
-			border-bottom-left-radius: 2px;
-			border-bottom-right-radius: 2px;
-			border-bottom: 1px solid #191a1e;
+			border-bottom-left-radius: $border-radius;
+			border-bottom-right-radius: $border-radius;
+			border-bottom: 1px solid $black-border;
 		}
 	}
 
-	&__field-label {
-		color: $gray-text;
-		min-width: 80px;
+	&__field-control {
+		color: $white-text;
+		margin-left: $default-gap-size / 2;
 	}
-
-	&__field-label-small {
-		color: $gray-text;
-		min-width: 40px;
-	}
-
-	&__field-control {}
 
 	&__field-header {
-		color: var(--blue-text);
+		color: $blue-text;
+	}
+
+	&__dimension {
+		margin-left: $default-gap-size / 2;
 	}
 
 	&__button {
 		position: absolute;
-		right: 5px;
+		right: $default-gap-size / 2;
 	}
 }

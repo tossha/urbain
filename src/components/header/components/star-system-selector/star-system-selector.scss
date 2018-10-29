@@ -1,0 +1,20 @@
+@import "../../../common/variables";
+
+.star-system-selector {
+	align-items: center;
+	background: $dark-gray;
+	border-radius: $border-radius;
+	display: flex;
+	justify-content: space-between;
+	height: 100%;
+	padding: 0 1.5rem;
+
+	&__label {
+		margin-right: 1.5rem;
+	}
+
+	&__selector {
+		background: $black;
+		width: 173px;
+	}
+}
