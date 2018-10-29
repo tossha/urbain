@@ -3,6 +3,7 @@ import PropTypes from "prop-types";
 import cn from "classnames";
 
 const FieldLabel = ({
+    id,
     className,
     tag: ComponentType = "span",
     normal = true,
@@ -12,6 +13,7 @@ const FieldLabel = ({
 }) => {
     return (
         <ComponentType
+            id={id}
             className={cn(
                 "panel__field-label",
                 {
@@ -28,6 +30,7 @@ const FieldLabel = ({
 };
 
 FieldLabel.propTypes = {
+    id: PropTypes.string,
     className: PropTypes.string,
     tag: PropTypes.string,
     normal: PropTypes.bool,
