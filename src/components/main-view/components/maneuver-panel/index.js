@@ -4,8 +4,8 @@ import Panel from "../../../common/panel";
 import "./index.scss";
 
 const ManeuverPanel = ({ className }) => (
-    <Panel id="maneuverPanel" className={className} caption="Maneuver" collapseDirection="left">
-        <div className="metrics-panel__content">
+    <Panel id="maneuverPanel" className={`maneuver-panel ${className}`} caption="Maneuver" collapseDirection="left">
+        <div className="maneuver-panel__content">
             <div className="panel__field-set">
                 <label className="panel__field panel__field--centered">
                     <button className="maneuver-panel__button" type="button" id="prev-burn">

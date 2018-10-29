@@ -1,13 +1,21 @@
-.maneuver-panel__button {
-    border-radius: 2px;
-    margin-bottom: 2px;
+.maneuver-panel {
+    font-size: 11px;
 
-    &:not(:first-child) {
-        margin-left: 8px;
+    .panel__field {
+        padding: 3px 8px;
     }
-}
 
-.maneuver-panel__button-block {
-    position: absolute;
-    right: 8px;
+    &__button {
+        border-radius: 2px;
+        margin-bottom: 2px;
+
+        &:not(:first-child) {
+            margin-left: 8px;
+        }
+    }
+
+    &__button-block {
+        position: absolute;
+        right: 8px;
+    }
 }
