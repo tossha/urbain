@@ -15,6 +15,7 @@ export default class VisualTrajectoryKeplerian extends VisualTrajectoryModelAbst
     constructor(trajectory, config) {
         super(trajectory, config);
         this.showFull = !!config.showFull;
+        this.trailPeriod = config.trailPeriod || false;
         this.lastPositionEpoch = false;
         this.lastFrameEpoch = false;
         this._markers.per = new VisualMarkerPericenter(this.threeObj, this.config.color);
@@ -162,15 +163,23 @@ export default class VisualTrajectoryKeplerian extends VisualTrajectoryModelAbst
 
         let cameraAngle = traj.getEccentricAnomalyByTrueAnomaly(cameraTrueAnomaly);
         let ang = traj.getEccentricAnomalyByEpoch(positionEpoch);
+        let minAnglePart = 0;
         let maxAnglePart = 1;
 
-        this._markers.per.enable();
-        this._markers.per.setPosition(new THREE.Vector3(traj.getPeriapsisRadius() - projectedRelativeCameraPosition.x, -projectedRelativeCameraPosition.y, 0));
-        this._markers.apo.enable();
-        this._markers.apo.setPosition(new THREE.Vector3(-traj.getApoapsisRadius() - projectedRelativeCameraPosition.x, -projectedRelativeCameraPosition.y, 0));
+        if (!this.trailPeriod) {
+            this._markers.per.enable();
+            this._markers.per.setPosition(new THREE.Vector3(traj.getPeriapsisRadius() - projectedRelativeCameraPosition.x, -projectedRelativeCameraPosition.y, 0));
+            this._markers.apo.enable();
+            this._markers.apo.setPosition(new THREE.Vector3(-traj.getApoapsisRadius() - projectedRelativeCameraPosition.x, -projectedRelativeCameraPosition.y, 0));
+        }
 
         // if there's less then one orbit left
-        if (!this.showFull
+        if (this.trailPeriod) {
+            this._markers.per.disable();
+            this._markers.apo.disable();
+            minAnglePart = 1 - (((ang - traj.getEccentricAnomalyByEpoch(positionEpoch - this.trailPeriod)) + TWO_PI) % TWO_PI) / TWO_PI;
+            maxAnglePart = 1;
+        } else if (!this.showFull
             && this.trajectory.maxEpoch !== false
             && this.trajectory.maxEpoch !== null
             && (this.trajectory.maxEpoch - positionEpoch) < traj.period
@@ -203,6 +212,7 @@ export default class VisualTrajectoryKeplerian extends VisualTrajectoryModelAbst
             pointsNum,
             ((cameraAngle - ang) / TWO_PI + 1) % 1,
             toFarthestPoint / toClosestPoint,
+            minAnglePart,
             maxAnglePart
         );
 
@@ -220,10 +230,11 @@ export default class VisualTrajectoryKeplerian extends VisualTrajectoryModelAbst
      *                                which means this area should have more points
      * @param proportion {number} - point density difference between densityCenter and
      *                              the opposite side of the ellipse
+     * @param minAnglePart {number} - must be between 0 and 1, where 1 means two pi.
      * @param maxAnglePart {number} - must be between 0 and 1, where 1 means two pi.
      * @returns {{coords: Array, angs: Array}}
      */
-    getEllipsePoints(curve, pointsNum, densityCenter, proportion, maxAnglePart) {
+    getEllipsePoints(curve, pointsNum, densityCenter, proportion, minAnglePart, maxAnglePart) {
         let nearSegmentSize = 0.25;
         if (proportion > 30) {
             nearSegmentSize = 1 / Math.min(proportion / 60 + 3.5, 12);
@@ -244,7 +255,7 @@ export default class VisualTrajectoryKeplerian extends VisualTrajectoryModelAbst
             otherSegmentsSize/segmentsFar,
             otherSegmentsSize/segmentsMedium
         ];
-        let curPos = 0;
+        let curPos = minAnglePart;
 
         segmentBounds[0] = densityCenter - nearSegmentSize / 2;
         if (segmentBounds[0] < 0)
@@ -259,8 +270,10 @@ export default class VisualTrajectoryKeplerian extends VisualTrajectoryModelAbst
         }
 
         while (curPos < maxAnglePart) {
-            coords.push(curve.getPoint(curPos));
-            angs.push(curPos);
+            if (curPos >= minAnglePart) {
+                coords.push(curve.getPoint(curPos));
+                angs.push((curPos - minAnglePart) / (maxAnglePart - minAnglePart));
+            }
             let i = 0;
             while (i < 4) {
                 if ((segmentBounds[i+1] > segmentBounds[i]

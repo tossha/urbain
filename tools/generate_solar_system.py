@@ -16,6 +16,14 @@ spice.loadKernel('kernels/plu055.bsp')
 spice.loadKernel('kernels/sat375.bsp')
 spice.loadKernel('kernels/ura111.bsp')
 
+spice.loadKernel('kernels/bennu_refdrmc_v1.bsp')
+spice.loadKernel('kernels/2162173_ryugu.bsp')
+
+etStart = spice.str2et('1950 Jan 1 12:00:00 TDB')
+etEnd = spice.str2et('2050 Jan 1 12:00:00 TDB')
+
+vsopTotal = 0
+
 stars = [
 	[216.7309, -83.6679, 4.742419852602448],
 	[341.5149, -81.3816, 5.597576014951102],
@@ -1191,6 +1199,26 @@ objects = [
 		'name': 'Neptune barycenter',
 		'position': [0,0,0]
 	},
+	{
+		'id': '2101955',
+		'type': 5,
+		'parent': '10',
+		'name': 'Bennu',
+		'maxError': 100,
+		'color': 'lightgrey',
+		'dataFrom': '2015 JAN 01 00:00:00.000',
+		'dataTo': '2023 MAY 31 00:00:00.000',
+		'configFrom': etStart,
+		'configTo': etEnd
+	},
+	{
+		'id': '2162173',
+		'type': 5,
+		'parent': '10',
+		'name': 'Ryugu',
+		'maxError': 100,
+		'color': 'lightgrey'
+	}
 ]
 
 referenceFrames = [
@@ -1249,11 +1277,15 @@ def getNextElements(parent, body, currentElements, step, maxError, maxEpoch):
 	prevElements = False
 	i = 0
 
+	# print('Looking for next orbit, curEpoch', currentElements.epoch, 'step', step, 'maxEpoch', maxEpoch)
+
 	while True:
 		if currentElements.epoch + step > maxEpoch:
 			nextEpoch = maxEpoch
 		else:
 			nextEpoch = currentElements.epoch + step
+
+		# print('\tTrying next epoch', nextEpoch, 'actual step', nextEpoch - currentElements.epoch)
 
 		nextElements = getOrbitFromSpice(parent, body, nextEpoch, currentElements.mu)
 
@@ -1269,6 +1301,8 @@ def getNextElements(parent, body, currentElements, step, maxError, maxEpoch):
 		errorVel = realState.velocity.sub(approximatedState.velocity).mag
 		i += 1
 
+		# print('\t\tAt', approximatedEpoch, 'error is', error, 'errorVel is', errorVel)
+
 		if error < maxError and errorVel / realState.velocity.mag < 0.05:
 			if direction == -1 or (nextEpoch == maxEpoch):
 				break
@@ -1283,14 +1317,18 @@ def getNextElements(parent, body, currentElements, step, maxError, maxEpoch):
 				direction = -1
 				step /= (nextEpoch - currentElements.epoch) / 2
 
+		# print('\t\tNew step is', step)
+
 		if i > 10:
 			break
 
 		prevElements = nextElements
 
+	# print('\tReturning epoch', nextElements.epoch)
+
 	return nextElements
 
-def getObjectTrajectory(body, parent, parentMu, etFrom, etTo, maxError, color):
+def getObjectTrajectory(body, parent, parentMu, etFrom, etTo, maxError, color, type):
 	lastOrbit = getOrbitFromSpice(parent, body, etFrom, parentMu)
 	trajectory = [(
 		lastOrbit.ecc,
@@ -1319,15 +1357,16 @@ def getObjectTrajectory(body, parent, parentMu, etFrom, etTo, maxError, color):
 		))
 
 		step = orbit.epoch - lastOrbit.epoch
+		# print('next orbit, time left', orbit.epoch - etTo)
 
 		lastOrbit = orbit
 
 		i += 1
 
-		if lastOrbit.epoch >= etEnd:
+		if lastOrbit.epoch >= etTo:
 			break
 
-	if body == '10':
+	if type == 1:
 		visual = {
 			'model': 'pointArray',
 			'config': {
@@ -1338,6 +1377,23 @@ def getObjectTrajectory(body, parent, parentMu, etFrom, etTo, maxError, color):
 				'referenceFrame': 1000,
 				'maxAngle': 3,
 				'minStep': 86400 * 7
+			}
+		}
+	elif type == 5 or type == 6:
+		visual = {
+			'regular': {
+				'model': 'keplerian',
+				'config': {
+					'color': color,
+					'trailPeriod': 86400 * 30
+				}
+			},
+			'selected': {
+				'model': 'keplerian',
+				'config': {
+					'color': color,
+					'showFull': True
+				}
 			}
 		}
 	else:
@@ -1499,7 +1555,7 @@ def getELP2000Trajectory(color, cutKm):
 		'data': _files
 	}
 
-def getBodyData(body, type, soi, name, color, texture, parent, pairing, j2, etFrom, etTo, maxError, staticPosition):
+def getBodyData(body, type, soi, name, color, texture, parent, pairing, j2, etFrom, etTo, maxError, staticPosition, configMinEpoch, configMaxEpoch):
 	global vsopTotal
 	try:
 		parentMu = spice.bodvrd(parent, "GM", 1)[1][0] if parent != '0' else 319.77790837966666
@@ -1522,7 +1578,11 @@ def getBodyData(body, type, soi, name, color, texture, parent, pairing, j2, etFr
 		trajectory = getELP2000Trajectory(color, 0.1)
 		print(sum([len(fileTerms) for fileTerms in trajectory['data']]))
 	else:
-		trajectory = getObjectTrajectory(body, parent, parentMu, etFrom, etTo, maxError, color)
+		trajectory = getObjectTrajectory(body, parent, parentMu, etFrom, etTo, maxError, color, type)
+		if configMinEpoch != None:
+			trajectory['periodStart'] = configMinEpoch
+		if configMaxEpoch != None:
+			trajectory['periodEnd'] = configMaxEpoch
 		print(len(trajectory['data']['elementsArray']))
 	
 	objectData = {
@@ -1624,18 +1684,15 @@ def getObjects(objects, etStart, etEnd):
 			parent = parent,
 			pairing = body['pair'] if 'pair' in body else False,
 			j2 = body['j2'] if 'j2' in body else False,
-			etFrom = etStart,
-			etTo = etEnd,
+			etFrom = spice.str2et(body['dataFrom'] + ' TDB') if 'dataFrom' in body else etStart,
+			etTo = spice.str2et(body['dataTo'] + ' TDB') if 'dataTo' in body else etEnd,
 			maxError = body['maxError'] if 'maxError' in body else False,
 			staticPosition = body['position'] if 'position' in body else False,
+			configMinEpoch = body['configFrom'] if 'configFrom' in body else None,
+			configMaxEpoch = body['configTo'] if 'configTo' in body else None
 		))
 
 	return data
-
-etStart = spice.str2et('1950 Jan 1 12:00:00 TDB')
-etEnd = spice.str2et('2050 Jan 1 12:00:00 TDB')
-
-vsopTotal = 0
 
 objectsData = getObjects(objects, etStart, etEnd)
 
