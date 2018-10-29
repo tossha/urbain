@@ -1,8 +1,8 @@
 import React from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 
+import Panel, { Field, FieldLabel, FieldControl } from "../../../../../common/panel";
 import "./camera-panel.scss";
-import Panel from "../../../../../common/panel";
 
 const CameraPanel = ({ className }) => (
     <Panel
@@ -12,14 +12,18 @@ const CameraPanel = ({ className }) => (
         titleIcon={<FontAwesomeIcon icon="expand" />}
         collapseDirection="right"
     >
-        <div className="panel__field camera-panel__field">
-            <span className="panel__field-label">Target:</span>
-            <select className="camera-panel__field-control" id="targetSelect" />
-        </div>
-        <div className="panel__field camera-panel__field">
-            <span className="panel__field-label">Frame type:</span>
-            <select className="camera-panel__field-control" id="rfTypeSelect" />
-        </div>
+        <Field className="camera-panel__field">
+            <FieldLabel>Target</FieldLabel>
+            <FieldControl>
+                <select className="camera-panel__field-control" id="targetSelect" />
+            </FieldControl>
+        </Field>
+        <Field className="camera-panel__field">
+            <FieldLabel>Frame type</FieldLabel>
+            <FieldControl>
+                <select className="camera-panel__field-control" id="rfTypeSelect" />
+            </FieldControl>
+        </Field>
     </Panel>
 );
 

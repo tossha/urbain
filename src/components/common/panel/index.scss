@@ -4,9 +4,7 @@
 	background-color: $gray;
 	border-radius: $border-radius;
 	font-size: 1.1rem;
-	// font-family: monospace;
 	pointer-events: auto;
-	// padding-bottom: 5px;
 
 	&--hidden {
 		display: none;
@@ -115,6 +113,11 @@
 	&__field-control {
 		color: $white-text;
 		margin-left: $default-gap-size / 2;
+
+		&--full-size {
+			display: flex;
+			width: 100%;
+		}
 	}
 
 	&__field-header {

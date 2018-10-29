@@ -1,7 +1,6 @@
 import React from "react";
 
-import Panel from "../../../../../common/panel";
-import Button from "../../../../../common/button";
+import Panel, { Field, FieldLabel, FieldControl, PanelButton } from "../../../../../common/panel";
 import Logo from "./logo";
 import "./index.scss";
 
@@ -10,38 +9,35 @@ function TimeSettingsPanel({ className }) {
         <Panel
             className={`time-settings-panel ${className}`}
             id="timePanel"
-            data-panel-name="time"
             caption="Time"
             titleIcon={<Logo className="time-settings-panel__logo" />}
         >
-            <div className="panel__field time-settings-panel__field">
-                <span className="panel__field-label panel__field-label--middle">Current</span>
-                <time className="panel__field-control" id="currentDateValue">
-                    01.01.2000 12:00:00
-                </time>
-                <Button className="panel__button" id="useCurrentTime">
-                    Now
-                </Button>
-            </div>
-            <div className="panel__field time-settings-panel__field">
-                <span className="panel__field-label panel__field-label--middle">Rate</span>
-                <span className="panel__field-control" id="timeScaleValue" />
-                <Button className="panel__button" id="setRealTimeScale">
-                    Real
-                </Button>
-            </div>
-            <div className="panel__field time-settings-panel__field">
-                <input
-                    id="timeScaleSlider"
-                    type="range"
-                    className="time-settings-panel__scale-slider"
-                    min="-1"
-                    max="1"
-                    step="0.001"
-                    defaultValue={"0.001"}
-                    style={{ width: "100%" }}
-                />
-            </div>
+            <Field>
+                <FieldLabel middle>Current</FieldLabel>
+                <FieldControl>
+                    <time id="currentDateValue">01.01.2000 12:00:00</time>
+                </FieldControl>
+                <PanelButton id="useCurrentTime">Now</PanelButton>
+            </Field>
+            <Field>
+                <FieldLabel middle>Rate</FieldLabel>
+                <FieldControl id="timeScaleValue" />
+                <PanelButton id="setRealTimeScale">Real</PanelButton>
+            </Field>
+            <Field centered>
+                <FieldControl fullSize>
+                    <input
+                        id="timeScaleSlider"
+                        type="range"
+                        className="time-settings-panel__scale-slider"
+                        min="-1"
+                        max="1"
+                        step="0.001"
+                        defaultValue="0.001"
+                        style={{ width: "100%" }}
+                    />
+                </FieldControl>
+            </Field>
         </Panel>
     );
 }

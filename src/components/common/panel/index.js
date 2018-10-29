@@ -3,6 +3,11 @@ import PropTypes from "prop-types";
 import cn from "classnames";
 
 import CollapseButton from "./components/collapse-button";
+import Field from "./components/field";
+import FieldLabel from "./components/field-label";
+import FieldControl from "./components/field-control";
+import PanelButton from "./components/button";
+import Dimension from "./components/dimension";
 import "./index.scss";
 
 class Panel extends Component {
@@ -84,4 +89,4 @@ class Panel extends Component {
     }
 }
 
-export default Panel;
+export { Panel as default, Field, FieldLabel, FieldControl, PanelButton, Dimension };

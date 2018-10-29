@@ -1,11 +1,13 @@
-.camera-panel {}
-.camera-panel.panel--collapsed {
-	min-width: 120px;
+.camera-panel {
+	.panel--collapsed {
+		min-width: 12rem;
+	}
+
+	&__field-control {
+		font-size: 1rem;
+	}
+
+	&__icon {
+		font-size: 1.4rem;
+	}
 }
-.camera-panel__field-control {
-	font-size: 10px;
-}
-.camera-panel__icon {
-	font-size: 14px;
-}
-.camera-panel__content {}
