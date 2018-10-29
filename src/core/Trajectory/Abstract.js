@@ -136,6 +136,12 @@ export default class TrajectoryAbstract
         );
     }
 
+    /**
+     *
+     * @param epoch
+     * @param referenceFrameOrId
+     * @return {KeplerianObject}
+     */
     getKeplerianObjectByEpoch(epoch, referenceFrameOrId) {
         let destinationFrame = (referenceFrameOrId instanceof ReferenceFrameAbstract)
             ? referenceFrameOrId

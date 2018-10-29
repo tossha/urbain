@@ -18,6 +18,8 @@ export default class VisualLabel extends VisualModelAbstract {
             {map: new THREE.CanvasTexture(this.canvas)}
         )));
 
+        this.threeObj.renderOrder = 1;
+
         this.setText(this.parameters.text);
     }
 

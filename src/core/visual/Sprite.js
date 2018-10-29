@@ -22,7 +22,7 @@ export default class VisualSprite extends VisualModelAbstract
     }
 
     setTexture(textureObj) {
-        if (this.dropped)
+        if (this._dropped)
             return;
 
         this.setThreeObj(new THREE.Sprite(new THREE.SpriteMaterial(
@@ -30,6 +30,9 @@ export default class VisualSprite extends VisualModelAbstract
         )));
         this.setScale(this.scale);
         this.updateCenter();
+
+        if (this._hedden)
+            this.hide();
     }
 
     updateCenter() {
@@ -73,11 +76,15 @@ export default class VisualSprite extends VisualModelAbstract
     }
 
     hide() {
-        this.threeObj.visible = false;
+        this._hedden = true;
+        if (this.threeObj)
+            this.threeObj.visible = false;
     }
 
     show() {
-        this.threeObj.visible = true;
+        this._hedden = false;
+        if (this.threeObj)
+            this.threeObj.visible = true;
     }
 
     render(epoch) {
@@ -86,6 +93,6 @@ export default class VisualSprite extends VisualModelAbstract
 
     drop() {
         super.drop();
-        this.dropped = true;
+        this._dropped = true;
     }
 }

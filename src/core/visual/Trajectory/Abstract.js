@@ -24,7 +24,13 @@ export default class VisualTrajectoryAbstract extends VisualModelAbstract
         this.color = config.color;
         this.config = config;
 
+        this._isSelected = false;
+
         this.initFlightEvents();
+
+        this._markers = {};
+        this._defaultMarkerScale  = 0.5;
+        this._selectedMarkerScale = 1;
 
         this._minEpoch = (config.minEpoch !== undefined) ? config.minEpoch : (trajectory.minEpoch || false);
         this._maxEpoch = (config.maxEpoch !== undefined) ? config.maxEpoch : (trajectory.maxEpoch || false);
@@ -156,25 +162,56 @@ export default class VisualTrajectoryAbstract extends VisualModelAbstract
             return;
         }
 
-        this.point.visible = true;
         this.point.position.copy(sim.getVisualCoords(this.trajectory.getPositionByEpoch(epoch)));
-        const scaleKoeff = this.pointSize * this.point.position.length() * this.pixelAngleSize;
+        let scaleKoeff = this.pointSize * this.point.position.length() * this.pixelAngleSize;
+        const ko = this.trajectory.getKeplerianObjectByEpoch(epoch);
+
+        if (ko.isElliptic && ko.sma < scaleKoeff) {
+            this._updateMarkerScales(0);
+            this.point.visible = false;
+            return;
+        }
+
+        if (ko.isElliptic && scaleKoeff > ko.sma / 5) {
+            this._updateMarkerScales(ko.sma / 5 / scaleKoeff);
+            scaleKoeff = ko.sma / 5;
+        } else {
+            this._updateMarkerScales();
+        }
+
+        this.point.visible = true;
         this.point.scale.x = scaleKoeff;
         this.point.scale.y = scaleKoeff;
         this.point.scale.z = scaleKoeff;
     }
 
     select() {
+        this._isSelected = true;
         this.setColor(this.config.selectedColor || 0xFFFFFF);
-        for (let event of this.flightEvents) {
-            event.model.setScale(1);
-        }
+        this._updateScales();
     }
 
     deselect() {
+        this._isSelected = false;
         this.setColor(this.config.color);
+        this._updateScales();
+    }
+
+    _updateScales() {
         for (let event of this.flightEvents) {
-            event.model.setScale(0.5);
+            event.model.setScale(this._isSelected ? 1 : 0.5);
+        }
+        this._updateMarkerScales();
+    }
+
+    _updateMarkerScales(multiplier) {
+        if (multiplier === undefined)
+            multiplier = 1;
+        for (let k in this._markers) {
+            this._markers[k].setScale(
+                (this._isSelected ? this._selectedMarkerScale : this._defaultMarkerScale)
+                * multiplier
+            );
         }
     }
 
@@ -187,11 +224,17 @@ export default class VisualTrajectoryAbstract extends VisualModelAbstract
         for (let event of this.flightEvents) {
             event.model.setColor(color);
         }
+        for (let k in this._markers) {
+            this._markers[k].setColor(color);
+        }
     }
 
     drop() {
         this.threeObj && sim.selection.removeSelectableObject(this.threeObj);
 
+        for (let k in this._markers) {
+            this._markers[k].drop();
+        }
         for (let event of this.flightEvents) {
             event.model.drop();
         }
