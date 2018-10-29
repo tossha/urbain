@@ -3,7 +3,7 @@ import PropTypes from "prop-types";
 import cn from "classnames";
 
 import CollapseButton from "./components/collapse-button";
-import "./index.css";
+import "./index.scss";
 
 class Panel extends Component {
     static propTypes = {

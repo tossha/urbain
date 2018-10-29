@@ -1,0 +1,65 @@
+@import "../variables";
+@import "button";
+@import "select";
+
+:root {
+	--black: #{$black};
+	--black-border: #{$black-border};
+	--blue: #{$blue};
+	--lightning-blue: #{$lightning-blue};
+	--gray: #{$gray};
+	--dark-gray: #{$dark-gray};
+	--blue-text: #{$blue-text};
+	--gray-text: #{$gray-text};
+	--white-text: #{$white-text};
+}
+
+html {
+	font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Roboto", "Helvetica Neue", Arial, sans-serif;
+	font-size: 62.5%; /* =10px */
+}
+
+body {
+	background-color: #000;
+	color: $white-text;
+	font-size: 1.2rem; /* =12px */
+	height: 100%;
+	line-height: 1.5rem;
+	margin: 0;
+	overflow: hidden;
+	width: 100%;
+}
+
+*,
+::after,
+::before {
+	box-sizing: border-box;
+}
+
+[hidden],
+.hidden {
+	display: none !important;
+}
+
+.noselect {
+	user-select: none !important;
+}
+
+
+button {
+	@include button-styles;
+}
+
+select {
+	@include select-styles;
+}
+
+a {
+	color: $white-text;
+	text-decoration: none;
+
+	&:hover,
+	&:visited {
+		color: $white-text;
+	}
+}

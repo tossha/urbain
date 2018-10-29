@@ -1,0 +1,118 @@
+@import "../variables";
+
+.panel {
+	background-color: $gray;
+	border-radius: 2px;
+	font-family: monospace;
+	pointer-events: auto;
+	padding-bottom: 5px;
+
+	&--hidden {
+		display: none;
+	}
+
+	&--collapsed {}
+
+	&__header {
+		align-items: center;
+		display: flex;
+		justify-content: space-between;
+		padding: 2px;
+	}
+
+	&__caption {
+		align-items: center;
+		display: flex;
+	}
+
+	&__caption-icon {
+		color: #8e9092;
+		margin-top: 0;
+		margin-left: 5px;
+		margin-bottom: 0;
+		font-size: 13px;
+	}
+
+	&__caption-text {
+		margin-left: 8px;
+	}
+
+	&__collapse-button {
+		border-radius: 2px;
+		margin-top: 3px;
+		margin-right: 3px;
+		padding: 2px 5px;
+
+		:hover,
+		:active {
+			background-color: #2d2f35;
+		}
+
+	}
+
+	&__content {}
+
+	&__field {
+		align-items: center;
+		display: flex;
+		margin: 10px 5px 0;
+		background-color: $dark-gray;
+		border: 1px solid $black-border;
+		border-radius: 2px;
+		padding: 8px;
+		position: relative;
+
+		&--left-aligned {
+			justify-content: flex-start;
+		}
+
+		&--centered {
+			justify-content: space-between;
+		}
+	}
+
+	&__field-set {
+		display: block;
+
+		.panel__field {
+			border-bottom: none;
+			border-top: none;
+			border-radius: 0;
+			margin-top: 0;
+		}
+
+		.panel__field:first-child {
+			border-top-left-radius: 2px;
+			border-top-right-radius: 2px;
+			border-top: 1px solid #191a1e;
+			margin-top: 10px;
+		}
+
+		.panel__field:last-child {
+			border-bottom-left-radius: 2px;
+			border-bottom-right-radius: 2px;
+			border-bottom: 1px solid #191a1e;
+		}
+	}
+
+	&__field-label {
+		color: $gray-text;
+		min-width: 80px;
+	}
+
+	&__field-label-small {
+		color: $gray-text;
+		min-width: 40px;
+	}
+
+	&__field-control {}
+
+	&__field-header {
+		color: var(--blue-text);
+	}
+
+	&__button {
+		position: absolute;
+		right: 5px;
+	}
+}

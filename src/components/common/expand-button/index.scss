@@ -1,22 +1,24 @@
+@import "../variables";
+
 .expand-button {
 	$b: &;
 
 	align-items: center;
-	background-color: var(--black);
-	font-size: 8px;
+	background-color: $black;
+	font-size: 0.8rem;
 	display: flex;
 	justify-content: center;
 	cursor: pointer;
 
 	&:hover {
-		background-color: var(--gray);
+		background-color: $gray;
 	}
 
 	&--expanded {
-		background-color: var(--blue);
+		background-color: $blue;
 
 		&:hover {
-			background-color: var(--lightning-blue);
+			background-color: $lightning-blue;
 		}
 
 		& #{$b}__icon {

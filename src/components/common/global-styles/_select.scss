@@ -1,0 +1,30 @@
+@import "../variables";
+
+@mixin select-styles() {
+	appearance: none !important;
+	-ms-appearance: none;
+	-moz-appearance: none;
+	-webkit-appearance: none;
+	background-color: $black;
+	background-image: url("/images/chevron-down-solid.svg");
+	background-position: right center;
+	background-repeat: no-repeat;
+	background-size: 1.25em 10px;
+	border-color: $black;
+	border-radius: $border-radius;
+	color: $white;
+	line-height: 1em;
+	min-height: 20px;
+	outline: none;
+	padding: 0 1.5em 0 0.3em;
+	text-indent: 0.01px;
+	text-overflow: "";
+
+	&::-ms-expand {
+		display: none;
+	}
+
+	& > option {
+		background-color: #131519;
+	}
+}
