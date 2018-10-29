@@ -67,8 +67,6 @@
 	}
 
 	&__field-label {
-		min-width: 8rem; // TODO: Remove me and use normal by default after adding Field component
-
 		&--normal {
 			min-width: 8rem;
 		}
