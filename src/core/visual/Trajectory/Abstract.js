@@ -157,7 +157,7 @@ export default class VisualTrajectoryAbstract extends VisualModelAbstract
     }
 
     render(epoch) {
-        if (!this.trajectory.isValidAtEpoch(epoch)) {
+        if (!this.trajectory.isValidAtEpoch(epoch) || this._isHidden) {
             this.point.visible = false;
             return;
         }
@@ -197,6 +197,11 @@ export default class VisualTrajectoryAbstract extends VisualModelAbstract
         this._updateScales();
     }
 
+    hide() {
+        super.hide();
+        this.point.visible = false;
+    }
+
     _updateScales() {
         for (let event of this.flightEvents) {
             event.model.setScale(this._isSelected ? 1 : 0.5);
@@ -208,10 +213,15 @@ export default class VisualTrajectoryAbstract extends VisualModelAbstract
         if (multiplier === undefined)
             multiplier = 1;
         for (let k in this._markers) {
-            this._markers[k].setScale(
-                (this._isSelected ? this._selectedMarkerScale : this._defaultMarkerScale)
-                * multiplier
-            );
+            if (multiplier < 0.1) {
+                this._markers[k].hide();
+            } else {
+                this._markers[k].show();
+                this._markers[k].setScale(
+                    (this._isSelected ? this._selectedMarkerScale : this._defaultMarkerScale)
+                    * multiplier
+                );
+            }
         }
     }
 

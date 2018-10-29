@@ -21,6 +21,7 @@ export default class ModuleSolarSystem extends Module
         StarSystemLoader.loadObjectByUrl(starSystem, './spacecraft/voyager1.json');
         StarSystemLoader.loadObjectByUrl(starSystem, './spacecraft/voyager2.json');
         StarSystemLoader.loadObjectByUrl(starSystem, './spacecraft/lro.json');
+        StarSystemLoader.loadObjectByUrl(starSystem, './spacecraft/osiris-rex.json');
 
         this.loadTLE(starSystem, 25544); // ISS
         this.loadTLE(starSystem, 20580); // Hubble

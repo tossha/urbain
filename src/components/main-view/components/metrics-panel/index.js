@@ -33,7 +33,7 @@ const MetricsPanel = () => (
                         id="showAnglesOfSelectedOrbit"
                         defaultChecked
                     />
-                    <span className="panel__field-label">Visualize angles</span>
+                    <span className="panel__field-label">Show angles</span>
                     <button className="metrics-panel__unload-object-button" type="button" id="unloadObject">
                         Unload object
                     </button>

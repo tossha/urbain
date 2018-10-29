@@ -6,13 +6,18 @@ export default class VisualModelAbstract
     constructor() {
         this.threeObj = null;
         this.scene = sim.scene;
+        this._isHidden = false;
     }
 
     setThreeObj(obj) {
         this.threeObj = obj;
         this.scene.add(this.threeObj);
         this.renderListener = this._onRender.bind(this);
-        document.addEventListener(Events.RENDER, this.renderListener);
+        if (this._isHidden) {
+            this.threeObj.visible = false;
+        } else {
+            document.addEventListener(Events.RENDER, this.renderListener);
+        }
     }
 
     setPosition(simCoords) {
@@ -35,6 +40,20 @@ export default class VisualModelAbstract
             // console.log('Error', e);
             this.threeObj.visible = false;
         }
+    }
+
+    hide() {
+        this._isHidden = true;
+        this.renderListener && document.removeEventListener(Events.RENDER, this.renderListener);
+        if (this.threeObj)
+            this.threeObj.visible = false;
+    }
+
+    show() {
+        this._isHidden = false;
+        this.renderListener && document.addEventListener(Events.RENDER, this.renderListener);
+        if (this.threeObj)
+            this.threeObj.visible = true;
     }
 
     render(epoch) {}

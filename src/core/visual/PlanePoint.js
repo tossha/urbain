@@ -20,21 +20,9 @@ export default class VisualPlanePoint extends VisualModelAbstract
 
         this.isEditMode = !!editingCallback;
 
-        this.isHidden = false;
-
         this.lastEpoch = 0;
 
         this.init();
-    }
-
-    hide() {
-        this.threeObj.visible = false;
-        this.isHidden = true;
-    }
-
-    show() {
-        this.threeObj.visible = true;
-        this.isHidden = false;
     }
 
     getReferenceFrame(epoch) {

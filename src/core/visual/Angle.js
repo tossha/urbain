@@ -27,7 +27,6 @@ export default class VisualAngle extends VisualModelAbstract
 
         this.orientationUpdated = false;
         this.valueUpdated = false;
-        this.isHidden = false;
         this.sizeNeedsUpdate = false;
 
         this.init();
@@ -35,16 +34,6 @@ export default class VisualAngle extends VisualModelAbstract
 
     setBounds(minValue, maxValue) {
         this.bounds = [minValue, maxValue];
-    }
-
-    hide() {
-        this.threeObj.visible = false;
-        this.isHidden = true;
-    }
-
-    show() {
-        this.threeObj.visible = true;
-        this.isHidden = false;
     }
 
     getReferenceFrame(epoch) {
@@ -265,10 +254,6 @@ export default class VisualAngle extends VisualModelAbstract
     }
 
     render(epoch) {
-        if (this.isHidden) {
-            return;
-        }
-
         const referenceFrame = this.getReferenceFrame(epoch);
         const pos = referenceFrame.transformPositionByEpoch(
             epoch,

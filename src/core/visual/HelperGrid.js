@@ -26,14 +26,6 @@ export default class HelperGrid extends VisualModelAbstract
         this.setThreeObj(threeGrid);
     }
 
-    hide() {
-        this.threeObj.visible = false;
-    }
-
-    show() {
-        this.threeObj.visible = true;
-    }
-
     render(epoch) {
         this.setPosition(this.referenceFrame.getOriginPositionByEpoch(epoch));
         this.threeObj.quaternion.copy(this.referenceFrame.getQuaternionByEpoch(epoch).toThreejs())

@@ -41,7 +41,7 @@ export default class VisualTrajectoryPointArray extends VisualTrajectoryModelAbs
             return;
         }
 
-        const endingBrightness = 0.4;
+        const endingBrightness = this.showBehind ? 0.4 : 0;
         const originPos = this.referenceFrame.getOriginPositionByEpoch(epoch);
         let points = [];
         let colors = [];

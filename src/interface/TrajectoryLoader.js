@@ -16,6 +16,7 @@ export default class TrajectoryLoader
         let type = config.type;
         let trajectory;
         let visualModel;
+        let selectedVisualModel;
 
         if (type === 'keplerian') {
             trajectory = this.createKeplerianBasic(config);
@@ -47,28 +48,41 @@ export default class TrajectoryLoader
         }
 
         if (config.visual !== undefined) {
-            if (config.visual.keplerianModel) {
-                visualModel = new VisualTrajectoryModelKeplerian(trajectory, config.visual);
-            } else if (config.visual.pointArrayModel) {
-                visualModel = new VisualTrajectoryModelPointArray(trajectory, config.visual);
+            if (config.visual.regular !== undefined) {
+                visualModel = this.createVisualModel(trajectory, config.visual.regular);
+                selectedVisualModel = this.createVisualModel(trajectory, config.visual.selected);
             } else {
-                let className;
-                if (config.visual.model === 'keplerian') {
-                    className = VisualTrajectoryModelKeplerian;
-                } else if (config.visual.model === 'pointArray') {
-                    className = VisualTrajectoryModelPointArray;
-                } else {
-                    className = sim.getClass(config.visual.model);
-                }
-                visualModel = new className(trajectory, config.visual.config);
+                visualModel = this.createVisualModel(trajectory, config.visual);
             }
         }
 
         if (visualModel) {
             trajectory.setVisualModel(visualModel);
         }
+        if (selectedVisualModel) {
+            trajectory.setSelectedVisualModel(selectedVisualModel);
+        }
 
         return trajectory;
+    }
+
+    static createVisualModel(trajectory, config) {
+        // legacy format, will be removed
+        if (config.keplerianModel) {
+            return new VisualTrajectoryModelKeplerian(trajectory, config);
+        } else if (config.pointArrayModel) {
+            return new VisualTrajectoryModelPointArray(trajectory, config);
+        }
+
+        let className;
+        if (config.model === 'keplerian') {
+            className = VisualTrajectoryModelKeplerian;
+        } else if (config.model === 'pointArray') {
+            className = VisualTrajectoryModelPointArray;
+        } else {
+            className = sim.getClass(config.model);
+        }
+        return new className(trajectory, config.config);
     }
 
     static createComposite(config) {

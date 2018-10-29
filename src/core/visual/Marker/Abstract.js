@@ -7,6 +7,7 @@ export default class VisualMarkerAbstract extends VisualSpriteStatic
         super(color);
         this._parent = parentThreeObj;
         this.threeObj && this._parent.add(this.threeObj);
+        this._isEnabled = false;
         this.hide();
     }
 
@@ -18,9 +19,30 @@ export default class VisualMarkerAbstract extends VisualSpriteStatic
     setThreeObj(threeObj) {
         this.threeObj = threeObj;
         this._parent && this._parent.add(this.threeObj);
+        if (this._isHidden || !this._isEnabled)
+            this.threeObj.visible = false;
     }
 
     setPosition(pos) {
         this.threeObj && this.threeObj.position.copy(pos);
+    }
+
+    enable() {
+        this._isEnabled = true;
+        if (!this._isHidden) {
+            this.threeObj.visible = true;
+        }
+    }
+
+    disable() {
+        this._isEnabled = false;
+        this.threeObj.visible = false;
+    }
+
+    show() {
+        super.show();
+        if (!this._isEnabled) {
+            this.threeObj.visible = false;
+        }
     }
 }

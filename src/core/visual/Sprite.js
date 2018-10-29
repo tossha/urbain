@@ -30,9 +30,6 @@ export default class VisualSprite extends VisualModelAbstract
         )));
         this.setScale(this.scale);
         this.updateCenter();
-
-        if (this._hedden)
-            this.hide();
     }
 
     updateCenter() {
@@ -73,18 +70,6 @@ export default class VisualSprite extends VisualModelAbstract
 
     setPositionOfEpoch(positionOfEpoch) {
         this.positionOfEpoch = positionOfEpoch;
-    }
-
-    hide() {
-        this._hedden = true;
-        if (this.threeObj)
-            this.threeObj.visible = false;
-    }
-
-    show() {
-        this._hedden = false;
-        if (this.threeObj)
-            this.threeObj.visible = true;
     }
 
     render(epoch) {

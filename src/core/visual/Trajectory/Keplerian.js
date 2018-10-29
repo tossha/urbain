@@ -112,11 +112,11 @@ export default class VisualTrajectoryKeplerian extends VisualTrajectoryModelAbst
         this.threeObj.quaternion.copy(orbitQuaternion.toThreejs());
         this.setPosition(this.trajectory.getReferenceFrameByEpoch(frameEpoch).getOriginPositionByEpoch(frameEpoch));
 
-        this._markers.apo.hide();
+        this._markers.apo.disable();
         if (curTa > 0 && curTa < Math.PI) {
-            this._markers.per.hide();
+            this._markers.per.disable();
         } else {
-            this._markers.per.show();
+            this._markers.per.enable();
             this._markers.per.setPosition(new THREE.Vector3(traj.getPeriapsisRadius(), 0, 0));
         }
     }
@@ -164,9 +164,9 @@ export default class VisualTrajectoryKeplerian extends VisualTrajectoryModelAbst
         let ang = traj.getEccentricAnomalyByEpoch(positionEpoch);
         let maxAnglePart = 1;
 
-        this._markers.per.show();
+        this._markers.per.enable();
         this._markers.per.setPosition(new THREE.Vector3(traj.getPeriapsisRadius() - projectedRelativeCameraPosition.x, -projectedRelativeCameraPosition.y, 0));
-        this._markers.apo.show();
+        this._markers.apo.enable();
         this._markers.apo.setPosition(new THREE.Vector3(-traj.getApoapsisRadius() - projectedRelativeCameraPosition.x, -projectedRelativeCameraPosition.y, 0));
 
         // if there's less then one orbit left
@@ -182,10 +182,10 @@ export default class VisualTrajectoryKeplerian extends VisualTrajectoryModelAbst
             const maxMa = traj.getMeanAnomalyByEpoch(this.trajectory.maxEpoch);
             const curMa = traj.getMeanAnomalyByEpoch(positionEpoch);
             if (!isInInterval(0, [curMa, maxMa])) {
-                this._markers.per.hide();
+                this._markers.per.disable();
             }
             if (!isInInterval(Math.PI, [curMa, maxMa])) {
-                this._markers.apo.hide();
+                this._markers.apo.disable();
             }
         }
 

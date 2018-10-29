@@ -11,7 +11,13 @@ export default class TrajectoryComposite extends TrajectoryAbstract
 
     select() {
         this.isSelected = true;
-        this.visualModel && this.visualModel.select();
+        if (this.selectedVisualModel) {
+            this.visualModel.hide();
+            this.selectedVisualModel.show();
+            this.selectedVisualModel.select();
+        } else {
+            this.visualModel && this.visualModel.select();
+        }
         this.components.map(traj => traj.select());
     }
 

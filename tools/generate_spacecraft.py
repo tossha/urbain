@@ -11,14 +11,17 @@ spice.loadKernel('naif0012.tls')
 spice.loadKernel('pck00010.tpc')
 spice.loadKernel('gm_de431.tpc')
 
-spice.loadKernel('kernels/spacecraft/voyager/voyager_1.ST+1991_a54418u.merged.bsp')
-spice.loadKernel('kernels/spacecraft/voyager/voyager_2.ST+1992_m05208u.merged.bsp')
+# spice.loadKernel('kernels/spacecraft/voyager/voyager_1.ST+1991_a54418u.merged.bsp')
+# spice.loadKernel('kernels/spacecraft/voyager/voyager_2.ST+1992_m05208u.merged.bsp')
 
-spice.loadKernel('kernels/spacecraft/lro/lrorg_2009169_2010001_v01.bsp')
-spice.loadKernel('kernels/spacecraft/lro/lroevnt_2009173_2009180_v01.bes')
-spice.loadKernel('kernels/spacecraft/lro/de421.bsp')
+spice.loadKernel('kernels/de424.bsp')
+spice.loadKernel('kernels/spacecraft/orx/orx_160909_231024_refod009_v2.bsp')
 
-spice.loadKernel('kernels/spacecraft/tesla/tesla1.bsp')
+# spice.loadKernel('kernels/spacecraft/lro/lrorg_2009169_2010001_v01.bsp')
+# spice.loadKernel('kernels/spacecraft/lro/lroevnt_2009173_2009180_v01.bes')
+# spice.loadKernel('kernels/spacecraft/lro/de421.bsp')
+
+# spice.loadKernel('kernels/spacecraft/tesla/tesla1.bsp')
 
 TWO_PI = 2 * math.pi
 
@@ -348,6 +351,33 @@ def createSpacecraftFile(fileName, id, name, renderingConfig, trajectoryParts):
 
 linearPoints = []
 
+orxTraj = (
+	{
+		'parent': 	'399',
+		'from': 	'2016 SEP 09 07:00:00.000',
+		'to':   	'2016 SEP 14 04:36:33.371',
+		'error': 	1
+	},
+	{
+		'parent': 	'10',
+		'from': 	'2016 SEP 14 04:36:33.371',
+		'to':   	'2017 SEP 18 01:43:50.433',
+		'error': 	50
+	},
+	{
+		'parent': 	'399',
+		'from': 	'2017 SEP 18 01:43:50.433',
+		'to':   	'2017 SEP 27 04:36:34.764',
+		'error': 	1
+	},
+	{
+		'parent': 	'10',
+		'from': 	'2017 SEP 27 04:36:34.764',
+		'to':   	'2023 OCT 24 23:21:18.962',
+		'error': 	50
+	}
+)
+
 voyager1traj = (
 	{
 		'parent': 	'399',
@@ -473,6 +503,25 @@ voyagerRendering = {
 	}
 }
 
+orxRendering = {
+	'regular': {
+		'model': 'pointArray',
+		'config': {
+			'color': 'green',
+			'showAhead': False,
+			'showBehind': False,
+			'trailPeriod': 86400 * 100,
+			'referenceFrame': 1000,
+		}
+	},
+	'selected': {
+		'model': 'keplerian',
+		'config': {
+			'color': 'green',
+		}
+	}
+}
+
 lroTraj = (
 	{
 		'parent': 	'399',
@@ -537,8 +586,10 @@ teslaTraj = (
 	},
 )
 
-createSpacecraftFile('./../public/spacecraft/voyager1.json', '-31', 'Voyager 1', voyagerRendering, voyager1traj)
+# createSpacecraftFile('./../public/spacecraft/voyager1.json', '-31', 'Voyager 1', voyagerRendering, voyager1traj)
 # createSpacecraftFile('./../public/spacecraft/voyager2.json', '-32', 'Voyager 2', voyagerRendering, voyager2traj)
+
+createSpacecraftFile('./../public/spacecraft/osiris-rex.json', '-64', 'OSIRIS-REx', orxRendering, orxTraj)
 
 # createSpacecraftFile('./../public/spacecraft/lro.json', '-85', 'LRO', False, lroTraj)
 

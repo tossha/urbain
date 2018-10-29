@@ -27,6 +27,7 @@ export default class TrajectoryAbstract
         this.cachedState = null;
 
         this.visualModel = null;
+        this.selectedVisualModel = null;
         this.object = null;
 
         this.parent = null;
@@ -163,6 +164,19 @@ export default class TrajectoryAbstract
         }
     }
 
+    setSelectedVisualModel(visualModel) {
+        this.selectedVisualModel = visualModel;
+        if (this.isSelected) {
+            this.visualModel.hide();
+        } else {
+            visualModel.hide();
+        }
+        this.clickHandler && visualModel.onClick(this.clickHandler);
+        for (let event of this.flightEvents) {
+            visualModel.addFlightEvent(event);
+        }
+    }
+
     setParent(parent) {
         this.parent = parent;
     }
@@ -178,18 +192,33 @@ export default class TrajectoryAbstract
         if (this.visualModel) {
             this.visualModel.drop();
         }
+        if (this.selectedVisualModel) {
+            this.selectedVisualModel.drop();
+        }
     }
 
     select() {
         this.isSelected = true;
-        this.visualModel && this.visualModel.select();
+        if (this.selectedVisualModel) {
+            this.visualModel.hide();
+            this.selectedVisualModel.show();
+            this.selectedVisualModel.select();
+        } else {
+            this.visualModel && this.visualModel.select();
+        }
         this.keplerianEditor = new KeplerianEditor(this);
         Events.addListener(Events.SHOW_ORBIT_ANGLES_CHANGED, this.showOrbitAnglesListener);
     }
 
     deselect() {
         this.isSelected = false;
-        this.visualModel && this.visualModel.deselect();
+        if (this.selectedVisualModel) {
+            this.selectedVisualModel.deselect();
+            this.selectedVisualModel.hide();
+            this.visualModel.show();
+        } else {
+            this.visualModel && this.visualModel.deselect();
+        }
         if (this.keplerianEditor) {
             this.keplerianEditor.remove();
             delete this.keplerianEditor;
