@@ -7,6 +7,7 @@ import Field from "./components/field";
 import FieldLabel from "./components/field-label";
 import FieldControl from "./components/field-control";
 import PanelButton from "./components/button";
+import FieldSet from "./components/field-set";
 import Dimension from "./components/dimension";
 import "./index.scss";
 
@@ -89,4 +90,4 @@ class Panel extends Component {
     }
 }
 
-export { Panel as default, Field, FieldLabel, FieldControl, PanelButton, Dimension };
+export { Panel as default, Field, FieldSet, FieldLabel, FieldControl, PanelButton, Dimension };

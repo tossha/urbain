@@ -1,13 +1,13 @@
 import React from "react";
 
-import Panel, { Field, FieldLabel, FieldControl, Dimension } from "../../../common/panel";
+import Panel, { Field, FieldSet, FieldLabel, FieldControl, Dimension } from "../../../common/panel";
 import Button from "../../../common/button";
 import "./index.scss";
 
 const ManeuverPanel = ({ className }) => (
     <Panel id="maneuverPanel" className={`maneuver-panel ${className}`} caption="Maneuver" collapseDirection="left">
         <div className="maneuver-panel__content">
-            <div className="panel__field-set">
+            <FieldSet>
                 <Field centered>
                     <Button className="maneuver-panel__button" id="prev-burn">
                         Prev burn
@@ -17,8 +17,8 @@ const ManeuverPanel = ({ className }) => (
                         Next burn
                     </Button>
                 </Field>
-            </div>
-            <div className="panel__field-set">
+            </FieldSet>
+            <FieldSet>
                 <Field className="panel__field-header">Increment</Field>
                 <Field centered>
                     <FieldLabel small id="increment" />
@@ -43,9 +43,9 @@ const ManeuverPanel = ({ className }) => (
                         </Button>
                     </FieldControl>
                 </Field>
-            </div>
+            </FieldSet>
 
-            <div className="panel__field-set">
+            <FieldSet>
                 <Field className="panel__field-header">Time</Field>
                 <Field>
                     <FieldLabel>Date</FieldLabel>
@@ -63,9 +63,9 @@ const ManeuverPanel = ({ className }) => (
                         </Button>
                     </span>
                 </Field>
-            </div>
+            </FieldSet>
 
-            <div className="panel__field-set">
+            <FieldSet>
                 <Field className="panel__field-header">Impulse</Field>
                 <Field centered>
                     <FieldLabel>Prograde</FieldLabel>
@@ -120,7 +120,7 @@ const ManeuverPanel = ({ className }) => (
                     <FieldControl id="burn-total" />
                     <Dimension>m/s</Dimension>
                 </Field>
-            </div>
+            </FieldSet>
         </div>
     </Panel>
 );

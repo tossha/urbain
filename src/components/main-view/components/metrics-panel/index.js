@@ -1,7 +1,7 @@
 import React from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 
-import Panel from "../../../common/panel";
+import Panel, { FieldSet, Field, FieldLabel, FieldControl, Dimension } from "../../../common/panel";
 import "./index.scss";
 import KeplerianView from "./components/keplerian-view";
 import CartesianVectorView from "./components/cartesian-vector-view";
@@ -15,72 +15,74 @@ const MetricsPanel = () => (
         collapseDirection="right"
     >
         <div className="metrics-panel__content">
-            <div className="panel__field-set">
-                <div className="panel__field">
-                    <span className="panel__field-label">Object</span>
-                    <span className="panel__field-control" id="metricsOf" />
-                </div>
-                <div className="panel__field">
-                    <span className="panel__field-label">Relative to</span>
-                    <span className="panel__field-control" id="relativeTo" />
-                </div>
-            </div>
-            <div className="panel__field-set">
-                <label className="panel__field panel__field--left-aligned">
-                    <input
-                        className="metrics-panel__angles-checker"
-                        type="checkbox"
-                        id="showAnglesOfSelectedOrbit"
-                        defaultChecked
-                    />
-                    <span className="panel__field-label">Show angles</span>
+            <FieldSet>
+                <Field>
+                    <FieldLabel>Object</FieldLabel>
+                    <FieldControl id="metricsOf" />
+                </Field>
+                <Field>
+                    <FieldLabel>Relative to</FieldLabel>
+                    <FieldControl id="relativeTo" />
+                </Field>
+            </FieldSet>
+            <FieldSet>
+                <Field leftAligned>
+                    <FieldLabel tag="label">
+                        <input
+                            className="metrics-panel__angles-checker"
+                            type="checkbox"
+                            id="showAnglesOfSelectedOrbit"
+                            defaultChecked
+                        />
+                        Show angles
+                    </FieldLabel>
                     <button className="metrics-panel__unload-object-button" type="button" id="unloadObject">
                         Unload object
                     </button>
-                </label>
-            </div>
-            <div className="panel__field-set">
-                <div className="panel__field panel__field-header">Main</div>
-                <div className="panel__field">
-                    <span className="panel__field-label">Orbit</span>
-                    <span className="panel__field-control" id="elements-orbit-alt" />
-                    <span className="panel__dimension">km</span>
-                </div>
-                <div className="panel__field">
-                    <span className="panel__field-label">Avg height</span>
-                    <span className="panel__field-control" id="elements-orbit-avg" />
-                    <span className="panel__dimension">km</span>
-                </div>
-                <div className="panel__field">
-                    <span className="panel__field-label">Altitude</span>
-                    <span className="panel__field-control" id="elements-alt" />
-                    <span className="panel__dimension">km</span>
-                </div>
-                <div className="panel__field">
-                    <span className="panel__field-label">Speed</span>
-                    <span className="panel__field-control" id="elements-speed" />
-                    <span className="panel__dimension">m/s</span>
-                </div>
-                <div className="panel__field">
-                    <span className="panel__field-label">Precession</span>
-                    <span className="panel__field-control" id="elements-precession" />
-                    <span className="panel__dimension">deg/day</span>
-                </div>
+                </Field>
+            </FieldSet>
+            <FieldSet>
+                <Field className="panel__field-header">Main</Field>
+                <Field>
+                    <FieldLabel>Orbit</FieldLabel>
+                    <FieldControl id="elements-orbit-alt" />
+                    <Dimension>km</Dimension>
+                </Field>
+                <Field>
+                    <FieldLabel>Avg height</FieldLabel>
+                    <FieldControl id="elements-orbit-avg" />
+                    <Dimension>km</Dimension>
+                </Field>
+                <Field>
+                    <FieldLabel>Altitude</FieldLabel>
+                    <FieldControl id="elements-alt" />
+                    <Dimension>km</Dimension>
+                </Field>
+                <Field>
+                    <FieldLabel>Speed</FieldLabel>
+                    <FieldControl id="elements-speed" />
+                    <Dimension>m/s</Dimension>
+                </Field>
+                <Field>
+                    <FieldLabel>Precession</FieldLabel>
+                    <FieldControl id="elements-precession" />
+                    <Dimension>deg/day</Dimension>
+                </Field>
 
-                <div className="panel__field" id="row-node-time" style={{ display: "none" }}>
-                    <span className="panel__field-label">Node local time</span>
-                    <span className="panel__field-control" id="elements-node-time" />
-                    <span className="panel__dimension" />
-                </div>
-            </div>
+                <Field id="row-node-time" style={{ display: "none" }}>
+                    <FieldLabel>Node local time</FieldLabel>
+                    <FieldControl id="elements-node-time" />
+                    <Dimension />
+                </Field>
+            </FieldSet>
 
-            <div className="panel__field-set">
-                <div className="panel__field panel__field-header">Keplerian</div>
+            <FieldSet>
+                <Field className="panel__field-header">Keplerian</Field>
                 <KeplerianView className="panel__field" />
-            </div>
+            </FieldSet>
 
-            <div className="panel__field-set">
-                <div className="panel__field panel__field-header">Cartesian</div>
+            <FieldSet>
+                <Field className="panel__field-header">Cartesian</Field>
                 <CartesianVectorView
                     className="metrics-panel__cartesian-position-vector js-metrics-panel-cartesian-position-vector"
                     vectorMagnitudeLabel="Position"
@@ -91,7 +93,7 @@ const MetricsPanel = () => (
                     vectorMagnitudeLabel="Velocity"
                     dimension="km/s"
                 />
-            </div>
+            </FieldSet>
         </div>
     </Panel>
 );

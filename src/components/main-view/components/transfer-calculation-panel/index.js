@@ -2,7 +2,7 @@ import React from "react";
 import cn from "classnames";
 
 import { Consumer } from "../../../../store";
-import Panel, { Field, FieldLabel, FieldControl, PanelButton, Dimension } from "../../../common/panel";
+import Panel, { Field, FieldSet, FieldLabel, FieldControl, PanelButton, Dimension } from "../../../common/panel";
 import "./index.scss";
 
 const TransferCalculationPanel = ({ className }) => (
@@ -14,7 +14,7 @@ const TransferCalculationPanel = ({ className }) => (
                 caption="Transfer calculation"
                 hidden={!store.viewSettings.showTransferCalculationPanel}
             >
-                <div className="panel__field-set">
+                <FieldSet>
                     <Field>
                         <FieldLabel>Origin</FieldLabel>
                         <FieldControl>
@@ -58,8 +58,8 @@ const TransferCalculationPanel = ({ className }) => (
                             />
                         </FieldControl>
                     </Field>
-                </div>
-                <div className="transfer-calculation-panel__delta-v-calc panel__field-set" data-panel-name="lambert">
+                </FieldSet>
+                <FieldSet className="transfer-calculation-panel__delta-v-calc " data-panel-name="lambert">
                     <Field className="panel__field-header">Delta-V</Field>
                     <Field>
                         <FieldLabel>Ejection</FieldLabel>
@@ -76,7 +76,7 @@ const TransferCalculationPanel = ({ className }) => (
                         <FieldControl id="deltaVTotal">0</FieldControl>
                         <Dimension>km/s</Dimension>
                     </Field>
-                </div>
+                </FieldSet>
             </Panel>
         )}
     </Consumer>

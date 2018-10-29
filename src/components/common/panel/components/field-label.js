@@ -36,7 +36,7 @@ FieldLabel.propTypes = {
     normal: PropTypes.bool,
     middle: PropTypes.bool,
     small: PropTypes.bool,
-    children: PropTypes.string,
+    children: PropTypes.node,
 };
 
 export default FieldLabel;
