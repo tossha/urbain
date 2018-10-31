@@ -1,14 +1,15 @@
 import React from "react";
 import cn from "classnames";
 
-import "./vector-component-view.css";
+import { FieldLabel, FieldControl, Dimension } from "../../../../common/panel";
+import "./vector-component-view.scss";
 
 function VectorComponentView({ className, label = "x", valueClassName = "vec-x", dimension = "km" }) {
     return (
         <div className={cn(className, "vector-component")}>
-            <span className="vector-component__label">{label}</span>
-            <span className={cn("vector-component__value", valueClassName)} />
-            <span className="metrics-panel__dimension vector-component__dimension">{dimension}</span>
+            <FieldLabel className="vector-component__label">{label}</FieldLabel>
+            <FieldControl className={valueClassName} />
+            <Dimension>{dimension}</Dimension>
         </div>
     );
 }

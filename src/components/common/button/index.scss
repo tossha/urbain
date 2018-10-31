@@ -1,0 +1,10 @@
+@import "../variables";
+
+.button {
+	border-radius: $border-radius;
+
+	&--small {
+		border-radius: $border-radius / 2;
+		padding: 2px 5px;
+	}
+}

@@ -2,7 +2,7 @@ import React, { Component } from "react";
 import Stats from "stats.js";
 
 import { Consumer } from "../../../../store/index";
-import "./index.css";
+import "./index.scss";
 
 class StatisticsBadge extends Component {
     elementRef = React.createRef();

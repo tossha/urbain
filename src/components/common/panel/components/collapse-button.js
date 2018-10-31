@@ -1,13 +1,14 @@
 import React from "react";
 import PropTypes from "prop-types";
 
+import Button from "../../button";
 import ArrowLogo from "../../logos/arrow-logo";
 import MaximizeLogo from "../../logos/maximize-logo";
 
 const CollapseButton = ({ isCollapsed, onClick, isToRight = false, className = "", collapseDirection = "left" }) => (
-    <button type="button" className={className} onClick={onClick}>
+    <Button className={className} onClick={onClick} small>
         {isCollapsed ? <MaximizeLogo /> : <ArrowLogo direction={collapseDirection} />}
-    </button>
+    </Button>
 );
 
 CollapseButton.propTypes = {

@@ -1,0 +1,13 @@
+.arrow-logo {
+	&--to-right {
+		transform: rotateZ(180deg);
+	}
+
+	&--to-top {
+		transform: rotateZ(90deg);
+	}
+
+	&--to-bottom {
+		transform: rotateZ(-90deg);
+	}
+}

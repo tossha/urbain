@@ -3,7 +3,13 @@ import PropTypes from "prop-types";
 import cn from "classnames";
 
 import CollapseButton from "./components/collapse-button";
-import "./index.css";
+import Field from "./components/field";
+import FieldLabel from "./components/field-label";
+import FieldControl from "./components/field-control";
+import PanelButton from "./components/button";
+import FieldSet from "./components/field-set";
+import Dimension from "./components/dimension";
+import "./index.scss";
 
 class Panel extends Component {
     static propTypes = {
@@ -84,4 +90,4 @@ class Panel extends Component {
     }
 }
 
-export default Panel;
+export { Panel as default, Field, FieldSet, FieldLabel, FieldControl, PanelButton, Dimension };

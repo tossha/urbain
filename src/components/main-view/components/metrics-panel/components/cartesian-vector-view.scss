@@ -1,0 +1,21 @@
+@import "../../../../common/variables";
+
+.cartesian-vector-view {
+	display: block;
+
+	&__header {
+		 display: flex;
+		 justify-content: space-between;
+		 margin-bottom: $default-gap-size / 2;
+
+		.vector-component__label {
+			min-width: 8rem;
+		}
+
+	}
+
+	&__vector-components {
+		border-left: 1px solid $gray-text;
+		padding-left: 2rem;
+	}
+}

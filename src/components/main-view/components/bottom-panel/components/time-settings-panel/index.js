@@ -1,34 +1,31 @@
 import React from "react";
 
-import Panel from "../../../../../common/panel";
+import Panel, { Field, FieldLabel, FieldControl, PanelButton } from "../../../../../common/panel";
 import Logo from "./logo";
-import "./index.css";
+import "./index.scss";
 
 function TimeSettingsPanel({ className }) {
     return (
         <Panel
             className={`time-settings-panel ${className}`}
             id="timePanel"
-            data-panel-name="time"
             caption="Time"
             titleIcon={<Logo className="time-settings-panel__logo" />}
         >
-            <div className="time-settings-panel__content">
-                <label className="panel__field time-settings-panel__field">
-                    <span className="panel__field-label">Current:</span>
+            <Field>
+                <FieldLabel middle>Current</FieldLabel>
+                <FieldControl>
                     <time id="currentDateValue">01.01.2000 12:00:00</time>
-                    <button type="button" className="panel__button" id="useCurrentTime">
-                        Now
-                    </button>
-                </label>
-                <label className="panel__field time-settings-panel__field">
-                    <span className="panel__field-label">Rate:</span>
-                    <span id="timeScaleValue" />
-                    <button type="button" className="panel__button" id="setRealTimeScale">
-                        Real
-                    </button>
-                </label>
-                <label className="panel__field time-settings-panel__field">
+                </FieldControl>
+                <PanelButton id="useCurrentTime">Now</PanelButton>
+            </Field>
+            <Field>
+                <FieldLabel middle>Rate</FieldLabel>
+                <FieldControl id="timeScaleValue" />
+                <PanelButton id="setRealTimeScale">Real</PanelButton>
+            </Field>
+            <Field centered>
+                <FieldControl fullSize>
                     <input
                         id="timeScaleSlider"
                         type="range"
@@ -36,11 +33,11 @@ function TimeSettingsPanel({ className }) {
                         min="-1"
                         max="1"
                         step="0.001"
-                        defaultValue={"0.001"}
+                        defaultValue="0.001"
                         style={{ width: "100%" }}
                     />
-                </label>
-            </div>
+                </FieldControl>
+            </Field>
         </Panel>
     );
 }

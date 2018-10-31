@@ -1,0 +1,22 @@
+@import "../../../common/variables";
+
+.maneuver-panel {
+    &__content {
+        font-size: 1rem;
+    }
+
+    .panel__field {
+        padding: 3px 8px;
+    }
+
+    &__button {
+        &:not(:first-child) {
+            margin-left: $default-gap-size / 2;
+        }
+    }
+    &__buttons {
+        display: flex;
+        flex-grow: 1;
+        justify-content: flex-end;
+    }
+}

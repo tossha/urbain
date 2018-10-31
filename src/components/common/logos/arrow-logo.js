@@ -1,7 +1,7 @@
 import React from "react";
 import cn from "classnames";
 
-import "./arrow-logo.css";
+import "./arrow-logo.scss";
 
 export default function ArrowLogo({ direction }) {
     const classNames = cn("arrow-logo", `arrow-logo--to-${direction}`);

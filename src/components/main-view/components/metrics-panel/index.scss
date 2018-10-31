@@ -1,0 +1,24 @@
+@import "../../../common/variables";
+
+.metrics-panel {
+	min-width: 26rem;
+
+	&__content {
+		font-size: 1rem;
+
+		.panel__field {
+			padding: 3px $default-gap-size;
+		}
+	}
+
+	&__angles-checker {
+		margin: 0 10px 0 0;
+	}
+
+	&__unload-object-button {
+		border-radius: 2px;
+		background: #3e2d33 !important;
+		margin-left: 15px;
+	}
+
+}

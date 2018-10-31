@@ -1,0 +1,11 @@
+.time-settings-panel {
+	.panel--collapsed {
+		min-width: 10rem;
+	}
+
+	&__logo {
+		margin-left: .5rem;
+	}
+
+	&__scale-slider {}
+}

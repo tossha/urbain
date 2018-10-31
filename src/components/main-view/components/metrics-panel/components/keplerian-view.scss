@@ -1,0 +1,13 @@
+.keplerian-view {
+	&__column {
+		width: calc(50% - 10px)
+	}
+
+	&__field {
+		display: flex;
+	}
+
+	&__field-label {
+		min-width: 3rem;
+	}
+}

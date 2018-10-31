@@ -4,7 +4,7 @@ import cn from "classnames";
 
 import { Consumer } from "../../../../store";
 import Panel from "../../../common/panel";
-import Button from "../../../common/button";
+import Button from "../../../common/button/index";
 import SatellitesGrid from "./components/satellites-grid";
 import "./index.scss";
 import { findSatellites } from "./web-api";
@@ -97,10 +97,11 @@ class SatelliteSearchPanel extends React.Component {
                                         <div className="searcher__search-button-wrapper">
                                             <Button
                                                 className="searcher__search-button"
-                                                text="search"
                                                 disabled={!this.isFilterValid}
                                                 onClick={this.handleSearch}
-                                            />
+                                            >
+                                                search
+                                            </Button>
                                         </div>
                                     </div>
                                 </div>

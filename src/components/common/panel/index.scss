@@ -1,0 +1,133 @@
+@import "../variables";
+
+.panel {
+	background-color: $gray;
+	border-radius: $border-radius;
+	font-size: 1.1rem;
+	pointer-events: auto;
+
+	&--hidden {
+		display: none;
+	}
+
+	&--collapsed {}
+
+	&__header {
+		align-items: center;
+		border-bottom: 1px solid $dark-gray;
+		display: flex;
+		justify-content: space-between;
+		padding: $border-radius;
+	}
+
+	&__caption {
+		align-items: center;
+		display: flex;
+	}
+
+	&__caption-icon {
+		color: $gray-text;
+		margin-left: 0.5rem;
+	}
+
+	&__caption-text {
+		margin-left: 0.8rem;
+	}
+
+	&__collapse-button {
+		margin-right: 0.3rem;
+	}
+
+	&__content {
+		color: $gray-text;
+		padding: 0.4rem;
+	}
+
+	&__field {
+		align-items: center;
+		display: flex;
+		margin-bottom: 0.8rem;
+		background-color: $dark-gray;
+		border: 1px solid $black-border;
+		border-radius: $border-radius;
+		padding: $default-gap-size;
+		position: relative;
+
+		&--left-aligned {
+			justify-content: flex-start;
+		}
+
+		&--centered {
+			justify-content: space-between;
+		}
+
+		&:last-child {
+			margin-bottom: 0;
+		}
+	}
+
+	&__field-label {
+		&--normal {
+			min-width: 8rem;
+		}
+
+		&--middle {
+			min-width: 6rem;
+		}
+
+		&--small {
+			min-width: 4rem;
+		}
+	}
+
+	&__field-set {
+		display: block;
+		margin-bottom: $default-gap-size;
+
+		&:last-child {
+			margin-bottom: 0;
+		}
+
+		.panel__field {
+			border-bottom: none;
+			border-top: none;
+			border-radius: 0;
+			margin-bottom: 0;
+		}
+
+		.panel__field:first-child {
+			border-top-left-radius: $border-radius;
+			border-top-right-radius: $border-radius;
+			border-top: 1px solid $black-border;
+		}
+
+		.panel__field:last-child {
+			border-bottom-left-radius: $border-radius;
+			border-bottom-right-radius: $border-radius;
+			border-bottom: 1px solid $black-border;
+		}
+	}
+
+	&__field-control {
+		color: $white-text;
+		margin-left: $default-gap-size / 2;
+
+		&--full-size {
+			display: flex;
+			width: 100%;
+		}
+	}
+
+	&__field-header {
+		color: $blue-text;
+	}
+
+	&__dimension {
+		margin-left: $default-gap-size / 2;
+	}
+
+	&__button {
+		position: absolute;
+		right: $default-gap-size / 2;
+	}
+}

@@ -3,7 +3,7 @@ import PropTypes from "prop-types";
 
 import { Consumer } from "../../../../store";
 import Select, { optionPropTypes } from "../../../common/select/select";
-import "./star-system-selector.css";
+import "./star-system-selector.scss";
 
 function StarSystemSelector({ options, defaultValue, onSelect }) {
     return (
