@@ -175,13 +175,16 @@ export default class VisualTrajectoryKeplerian extends VisualTrajectoryModelAbst
 
         // if there's less then one orbit left
         if (this.trailPeriod) {
+            let minEpoch = positionEpoch - this.trailPeriod;
+            if (this.trajectory.minEpoch !== false && this.trajectory.minEpoch > minEpoch) {
+                minEpoch = this.trajectory.minEpoch;
+            }
             this._markers.per.disable();
             this._markers.apo.disable();
-            minAnglePart = 1 - (((ang - traj.getEccentricAnomalyByEpoch(positionEpoch - this.trailPeriod)) + TWO_PI) % TWO_PI) / TWO_PI;
+            minAnglePart = 1 - (((ang - traj.getEccentricAnomalyByEpoch(minEpoch)) + TWO_PI) % TWO_PI) / TWO_PI;
             maxAnglePart = 1;
         } else if (!this.showFull
             && this.trajectory.maxEpoch !== false
-            && this.trajectory.maxEpoch !== null
             && (this.trajectory.maxEpoch - positionEpoch) < traj.period
         ) {
             // rendering a part of ellipse

@@ -14,11 +14,11 @@ export default class StarSystemEntry
         return this.alias;
     }
 
-    load() {
+    load(callback) {
         if (sim.isModuleLoaded(this.moduleName)) {
-            sim.getModule(this.moduleName).loadStarSystem(this.alias);
+            sim.getModule(this.moduleName).loadStarSystem(this.alias, callback);
         } else {
-            sim.loadModule(this.moduleName, module => module.loadStarSystem(this.alias));
+            sim.loadModule(this.moduleName, module => module.loadStarSystem(this.alias, callback));
         }
     }
 }

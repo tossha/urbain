@@ -23,7 +23,6 @@ function init(statistics, viewPortId = "viewport-id") {
 
     sim.init(document.getElementById(viewPortId), firstRender);
     sim.loadModule('PatchedConics');
-    sim.starSystemManager.loadDefault();
 }
 
 export {

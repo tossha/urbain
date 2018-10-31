@@ -17,6 +17,8 @@ spice.loadKernel('gm_de431.tpc')
 spice.loadKernel('kernels/de424.bsp')
 spice.loadKernel('kernels/spacecraft/orx/orx_160909_231024_refod009_v2.bsp')
 
+spice.loadKernel('parker__1.bsp')
+
 # spice.loadKernel('kernels/spacecraft/lro/lrorg_2009169_2010001_v01.bsp')
 # spice.loadKernel('kernels/spacecraft/lro/lroevnt_2009173_2009180_v01.bes')
 # spice.loadKernel('kernels/spacecraft/lro/de421.bsp')
@@ -289,7 +291,7 @@ def getObjectTrajectory(body, parent, etFrom, etTo, maxError, renderingConfig, i
 		if lastOrbit.epoch >= etTo:
 			break
 
-	print(len(trajectory))
+	print(parent, len(trajectory))
 
 	result = {
 		'type': 'keplerian_array',
@@ -315,8 +317,8 @@ def createCompositeTrajectory(body, renderingConfig, parts):
 			getObjectTrajectory(
 				body,
 				part['parent'],
-				spice.str2et(part['from'] + ' TDB'),
-				spice.str2et(part['to'] + ' TDB'),
+				spice.str2et(part['from'] + ' TDB') if isinstance(part['from'], str) else part['from'],
+				spice.str2et(part['to']   + ' TDB') if isinstance(part['to'],   str) else part['to'],
 				part['error'],
 				part['visual'] if 'visual' in part else None,
 				part['step'] if 'step' in part else 60
@@ -348,6 +350,61 @@ def createSpacecraftFile(fileName, id, name, renderingConfig, trajectoryParts):
 		'name': name,
 		'trajectory': createCompositeTrajectory(id, renderingConfig, trajectoryParts)
 	})
+
+def getSpkSegments(fileName, scId = None):
+	handle = spice.dafopr(fileName)
+
+	spice.dafbfs(handle)
+
+	res = []
+
+	found = spice.daffna()
+	while found:
+		d = spice.dafgs()
+		segData = spice.spkuds(list(spice.dafgs())[0:5])
+		if scId == None or scId == segData[0]:
+			res.append({
+				'id': segData[0],
+				'parent': segData[1],
+				'from': segData[4],
+				'to':   segData[5]
+			})
+
+		found = spice.daffna()
+
+	spice.dafcls(handle)
+
+	return res
+
+def genConfig(spkFile, scId, color):
+	segments = getSpkSegments(spkFile, scId)
+	for seg in segments:
+		seg['error'] = 500 if seg['parent'] == 10 else 20
+		seg['visual'] = {
+			'regular': {
+				'model': 'keplerian',
+				'config': {
+					'color': color,
+					'trailPeriod': 86400 * 30 if seg['parent'] == 10 else 3600 * 6
+				}
+			},
+			'selected': {
+				'model': 'keplerian',
+				'config': {
+					'color': color,
+					'showFull': True
+				}
+			}
+		}
+		seg['parent'] = str(seg['parent'])
+	return segments
+
+def createFromSpk(spkFile, color, name, jsonFile = None, scId = None):
+	config = genConfig('kernels/spacecraft/' + spkFile, scId, color)
+	spice.loadKernel('kernels/spacecraft/' + spkFile)
+	if jsonFile == None:
+		jsonFile = spkFile[0:-4] + '.json'
+	createSpacecraftFile('./../public/spacecraft/' + jsonFile, str(config[0]['id']), name, None, config)
 
 linearPoints = []
 
@@ -522,6 +579,25 @@ orxRendering = {
 	}
 }
 
+pspRendering = {
+	'regular': {
+		'model': 'pointArray',
+		'config': {
+			'color': 'green',
+			'showAhead': False,
+			'showBehind': False,
+			'trailPeriod': 86400 * 700,
+			'referenceFrame': 1000,
+		}
+	},
+	'selected': {
+		'model': 'keplerian',
+		'config': {
+			'color': 'green',
+		}
+	}
+}
+
 lroTraj = (
 	{
 		'parent': 	'399',
@@ -566,7 +642,6 @@ lroRendering = {
 	}
 }
 
-
 teslaTraj = (
 	{
 		'parent': 	'399',
@@ -586,10 +661,36 @@ teslaTraj = (
 	},
 )
 
+pspTraj = (
+	{
+		'parent': 	'10',
+		'from': 	'2018 AUG 13 11:17:00.000',
+		'to':   	'2025 AUG 31 09:18:00.000',
+		'error': 	50
+	},
+)
+
+# print(getSpkSegments('kernels/de430.bsp', 1))
+# print(getSpkSegments('kernels/mar097.bsp', 199))
+# print(spice.et2utc(630849669.1838495))
+# print(spice.et2jd(3155716867))
+# print(spice.str2et('2050-JAN-01 00:00:00'))
+
+# print(spice.str2et('JD ' + str(2484418.4999999)))
+# print(spice.et2utc(spice.str2et('JD ' + str(2484418.4999999))))
+
+# print(spice.str2et('2090-JAN-02 00:00:00.0000 CT'))
+
+# createFromSpk('parker.bsp', 'green', 'Parker Solar Probe')
+# createFromSpk('roadster.bsp', '#D60044', 'Tesla Roadster')
+createFromSpk('hayabusa2.bsp', 'green', 'Hayabusa 2')
+
 # createSpacecraftFile('./../public/spacecraft/voyager1.json', '-31', 'Voyager 1', voyagerRendering, voyager1traj)
 # createSpacecraftFile('./../public/spacecraft/voyager2.json', '-32', 'Voyager 2', voyagerRendering, voyager2traj)
 
-createSpacecraftFile('./../public/spacecraft/osiris-rex.json', '-64', 'OSIRIS-REx', orxRendering, orxTraj)
+# createSpacecraftFile('./../public/spacecraft/osiris-rex.json', '-64', 'OSIRIS-REx', orxRendering, orxTraj)
+
+# createSpacecraftFile('./../public/spacecraft/parker.json', '-96', 'Parker Solar Probe', pspRendering, pspTraj)
 
 # createSpacecraftFile('./../public/spacecraft/lro.json', '-85', 'LRO', False, lroTraj)
 

@@ -54,7 +54,7 @@ class Simulation
 
         this.ui = new UI();
 
-        this.starSystemManager.loadDefault();
+        this.starSystemManager.loadDefault(() => requestAnimationFrame(renderLoopFunction));
 
         VisualFlightEventImpulsiveBurn.preloadTexture();
         VisualMarkerPericenter.preloadTexture();
@@ -88,7 +88,6 @@ class Simulation
 
     startRendering() {
         this.renderLoopActive = true;
-        requestAnimationFrame(this.renderLoopFunction);
     }
 
     stopRendering() {

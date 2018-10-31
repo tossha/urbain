@@ -28,11 +28,11 @@ export default class StarSystemManager {
         this._starSystems.push(new StarSystemEntry(idx, alias, label, module));
     }
 
-    loadDefault() {
-        this.loadByIdx(this.defaultStarSystemIdx);
+    loadDefault(callback) {
+        this.loadByIdx(this.defaultStarSystemIdx, callback);
     }
 
-    loadByIdx(idx) {
+    loadByIdx(idx, callback) {
         if (idx === this._loadedIdx) {
             return;
         }
@@ -43,7 +43,7 @@ export default class StarSystemManager {
             return;
         }
 
-        starSystem.load();
+        starSystem.load(callback);
         this._loadedIdx = idx;
     }
 

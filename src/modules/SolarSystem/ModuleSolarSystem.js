@@ -13,8 +13,8 @@ export default class ModuleSolarSystem extends Module
         this._addClass('OrientationIAUModel', OrientationIAUModel);
     }
 
-    loadStarSystem() {
-        sim.loadStarSystem('solar_system.json', starSystem => this._onSystemLoaded(starSystem));
+    loadStarSystem(alias, callback) {
+        sim.loadStarSystem('solar_system.json', starSystem => { this._onSystemLoaded(starSystem); callback && callback(starSystem); });
     }
 
     _onSystemLoaded(starSystem) {
@@ -22,6 +22,9 @@ export default class ModuleSolarSystem extends Module
         StarSystemLoader.loadObjectByUrl(starSystem, './spacecraft/voyager2.json');
         StarSystemLoader.loadObjectByUrl(starSystem, './spacecraft/lro.json');
         StarSystemLoader.loadObjectByUrl(starSystem, './spacecraft/osiris-rex.json');
+        StarSystemLoader.loadObjectByUrl(starSystem, './spacecraft/parker.json');
+        StarSystemLoader.loadObjectByUrl(starSystem, './spacecraft/roadster.json');
+        StarSystemLoader.loadObjectByUrl(starSystem, './spacecraft/hayabusa2.json');
 
         this.loadTLE(starSystem, 25544); // ISS
         this.loadTLE(starSystem, 20580); // Hubble
