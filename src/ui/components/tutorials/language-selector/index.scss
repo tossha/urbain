@@ -1,0 +1,62 @@
+@import "../../common/variables";
+@import "../wizard-buttons";
+
+.language-selector-wrapper {
+	color: $black;
+	height: 100%;
+	left: 0;
+	position: fixed;
+	top: 0;
+	width: 100%;
+
+	&::before {
+		background-color: #000;
+		content: "";
+		height: 100%;
+		left: 0;
+		opacity: 0.8;
+		position: absolute;
+		top: 0;
+		width: 100%;
+		z-index: 999999;
+	}
+}
+
+.language-selector {
+	background-color: $white;
+	border-radius: $border-radius;
+	min-width: 300px;
+	max-width: 580px;
+
+	padding: 10px 20px;
+	position: absolute;
+
+	top: 50%;
+	left: 50%;
+	transform: translateX(-50%) translateY(-50%);
+	z-index: 9999999;
+
+	&__row {
+		align-items: center;
+		border-bottom: 1px solid $gray-text;
+		display: flex;
+		justify-content: space-between;
+		padding: 10px 0;
+
+		&:last-child {
+			border-bottom: none;
+		}
+	}
+
+	&__content {
+		margin-right: 10px;
+	}
+
+	&__button {
+		@include urbain-tutorial-wizard-button;
+		@include urbain-tutorial-wizard-button-default;
+
+		display: block;
+		min-width: 80px;
+	}
+}

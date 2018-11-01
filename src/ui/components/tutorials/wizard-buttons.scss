@@ -1,0 +1,46 @@
+@import "../common/variables";
+
+$urbain-tutorial-wizard-button-normal: #3449bd;
+
+@mixin urbain-tutorial-wizard-button {
+	$button-margin: 30px;
+
+	background-image: none;
+	border-radius: $border-radius;
+	box-sizing: border-box;
+	font-size: 1.2rem;
+	font-weight: bold;
+	padding: 5px 20px;
+	text-shadow: none;
+	text-align: center;
+}
+
+@mixin urbain-tutorial-wizard-button-default() {
+	$button-bg-color-normal: $urbain-tutorial-wizard-button-normal;
+	$button-bg-color-active: $blue;
+
+	background-color: $button-bg-color-normal;
+	border: 1px solid $button-bg-color-normal;
+	color: $white-text;
+
+	&:hover,
+	&:active {
+		background-color: $button-bg-color-active;
+	}
+}
+
+@mixin urbain-tutorial-wizard-button-secondary() {
+	$button-bg-color-normal: $urbain-tutorial-wizard-button-normal;
+	$button-bg-color-active: $blue;
+
+	background-color: $white;
+	border: 1px solid $button-bg-color-normal;
+	color: $button-bg-color-normal;
+
+	&:hover,
+	&:active {
+		background-color: $white;
+		color: $button-bg-color-active;
+		border-color: $button-bg-color-active;
+	}
+}

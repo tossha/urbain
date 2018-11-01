@@ -1,6 +1,6 @@
 import { init } from "./core/index";
 import { loadTLE, loadKSP } from "./api";
-import { Store } from "./store";
+import { Store } from "./ui/index";
 
 class Application {
     constructor(sim) {
