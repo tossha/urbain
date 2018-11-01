@@ -1,6 +1,6 @@
 import React from "react";
 
-import Panel, { Field, FieldLabel, FieldControl, PanelButton } from "../../../../../common/panel/index";
+import Panel, { Field, FieldLabel, FieldControl, PanelButton } from "../../../../../common/panel";
 import Logo from "./logo";
 import "./index.scss";
 

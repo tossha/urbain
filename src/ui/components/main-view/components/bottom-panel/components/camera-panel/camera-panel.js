@@ -1,7 +1,7 @@
 import React from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 
-import Panel, { Field, FieldLabel, FieldControl } from "../../../../../common/panel/index";
+import Panel, { Field, FieldLabel, FieldControl } from "../../../../../common/panel";
 import "./camera-panel.scss";
 
 const CameraPanel = ({ className }) => (

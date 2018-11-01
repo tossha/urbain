@@ -1,6 +1,6 @@
 import * as wizardIds from "./wizards/wizard-ids";
 import LocalStorageWatchStatusService from "./services/local-storage-watch-status-service";
-import { showLangSelectorDialog } from "./language-selector/index";
+import { showLangSelectorDialog } from "./language-selector";
 import StepHandlerService from "./services/step-handler-service";
 
 async function showWizard(
