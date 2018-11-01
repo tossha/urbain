@@ -4,11 +4,11 @@ import cn from "classnames";
 
 import { Consumer } from "../../../../store";
 import Panel from "../../../common/panel";
-import Button from "../../../common/button/index";
+import Button from "../../../common/button";
 import SatellitesGrid from "./components/satellites-grid";
-import "./index.scss";
 import { findSatellites } from "./web-api";
 import Satellite from "./satelite";
+import "./index.scss";
 
 class SatelliteSearchPanel extends React.Component {
     static propTypes = {

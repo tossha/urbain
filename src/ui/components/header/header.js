@@ -1,10 +1,10 @@
 import React from "react";
 import cn from "classnames";
 
-import "./header.scss";
 import Logo from "./components/logo";
 import StarSystemSelector from "./components/star-system-selector/star-system-selector";
 import MainMenu from "./components/main-menu/main-menu";
+import "./header.scss";
 
 const Header = ({ className }) => (
     <header className={cn(className, "header", "noselect")}>

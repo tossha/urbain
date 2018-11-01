@@ -6,7 +6,7 @@ import CameraPanel from "./components/camera-panel/camera-panel";
 import TimeLine from "./components/time-line";
 import PauseButton from "./components/pause-button";
 import TimeSettingsPanel from "./components/time-settings-panel";
-import StatisticsBadge from "../statistics-badge/index";
+import StatisticsBadge from "../../../statistics-badge";
 
 import "./index.scss";
 

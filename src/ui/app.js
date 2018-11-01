@@ -1,10 +1,10 @@
 import React from "react";
 
-import { showWizard, wizardIds } from "./tutorials";
-import "./common/app-layout.scss";
-import Header from "./header/header";
-import MainView from "./main-view/main-view";
-import Footer from "./footer/footer";
+import { showWizard, wizardIds } from "./components/tutorials/index";
+import Header from "./components/header/header";
+import MainView from "./components/main-view/main-view";
+import Footer from "./components/footer/footer";
+import "./components/common/app-layout.scss";
 
 class App extends React.Component {
     componentDidMount() {

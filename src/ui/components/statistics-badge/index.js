@@ -1,7 +1,7 @@
 import React, { Component } from "react";
 import Stats from "stats.js";
 
-import { Consumer } from "../../../../store/index";
+import { Consumer } from "../../store/index";
 import "./index.scss";
 
 class StatisticsBadge extends Component {

@@ -2,9 +2,9 @@ import React from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 
 import Panel, { FieldSet, Field, FieldLabel, FieldControl, Dimension } from "../../../common/panel";
-import "./index.scss";
 import KeplerianView from "./components/keplerian-view";
 import CartesianVectorView from "./components/cartesian-vector-view";
+import "./index.scss";
 
 const MetricsPanel = () => (
     <Panel

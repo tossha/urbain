@@ -3,7 +3,7 @@ import PropTypes from "prop-types";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import cn from "classnames";
 
-import { sim, Events } from "../../../../../../core/index";
+import { sim, Events } from "../../../../../../../core/index";
 import "./index.scss";
 
 class PauseButton extends Component {

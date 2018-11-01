@@ -2,22 +2,24 @@
 
 @import "../common/global-styles/global";
 @import "../common/variables";
-@import "./wizard-buttons";
+@import "wizard-buttons";
 
 .introjs-helperNumberLayer {
 	display: none;
 }
 
 .urbain-tutorial-wizard {
-	$button-margin: 30px;
+	$button-margin: 3rem;
 
 	background-color: $white;
 	border-radius: $border-radius;
-	padding: 20px;
+	color: #131519;
+	font-size: 1.2rem;
+	padding: 2rem;
 	max-width: 580px;
 
 	.introjs-tooltiptext {
-		font-size: 1.05rem;
+		font-size: 1.2rem;
 		line-height: 1.5rem;
 		padding-bottom: 2rem;
 		text-align: justify;
@@ -25,7 +27,7 @@
 
 	.introjs-progress {
 		border-radius: 2px;
-		margin-bottom: 10px;
+		margin-bottom: 1rem;
 	}
 
 	.introjs-progressbar {

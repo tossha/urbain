@@ -1,14 +1,14 @@
 import React from "react";
 import cn from "classnames";
 
-import "./main-view.scss";
+import SideBar from "../common/side-bar";
 import BottomPanel from "./components/bottom-panel";
 import CreationPanel from "./components/creation-panel";
 import TransferCalculationPanel from "./components/transfer-calculation-panel";
-import MetricsPanel from "./components/metrics-panel/index";
+import MetricsPanel from "./components/metrics-panel";
+import ManeuverPanel from "./components/maneuver-panel";
 import SatelliteSearchPanel from "./components/satellite-search-panel";
-import SideBar from "../common/side-bar";
-import ManeuverPanel from "./components/maneuver-panel/index";
+import "./main-view.scss";
 
 const MainView = ({ className, children }) => {
     return (

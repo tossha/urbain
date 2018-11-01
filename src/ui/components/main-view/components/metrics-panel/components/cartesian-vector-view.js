@@ -4,8 +4,8 @@ import cn from "classnames";
 
 import VectorComponentView from "./vector-component-view";
 import ExpandButton from "../../../../common/expand-button/index";
+import { Field } from "../../../../common/panel";
 import "./cartesian-vector-view.scss";
-import Field from "../../../../common/panel/components/field";
 
 class CartesianVectorView extends Component {
     static propTypes = {

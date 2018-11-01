@@ -1,7 +1,7 @@
 import React, { Component } from "react";
 import PropTypes from "prop-types";
 
-import Button from "../../../../common/button/index";
+import Button from "../../../../common/button";
 import Satellite from "../satelite";
 
 class LoadButton extends Component {
