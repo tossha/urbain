@@ -1,9 +1,8 @@
 import React from "react";
 import PropTypes from "prop-types";
 import cn from "classnames";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import * as faGithub from "@fortawesome/fontawesome-free-brands/faGithub";
-import * as faTelegram from "@fortawesome/fontawesome-free-brands/faTelegram";
+import { ReactComponent as GithubLogo } from "./github-logo.svg";
+import { ReactComponent as TelegramLogo } from "./telegram-logo.svg";
 
 import "./footer.scss";
 
@@ -21,7 +20,7 @@ const Footer = ({ className }) => (
                     target="_blank"
                     rel="noopener noreferrer"
                 >
-                    <FontAwesomeIcon className="footer__social-link-logo" icon={faGithub} />
+                    <GithubLogo className="footer__social-link-logo" />
                 </a>
                 <a
                     className="footer__social-link"
@@ -29,7 +28,7 @@ const Footer = ({ className }) => (
                     target="_blank"
                     rel="noopener noreferrer"
                 >
-                    <FontAwesomeIcon className="footer__social-link-logo" icon={faTelegram} />
+                    <TelegramLogo className="footer__social-link-logo" />
                 </a>
             </span>
         </div>

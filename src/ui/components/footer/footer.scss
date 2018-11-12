@@ -23,7 +23,11 @@
 	}
 
 	&__social-link-logo {
-		color: $gray-text;
-		font-size: 1.5rem;
+		fill: $gray-text;
+		height: 1.5rem;
+
+		&:hover {
+			fill: $white-text;
+		}
 	}
 }
