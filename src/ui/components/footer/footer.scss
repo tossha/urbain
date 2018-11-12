@@ -1,0 +1,29 @@
+@import "../common/variables";
+
+.footer {
+	align-items: center;
+	display: flex;
+	color: $gray-text;
+
+	&__wrapper {
+		align-items: center;
+		display: flex;
+		justify-content: space-between;
+		padding: 0 10rem;
+		width: 100%;
+	}
+
+	&__social-links {
+		align-items: center;
+		display: flex;
+	}
+
+	&__social-link {
+		margin-left: 1.5rem;
+	}
+
+	&__social-link-logo {
+		color: $gray-text;
+		font-size: 1.5rem;
+	}
+}
