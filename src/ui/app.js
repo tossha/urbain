@@ -13,12 +13,11 @@ class App extends React.Component {
 
     render() {
         return (
-            <div className="app-layout">
-                <MainView className="app-layout__main">
-                    <Header className="app-layout__header" />
-                </MainView>
+            <>
+                <Header className="app-layout__header" />
+                <MainView className="app-layout__main" />
                 <Footer className="app-layout__footer" />
-            </div>
+            </>
         );
     }
 }

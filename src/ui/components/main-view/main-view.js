@@ -1,4 +1,5 @@
 import React from "react";
+import PropTypes from "prop-types";
 import cn from "classnames";
 
 import SideBar from "../common/side-bar";
@@ -10,11 +11,10 @@ import ManeuverPanel from "./components/maneuver-panel";
 import SatelliteSearchPanel from "./components/satellite-search-panel";
 import "./main-view.scss";
 
-const MainView = ({ className, children }) => {
+const MainView = ({ className }) => {
     return (
-        <main className={cn(className, "main-view")}>
-            <div id="viewport-id" />
-            {children}
+        <main className={cn("main-view", className)}>
+            <div id="viewport-id" className="main-view__viewport-container" />
             <SideBar className="main-view__left-side-bar">
                 <CreationPanel className="main-view__creation-panel" />
                 <ManeuverPanel className="main-view__maneuver-panel" />
@@ -27,6 +27,10 @@ const MainView = ({ className, children }) => {
             <BottomPanel className="main-view__bottom-panel" />
         </main>
     );
+};
+
+MainView.propTypes = {
+    className: PropTypes.string,
 };
 
 export default MainView;

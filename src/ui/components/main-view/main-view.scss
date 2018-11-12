@@ -42,4 +42,9 @@
 		right: $default-gap-size;
 		position: absolute;
 	}
+
+	&__viewport-container {
+		min-height: 100%;
+		width: 100%;
+	}
 }
