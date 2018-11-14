@@ -194,7 +194,8 @@ class Simulation
             this._footerDomElement = document.getElementById("app-footer");
         }
 
-        const height = window.innerHeight - this._footerDomElement.clientHeight;
+        const footerHeight = (this._footerDomElement ? this._footerDomElement.clientHeight : 0);
+        const height = window.innerHeight - footerHeight;
 
         this.renderer.setSize(this.domElement.clientWidth, height);
     }
