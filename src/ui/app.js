@@ -6,6 +6,8 @@ import MainView from "./components/main-view/main-view";
 import Footer from "./components/footer/footer";
 import "./components/common/app-layout.scss";
 
+const IS_FOOTER_VISIBLE = process.env.REACT_APP_IS_FOOTER_VISIBLE === "true";
+
 class App extends React.Component {
     componentDidMount() {
         showWizard(wizardIds.GETTING_STARTED_WIZARD);
@@ -13,12 +15,11 @@ class App extends React.Component {
 
     render() {
         return (
-            <div className="app-layout">
-                <MainView className="app-layout__main">
-                    <Header className="app-layout__header" />
-                </MainView>
-                <Footer className="app-layout__footer" />
-            </div>
+            <>
+                <Header className="app-layout__header" />
+                <MainView className="app-layout__main" />
+                {IS_FOOTER_VISIBLE && <Footer className="app-layout__footer" />}
+            </>
         );
     }
 }

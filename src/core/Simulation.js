@@ -37,8 +37,9 @@ class Simulation
         this.textureLoader = new THREE.TextureLoader();
 
         this.renderer = new THREE.WebGLRenderer({antialias: true, logarithmicDepthBuffer: true});
-        this.renderer.setSize(window.innerWidth, window.innerHeight);
+
         this.domElement = viewPortDomElement;
+        this._setRenderSize();
         this.domElement.appendChild(this.renderer.domElement);
         window.addEventListener("resize", this.onWindowResize.bind(this));
 
@@ -128,7 +129,7 @@ class Simulation
     }
 
     onWindowResize() {
-        this.renderer.setSize(window.innerWidth, window.innerHeight);
+        this._setRenderSize();
         this.camera.onResize();
     }
 
@@ -186,6 +187,17 @@ class Simulation
 
     getPropagator(alias) {
         return this.propagators[alias];
+    }
+
+    _setRenderSize() {
+        if(!this._footerDomElement) {
+            this._footerDomElement = document.getElementById("app-footer");
+        }
+
+        const footerHeight = (this._footerDomElement ? this._footerDomElement.clientHeight : 0);
+        const height = window.innerHeight - footerHeight;
+
+        this.renderer.setSize(this.domElement.clientWidth, height);
     }
 }
 
