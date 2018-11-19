@@ -140,7 +140,7 @@ class Store {
 
         return {
             options: starSystemManager.starSystems,
-            dfeaultValue: starSystemManager.defaultStarSystem,
+            defaultValue: starSystemManager.defaultStarSystem,
             onSelect: item => starSystemManager.loadByIdx(item.idx),
         };
     }
