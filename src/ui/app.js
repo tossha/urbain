@@ -10,7 +10,7 @@ const IS_FOOTER_VISIBLE = process.env.REACT_APP_IS_FOOTER_VISIBLE === "true";
 
 class App extends React.Component {
     componentDidMount() {
-        showWizard(wizardIds.GETTING_STARTED_WIZARD);
+        showWizard({ wizardId: wizardIds.GETTING_STARTED_WIZARD });
     }
 
     render() {
