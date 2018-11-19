@@ -3,19 +3,22 @@ import LocalStorageWatchStatusService from "./services/local-storage-watch-statu
 import { showLangSelectorDialog } from "./language-selector";
 import StepHandlerService from "./services/step-handler-service";
 
-async function showWizard(
+let isAnyTutorialVisible = false;
+
+async function showWizard({
     wizardId,
+    ignoreWatchStatusCheck = false,
     watchStatusService = new LocalStorageWatchStatusService(window.localStorage),
     stepHandlerService = new StepHandlerService("tutorial_", "duration_tut_"),
-) {
-    if (!watchStatusService.canWatch(wizardId)) {
+} = {}) {
+    if (isAnyTutorialVisible || (!watchStatusService.canWatch(wizardId) && !ignoreWatchStatusCheck)) {
         return;
     }
 
     const { default: wizard } = await import(/* webpackChunkName: "[request]" */ `./wizards/${wizardId}/index`);
+    isAnyTutorialVisible = true;
 
     stepHandlerService.handleStep(0);
-
     const selectedId = await showLangSelectorDialog(wizard.langs);
 
     Promise.all([
@@ -31,12 +34,14 @@ async function showWizard(
                 onComplete() {
                     stepHandlerService.handleStep(this._currentStep + 2);
                     watchStatusService.markAsWatched(wizardId);
+                    isAnyTutorialVisible = false;
                 },
             });
             intro.start();
         })
         .catch(error => {
             console.error(error.message);
+            isAnyTutorialVisible = false;
         });
 }
 

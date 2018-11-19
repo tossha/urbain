@@ -1,5 +1,13 @@
 import { HELP_PAGE_URL, TOP_MENU_ITEMS } from "./constants";
 import { createContext } from "./context";
+import { showWizard } from "../components/tutorials";
+import * as wizardIds from "../components/tutorials/wizards/wizard-ids";
+
+export function openLinkInNewTab(url) {
+    if (url) {
+        window.open(url, "_blank");
+    }
+}
 
 export const MenuItemType = {
     NONE: 0,
@@ -8,9 +16,10 @@ export const MenuItemType = {
 };
 
 class MenuItem {
-    constructor(label, type = MenuItemType.NONE) {
+    constructor({ label, type = MenuItemType.NONE, onClick = () => {} }) {
         this.label = label;
         this.type = type;
+        this.onClick = onClick;
     }
 
     get isClickable() {
@@ -20,7 +29,7 @@ class MenuItem {
 
 class LinkMenuItem extends MenuItem {
     constructor(label, { href = "", target = "_self" } = {}) {
-        super(label, MenuItemType.LINK);
+        super({ label, type: MenuItemType.LINK });
 
         this.href = href;
         this.target = target;
@@ -33,7 +42,7 @@ class LinkMenuItem extends MenuItem {
 
 class DropDownMenuItem extends MenuItem {
     constructor(label, options = []) {
-        super(label, MenuItemType.DROPDOWN);
+        super({ label, type: MenuItemType.DROPDOWN });
 
         this.options = options;
     }
@@ -110,10 +119,20 @@ class Store {
                 },
             },
         ]),
-        new LinkMenuItem(TOP_MENU_ITEMS.HELP, {
-            href: HELP_PAGE_URL,
-            target: "_blank",
-        }),
+        new DropDownMenuItem(TOP_MENU_ITEMS.HELP, [
+            new MenuItem({
+                label: "Urbain Wiki",
+                onClick: () => {
+                    openLinkInNewTab(HELP_PAGE_URL);
+                },
+            }),
+            new MenuItem({
+                label: "Show tutorial",
+                onClick: () => {
+                    showWizard({ wizardId: wizardIds.GETTING_STARTED_WIZARD, ignoreWatchStatusCheck: true });
+                },
+            }),
+        ]),
     ];
 
     get starSystemSelectorSettings() {
@@ -121,7 +140,7 @@ class Store {
 
         return {
             options: starSystemManager.starSystems,
-            defaultValue: starSystemManager.defaultStarSystem,
+            dfeaultValue: starSystemManager.defaultStarSystem,
             onSelect: item => starSystemManager.loadByIdx(item.idx),
         };
     }
