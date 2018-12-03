@@ -2,11 +2,13 @@ import React, { Component } from "react";
 import PropTypes from "prop-types";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 
-import { Consumer } from "../../../../../store/index";
+import { RootContext } from "../../../../../store";
 import DropDownMenuItem from "./drop-down-menu-item";
 import "./drop-down-menu.scss";
 
 class DropDownMenu extends Component {
+    static contextType = RootContext;
+
     static propTypes = {
         text: PropTypes.string.isRequired,
         options: PropTypes.arrayOf(
@@ -21,15 +23,18 @@ class DropDownMenu extends Component {
     };
 
     handleSelect = selectedItem => {
-        const { store, updateStore, text } = this.props;
-        const dropDownMenuData = store.topMenu.find(item => item.label === text);
+        const { store, updateStore } = this.context;
+        const dropDownMenuData = store.topMenu.find(item => item.label === this.props.text);
 
         dropDownMenuData.onSelect(selectedItem);
         updateStore(store);
     };
 
     render() {
-        const { text, options } = this.props;
+        const { text } = this.props;
+        const dropDownMenuData = this.context.store.topMenu.find(item => item.label === text);
+        const options = dropDownMenuData ? dropDownMenuData.options : [];
+
         const hasOptionsToShow = options.length > 0;
 
         return (
@@ -59,13 +64,4 @@ class DropDownMenu extends Component {
     }
 }
 
-export default props => (
-    <Consumer>
-        {({ store, updateStore }) => {
-            const dropDownMenuData = store.topMenu.find(item => item.label === props.text);
-            const options = dropDownMenuData ? dropDownMenuData.options : [];
-
-            return <DropDownMenu {...props} store={store} updateStore={updateStore} options={options} />;
-        }}
-    </Consumer>
-);
+export default DropDownMenu;

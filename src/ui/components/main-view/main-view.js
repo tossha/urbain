@@ -9,7 +9,7 @@ import TransferCalculationPanel from "./components/transfer-calculation-panel";
 import MetricsPanel from "./components/metrics-panel";
 import ManeuverPanel from "./components/maneuver-panel";
 import DynamicTrajectoryPanel from "./components/dynamic-trajectory-panel";
-import SatelliteSearchPanel from "./components/satellite-search-panel";
+import SatelliteSearchPanel from "../satellite-search-panel/index";
 import "./main-view.scss";
 
 const MainView = ({ className }) => {

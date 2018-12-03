@@ -1,9 +1,5 @@
 @import "../../../common/variables";
 
-.satellite-search-panel {
-
-}
-
 .searcher {
 	align-items: center;
 	display: flex;
@@ -31,16 +27,4 @@
 	&__column {
 		margin: 0 $default-gap-size;
 	}
-}
-
-.satellites-grid {
-	border: 1px solid $white;
-	width: 100%;
-	text-align: center;
-}
-
-.satellites-grid-container {
-	width: 100%;
-	height: 500px;
-	overflow: auto;
 }

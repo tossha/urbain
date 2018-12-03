@@ -50,8 +50,12 @@ export default class StarSystem
     }
 
     deleteObject(id) {
-        this.objects[id].drop();
-        delete this.objects[id];
+        return new Promise(resolve => {
+            this.objects[id].drop();
+            delete this.objects[id];
+
+            resolve();
+        })
     }
 
     isBody(objectId) {

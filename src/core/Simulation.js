@@ -65,7 +65,7 @@ class Simulation
     }
 
     loadStarSystem(jsonFile, onLoadFinish) {
-        $.getJSON("./star_systems/" + jsonFile, starSystemConfig => {
+        return Promise.resolve($.getJSON("./star_systems/" + jsonFile, starSystemConfig => {
             this.selection.deselect();
             this.starSystem && this.starSystem.unload();
             this.starSystem = new StarSystem(starSystemConfig.id);
@@ -84,7 +84,7 @@ class Simulation
             Events.dispatch(Events.STAR_SYSTEM_LOADED, {starSystem: this.starSystem});
 
             this.startRendering();
-        });
+        }));
     }
 
     startRendering() {
@@ -155,7 +155,8 @@ class Simulation
 
     loadModule(alias, callback) {
         const className = 'Module' + alias;
-        import('../modules/' + alias + '/' + className).then((module) => {
+
+        return import('../modules/' + alias + '/' + className).then((module) => {
             this.modules[alias] = new module.default();
             this.modules[alias].init();
             callback && callback(this.modules[alias]);
@@ -166,6 +167,7 @@ class Simulation
         if (this.modules[alias] === undefined) {
             throw new Error('Unknown module: ' + alias);
         }
+
         return this.modules[alias];
     }
 

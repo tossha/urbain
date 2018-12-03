@@ -59,10 +59,10 @@ export default class StarSystemLoader
     }
 
     static loadObjectByUrl(starSystem, url) {
-        $.getJSON(url, (objectConfig) => {
+        return Promise.resolve($.getJSON(url, (objectConfig) => {
             this._loadObject(starSystem, objectConfig);
             starSystem.getObject(objectConfig.id).setTrajectory(TrajectoryLoader.create(objectConfig.trajectory));
-        });
+        }));
     }
 
     static _loadObject(starSystem, config) {

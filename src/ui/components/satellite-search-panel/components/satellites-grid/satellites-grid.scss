@@ -1,0 +1,21 @@
+@import "../../../common/variables";
+
+.satellites-grid {
+	border: 1px solid $gray-text;
+	border-collapse: collapse;
+	width: 100%;
+	text-align: center;
+
+	td {
+		border: 1px solid $gray-text;
+	}
+
+	&__command-column {
+		text-align: center;
+		width: 5rem;
+	}
+
+	&__action-button {
+		margin: 0 auto;
+	}
+}

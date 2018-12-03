@@ -1,10 +1,10 @@
 import React from "react";
 
 import Panel, { Field, FieldLabel, PanelButton } from "../../common/panel";
-import { Consumer } from "../../../store";
+import { RootContext } from "../../../store";
 
 const CreationPanel = ({ className }) => (
-    <Consumer>
+    <RootContext.Consumer>
         {({ store }) => (
             <Panel
                 className={className}
@@ -23,7 +23,9 @@ const CreationPanel = ({ className }) => (
                 </Field>
             </Panel>
         )}
-    </Consumer>
+    </RootContext.Consumer>
 );
+
+CreationPanel.contextType = RootContext;
 
 export default CreationPanel;

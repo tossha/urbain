@@ -2,8 +2,9 @@ import React from "react";
 import ReactDOM from "react-dom";
 
 import { configureLibs } from "./libs";
-import { Provider, Store } from "./store";
+import { RootContext, Store } from "./store";
 import { createStatsBadge } from "./components/statistics-badge";
+import SatelliteFinder from "./services/satellite-finder";
 import AppComponent from "./app";
 
 configureLibs();
@@ -11,20 +12,31 @@ const statsBadge = createStatsBadge();
 
 class Root extends React.Component {
     state = {
-        stats: statsBadge,
         store: this.props.store,
-        updateStore: updatedStore => {
-            this.setState({
-                store: updatedStore,
-            });
-        },
+    };
+
+    _handleUpdateStore = updatedStore => {
+        this.setState({
+            store: updatedStore,
+        });
     };
 
     render() {
+        const { store } = this.state;
+
         return (
-            <Provider value={this.state}>
+            <RootContext.Provider
+                value={{
+                    store,
+                    stats: statsBadge,
+                    updateStore: this._handleUpdateStore,
+                    webApiServices: {
+                        satelliteFinder: new SatelliteFinder("/api"),
+                    },
+                }}
+            >
                 <AppComponent />
-            </Provider>
+            </RootContext.Provider>
         );
     }
 }
