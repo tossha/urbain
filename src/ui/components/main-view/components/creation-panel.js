@@ -26,6 +26,4 @@ const CreationPanel = ({ className }) => (
     </RootContext.Consumer>
 );
 
-CreationPanel.contextType = RootContext;
-
 export default CreationPanel;

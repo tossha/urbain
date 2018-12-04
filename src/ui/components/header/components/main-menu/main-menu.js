@@ -31,6 +31,4 @@ function MainMenu() {
     );
 }
 
-MainMenu.contextType = RootContext;
-
 export default MainMenu;

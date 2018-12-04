@@ -82,6 +82,4 @@ const TransferCalculationPanel = ({ className }) => (
     </RootContext.Consumer>
 );
 
-TransferCalculationPanel.contextType = RootContext;
-
 export default TransferCalculationPanel;
