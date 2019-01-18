@@ -4,7 +4,7 @@ import Constant from "../FunctionOfEpoch/Constant";
 import VisualModelAbstract from "./ModelAbstract";
 import {RF_BASE} from "../ReferenceFrame/Factory";
 import VirtualPlane from "./VirtualPlane";
-import {TWO_PI} from "../algebra";
+import {TWO_PI, rad2deg, deg2rad} from "../algebra";
 import ArrowObject from "./Arrow";
 import { sim } from "../Simulation";
 
@@ -58,7 +58,11 @@ export default class VisualAngle extends VisualModelAbstract
 
         if (this.isEditMode) {
             this.mouseDownListener = this.onMouseDown.bind(this);
-            document.addEventListener('mousedown', this.mouseDownListener);
+            sim.addEventListener('mousedown', this.mouseDownListener, 2);
+
+            if (!(this._value instanceof Constant)) {
+                throw Error('Editable angle requires Constant instance as a value');
+            }
         }
 
         this.sizeNeedsUpdate = true;
@@ -91,15 +95,45 @@ export default class VisualAngle extends VisualModelAbstract
             document.addEventListener('mouseup', this.mouseUpListener);
             this.mouseMoveListener = this.onMouseMove.bind(this);
             sim.addEventListener('mousemove', this.mouseMoveListener, 2 + this.customPriority / 100);
+            this.mouseMoved = false;
+        } else {
+            return true;
         }
     }
 
     onMouseUp(event) {
         document.removeEventListener('mouseup', this.mouseUpListener);
         sim.removeEventListener('mousemove', this.mouseMoveListener);
+
+        if (!this.mouseMoved) {
+            let input = prompt('Enter angle value in degrees', rad2deg(this._value.value));
+            if (input !== null && input !== '' && !isNaN(Number(input))) {
+                let newAngleValue = deg2rad(Number(input));
+
+                if (newAngleValue < this.bounds[0] || newAngleValue > this.bounds[1]) {
+                    const lowDiff  = (this.bounds[0] - newAngleValue + TWO_PI) % TWO_PI;
+                    const highDiff = (newAngleValue - this.bounds[1] + TWO_PI) % TWO_PI;
+                    if (lowDiff <= highDiff) {
+                        newAngleValue = this.bounds[0];
+                    } else {
+                        newAngleValue = this.bounds[1];
+                    }
+                }
+
+                if (newAngleValue !== this._value.value) {
+                    this._value.value = newAngleValue;
+                    this.valueUpdated = true;
+                    if (this.editingCallback) {
+                        this.editingCallback(this._value.value);
+                    }
+                }
+            }
+        }
     }
 
     onMouseMove() {
+        this.mouseMoved = true;
+
         const plane = this.getVirtualPlane();
         let intersection = sim.raycaster.intersectObjects([plane])[0];
         if (intersection) {
@@ -249,7 +283,7 @@ export default class VisualAngle extends VisualModelAbstract
         delete this.threeArc;
         document.removeEventListener('wheel', this.onWheelListener);
         if (this.mouseDownListener) {
-            document.removeEventListener('mousedown', this.mouseDownListener);
+            sim.removeEventListener('mousedown', this.mouseDownListener);
         }
     }
 

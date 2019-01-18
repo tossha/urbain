@@ -21,10 +21,10 @@ export default class SelectionHandler extends VisualModelAbstract
             new THREE.MeshBasicMaterial({color: 0xFFFF00})
         ));
 
-        sim.addEventListener('click', this.onMouseClick.bind(this), 1);
         sim.addEventListener('mousedown', this.onMouseDown.bind(this), 1);
 
         this.mouseMoveListener = this.onMouseMove.bind(this);
+        this.mouseUpListener = this.onMouseUp.bind(this);
     }
 
     /**
@@ -77,6 +77,7 @@ export default class SelectionHandler extends VisualModelAbstract
     onMouseDown(event) {
         if (event.button === this.selectionMouseButton) {
             document.addEventListener('mousemove', this.mouseMoveListener);
+            document.addEventListener('mouseup', this.mouseUpListener);
             this.hasMouseMoved = false;
             this.mouseClickStart = [event.clientX, event.clientY];
         }
@@ -88,7 +89,7 @@ export default class SelectionHandler extends VisualModelAbstract
         }
     }
 
-    onMouseClick(event) {
+    onMouseUp(event) {
         const wasSelected = this.selectedObject;
 
         if (event.button !== this.selectionMouseButton) {
@@ -96,6 +97,7 @@ export default class SelectionHandler extends VisualModelAbstract
         }
 
         document.removeEventListener('mousemove', this.mouseMoveListener);
+        document.removeEventListener('mouseup', this.mouseUpListener);
 
         if (this.hasMouseMoved) {
             return;
