@@ -12,8 +12,8 @@ export default class UIPanelCreation extends UIPanel {
     constructor(panelDom) {
         super(panelDom);
 
-        this.jqPause = this.jqDom.find('#createOrbit');
-        this.jqPause.click(() => {
+        this.jqCreate = this.jqDom.find('#createOrbit');
+        this.jqCreate.click(() => {
             const center = sim.camera.orbitingPoint;
             const object = sim.starSystem.getObject(center);
             if (!object.physicalModel) {

@@ -25,6 +25,10 @@ export default class UIPanelManeuver extends UIPanel {
         this.jqDom.find('#prev-burn').on('click', () => this.setBurnIdx(this.burnIdx - 1));
         this.jqDom.find('#next-burn').on('click', () => this.setBurnIdx(this.burnIdx + 1));
 
+        this.jqDom.find('#period-minus').on('click', () => {this.burn.epoch -= this.getOrbitPeriod();this.update()});
+        this.jqDom.find('#period-plus' ).on('click', () => {this.burn.epoch += this.getOrbitPeriod();this.update()});
+
+
         this.jqDom.find('#epoch-minus').on('click', () => {this.burn.epoch -= this.increment;this.update()});
         this.jqDom.find('#epoch-plus').on('click', () => {this.burn.epoch += this.increment;this.update()});
         for (let comp of ['prograde', 'normal', 'radial']) {
@@ -32,6 +36,13 @@ export default class UIPanelManeuver extends UIPanel {
             this.jqDom.find('#' + comp + '-plus').on('click', () => {this.burn[comp] += this.increment / 1000;this.update()});
             this.jqDom.find('#' + comp + '-zero').on('click', () => {this.burn[comp] = 0;this.update()});
         }
+
+        this.jqDom.find('#remove-burn').on('click', () => {
+            let traj = this.trajectory;
+            this.trajectory.removeFlightEvent(this.burn);
+            this.handleDeselect();
+            this.init(traj);
+        });
 
         this.hide();
     }
@@ -74,6 +85,14 @@ export default class UIPanelManeuver extends UIPanel {
         }
         this.show();
         this.setBurnIdx(0);
+    }
+
+    getOrbitPeriod() {
+        let orbit = this.trajectory.getComponentByEpoch(this.burn.epoch, true);
+        if (!orbit) {
+            return 0;
+        }
+        return orbit.getKeplerianObjectByEpoch(this.burn.epoch).period;
     }
 
     updateBurns() {
