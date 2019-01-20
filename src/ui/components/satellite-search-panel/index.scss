@@ -1,9 +1,14 @@
 @import "../common/variables";
+@import "../common/simplebar/index";
 
 .satellite-search-panel {}
 
 .satellites-grid-container {
-	width: 100%;
 	max-height: 35rem;
 	overflow: auto;
+	width: 100%;
+}
+
+.satellites-grid-wrapper {
+	padding-right: 1rem;
 }

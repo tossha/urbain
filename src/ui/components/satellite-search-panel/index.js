@@ -2,13 +2,15 @@ import React from "react";
 import PropTypes from "prop-types";
 import cn from "classnames";
 
+import { createSimplebar } from "../common/simplebar";
 import { RootContext } from "../../store";
 import Panel, { FieldSet, Field } from "../common/panel/index";
 import SatellitesGrid from "./components/satellites-grid/satellites-grid";
 
-import Satellite from "./satelite";
 import Searcher from "./components/searcher";
 import "./index.scss";
+import ExpandButton from "../common/expand-button";
+import FilterBar from "./components/filter-bar";
 
 class SatelliteSearchPanel extends React.Component {
     static contextType = RootContext;
@@ -20,6 +22,22 @@ class SatelliteSearchPanel extends React.Component {
     state = {
         satellites: [],
     };
+
+    _containerRef = React.createRef();
+
+    componentDidUpdate() {
+        this._refreshScrollBar();
+    }
+
+    _refreshScrollBar() {
+        if (this._containerRef.current) {
+            if (!this._simplebar) {
+                this._simplebar = createSimplebar(this._containerRef.current);
+            }
+
+            this._simplebar.recalculate();
+        }
+    }
 
     _handleSearch = async ({ noradId, launchDate }) => {
         const { satelliteFinder } = this.context.webApiServices;
@@ -55,12 +73,14 @@ class SatelliteSearchPanel extends React.Component {
                     <FieldSet>
                         <Field className="panel__field-header">Satellites</Field>
                         <Field>
-                            <div className="satellites-grid-container">
-                                <SatellitesGrid
-                                    satellites={satellites}
-                                    onSatelliteLoad={store.loadSatellite}
-                                    onSatelliteUnload={store.unloadSatellite}
-                                />
+                            <div className="satellites-grid-container" ref={this._containerRef}>
+                                <div className="satellites-grid-wrapper">
+                                    <SatellitesGrid
+                                        satellites={satellites}
+                                        onSatelliteLoad={store.loadSatellite}
+                                        onSatelliteUnload={store.unloadSatellite}
+                                    />
+                                </div>
                             </div>
                         </Field>
                     </FieldSet>
