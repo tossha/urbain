@@ -3,15 +3,18 @@
 .searcher {
 	align-items: center;
 	display: flex;
+	justify-content: space-between;
 
-	&__filter {
-		display: flex;
+	&__autocomplete {
+		flex-grow: 1;
+	}
+
+	&__autocomplete-label {
+		margin-bottom: $default-gap-size / 2;
 	}
 
 	&__input {
-		font-size: 10px;
 		width: 100%;
-		padding-left: $default-gap-size;
 		height: 20px;
 	}
 
@@ -26,5 +29,26 @@
 
 	&__column {
 		margin: 0 $default-gap-size;
+	}
+}
+
+.satellite-option {
+	display: flex;
+	justify-content: space-between;
+
+	&__norad-id {
+		border: 1px solid $gray;
+		color: $gray-text;
+		padding: $default-gap-size / 4;
+	}
+
+	&__name {
+		flex-grow: 1;
+		margin-left: $default-gap-size;
+		text-decoration: underline;
+	}
+
+	&__launch-date {
+		margin-left: $default-gap-size;
 	}
 }

@@ -40,15 +40,31 @@ class SatelliteSearchPanel extends React.Component {
         }
     }
 
-    _handleSearch = async ({ noradId, launchDate }) => {
+    _searchSatellitesByName = async ({ name }) => {
         const { satelliteFinder } = this.context.webApiServices;
 
         try {
-            const { satellites } = await satelliteFinder.findSatellites(noradId, launchDate);
+            const { satellites } = await satelliteFinder.findSatellites({ name });
+
+            return satellites;
+        } catch (e) {
+            console.error(e);
+        }
+
+        return [];
+    };
+
+    _handleSearch = async ({ noradId, name, launchDate }) => {
+        const { satelliteFinder } = this.context.webApiServices;
+
+        try {
+            const { satellites } = await satelliteFinder.findSatellites({ noradId, name, launchDate });
 
             this.setState({
-                satellites: satellites.map(s => new Satellite(s)),
+                satellites,
             });
+
+            this._refreshScrollBar();
         } catch (e) {
             console.error(e);
         }
@@ -72,7 +88,11 @@ class SatelliteSearchPanel extends React.Component {
                 collapseDirection="right"
             >
                 <Field leftAligned>
-                    <Searcher className="satellite-search-panel__searcher" onSearch={this._handleSearch} />
+                    <Searcher
+                        className="satellite-search-panel__searcher"
+                        onSearchSatellitesByName={this._searchSatellitesByName}
+                        onSearch={this._handleSearch}
+                    />
                 </Field>
                 <FieldSet>
                     <Field className="panel__field-header" centered>

@@ -1,7 +1,11 @@
 @import "../common/variables";
 @import "../common/simplebar/index";
 
-.satellite-search-panel {}
+.satellite-search-panel {
+	&__searcher {
+		width: 100%;
+	}
+}
 
 .satellites-grid-container {
 	max-height: 35rem;

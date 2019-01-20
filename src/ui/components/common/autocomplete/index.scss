@@ -1,0 +1,54 @@
+@import "../variables";
+
+.react-autosuggest {
+	&__container {
+		position: relative;
+	}
+
+	&__input {
+		background-color: $black;
+		border: none;
+		box-sizing: border-box;
+		color: $white;
+		font-size: 1.1rem;
+		padding: 0.5rem $default-gap-size;
+		width: 100%;
+
+		&--focused {
+			outline: none;
+		}
+
+		&--open {}
+	}
+
+	&__suggestions-container {
+		display: none;
+		width: 100%;
+
+		&--open {
+			background-color: $black;
+			display: block;
+			position: absolute;
+			border: 1px solid $black-border;
+			z-index: 2;
+		}
+	}
+
+	&__suggestions-list {
+		margin: 0;
+		padding: 0;
+		list-style-type: none;
+		max-height: 250px;
+		overflow-y: auto;
+	}
+
+	&__suggestion {
+		cursor: pointer;
+		text-align: left;
+		padding: 0.5rem $default-gap-size;
+
+		&--highlighted {
+			background-color: $dark-gray;
+		}
+	}
+}
