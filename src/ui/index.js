@@ -4,11 +4,12 @@ import ReactDOM from "react-dom";
 import { configureLibs } from "./libs";
 import { RootContext, Store } from "./store";
 import { createStatsBadge } from "./components/statistics-badge";
-import SatelliteFinder from "./services/satellite-finder";
+import { createServices } from "./services";
 import AppComponent from "./app";
 
 configureLibs();
 const statsBadge = createStatsBadge();
+const webApiServices = createServices();
 
 class Root extends React.Component {
     state = {
@@ -30,9 +31,7 @@ class Root extends React.Component {
                     store,
                     stats: statsBadge,
                     updateStore: this._handleUpdateStore,
-                    webApiServices: {
-                        satelliteFinder: new SatelliteFinder("/api"),
-                    },
+                    webApiServices,
                 }}
             >
                 <AppComponent />
