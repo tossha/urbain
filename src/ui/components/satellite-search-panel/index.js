@@ -21,6 +21,7 @@ class SatelliteSearchPanel extends React.Component {
 
     state = {
         satellites: [],
+        filterBarVisible: true,
     };
 
     _containerRef = React.createRef();
@@ -53,10 +54,14 @@ class SatelliteSearchPanel extends React.Component {
         }
     };
 
+    _handleFilterBarToggle = () => {
+        this.setState(({ filterBarVisible }) => ({ filterBarVisible: !filterBarVisible }));
+    };
+
     render() {
         const { className } = this.props;
-        const { satellites } = this.state;
-        const { store } = this.context;
+        const { satellites, filterBarVisible } = this.state;
+        const { store, webApiServices } = this.context;
         const { showSatelliteSearchPanel } = store.viewSettings;
 
         return (
@@ -69,6 +74,21 @@ class SatelliteSearchPanel extends React.Component {
                 <Field leftAligned>
                     <Searcher className="satellite-search-panel__searcher" onSearch={this._handleSearch} />
                 </Field>
+                <FieldSet>
+                    <Field className="panel__field-header" centered>
+                        Extended Filters
+                        <ExpandButton
+                            className="cartesian-vector-view__expand-button"
+                            expanded={filterBarVisible}
+                            onClick={this._handleFilterBarToggle}
+                        />
+                    </Field>
+                    {filterBarVisible && (
+                        <Field>
+                            <FilterBar satelliteFinder={webApiServices.satelliteFinder} />
+                        </Field>
+                    )}
+                </FieldSet>
                 {satellites.length > 0 && (
                     <FieldSet>
                         <Field className="panel__field-header">Satellites</Field>

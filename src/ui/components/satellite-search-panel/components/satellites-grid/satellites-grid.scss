@@ -3,8 +3,9 @@
 .satellites-grid {
 	border: 1px solid $gray-text;
 	border-collapse: collapse;
-	width: 100%;
+	margin-bottom: 0.75rem;
 	text-align: center;
+	width: 100%;
 
 	td {
 		border: 1px solid $gray-text;
