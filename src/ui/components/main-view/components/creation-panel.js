@@ -13,8 +13,13 @@ const CreationPanel = ({ className }) => (
                 hidden={!store.viewSettings.showOrbitCreationPanel}
             >
                 <Field>
-                    <FieldLabel>Create Orbit</FieldLabel>
+                    <FieldLabel>Create orbit</FieldLabel>
                     <PanelButton id="createOrbit">Create</PanelButton>
+                </Field>
+                <Field>
+                    <FieldLabel>Import</FieldLabel>
+                    <input type="text" id="dump" style={{width: '150px'}}/>
+                    <PanelButton id="importOrbit">Load</PanelButton>
                 </Field>
             </Panel>
         )}

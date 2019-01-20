@@ -8,6 +8,7 @@ import CreationPanel from "./components/creation-panel";
 import TransferCalculationPanel from "./components/transfer-calculation-panel";
 import MetricsPanel from "./components/metrics-panel";
 import ManeuverPanel from "./components/maneuver-panel";
+import DynamicTrajectoryPanel from "./components/dynamic-trajectory-panel";
 import SatelliteSearchPanel from "./components/satellite-search-panel";
 import "./main-view.scss";
 
@@ -22,6 +23,7 @@ const MainView = ({ className }) => {
             </SideBar>
             <SideBar className="main-view__right-side-bar" right>
                 <MetricsPanel />
+                <DynamicTrajectoryPanel />
             </SideBar>
             <SatelliteSearchPanel className="main-view__satellite-search-panel" />
             <BottomPanel className="main-view__bottom-panel" />

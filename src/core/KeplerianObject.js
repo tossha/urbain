@@ -29,6 +29,19 @@ export default class KeplerianObject
         return new KeplerianObject(this._ecc, this._sma, this._aop, this._inc, this._raan, this.m0, this._epoch, this._mu, false);
     }
 
+    dump() {
+        return {
+            ecc: this._ecc,
+            sma: this._sma,
+            aop: this._aop,
+            inc: this._inc,
+            loan: this._raan,
+            m0: this.m0,
+            epoch: this._epoch,
+            mu: this._mu
+        }
+    }
+
     updateMeanMotion() {
         this.meanMotion = Math.sqrt(this._mu / Math.abs(this._sma)) / Math.abs(this._sma);
     }

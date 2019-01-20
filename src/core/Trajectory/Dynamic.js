@@ -15,6 +15,30 @@ export default class TrajectoryDynamic extends TrajectoryComposite
         this.updateHandlers = [];
     }
 
+    dump() {
+        let dumpObj = {
+            components: [],
+            events: [],
+            visualModel: this.visualModel.config,
+            minEpoch: this.minEpoch,
+            maxEpoch: this.maxEpoch,
+        };
+        for (let component of this.components) {
+            dumpObj.components.push(component.dump());
+        }
+        for (let flightEvent of this.flightEvents) {
+            if (flightEvent instanceof FlightEventImpulsiveBurn) {
+                dumpObj.events.push({
+                    epoch: flightEvent._epoch,
+                    x: flightEvent._vector[0],
+                    y: flightEvent._vector[1],
+                    z: flightEvent._vector[2],
+                });
+            }
+        }
+        return dumpObj;
+    }
+
     /**
      *
      * @param trajectory {TrajectoryAbstract}
