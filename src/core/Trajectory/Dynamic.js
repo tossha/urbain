@@ -15,6 +15,30 @@ export default class TrajectoryDynamic extends TrajectoryComposite
         this.updateHandlers = [];
     }
 
+    dump() {
+        let dumpObj = {
+            components: [],
+            events: [],
+            visualModel: this.visualModel.config,
+            minEpoch: this.minEpoch,
+            maxEpoch: this.maxEpoch,
+        };
+        for (let component of this.components) {
+            dumpObj.components.push(component.dump());
+        }
+        for (let flightEvent of this.flightEvents) {
+            if (flightEvent instanceof FlightEventImpulsiveBurn) {
+                dumpObj.events.push({
+                    epoch: flightEvent._epoch,
+                    x: flightEvent._vector[0],
+                    y: flightEvent._vector[1],
+                    z: flightEvent._vector[2],
+                });
+            }
+        }
+        return dumpObj;
+    }
+
     /**
      *
      * @param trajectory {TrajectoryAbstract}
@@ -32,15 +56,18 @@ export default class TrajectoryDynamic extends TrajectoryComposite
                 pointEpoch,
                 new Vector([0, 0, 0])
             )).onUpdate((newEvent, oldEvent) => {
-                this.sortManeuvers();
+                this.sortFlightEvents();
                 this.propagate(Math.min(oldEvent.epoch, newEvent.epoch));
             }));
             this.updateHandlers.map(h => h(this));
         });
     }
 
-    sortManeuvers() {
-        this.flightEvents.sort((e1, e2) => (e1.epoch < e2.epoch) ? -1 : (e1.epoch > e2.epoch ? 1 : 0));
+    removeFlightEvent(flightEvent) {
+        super.removeFlightEvent(flightEvent);
+        if (flightEvent instanceof FlightEventImpulsiveBurn) {
+            this.propagator.propagate(this, flightEvent.epoch);
+        }
     }
 
     propagate(startEpoch) {

@@ -52,8 +52,8 @@ export default class TrajectoryComposite extends TrajectoryAbstract
         return this.getComponentByEpoch(epoch).getStateByEpoch(epoch, referenceFrameOrId, frameEpoch);
     }
 
-    getComponentByEpoch(epoch) {
-        if (this.lastUsedTrajectory
+    getComponentByEpoch(epoch, noCache) {
+        if (!noCache && this.lastUsedTrajectory
             && (this.lastUsedTrajectory.minEpoch === false || this.lastUsedTrajectory.minEpoch <= epoch)
             && (this.lastUsedTrajectory.maxEpoch === false || this.lastUsedTrajectory.maxEpoch >= epoch)
         ) {

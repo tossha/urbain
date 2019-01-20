@@ -42,12 +42,23 @@ export default class EventHandler
             return;
         }
 
-        const highestPriority = list.reduce((val, a) => Math.max(val, a.priority), list[0].priority);
+        let highestPriority = list.reduce((val, a) => Math.max(val, a.priority), list[0].priority);
 
-        for (const listener of list) {
-            if (listener.priority === highestPriority) {
-                listener.handler(eventObject);
+        let nextPriority = true;
+        let handlersLeft = list.length;
+
+        while (nextPriority && handlersLeft > 0) {
+            handlersLeft = 0;
+            for (const listener of list) {
+                if (listener.priority === highestPriority) {
+                    if (listener.handler(eventObject) !== true) {
+                        nextPriority = false;
+                    }
+                } else if (listener.priority < highestPriority) {
+                    handlersLeft++;
+                }
             }
+            highestPriority--;
         }
     }
 }

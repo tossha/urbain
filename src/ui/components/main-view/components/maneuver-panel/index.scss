@@ -14,9 +14,16 @@
             margin-left: $default-gap-size / 2;
         }
     }
+
     &__buttons {
         display: flex;
         flex-grow: 1;
         justify-content: flex-end;
+    }
+
+    &__remove-button {
+        border-radius: 2px;
+        background: #3e2d33 !important;
+        margin-left: 15px;
     }
 }

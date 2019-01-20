@@ -95,6 +95,18 @@ export default class TrajectoryAbstract
         this.visualModel && this.visualModel.addFlightEvent(flightEvent);
     }
 
+    removeFlightEvent(flightEvent) {
+        let idx = this.flightEvents.indexOf(flightEvent);
+        if (idx !== -1) {
+            this.flightEvents.splice(idx, 1);
+        }
+        this.visualModel && this.visualModel.removeFlightEvent(flightEvent);
+    }
+
+    sortFlightEvents() {
+        this.flightEvents.sort((e1, e2) => (e1.epoch < e2.epoch) ? -1 : (e1.epoch > e2.epoch ? 1 : 0));
+    }
+
     clearAfterEpoch(epoch) {
         let newEvents = [];
         for (let event of this.flightEvents) {

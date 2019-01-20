@@ -13,6 +13,9 @@ const ManeuverPanel = ({ className }) => (
                         Prev burn
                     </Button>
                     <FieldLabel id="burn-name" />
+                    <button className="maneuver-panel__remove-button" type="button" id="remove-burn">
+                        remove
+                    </button>
                     <Button className="maneuver-panel__button" id="next-burn">
                         Next burn
                     </Button>
@@ -50,6 +53,14 @@ const ManeuverPanel = ({ className }) => (
                 <Field>
                     <FieldLabel>Date</FieldLabel>
                     <FieldControl id="burn-date" />
+                    <span className="maneuver-panel__buttons">
+                        <Button className="maneuver-panel__button" id="period-minus">
+                            -P
+                        </Button>
+                        <Button className="maneuver-panel__button" id="period-plus">
+                            +P
+                        </Button>
+                    </span>
                 </Field>
                 <Field centered>
                     <FieldLabel>Epoch</FieldLabel>

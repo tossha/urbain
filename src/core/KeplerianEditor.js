@@ -29,7 +29,9 @@ export default class KeplerianEditor
             referenceFrame,
             position,
             new Constant(new Quaternion()),
-            new FunctionOfEpochCustom(epoch => this.trajectory.getKeplerianObjectByEpoch(epoch).raan),
+            this.isEditMode
+                ? new Constant(this.trajectory.raan)
+                : new FunctionOfEpochCustom(epoch => this.trajectory.getKeplerianObjectByEpoch(epoch).raan),
             this.colorRaan,
             1.5,
             this.isEditMode ? VisualAngle.TYPE_SECTOR : VisualAngle.TYPE_ARC,
@@ -45,7 +47,9 @@ export default class KeplerianEditor
                 return (new Quaternion(new Vector([0,0,1]), ko.raan + Math.PI / 2))
                     .mul_(new Quaternion(new Vector([1,0,0]), Math.PI / 2));
             }),
-            new FunctionOfEpochCustom(epoch => this.trajectory.getKeplerianObjectByEpoch(epoch).inc),
+            this.isEditMode
+                ? new Constant(this.trajectory.inc)
+                : new FunctionOfEpochCustom(epoch => this.trajectory.getKeplerianObjectByEpoch(epoch).inc),
             this.colorInc,
             2,
             this.isEditMode ? VisualAngle.TYPE_SECTOR : VisualAngle.TYPE_ARC,
@@ -62,7 +66,9 @@ export default class KeplerianEditor
                 return (new Quaternion(new Vector([0,0,1]), ko.raan))
                     .mul_(new Quaternion(new Vector([1,0,0]), ko.inc));
             }),
-            new FunctionOfEpochCustom(epoch => this.trajectory.getKeplerianObjectByEpoch(epoch).aop),
+            this.isEditMode
+                ? new Constant(this.trajectory.aop)
+                : new FunctionOfEpochCustom(epoch => this.trajectory.getKeplerianObjectByEpoch(epoch).aop),
             this.colorAop,
             2.5,
             this.isEditMode ? VisualAngle.TYPE_SECTOR : VisualAngle.TYPE_ARC,

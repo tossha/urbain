@@ -7,6 +7,16 @@ export default class TrajectoryKeplerianBasic extends TrajectoryKeplerianAbstrac
         this.keplerianObject = keplerianObject;
     }
 
+    dump() {
+        return {
+            referenceFrame: this.referenceFrame.id,
+            keplerianObject: this.keplerianObject.dump(),
+            visualModel: this.visualModel.config,
+            minEpoch: this.minEpoch,
+            maxEpoch: this.maxEpoch,
+        };
+    }
+
     onUpdate(callback) {
         this.keplerianObject.setUpdateCallback(() => callback(this));
         return this;

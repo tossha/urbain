@@ -61,8 +61,8 @@ export default class ModuleKSP extends Module
             || (scaleType === "hour")
             || (scaleType === "threeHours")
         ) {
-            let string = '' + Math.floor(date / 9201600) + 'y';
-            string += ' ' + ('' + Math.floor((date % 9201600) / 21600)).padStart(3, '0') + 'd';
+            let string = '' + (Math.floor(date / 9201600)+1) + 'y';
+            string += ' ' + ('' + (Math.floor((date % 9201600) / 21600)+1)).padStart(3, '0') + 'd';
             string += ' ' + ('' + Math.floor((date % 21600) / 3600)).padStart(2, '0');
             string += ':' + ('' + Math.floor((date % 3600) / 60)).padStart(2, '0');
             return string;
@@ -72,21 +72,21 @@ export default class ModuleKSP extends Module
             || (scaleType === "thirtyDays")
             || (scaleType === "hundredDays")
         ) {
-            let string = '' + Math.floor(date / 9201600) + 'y';
-            string += ' ' + ('' + Math.floor((date % 9201600) / 21600)).padStart(3, '0') + 'd';
+            let string = '' + (Math.floor(date / 9201600)+1) + 'y';
+            string += ' ' + ('' + (Math.floor((date % 9201600) / 21600)+1)).padStart(3, '0') + 'd';
             return string;
         } else if ((scaleType === "year")
             || (scaleType === "fiveYears")
             || (scaleType === "twentyYears")
         ) {
-            return '' + Math.floor(date / 9201600) + 'y';
+            return '' + (Math.floor(date / 9201600)+1) + 'y';
         }
         return null;
     }
 
     static formatDateFull(date) {
-        let string = '' + Math.floor(date / 9201600) + 'y';
-        string += ' ' + ('' + Math.floor((date % 9201600) / 21600)).padStart(3, '0') + 'd';
+        let string = '' + (Math.floor(date / 9201600)+1) + 'y';
+        string += ' ' + ('' + (Math.floor((date % 9201600) / 21600)+1)).padStart(3, '0') + 'd';
         string += ' ' + ('' + Math.floor((date % 21600) / 3600)).padStart(2, '0');
         string += ':' + ('' + Math.floor((date % 3600) / 60)).padStart(2, '0');
         string += ':' + ('' + Math.round(date % 60)).padStart(2, '0');
