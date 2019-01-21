@@ -1,17 +1,13 @@
 @import "~simplebar/dist/simplebar.css";
 @import "../variables";
 
-$urbain-simplebar-scroll-size: 0.5rem;
+$urbain-simplebar-scroll-size: 0.4rem;
 
 .simplebar-track {
-	background-color: $gray;
-	border-radius: $urbain-simplebar-scroll-size / 2;
-
 	&.horizontal {
 		height: $urbain-simplebar-scroll-size;
 
 		.simplebar-scrollbar {
-			bottom: 0;
 			height: $urbain-simplebar-scroll-size;
 		}
 	}
@@ -20,7 +16,6 @@ $urbain-simplebar-scroll-size: 0.5rem;
 		width: $urbain-simplebar-scroll-size;
 
 		.simplebar-scrollbar {
-			right: 0;
 			width: $urbain-simplebar-scroll-size;
 		}
 	}
@@ -30,22 +25,12 @@ $urbain-simplebar-scroll-size: 0.5rem;
 	$bg-color: $black-border;
 
 	background-color: $bg-color;
-	border-radius: $urbain-simplebar-scroll-size / 2;
+	border-radius: $urbain-simplebar-scroll-size;
 	opacity: 1;
 
 	&:hover {
 		background-color: $bg-color;
 		opacity: 1;
-	}
-
-	&::before {
-		background-color: $bg-color;
-		opacity: 1;
-
-
-		&:hover {
-			background-color: $bg-color;
-		}
 	}
 }
 
