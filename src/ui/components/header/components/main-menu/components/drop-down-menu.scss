@@ -65,8 +65,8 @@
 
 	&__caret {
 		color: $gray-text;
-		font-size: 10px;
-		margin-left: $default-gap-size;
-		margin-top: 2px;
+		margin-left: $default-gap-size / 4;
+		height: 1.8rem;
+		width: 1.8rem;
 	}
 }

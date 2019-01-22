@@ -1,8 +1,8 @@
 import React from "react";
 import PropTypes from "prop-types";
 import cn from "classnames";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 
+import DropdownIcon from "../logos/dropdown-icon";
 import Button from "../button";
 import "./index.scss";
 
@@ -14,7 +14,7 @@ function ExpandButton({ className, onClick, expanded = false }) {
             })}
             onClick={onClick}
         >
-            <FontAwesomeIcon className="expand-button__icon" icon="chevron-down" />
+            <DropdownIcon className="expand-button__icon" />
         </Button>
     );
 }

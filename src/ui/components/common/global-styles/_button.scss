@@ -11,9 +11,7 @@
 
 	&:hover,
 	&:active {
-		&:not(:disabled) {
-			background-color: $gray;
-		}
+		background-color: $gray;
 	}
 
 	&:disabled {
