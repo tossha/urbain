@@ -49,6 +49,7 @@ class ProgressButton extends React.Component {
 
     render() {
         const { className, children, disabled, id } = this.props;
+
         return (
             <Button id={id} className={`progress-button ${className}`} disabled={disabled} onClick={this._handleClick}>
                 {this.state.loading ? <PreLoader /> : children}

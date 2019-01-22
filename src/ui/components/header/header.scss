@@ -3,7 +3,7 @@
 .header {
 	align-items: center;
 	display: flex;
-	height: 47px;
+	height: $header-height;
 
 	&__logo-wrapper {
 		background: $dark-gray;

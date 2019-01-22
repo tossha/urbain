@@ -1,4 +1,5 @@
 @import "global-styles/global";
+@import "z-index";
 
 .app-layout {
 	color: $white-text;
@@ -12,7 +13,8 @@
 		position: fixed;
 		top: 8px;
 		left: 8px;
-		z-index: 99999;
+
+		@include z-index(fixed-header);
 	}
 
 	&__main {
