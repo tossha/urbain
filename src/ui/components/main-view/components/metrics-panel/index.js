@@ -1,5 +1,5 @@
 import React from "react";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { ReactComponent as BarsIcon } from "../../../common/images/menu.svg";
 
 import Panel, { FieldSet, Field, FieldLabel, FieldControl, Dimension } from "../../../common/panel";
 import KeplerianView from "./components/keplerian-view";
@@ -11,7 +11,7 @@ const MetricsPanel = () => (
         id="metricsPanel"
         className="metrics-panel"
         caption="Metrics"
-        titleIcon={<FontAwesomeIcon icon="bars" />}
+        titleIcon={<BarsIcon className="metrics-panel__icon" />}
         collapseDirection="right"
     >
         <div className="metrics-panel__content">

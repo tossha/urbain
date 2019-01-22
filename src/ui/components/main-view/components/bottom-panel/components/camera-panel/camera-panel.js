@@ -1,5 +1,5 @@
 import React from "react";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { ReactComponent as FullscreenIcon } from "../../../../../common/images/fullscreen.svg";
 
 import Panel, { Field, FieldLabel, FieldControl } from "../../../../../common/panel";
 import "./camera-panel.scss";
@@ -9,7 +9,7 @@ const CameraPanel = ({ className }) => (
         id="cameraPanel"
         className={`camera-panel ${className}`}
         caption="Camera"
-        titleIcon={<FontAwesomeIcon icon="expand" />}
+        titleIcon={<FullscreenIcon className="camera-panel__icon" />}
         collapseDirection="right"
     >
         <Field className="camera-panel__field">

@@ -55,7 +55,13 @@
 	}
 
 	&__menu-item-icon {
-		min-width: 35px;
+		height: 20px;
+		padding-right: 1rem;
+		margin-top: -0.3rem;
+
+		&--unchecked {
+			fill: transparent;
+		}
 	}
 
 	&__toggler {

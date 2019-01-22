@@ -1,13 +1,11 @@
 import React from "react";
 import ReactDOM from "react-dom";
 
-import { configureLibs } from "./libs";
 import { RootContext, Store } from "./store";
 import { createStatsBadge } from "./components/statistics-badge";
 import { createServices } from "./services";
 import AppComponent from "./app";
 
-configureLibs();
 const statsBadge = createStatsBadge();
 const webApiServices = createServices();
 

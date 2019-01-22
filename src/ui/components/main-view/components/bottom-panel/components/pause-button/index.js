@@ -1,8 +1,9 @@
 import React, { Component } from "react";
 import PropTypes from "prop-types";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import cn from "classnames";
 
+import { ReactComponent as PlayIcon } from "../../../../../common/images/play.svg";
+import { ReactComponent as PauseIcon } from "../../../../../common/images/pause.svg";
 import { sim, Events } from "../../../../../../../core/index";
 import "./index.scss";
 
@@ -50,9 +51,7 @@ class PauseButton extends Component {
                 )}
                 onClick={this.handleClick}
             >
-                <div>
-                    <FontAwesomeIcon className="pause-button__icon" icon={isTimeRunning ? "pause" : "play"} />
-                </div>
+                <div>{isTimeRunning ? <PauseIcon /> : <PlayIcon />}</div>
                 <div>{isTimeRunning ? "Pause" : "Resume"}</div>
             </div>
         );
