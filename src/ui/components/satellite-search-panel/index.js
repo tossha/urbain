@@ -4,13 +4,11 @@ import cn from "classnames";
 
 import { createSimplebar } from "../common/simplebar";
 import { RootContext } from "../../store";
-import Panel, { FieldSet, Field } from "../common/panel/index";
 import SatellitesGrid from "./components/satellites-grid/satellites-grid";
-
 import Searcher from "./components/searcher";
+import Dialog from "../common/dialog";
+
 import "./index.scss";
-import ExpandButton from "../common/expand-button";
-import FilterBar from "./components/filter-bar";
 
 class SatelliteSearchPanel extends React.Component {
     static contextType = RootContext;
@@ -40,7 +38,7 @@ class SatelliteSearchPanel extends React.Component {
         }
     }
 
-    _searchSatellitesByName = async ({ name }) => {
+    _searchSatellitesByName = async name => {
         const { satelliteFinder } = this.context.webApiServices;
 
         try {
@@ -70,62 +68,57 @@ class SatelliteSearchPanel extends React.Component {
         }
     };
 
-    _handleFilterBarToggle = () => {
-        this.setState(({ filterBarVisible }) => ({ filterBarVisible: !filterBarVisible }));
+    _handleClose = () => {
+        const { store, updateStore } = this.context;
+
+        store.viewSettings.satelliteSearchPanel.toggle();
+        updateStore(store);
     };
+
+    _renderOption = satellite => (
+        <div className="satellite-option">
+            <span className="satellite-option__norad-id">{satellite.noradId}</span>
+            <span className="satellite-option__name">{satellite.name}</span>
+            <span className="satellite-option__launch-date">{satellite.launchDate}</span>
+        </div>
+    );
 
     render() {
         const { className } = this.props;
-        const { satellites, filterBarVisible } = this.state;
-        const { store, webApiServices } = this.context;
-        const { showSatelliteSearchPanel } = store.viewSettings;
+        const { satellites } = this.state;
+        const { store } = this.context;
+        const { isVisible } = store.viewSettings.satelliteSearchPanel;
 
         return (
-            <Panel
+            <Dialog
                 className={cn("satellite-search-panel", className)}
                 caption="Satellite search panel"
-                hidden={!showSatelliteSearchPanel}
-                collapseDirection="right"
+                isOpen={isVisible}
+                onClose={this._handleClose}
             >
-                <Field leftAligned>
-                    <Searcher
-                        className="satellite-search-panel__searcher"
-                        onSearchSatellitesByName={this._searchSatellitesByName}
-                        onSearch={this._handleSearch}
-                    />
-                </Field>
-                <FieldSet>
-                    <Field className="panel__field-header" centered>
-                        Extended Filters
-                        <ExpandButton
-                            className="cartesian-vector-view__expand-button"
-                            expanded={filterBarVisible}
-                            onClick={this._handleFilterBarToggle}
-                        />
-                    </Field>
-                    {filterBarVisible && (
-                        <Field>
-                            <FilterBar satelliteFinder={webApiServices.satelliteFinder} />
-                        </Field>
-                    )}
-                </FieldSet>
+                <Searcher
+                    className="satellite-search-panel__searcher"
+                    placeholder="Start typing satellite name ..."
+                    onSource={this._searchSatellitesByName}
+                    onSearch={this._handleSearch}
+                    renderOption={this._renderOption}
+                />
                 {satellites.length > 0 && (
-                    <FieldSet>
-                        <Field className="panel__field-header">Satellites</Field>
-                        <Field>
-                            <div className="satellites-grid-container" ref={this._containerRef}>
-                                <div className="satellites-grid-wrapper">
-                                    <SatellitesGrid
-                                        satellites={satellites}
-                                        onSatelliteLoad={store.loadSatellite}
-                                        onSatelliteUnload={store.unloadSatellite}
-                                    />
-                                </div>
-                            </div>
-                        </Field>
-                    </FieldSet>
+                    <div className="satellite-search-panel__satellites satellites">
+                        <div className="satellites__header">
+                            Satellites
+                            <span className="satellites__header-line" />
+                        </div>
+                        <div className="satellites__grid" ref={this._containerRef}>
+                            <SatellitesGrid
+                                satellites={satellites}
+                                onSatelliteLoad={store.loadSatellite}
+                                onSatelliteUnload={store.unloadSatellite}
+                            />
+                        </div>
+                    </div>
                 )}
-            </Panel>
+            </Dialog>
         );
     }
 }

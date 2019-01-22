@@ -5,14 +5,51 @@
 	&__searcher {
 		width: 100%;
 	}
+
+	&__satellites {
+		margin-top: 2 * $default-gap-size;
+	}
 }
 
-.satellites-grid-container {
-	max-height: 35rem;
-	overflow: auto;
-	width: 100%;
+.satellites {
+	&__header {
+		color: $blue-text;
+		display: flex;
+		justify-content: space-between;
+		margin-bottom: $default-gap-size;
+	}
+
+	&__header-line {
+		align-self: center;
+		border-bottom: 1px solid $gray-text;
+		flex-grow: 1;
+		margin-left: $default-gap-size;
+	}
+
+	&__grid {
+		max-height: 35rem;
+		overflow: auto;
+		width: 100%;
+	}
 }
 
-.satellites-grid-wrapper {
-	padding-right: 1rem;
+.satellite-option {
+	display: flex;
+	justify-content: space-between;
+
+	&__norad-id {
+		border: 1px solid $gray;
+		color: $gray-text;
+		padding: $default-gap-size / 4;
+	}
+
+	&__name {
+		flex-grow: 1;
+		margin-left: $default-gap-size;
+		text-decoration: underline;
+	}
+
+	&__launch-date {
+		margin-left: $default-gap-size;
+	}
 }

@@ -61,7 +61,12 @@ class Store {
         showBodyLabels: true,
         showOrbitCreationPanel: false,
         showTransferCalculationPanel: false,
-        showSatelliteSearchPanel: false,
+        satelliteSearchPanel: {
+            isVisible: false,
+            toggle() {
+                this.isVisible = !this.isVisible;
+            },
+        },
     };
 
     topMenu = [
@@ -100,9 +105,9 @@ class Store {
             },
             {
                 label: "Satellite search panel",
-                selected: this.viewSettings.showSatelliteSearchPanel,
-                onUpdate: ({ selected }) => {
-                    this.viewSettings.showSatelliteSearchPanel = selected;
+                selected: this.viewSettings.satelliteSearchPanel.isVisible,
+                onUpdate: () => {
+                    this.viewSettings.satelliteSearchPanel.toggle();
                 },
             },
         ]),

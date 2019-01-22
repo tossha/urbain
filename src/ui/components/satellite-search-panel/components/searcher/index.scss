@@ -1,54 +1,39 @@
 @import "../../../common/variables";
 
 .searcher {
-	align-items: center;
+	$border-style: 1px solid $dialog-border-color;
+
+	align-items: stretch;
+	border: $border-style;
 	display: flex;
 	justify-content: space-between;
+	height: 25px;
 
 	&__autocomplete {
 		flex-grow: 1;
+		height: 100%;
+		position: relative;
 	}
 
-	&__autocomplete-label {
-		margin-bottom: $default-gap-size / 2;
+	&__autocomplete-search-logo {
+		fill: $gray-text;
+		margin-left: 0.5rem;
+		position: absolute;
+		width: 1.5rem;
+		z-index: 2;
 	}
 
-	&__input {
-		width: 100%;
-		height: 20px;
+	&__autocomplete-input {
+		.react-autosuggest__input {
+			padding-left: 2.5rem;
+		}
 	}
 
 	&__search-button {
-		padding-left: 10px;
-		padding-right: 10px;
-	}
-
-	&__search-button-wrapper {
-		margin: 0 $default-gap-size;
-	}
-
-	&__column {
-		margin: 0 $default-gap-size;
-	}
-}
-
-.satellite-option {
-	display: flex;
-	justify-content: space-between;
-
-	&__norad-id {
-		border: 1px solid $gray;
-		color: $gray-text;
-		padding: $default-gap-size / 4;
-	}
-
-	&__name {
-		flex-grow: 1;
-		margin-left: $default-gap-size;
-		text-decoration: underline;
-	}
-
-	&__launch-date {
-		margin-left: $default-gap-size;
+		border-left: $border-style;
+		border-radius: 0;
+		font-size: 1.2rem;
+		height: 100%;
+		padding: 0 2 * $default-gap-size;
 	}
 }

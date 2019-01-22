@@ -30,7 +30,7 @@ const MainView = ({ className }) => {
                         <MetricsPanel />
                         <DynamicTrajectoryPanel />
                     </SideBar>
-                    {store.viewSettings.showSatelliteSearchPanel ? (
+                    {store.viewSettings.satelliteSearchPanel.isVisible ? (
                         <Suspense fallback={<div />}>
                             <SatelliteSearchPanel className="main-view__satellite-search-panel" />
                         </Suspense>

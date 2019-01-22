@@ -17,25 +17,27 @@ class SatellitesGrid extends React.Component {
             <table className="satellites-grid">
                 <thead className="satellites-grid__head">
                     <tr>
-                        <th className="satellites-grid__pos-column">#</th>
-                        <th className="satellites-grid__id-column">ID</th>
-                        <th className="satellites-grid__name-column">Name</th>
-                        <th className="satellites-grid__designator-column">Designator</th>
-                        <th className="satellites-grid__launch-date-column">Launch date</th>
+                        <th>#</th>
+                        <th>ID</th>
+                        <th>Name</th>
+                        <th>Launch date</th>
+                        <th>Designator</th>
+                        <th>Decay date</th>
                         <th className="satellites-grid__command-column" />
                     </tr>
                 </thead>
                 <tbody>
                     {this.props.satellites.map((satellite, index) => {
-                        const { noradId, name, launchDate, intlDes } = satellite;
+                        const { noradId, name, launchDate, intlDes, decayDate } = satellite;
 
                         return (
                             <tr key={noradId}>
                                 <td>{index + 1}</td>
                                 <td>{noradId}</td>
                                 <td>{name}</td>
-                                <td>{intlDes}</td>
                                 <td>{launchDate}</td>
+                                <td>{intlDes}</td>
+                                <td>{decayDate === "0000-00-00" ? "-" : decayDate}</td>
                                 <td className="satellites-grid__command-column">
                                     <ActionButton
                                         className="satellites-grid__action-button"

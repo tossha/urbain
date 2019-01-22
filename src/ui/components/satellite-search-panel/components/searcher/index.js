@@ -2,7 +2,8 @@ import React from "react";
 import PropTypes from "prop-types";
 
 import ProgressButton from "../../../common/progress-button";
-import Autocomplete from "../../../common/autocomplete/async";
+import { AsyncAutocomplete } from "../../../common/autocomplete";
+import { ReactComponent as SearchLogo } from "../../../common/images/search.svg";
 
 import "./index.scss";
 
@@ -10,70 +11,65 @@ class Searcher extends React.Component {
     static propTypes = {
         className: PropTypes.string.isRequired,
         onSearch: PropTypes.func.isRequired,
-        onSearchSatellitesByName: PropTypes.func.isRequired,
+        onSource: PropTypes.func.isRequired,
+        renderOption: PropTypes.func,
+        placeholder: PropTypes.string,
+    };
+
+    static defaultTypes = {
+        placeholder: "",
+        renderOption: option => option,
     };
 
     state = {
-        name: "",
-        noradId: "",
-        launchDate: "",
+        query: "",
     };
 
-    get _isFilterValid() {
-        return Boolean(this.state.noradId) || Boolean(this.state.launchDate) || Boolean(this.state.name); // TODO: Add a few more validation rules
+    get query() {
+        return this.state.query.trim();
     }
 
-    _handleSearch = async () => {
-        const { noradId, name, launchDate } = this.state;
-
-        return this.props.onSearch({ noradId, name, launchDate });
+    _handleSelect = option => {
+        return this.props.onSearch({ name: option.name });
     };
 
-    _handleSearchSatellitesByName = token => {
-        return this.props.onSearchSatellitesByName({ name: token });
+    _handleSearch = () => {
+        return this.props.onSearch({ name: this.query });
     };
 
-    _handleSatelliteSelect = ({ noradId, name, launchDate }) => {
-        this.setState({ name /* noradId,  launchDate */ });
+    _handleSource = query => {
+        return this.props.onSource(query);
     };
 
-    _handleSatelliteNameChange = name => {
-        this.setState({ name });
+    _handleTyping = query => {
+        this.setState({ query });
     };
-
-    _renderOption = satellite => (
-        <div className="satellite-option">
-            <span className="satellite-option__norad-id">{satellite.noradId}</span>
-            <span className="satellite-option__name">{satellite.name}</span>
-            <span className="satellite-option__launch-date">{satellite.launchDate}</span>
-        </div>
-    );
 
     render() {
-        const { className } = this.props;
+        const { className, placeholder, renderOption } = this.props;
 
         return (
             <div className={`searcher ${className}`}>
-                <label className="searcher__autocomplete">
-                    <Autocomplete
-                        className="searcher__input"
-                        placeholder="Start typing satellite name ..."
-                        onFetchOptions={this._handleSearchSatellitesByName}
+                <div className="searcher__autocomplete">
+                    <SearchLogo className="searcher__autocomplete-search-logo" />
+                    <AsyncAutocomplete
+                        className="searcher__autocomplete-input"
+                        placeholder={placeholder}
+                        onFetchOptions={this._handleSource}
                         mapValue={satellite => satellite.name}
-                        renderOption={this._renderOption}
-                        onSelect={this._handleSatelliteSelect}
-                        onChange={this._handleSatelliteNameChange}
+                        renderOption={renderOption}
+                        onSelect={this._handleSelect}
+                        onChange={this._handleTyping}
+                        onSubmit={this._handleSearch}
                     />
-                </label>
-                <div className="searcher__search-button-wrapper">
-                    <ProgressButton
-                        className="searcher__search-button"
-                        disabled={!this._isFilterValid}
-                        onClick={this._handleSearch}
-                    >
-                        search
-                    </ProgressButton>
                 </div>
+                <ProgressButton
+                    className="searcher__search-button"
+                    disabled={!Boolean(this.query)}
+                    onClick={this._handleSearch}
+                >
+                    search
+                </ProgressButton>
             </div>
         );
     }
