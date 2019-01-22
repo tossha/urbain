@@ -18,7 +18,7 @@ const CreationPanel = ({ className }) => (
                 </Field>
                 <Field>
                     <FieldLabel>Import</FieldLabel>
-                    <input type="text" id="dump" style={{width: '150px'}}/>
+                    <input type="text" id="dump" style={{ width: "150px" }} />
                     <PanelButton id="importOrbit">Load</PanelButton>
                 </Field>
             </Panel>
