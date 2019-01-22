@@ -2,18 +2,24 @@
 
 .expand-button {
 	$b: &;
+	$size: 15px;
 
 	align-items: center;
 	background-color: $black;
-	font-size: 0.8rem;
 	display: flex;
 	justify-content: center;
 	cursor: pointer;
-	height: 15px;
-	width: 15px;
+	padding: 0;
+	height: $size;
+	width: $size;
 
 	&:hover {
 		background-color: $gray;
+	}
+
+	&__icon {
+		height: $size;
+		width: $size;
 	}
 
 	&--expanded {

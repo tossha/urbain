@@ -1,6 +1,9 @@
 import React from "react";
 import PropTypes from "prop-types";
-import ReactSelect, { components } from "react-select";
+import ReactSelect from "react-select";
+import cn from "classnames";
+
+import DropdownIndicator from "./components/dropdown-indicator";
 
 const DEFAULT = {
     background: "var(--black)",
@@ -46,55 +49,33 @@ const customSelectStyles = {
 
     singleValue: (base, state) => {
         const opacity = state.isDisabled ? 0.5 : 1;
-        const transition = "opacity 300ms";
 
         return {
             ...base,
-            color: DEFAULT.color,
             opacity,
-            transition,
+            color: DEFAULT.color,
         };
     },
-
-    dropdownIndicator: () => ({
-        padding: 0,
-        background: `url("/images/chevron-down-solid.svg") 0 0 no-repeat`,
-        marginRight: 5,
-        height: 10,
-        width: 10,
-    }),
 
     indicatorSeparator: () => ({
         display: "none",
     }),
 };
 
-const IndicatorsContainer = props => {
-    return components.IndicatorsContainer && <components.IndicatorsContainer {...props} />;
-};
-
-const DropdownIndicator = props => {
-    return (
-        components.DropdownIndicator && (
-            <components.DropdownIndicator {...props}>
-                <span />
-            </components.DropdownIndicator>
-        )
-    );
-};
-
 const Select = ({ id, className, options, value, onSelect = () => {} }) => {
+    const blockName = "select";
+
     return (
         <ReactSelect
             id={id}
-            className={className}
-            classNamePrefix="select"
+            className={cn(blockName, className)}
+            classNamePrefix={blockName}
             placeholder=""
             styles={customSelectStyles}
             isSearchable={false}
             options={options}
             defaultValue={value}
-            components={{ IndicatorsContainer, DropdownIndicator }}
+            components={{ DropdownIndicator }}
             onChange={onSelect}
         />
     );

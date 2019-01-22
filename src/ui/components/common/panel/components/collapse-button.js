@@ -3,7 +3,7 @@ import PropTypes from "prop-types";
 
 import Button from "../../button";
 import ArrowLogo from "../../logos/arrow-logo";
-import MaximizeLogo from "../../logos/maximize-logo";
+import { ReactComponent as MaximizeLogo } from "../../images/maximize.svg";
 
 const CollapseButton = ({ isCollapsed, onClick, isToRight = false, className = "", collapseDirection = "left" }) => (
     <Button className={className} onClick={onClick} small>

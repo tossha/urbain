@@ -1,6 +1,7 @@
 import React, { Component } from "react";
 import PropTypes from "prop-types";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import cn from "classnames";
+import { ReactComponent as CheckIcon } from "../../../../common/images/check.svg";
 
 class DropdownMenuItem extends Component {
     static propTypes = {
@@ -15,10 +16,13 @@ class DropdownMenuItem extends Component {
 
     render() {
         const { text, selected } = this.props;
+        const iconClass = cn("drop-down-menu__menu-item-icon", {
+            "drop-down-menu__menu-item-icon--unchecked": !selected,
+        });
 
         return (
             <li className="drop-down-menu__menu-item" onClick={this.handleClick}>
-                <span className="drop-down-menu__menu-item-icon">{selected && <FontAwesomeIcon icon="check" />}</span>
+                <CheckIcon className={iconClass} />
                 {text}
             </li>
         );

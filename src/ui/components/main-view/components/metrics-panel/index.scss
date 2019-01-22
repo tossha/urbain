@@ -4,6 +4,13 @@
 	min-width: 26rem;
 	margin-bottom: 10px;
 
+	&__icon {
+		height: 15px;
+		margin-left: -3px;
+		margin-bottom: -3px;
+		width: 15px;
+	}
+
 	&__content {
 		font-size: 1rem;
 

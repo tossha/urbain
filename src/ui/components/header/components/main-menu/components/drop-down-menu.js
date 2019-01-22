@@ -1,9 +1,10 @@
 import React, { Component } from "react";
 import PropTypes from "prop-types";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 
 import { RootContext } from "../../../../../store";
+import DropdownIcon from "../../../../common/logos/dropdown-icon";
 import DropDownMenuItem from "./drop-down-menu-item";
+
 import "./drop-down-menu.scss";
 
 class DropDownMenu extends Component {
@@ -42,7 +43,7 @@ class DropDownMenu extends Component {
                 <li>
                     <span className="drop-down-menu__toggler">
                         {text}
-                        {hasOptionsToShow && <FontAwesomeIcon className="drop-down-menu__caret" icon="chevron-down" />}
+                        {hasOptionsToShow && <DropdownIcon className="drop-down-menu__caret" />}
                     </span>
                     {hasOptionsToShow && (
                         <ul className="drop-down-menu__menu">
