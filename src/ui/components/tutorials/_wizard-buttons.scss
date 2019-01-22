@@ -25,7 +25,7 @@ $urbain-tutorial-wizard-button-normal: #3449bd;
 
 	&:hover,
 	&:active {
-		background-color: $button-bg-color-active;
+		background-color: $button-bg-color-active !important;
 	}
 }
 
@@ -39,7 +39,7 @@ $urbain-tutorial-wizard-button-normal: #3449bd;
 
 	&:hover,
 	&:active {
-		background-color: $white;
+		background-color: $white !important;
 		color: $button-bg-color-active;
 		border-color: $button-bg-color-active;
 	}
