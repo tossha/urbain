@@ -1,7 +1,9 @@
 @import "../variables";
+@import "../z-index";
 
 .react-autosuggest {
 	&__container {
+		height: 100%;
 		position: relative;
 	}
 
@@ -11,6 +13,7 @@
 		box-sizing: border-box;
 		color: $white;
 		font-size: 1.1rem;
+		height: 100%;
 		padding: 0.5rem $default-gap-size;
 		width: 100%;
 
@@ -30,7 +33,9 @@
 			display: block;
 			position: absolute;
 			border: 1px solid $black-border;
-			z-index: 2;
+			margin-top: 1px;
+
+			@include z-index(dropdown);
 		}
 	}
 
