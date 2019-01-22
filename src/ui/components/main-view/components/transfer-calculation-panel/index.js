@@ -1,12 +1,12 @@
 import React from "react";
 import cn from "classnames";
 
-import { Consumer } from "../../../../store";
+import { RootContext } from "../../../../store";
 import Panel, { Field, FieldSet, FieldLabel, FieldControl, PanelButton, Dimension } from "../../../common/panel";
 import "./index.scss";
 
 const TransferCalculationPanel = ({ className }) => (
-    <Consumer>
+    <RootContext.Consumer>
         {({ store }) => (
             <Panel
                 className={cn(className, "transfer-calculation-panel")}
@@ -79,7 +79,7 @@ const TransferCalculationPanel = ({ className }) => (
                 </FieldSet>
             </Panel>
         )}
-    </Consumer>
+    </RootContext.Consumer>
 );
 
 export default TransferCalculationPanel;

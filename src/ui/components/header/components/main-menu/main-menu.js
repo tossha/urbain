@@ -4,7 +4,7 @@ import cn from "classnames";
 import "./main-menu.scss";
 import DropDownMenu from "./components/drop-down-menu";
 import MenuLink from "./components/menu-link";
-import { Consumer, MenuItemType } from "../../../../store";
+import { RootContext, MenuItemType } from "../../../../store";
 
 function MainMenuItem({ menuItem, clickable }) {
     return (
@@ -20,13 +20,13 @@ function MainMenuItem({ menuItem, clickable }) {
 function MainMenu() {
     return (
         <nav className="main-menu">
-            <Consumer>
+            <RootContext.Consumer>
                 {({ store }) =>
                     store.topMenu.map(menuItem => (
                         <MainMenuItem key={menuItem.label} menuItem={menuItem} clickable={menuItem.isClickable} />
                     ))
                 }
-            </Consumer>
+            </RootContext.Consumer>
         </nav>
     );
 }

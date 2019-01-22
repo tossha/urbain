@@ -1,0 +1,38 @@
+@import "~simplebar/dist/simplebar.css";
+@import "../variables";
+
+$urbain-simplebar-scroll-size: 0.4rem;
+
+.simplebar-track {
+	&.horizontal {
+		height: $urbain-simplebar-scroll-size;
+
+		.simplebar-scrollbar {
+			height: $urbain-simplebar-scroll-size;
+		}
+	}
+
+	&.vertical {
+		width: $urbain-simplebar-scroll-size;
+
+		.simplebar-scrollbar {
+			width: $urbain-simplebar-scroll-size;
+		}
+	}
+}
+
+.simplebar-scrollbar {
+	$bg-color: $black-border;
+
+	background-color: $bg-color;
+	border-radius: $urbain-simplebar-scroll-size;
+	opacity: 1;
+
+	&:hover {
+		background-color: $bg-color;
+		opacity: 1;
+	}
+}
+
+
+

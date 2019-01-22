@@ -1,7 +1,7 @@
 import React, { Component } from "react";
 import Stats from "stats.js";
 
-import { Consumer } from "../../store/index";
+import { RootContext } from "../../store/index";
 import "./index.scss";
 
 class StatisticsBadge extends Component {
@@ -21,9 +21,9 @@ class StatisticsBadge extends Component {
 }
 
 export default () => (
-    <Consumer>
+    <RootContext.Consumer>
         {({ store, stats }) => (store.viewSettings.showStatistics ? <StatisticsBadge stats={stats} /> : null)}
-    </Consumer>
+    </RootContext.Consumer>
 );
 
 export function createStatsBadge() {

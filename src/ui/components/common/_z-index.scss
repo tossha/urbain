@@ -1,0 +1,12 @@
+$z-index: (
+	sidebar: 10,
+	dropdown: 100,
+	modal-dialog: 1001,
+	fixed-header: 99999,
+	header-sub-menu: 21000,
+	full-page-overlay: 99999999999,
+);
+
+@mixin z-index($z-index-position) {
+	z-index: #{map-get($z-index, $z-index-position)} !important;
+}

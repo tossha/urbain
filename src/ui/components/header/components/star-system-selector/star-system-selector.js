@@ -1,7 +1,7 @@
 import React from "react";
 import PropTypes from "prop-types";
 
-import { Consumer } from "../../../../store";
+import { RootContext } from "../../../../store";
 import Select, { optionPropTypes } from "../../../common/select/select";
 import "./star-system-selector.scss";
 
@@ -26,11 +26,11 @@ StarSystemSelector.propTypes = {
 };
 
 export default () => (
-    <Consumer>
+    <RootContext.Consumer>
         {({ store }) => {
             const { options, defaultValue, onSelect } = store.starSystemSelectorSettings;
 
             return <StarSystemSelector options={options} defaultValue={defaultValue} onSelect={onSelect} />;
         }}
-    </Consumer>
+    </RootContext.Consumer>
 );

@@ -1,6 +1,8 @@
 @import "../common/variables";
+@import "../common/z-index";
 
 .main-view {
+	display: flex;
 	position: relative;
 
 	&__bottom-panel {
@@ -10,12 +12,16 @@
 		pointer-events: none;
 		padding: 8px;
 		width: 100%;
+
+		@include z-index(sidebar);
 	}
 
 	&__left-side-bar {
 		position: absolute;
 		top: 65px;
 		width: 320px;
+
+		@include z-index(sidebar);
 	}
 
 	&__right-side-bar {
@@ -23,28 +29,50 @@
 		top: 65px;
 		right: 0;
 		width: 290px;
+
+		@include z-index(sidebar);
 	}
 
 	&__creation-panel {
 		margin-bottom: 10px;
+
+		@include z-index(sidebar);
 	}
 
 	&__maneuver-panel {
 		margin-bottom: 10px;
+
+		@include z-index(sidebar);
 	}
 
-	&__transfer-calculation-panel {}
+	&__transfer-calculation-panel {
+
+		@include z-index(sidebar);
+	}
 
 	&__satellite-search-panel {
-		max-width: calc(520px - #{$default-gap-size} * 2);
-		min-width: 400px;
-		top: $default-gap-size;
-		right: $default-gap-size;
+		left: 0;
+		margin: 0 auto;
+		max-width: 800px;
 		position: absolute;
+		right: 0;
+		top: $header-height + 2 * $default-gap-size;
+
+		@include z-index(modal-dialog);
 	}
 
 	&__viewport-container {
 		min-height: 100%;
 		width: 100%;
+	}
+
+	&__viewport-entry {
+		height: 100%;
+		width: 100%;
+
+		canvas {
+			height: 100%;
+			width: 100%;
+		}
 	}
 }
