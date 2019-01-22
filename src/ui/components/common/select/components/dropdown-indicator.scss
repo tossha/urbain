@@ -1,0 +1,15 @@
+@import "../../variables";
+
+.dropdown-indicator {
+	cursor: pointer;
+	padding: 0;
+
+	&:hover &__icon {
+		fill: $white-text;
+	}
+
+	&__icon {
+		fill: $gray-text;
+		width: 1.8rem;
+	}
+}
