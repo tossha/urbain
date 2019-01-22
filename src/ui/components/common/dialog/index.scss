@@ -1,0 +1,40 @@
+@import "../variables";
+@import "../z-index";
+
+.dialog {
+	background-color: $gray;
+	border: 1px solid #555;
+	display: none;
+
+	@include z-index(modal-dialog);
+
+	&--open {
+		display: block;
+	}
+
+	&__header {
+		display: flex;
+		justify-content: space-between;
+		padding: $default-gap-size / 2 $default-gap-size 0;
+	}
+
+	&__close-button {
+		color: $gray-text;
+		cursor: pointer;
+
+		&:hover {
+			color: $white-text;
+		}
+	}
+
+	&__close-button-icon {
+		$size: 1.25rem;
+
+		height: $size;
+		width: $size;
+	}
+
+	&__body {
+		padding: 2 / 3 * $default-gap-size;
+	}
+}
