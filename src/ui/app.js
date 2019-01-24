@@ -4,9 +4,10 @@ import { showWizard, wizardIds } from "./components/tutorials/index";
 import Header from "./components/header/header";
 import MainView from "./components/main-view/main-view";
 import Footer from "./components/footer/footer";
+import { config } from "../configuration";
 import "./components/common/app-layout.scss";
 
-const IS_FOOTER_VISIBLE = process.env.REACT_APP_IS_FOOTER_VISIBLE === "true";
+const IS_FOOTER_VISIBLE = config.isFooterVisible;
 
 class App extends React.Component {
     componentDidMount() {
