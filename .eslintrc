@@ -1,9 +1,11 @@
 {
   "extends": "react-app",
-  "env": {
-    "es6": true
+  "plugins": ["prettier"],
+  "parserOptions": {
+    "ecmaFeatures": {
+      "legacyDecorators": true
+    }
   },
-  "plugins": ["babel", "prettier", "react"],
   "rules": {
     "prettier/prettier": "error"
   }

@@ -4,9 +4,9 @@
   "description": "",
   "main": "src/index.js",
   "scripts": {
-    "start": "yarn && react-scripts start",
-    "build": "yarn && react-scripts build",
-    "test": "yarn && react-scripts test",
+    "start": "yarn && react-app-rewired start",
+    "build": "yarn && react-app-rewired build",
+    "test": "yarn && react-app-rewired test",
     "predeploy": "yarn run build",
     "deploy": "gh-pages -d build"
   },
@@ -41,12 +41,15 @@
     "three": "0.100.0"
   },
   "devDependencies": {
+    "@babel/plugin-proposal-decorators": "7.3.0",
+    "customize-cra": "0.2.10",
     "eslint-plugin-babel": "5.3.0",
     "eslint-plugin-prettier": "3.0.1",
     "gh-pages": "2.0.1",
     "node-sass": "4.11.0",
     "prettier": "1.16.1",
-    "prop-types": "15.6.2"
+    "prop-types": "15.6.2",
+    "react-app-rewired": "2.0.2"
   },
   "browserslist": [
     ">0.2%",

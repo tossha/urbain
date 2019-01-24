@@ -7,3 +7,4 @@ vendor/
 src/core/
 src/interface/
 src/ui-legacy/
+src/modules/
