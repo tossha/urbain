@@ -1,8 +1,8 @@
 import React from "react";
 import PropTypes from "prop-types";
 import Select from "../../../common/select/select";
-import SatelliteFinder from "../../../../services/satellite-finder/satellite-finder";
-import { FieldType } from "../../../../services/satellite-finder/api-config";
+import SatelliteFinder from "../../../../../application/services/satellite-finder/satellite-finder";
+import { FieldType } from "../../../../../application/services/satellite-finder/api-config";
 
 import "./index.scss";
 

@@ -1,7 +1,7 @@
 import React from "react";
 import PropTypes from "prop-types";
+import { inject } from "mobx-react";
 
-import { RootContext } from "../../../../store";
 import Select, { optionPropTypes } from "../../../common/select/select";
 import "./star-system-selector.scss";
 
@@ -25,12 +25,12 @@ StarSystemSelector.propTypes = {
     onSelect: PropTypes.func,
 };
 
-export default () => (
-    <RootContext.Consumer>
-        {({ store }) => {
-            const { options, defaultValue, onSelect } = store.starSystemSelectorSettings;
+export default inject(({ appStore }) => {
+    const { options, defaultValue, onSelect } = appStore.starSystemSelectorSettings;
 
-            return <StarSystemSelector options={options} defaultValue={defaultValue} onSelect={onSelect} />;
-        }}
-    </RootContext.Consumer>
-);
+    return {
+        options,
+        defaultValue,
+        onSelect,
+    };
+})(StarSystemSelector);

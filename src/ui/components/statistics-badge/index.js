@@ -1,7 +1,7 @@
 import React, { Component } from "react";
-import Stats from "stats.js";
+import { inject, observer } from "mobx-react";
 
-import { RootContext } from "../../store/index";
+import Stats from "stats.js";
 import "./index.scss";
 
 class StatisticsBadge extends Component {
@@ -20,10 +20,12 @@ class StatisticsBadge extends Component {
     }
 }
 
-export default () => (
-    <RootContext.Consumer>
-        {({ store, stats }) => (store.viewSettings.showStatistics ? <StatisticsBadge stats={stats} /> : null)}
-    </RootContext.Consumer>
+export default inject("appStore")(
+    observer(({ appStore }) => {
+        return appStore.visualObjects.statisticsBadge.isVisible ? (
+            <StatisticsBadge stats={appStore.visualObjects.statisticsBadge.meta} />
+        ) : null;
+    }),
 );
 
 export function createStatsBadge() {

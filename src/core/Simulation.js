@@ -1,9 +1,10 @@
 import * as THREE from "three";
 import $ from "jquery";
+import { computed, observable } from "mobx";
 import EventHandler from "./EventHandler";
-import {Vector} from "./algebra";
+import { Vector } from "./algebra";
 import Events from "./Events";
-import {ReferenceFrame} from "./ReferenceFrame/Factory";
+import ReferenceFrameFactory, { ReferenceFrame } from "./ReferenceFrame/Factory";
 import TimeLine from "../ui-legacy/TimeLine";
 import StarSystemLoader from "../interface/StarSystemLoader";
 import VisualRaycaster from "./visual/Raycaster";
@@ -11,24 +12,27 @@ import SelectionHandler from "../ui-legacy/SelectionHandler";
 import UI from "../ui-legacy/UI";
 import StarSystem from "./StarSystem";
 import Camera from "../ui-legacy/Camera";
-import ReferenceFrameFactory from "./ReferenceFrame/Factory";
 import StarSystemManager from "../interface/StarSystemManager";
 import VisualFlightEventImpulsiveBurn from "./visual/FlightEvent/ImpulsiveBurn";
 import VisualMarkerApocenter from "./visual/Marker/Apocenter";
 import VisualMarkerPericenter from "./visual/Marker/Pericenter";
 
-class Simulation
-{
+
+class Simulation {
     constructor() {
         this.modules = {};
         this.propagators = {};
         this.renderLoopActive = false;
         this.starSystemManager = new StarSystemManager();
-
-        this._initSettings();
     }
 
-    init(viewPortDomElement, renderLoopFunction) {
+    /**
+     * @param {AppModel} appModel
+     * @param {string} viewPortId
+     * @param renderLoopFunction
+     */
+    init(appModel, viewPortId, renderLoopFunction) {
+        this._appModel = appModel;
         this.renderLoopFunction = renderLoopFunction;
 
         this.scene = new THREE.Scene();
@@ -38,7 +42,7 @@ class Simulation
 
         this.renderer = new THREE.WebGLRenderer({antialias: true, logarithmicDepthBuffer: true});
 
-        this.domElement = viewPortDomElement;
+        this.domElement = document.getElementById(viewPortId);
         this._setRenderSize();
         this.domElement.appendChild(this.renderer.domElement);
         window.addEventListener("resize", this.onWindowResize.bind(this));
@@ -103,14 +107,12 @@ class Simulation
         return this.time.getDateByEpoch(this.time.epoch);
     }
 
-    forceEpoch(epoch) {
-        return this.time.forceEpoch(epoch);
-    }
+    get settings() {
+        const showBodyLabels = this._appModel ? this._appModel.visualObjects.bodyLabels.isVisible : true;
 
-    _initSettings() {
-        this.settings = {
+        return {
             ui: {
-                showBodyLabels: true,
+                showBodyLabels,
                 showAnglesOfSelectedOrbit: true,
                 camera: {
                     mouseSensitivity: 0.007,
@@ -118,6 +120,10 @@ class Simulation
                 }
             }
         }
+    };
+
+    forceEpoch(epoch) {
+        return this.time.forceEpoch(epoch);
     }
 
     addEventListener(eventName, listener, priority) {
@@ -153,6 +159,11 @@ class Simulation
         return (new Vector(visualCoords.toArray())).add_(this.camera.lastPosition);
     }
 
+    /**
+     * @param alias
+     * @param callback
+     * @return {Promise<T | never>}
+     */
     loadModule(alias, callback) {
         const className = 'Module' + alias;
 

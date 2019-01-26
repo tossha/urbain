@@ -1,15 +1,15 @@
 import React, { Component } from "react";
 import PropTypes from "prop-types";
+import { inject, observer } from "mobx-react";
 
-import { RootContext } from "../../../../../store";
+import { AppStore } from "../../../../../store";
 import DropdownIcon from "../../../../common/logos/dropdown-icon";
 import DropDownMenuItem from "./drop-down-menu-item";
-
 import "./drop-down-menu.scss";
 
+@inject("appStore")
+@observer
 class DropDownMenu extends Component {
-    static contextType = RootContext;
-
     static propTypes = {
         text: PropTypes.string.isRequired,
         options: PropTypes.arrayOf(
@@ -21,19 +21,20 @@ class DropDownMenu extends Component {
             }),
         ).isRequired,
         onSelect: PropTypes.func,
+        appStore: PropTypes.instanceOf(AppStore),
     };
 
-    handleSelect = selectedItem => {
-        const { store, updateStore } = this.context;
-        const dropDownMenuData = store.topMenu.find(item => item.label === this.props.text);
+    get dropDownMenuData() {
+        return this.props.appStore.header.mainMenu.find(item => item.label === this.props.text);
+    }
 
-        dropDownMenuData.onSelect(selectedItem);
-        updateStore(store);
+    handleSelect = selectedItem => {
+        this.dropDownMenuData.onSelect(selectedItem);
     };
 
     render() {
         const { text } = this.props;
-        const dropDownMenuData = this.context.store.topMenu.find(item => item.label === text);
+        const dropDownMenuData = this.dropDownMenuData;
         const options = dropDownMenuData ? dropDownMenuData.options : [];
 
         const hasOptionsToShow = options.length > 0;

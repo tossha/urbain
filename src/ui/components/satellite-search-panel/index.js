@@ -1,9 +1,10 @@
 import React from "react";
 import PropTypes from "prop-types";
+import { inject, observer } from "mobx-react";
 import cn from "classnames";
 
+import { AppStore } from "../../store";
 import { createSimplebar } from "../common/simplebar";
-import { RootContext } from "../../store";
 import SatellitesGrid from "./components/satellites-grid/satellites-grid";
 import Searcher from "./components/searcher";
 import { FilterItem } from "./components/filter-item";
@@ -11,12 +12,12 @@ import { FilterItem } from "./components/filter-item";
 import Dialog from "../common/dialog";
 import "./index.scss";
 
+@inject("appStore")
+@observer
 class SatelliteSearchPanel extends React.Component {
-    static contextType = RootContext;
-
     static propTypes = {
         className: PropTypes.string,
-        visible: PropTypes.bool.isRequired,
+        appStore: PropTypes.instanceOf(AppStore),
     };
 
     state = {
@@ -48,7 +49,7 @@ class SatelliteSearchPanel extends React.Component {
         if (!query) {
             return;
         }
-        const { satelliteFinder } = this.context.webApiServices;
+        const { satelliteFinder } = this.props.appStore.webApiServices;
         const searchParam = {
             [this.state.activeFilterValue]: query,
         };
@@ -80,17 +81,14 @@ class SatelliteSearchPanel extends React.Component {
     _handleSelect = satellite => {};
 
     _handleClose = () => {
-        const { store, updateStore } = this.context;
-
-        store.viewSettings.satelliteSearchPanel.toggle();
-        updateStore(store);
+        this.props.appStore.visualObjects.satelliteSearchPanel.toggle();
     };
 
-    _renderOption = satellite => (
+    _renderOption = ({ noradId, name, launchDate }) => (
         <div className="satellite-option">
-            <span className="satellite-option__norad-id">{satellite.noradId}</span>
-            <span className="satellite-option__name">{satellite.name}</span>
-            <span className="satellite-option__launch-date">{satellite.launchDate}</span>
+            <span className="satellite-option__norad-id">{noradId}</span>
+            <span className="satellite-option__name">{name}</span>
+            <span className="satellite-option__launch-date">{launchDate}</span>
         </div>
     );
 
@@ -129,15 +127,14 @@ class SatelliteSearchPanel extends React.Component {
     }
 
     render() {
-        const { className, visible } = this.props;
+        const { className, appStore } = this.props;
         const { satellites } = this.state;
-        const { store } = this.context;
 
         return (
             <Dialog
                 className={cn("satellite-search-panel", className)}
                 caption="Satellite search panel"
-                isOpen={visible}
+                isOpen={appStore.visualObjects.satelliteSearchPanel.isVisible}
                 onClose={this._handleClose}
             >
                 <Searcher
@@ -158,8 +155,8 @@ class SatelliteSearchPanel extends React.Component {
                         <div className="satellites__grid" ref={this._containerRef}>
                             <SatellitesGrid
                                 satellites={satellites}
-                                onSatelliteLoad={store.loadSatellite}
-                                onSatelliteUnload={store.unloadSatellite}
+                                onSatelliteLoad={appStore.loadSatellite}
+                                onSatelliteUnload={appStore.unloadSatellite}
                             />
                         </div>
                     </div>

@@ -1,15 +1,22 @@
 import { sim } from "./Simulation";
 import Events from "./Events";
 
-function init(statistics, viewPortId = "viewport-id") {
+/**
+ * @param {AppModel} appModel
+ * @param {string} viewPortId
+ */
+function init(appModel, viewPortId) {
+    const statistics = appModel.visualObjects.statisticsBadge.meta;
+    const { simulation } = appModel;
+
     let globalTime;
 
     function render(curTime) {
-        if (!sim.renderLoopActive) {
+        if (!simulation.renderLoopActive) {
             return;
         }
 
-        sim.tick((curTime - globalTime) / 1000);
+        simulation.tick((curTime - globalTime) / 1000);
 
         globalTime = curTime;
         statistics.update();
@@ -21,8 +28,8 @@ function init(statistics, viewPortId = "viewport-id") {
         requestAnimationFrame(render);
     }
 
-    sim.init(document.getElementById(viewPortId), firstRender);
-    sim.loadModule('PatchedConics');
+    simulation.init(appModel, viewPortId, firstRender);
+    simulation.loadModule("PatchedConics");
 }
 
 export {

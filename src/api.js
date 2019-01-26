@@ -1,9 +1,16 @@
 import { sim } from "./core/index";
 
-export const loadTLE = function(noradId) {
+/**
+ * @param {number} noradId
+ * @return {Promise<any>}
+ */
+export function loadTLE(noradId) {
     return sim.getModule("SolarSystem").loadTLE(sim.starSystem, noradId);
-};
+}
 
-export const loadKSP = function() {
+/**
+ * @return {Promise<T|never>}
+ */
+export function loadKSP() {
     return sim.loadModule("KSP");
-};
+}

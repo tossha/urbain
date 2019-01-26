@@ -1,45 +1,23 @@
 import React from "react";
 import ReactDOM from "react-dom";
+import { Provider } from "mobx-react";
 
-import { RootContext, Store } from "./store";
-import { createStatsBadge } from "./components/statistics-badge";
-import { createServices } from "./services";
 import AppComponent from "./app";
+import { AppStore } from "./store";
+import { VIEWPORT_ENTRY_ID } from "./constants";
 
-const statsBadge = createStatsBadge();
-const webApiServices = createServices();
+/**
+ * @param {AppModel} appModel
+ */
+function renderUi(appModel) {
+    const appStore = new AppStore(appModel);
 
-class Root extends React.Component {
-    state = {
-        store: this.props.store,
-    };
-
-    _handleUpdateStore = updatedStore => {
-        this.setState({
-            store: updatedStore,
-        });
-    };
-
-    render() {
-        const { store } = this.state;
-
-        return (
-            <RootContext.Provider
-                value={{
-                    store,
-                    stats: statsBadge,
-                    updateStore: this._handleUpdateStore,
-                    webApiServices,
-                }}
-            >
-                <AppComponent />
-            </RootContext.Provider>
-        );
-    }
+    ReactDOM.render(
+        <Provider appStore={appStore}>
+            <AppComponent />
+        </Provider>,
+        document.getElementById("root"),
+    );
 }
 
-function renderUi(initialState) {
-    ReactDOM.render(<Root store={initialState} />, document.getElementById("root"));
-}
-
-export { renderUi, statsBadge, Store };
+export { renderUi, AppStore, VIEWPORT_ENTRY_ID };
