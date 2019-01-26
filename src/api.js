@@ -9,7 +9,7 @@ export function loadTLE(noradId) {
 }
 
 /**
- * @return {Promise<T|never>}
+ * @return {Promise}
  */
 export function loadKSP() {
     return sim.loadModule("KSP");

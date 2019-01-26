@@ -83,7 +83,7 @@ const TransferCalculationPanel = ({ className, appStore }) => (
 
 TransferCalculationPanel.propTypes = {
     className: PropTypes.string,
-    appStore: PropTypes.isPrototypeOf(AppStore),
+    appStore: PropTypes.instanceOf(AppStore),
 };
 
 export default inject("appStore")(observer(TransferCalculationPanel));

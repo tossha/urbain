@@ -1,4 +1,4 @@
-import React, { Suspense } from "react";
+import React from "react";
 import { inject, observer } from "mobx-react";
 import PropTypes from "prop-types";
 import cn from "classnames";
@@ -11,11 +11,10 @@ import TransferCalculationPanel from "./components/transfer-calculation-panel";
 import MetricsPanel from "./components/metrics-panel";
 import ManeuverPanel from "./components/maneuver-panel";
 import DynamicTrajectoryPanel from "./components/dynamic-trajectory-panel";
+import SatelliteSearchPanel from "../satellite-search-panel";
 import { AppStore } from "../../store";
 
 import "./main-view.scss";
-
-const SatelliteSearchPanel = React.lazy(() => import("../satellite-search-panel/index"));
 
 const MainView = ({ className, appStore }) => (
     <main className={cn(className, "main-view")}>
@@ -29,18 +28,17 @@ const MainView = ({ className, appStore }) => (
             <MetricsPanel />
             <DynamicTrajectoryPanel />
         </SideBar>
-        {appStore.visualObjects.satelliteSearchPanel.isVisible ? (
-            <Suspense fallback={<div />}>
-                <SatelliteSearchPanel className="main-view__satellite-search-panel" />
-            </Suspense>
-        ) : null}
+        <SatelliteSearchPanel
+            className="main-view__satellite-search-panel"
+            visible={appStore.visualObjects.satelliteSearchPanel.isVisible}
+        />
         <BottomPanel className="main-view__bottom-panel" />
     </main>
 );
 
 MainView.propTypes = {
     className: PropTypes.string,
-    appStore: PropTypes.isPrototypeOf(AppStore),
+    appStore: PropTypes.instanceOf(AppStore),
 };
 
 export default inject("appStore")(observer(MainView));

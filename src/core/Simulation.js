@@ -162,7 +162,7 @@ class Simulation {
     /**
      * @param alias
      * @param callback
-     * @return {Promise<T | never>}
+     * @return {Promise}
      */
     loadModule(alias, callback) {
         const className = 'Module' + alias;
