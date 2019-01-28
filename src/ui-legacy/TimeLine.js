@@ -25,7 +25,7 @@ export default class TimeLine
         this.timeLineCanvasDomElement.addEventListener("mousedown",  this.onMouseDown  .bind(this));
         window                       .addEventListener("mouseup",    this.onMouseUp    .bind(this));
         window                       .addEventListener("mousemove",  this.onMouseMove  .bind(this));
-        this.timeLineCanvasDomElement.addEventListener("mousewheel", this.onMouseWheel .bind(this));
+        this.timeLineCanvasDomElement.addEventListener("wheel",      this.onMouseWheel .bind(this));
 
         window.addEventListener('keypress', e => {
             if (e.key === ' ') {
