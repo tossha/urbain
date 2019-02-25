@@ -6,8 +6,9 @@ import { createSimplebar } from "../common/simplebar";
 import { RootContext } from "../../store";
 import SatellitesGrid from "./components/satellites-grid/satellites-grid";
 import Searcher from "./components/searcher";
-import Dialog from "../common/dialog";
+import { FilterItem } from "./components/filter-item";
 
+import Dialog from "../common/dialog";
 import "./index.scss";
 
 class SatelliteSearchPanel extends React.Component {
@@ -19,10 +20,14 @@ class SatelliteSearchPanel extends React.Component {
 
     state = {
         satellites: [],
-        filterBarVisible: true,
+        activeFilterValue: "noradId",
     };
 
     _containerRef = React.createRef();
+
+    get _searcherPlaceholder() {
+        return `Start typing satellite ${this.state.activeFilterValue} ...`;
+    }
 
     componentDidUpdate() {
         this._refreshScrollBar();
@@ -38,11 +43,17 @@ class SatelliteSearchPanel extends React.Component {
         }
     }
 
-    _searchSatellitesByName = async name => {
+    _searchSatellites = async query => {
+        if (!query) {
+            return;
+        }
         const { satelliteFinder } = this.context.webApiServices;
+        const searchParam = {
+            [this.state.activeFilterValue]: query,
+        };
 
         try {
-            const { satellites } = await satelliteFinder.findSatellites({ name });
+            const { satellites } = await satelliteFinder.findSatellites(searchParam);
 
             return satellites;
         } catch (e) {
@@ -52,21 +63,20 @@ class SatelliteSearchPanel extends React.Component {
         return [];
     };
 
-    _handleSearch = async ({ noradId, name, launchDate }) => {
-        const { satelliteFinder } = this.context.webApiServices;
+    _handleSearch = async query => {
+        const satellites = await this._searchSatellites(query);
 
-        try {
-            const { satellites } = await satelliteFinder.findSatellites({ noradId, name, launchDate });
-
-            this.setState({
+        this.setState(
+            {
                 satellites,
-            });
-
-            this._refreshScrollBar();
-        } catch (e) {
-            console.error(e);
-        }
+            },
+            () => {
+                this._refreshScrollBar();
+            },
+        );
     };
+
+    _handleSelect = satellite => {};
 
     _handleClose = () => {
         const { store, updateStore } = this.context;
@@ -83,6 +93,40 @@ class SatelliteSearchPanel extends React.Component {
         </div>
     );
 
+    _handleParamSelectorChange = e => {
+        this.setState({
+            activeFilterValue: e.target.value,
+        });
+    };
+
+    _renderFilter() {
+        const { activeFilterValue } = this.state;
+
+        return (
+            <div className="satellite-search-panel__filter filter-selector">
+                Search by:
+                <FilterItem
+                    filterId="noradId"
+                    label="norad id"
+                    value={activeFilterValue}
+                    onSwitch={this._handleParamSelectorChange}
+                />
+                <FilterItem
+                    filterId="name"
+                    label="name"
+                    value={activeFilterValue}
+                    onSwitch={this._handleParamSelectorChange}
+                />
+                <FilterItem
+                    filterId="launchDate"
+                    label="launch date"
+                    value={activeFilterValue}
+                    onSwitch={this._handleParamSelectorChange}
+                />
+            </div>
+        );
+    }
+
     render() {
         const { className } = this.props;
         const { satellites } = this.state;
@@ -98,11 +142,13 @@ class SatelliteSearchPanel extends React.Component {
             >
                 <Searcher
                     className="satellite-search-panel__searcher"
-                    placeholder="Start typing satellite name ..."
-                    onSource={this._searchSatellitesByName}
+                    placeholder={this._searcherPlaceholder}
+                    onSource={this._searchSatellites}
                     onSearch={this._handleSearch}
+                    onSelect={this._handleSelect}
                     renderOption={this._renderOption}
                 />
+                {this._renderFilter()}
                 {satellites.length > 0 && (
                     <div className="satellite-search-panel__satellites satellites">
                         <div className="satellites__header">

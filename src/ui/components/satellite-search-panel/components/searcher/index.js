@@ -11,6 +11,7 @@ class Searcher extends React.Component {
     static propTypes = {
         className: PropTypes.string.isRequired,
         onSearch: PropTypes.func.isRequired,
+        onSelect: PropTypes.func.isRequired,
         onSource: PropTypes.func.isRequired,
         renderOption: PropTypes.func,
         placeholder: PropTypes.string,
@@ -30,11 +31,11 @@ class Searcher extends React.Component {
     }
 
     _handleSelect = option => {
-        return this.props.onSearch({ name: option.name });
+        return this.props.onSelect(option);
     };
 
     _handleSearch = () => {
-        return this.props.onSearch({ name: this.query });
+        return this.props.onSearch(this.query);
     };
 
     _handleSource = query => {
