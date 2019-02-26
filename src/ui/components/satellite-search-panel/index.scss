@@ -6,6 +6,10 @@
 		width: 100%;
 	}
 
+	&__filter {
+		margin-top: 1rem;
+	}
+
 	&__satellites {
 		margin-top: 2 * $default-gap-size;
 	}
@@ -51,5 +55,31 @@
 
 	&__launch-date {
 		margin-left: $default-gap-size;
+	}
+}
+
+.filter-selector {
+	align-items: center;
+	color: $gray-text;
+	display: flex;
+
+	&__item {
+		align-items: center;
+		display: flex;
+		margin-left: 1rem;
+
+		&--active {
+			color: $white-text;
+		}
+	}
+
+	&__radio {
+		cursor: pointer;
+		padding: 0;
+	}
+
+	&__label {
+		cursor: pointer;
+		padding-left: 1rem;
 	}
 }
