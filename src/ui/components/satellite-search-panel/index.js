@@ -16,6 +16,7 @@ class SatelliteSearchPanel extends React.Component {
 
     static propTypes = {
         className: PropTypes.string,
+        visible: PropTypes.bool.isRequired,
     };
 
     state = {
@@ -128,16 +129,15 @@ class SatelliteSearchPanel extends React.Component {
     }
 
     render() {
-        const { className } = this.props;
+        const { className, visible } = this.props;
         const { satellites } = this.state;
         const { store } = this.context;
-        const { isVisible } = store.viewSettings.satelliteSearchPanel;
 
         return (
             <Dialog
                 className={cn("satellite-search-panel", className)}
                 caption="Satellite search panel"
-                isOpen={isVisible}
+                isOpen={visible}
                 onClose={this._handleClose}
             >
                 <Searcher

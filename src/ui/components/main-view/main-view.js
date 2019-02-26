@@ -1,4 +1,4 @@
-import React, { Suspense } from "react";
+import React from "react";
 import PropTypes from "prop-types";
 import cn from "classnames";
 
@@ -10,10 +10,9 @@ import TransferCalculationPanel from "./components/transfer-calculation-panel";
 import MetricsPanel from "./components/metrics-panel";
 import ManeuverPanel from "./components/maneuver-panel";
 import DynamicTrajectoryPanel from "./components/dynamic-trajectory-panel";
+import SatelliteSearchPanel from "../satellite-search-panel/index";
 
 import "./main-view.scss";
-
-const SatelliteSearchPanel = React.lazy(() => import("../satellite-search-panel/index"));
 
 const MainView = ({ className }) => {
     return (
@@ -30,11 +29,10 @@ const MainView = ({ className }) => {
                         <MetricsPanel />
                         <DynamicTrajectoryPanel />
                     </SideBar>
-                    {store.viewSettings.satelliteSearchPanel.isVisible ? (
-                        <Suspense fallback={<div />}>
-                            <SatelliteSearchPanel className="main-view__satellite-search-panel" />
-                        </Suspense>
-                    ) : null}
+                    <SatelliteSearchPanel
+                        className="main-view__satellite-search-panel"
+                        visible={store.viewSettings.satelliteSearchPanel.isVisible}
+                    />
                     <BottomPanel className="main-view__bottom-panel" />
                 </main>
             )}
