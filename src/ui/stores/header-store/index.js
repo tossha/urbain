@@ -9,9 +9,12 @@ import { openLinkInNewTab } from "../../utils";
 export class HeaderStore {
     /**
      * @param {AppModel} appModel
+     * @param {SatelliteSearchPanelStore} satelliteSearchPanelStore
      */
-    constructor(appModel) {
+    constructor(appModel, satelliteSearchPanelStore) {
         this._appModel = appModel;
+        this._satelliteSearchPanelStore = satelliteSearchPanelStore;
+        this._statisticsModel = this._appModel.simulationModel.statisticsModel;
     }
 
     /**
@@ -39,23 +42,23 @@ export class HeaderStore {
             new DropDownMenuItem(TOP_MENU_ITEMS.VIEW, [
                 {
                     label: "Body Labels",
-                    selected: this._appModel.visualObjects.bodyLabels.isVisible,
+                    selected: this._appModel.bodyLabels.isVisible,
                     onUpdate: ({ selected }) => {
-                        this._appModel.visualObjects.bodyLabels.toggle(selected);
+                        this._appModel.bodyLabels.toggle(selected);
                     },
                 },
                 {
                     label: "Statistics badge",
-                    selected: this._appModel.visualObjects.statisticsBadge.isVisible,
+                    selected: this._statisticsModel.isBadgeVisible,
                     onUpdate: ({ selected }) => {
-                        this._appModel.visualObjects.statisticsBadge.toggle(selected);
+                        this._statisticsModel.toggleBadge(selected);
                     },
                 },
                 {
                     label: "Satellite search panel",
-                    selected: this._appModel.visualObjects.satelliteSearchPanel.isVisible,
+                    selected: this._satelliteSearchPanelStore.isVisible,
                     onUpdate: ({ selected }) => {
-                        this._appModel.visualObjects.satelliteSearchPanel.toggle(selected);
+                        this._satelliteSearchPanelStore.toggle(selected);
                     },
                 },
             ]),
@@ -76,3 +79,5 @@ export class HeaderStore {
         ];
     }
 }
+
+export { MenuItemType } from "./menu-items/menu-item-type";

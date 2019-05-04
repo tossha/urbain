@@ -4,8 +4,7 @@ import { inject, observer } from "mobx-react";
 import cn from "classnames";
 
 import "./main-menu.scss";
-import { AppStore } from "../../../../store/app-store";
-import { MenuItemType } from "../../../../store";
+import { MenuItemType, AppStore } from "../../../../stores";
 import DropDownMenu from "./components/drop-down-menu";
 import MenuLink from "./components/menu-link";
 

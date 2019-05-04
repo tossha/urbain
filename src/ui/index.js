@@ -2,22 +2,23 @@ import React from "react";
 import ReactDOM from "react-dom";
 import { Provider } from "mobx-react";
 
+import { createStores, AppStore } from "./stores";
 import AppComponent from "./app";
-import { AppStore } from "./store";
-import { VIEWPORT_ENTRY_ID } from "./constants";
 
 /**
  * @param {AppModel} appModel
+ * @param {SimulationModel} simulationModel
+ * @param {string} viewportId
  */
-function renderUi(appModel) {
-    const appStore = new AppStore(appModel);
+function renderUi(appModel, simulationModel, viewportId) {
+    const stores = createStores(appModel, simulationModel);
 
     ReactDOM.render(
-        <Provider appStore={appStore}>
-            <AppComponent />
+        <Provider {...stores}>
+            <AppComponent viewportId={viewportId} />
         </Provider>,
         document.getElementById("root"),
     );
 }
 
-export { renderUi, AppStore, VIEWPORT_ENTRY_ID };
+export { renderUi, AppStore };

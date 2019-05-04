@@ -1,39 +1,39 @@
-import { init } from "../core";
-import { loadTLE, loadKSP } from "../api";
-import { renderUi, VIEWPORT_ENTRY_ID } from "../ui";
-import { AppModel } from "./models/app";
+import { init as initSimulationEngine } from "../core";
+import { renderUi } from "../ui";
 import { createServices } from "./services";
+import { AppModel } from "./models/app-model";
+
+const VIEWPORT_ENTRY_ID = "viewport-id";
 
 class Application {
-    /**
-     * @param {Simulation} sim
-     */
-    constructor(sim) {
+    constructor() {
         const services = createServices();
-        this._appModel = new AppModel(sim, loadTLE, services);
+        this._appModel = new AppModel(services, VIEWPORT_ENTRY_ID);
     }
 
-    init() {
-        init(this._appModel, VIEWPORT_ENTRY_ID);
+    renderUi() {
+        renderUi(this._appModel, this._simulationModel, this._simulationModel.viewportId);
     }
 
-    /**
-     * @return {AppModel}
-     */
-    get appModel() {
-        return this._appModel;
+    initSimulation() {
+        initSimulationEngine(this._simulationModel);
     }
 
     getApi() {
         return {
-            loadTLE,
-            loadKSP,
+            loadTLE: noradId => this._simulationModel.loadTLE(noradId),
+            loadKSP: () => this._simulationModel.loadKSP(),
         };
     }
 
-    renderUi() {
-        renderUi(this._appModel);
+    /**
+     * @return {SimulationModel}
+     * @private
+     */
+    get _simulationModel() {
+        return this._appModel.simulationModel;
     }
 }
 
 export default Application;
+export { VisualObject } from "./entities/visual-object";

@@ -1,9 +1,15 @@
 import axios from "axios";
 import SearchApiParamsBuilder from "./search-api-params-builder";
-import { FieldParameter, NumberFieldRelationType, ServerFieldName, StringFieldRelationType } from "./api-config";
+import {
+    FieldParameter,
+    NumberFieldRelationType,
+    ServerFieldName,
+    StringFieldRelationType,
+    FieldType,
+} from "./api-config";
 import Satellite from "./satelite";
 
-class SatelliteFinder {
+class SatelliteLookup {
     constructor(apiEndpoint) {
         this._apiUrl = apiEndpoint;
     }
@@ -76,4 +82,6 @@ class SatelliteFinder {
     }
 }
 
-export default SatelliteFinder;
+export default SatelliteLookup;
+
+export { FieldType };

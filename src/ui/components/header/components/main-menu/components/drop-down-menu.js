@@ -2,7 +2,7 @@ import React, { Component } from "react";
 import PropTypes from "prop-types";
 import { inject, observer } from "mobx-react";
 
-import { AppStore } from "../../../../../store";
+import { AppStore } from "../../../../../stores";
 import DropdownIcon from "../../../../common/logos/dropdown-icon";
 import DropDownMenuItem from "./drop-down-menu-item";
 import "./drop-down-menu.scss";

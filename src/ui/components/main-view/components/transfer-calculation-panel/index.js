@@ -4,7 +4,7 @@ import { inject, observer } from "mobx-react";
 import cn from "classnames";
 
 import Panel, { Field, FieldSet, FieldLabel, FieldControl, PanelButton, Dimension } from "../../../common/panel";
-import { AppStore } from "../../../../store";
+import { AppStore } from "../../../../stores";
 
 import "./index.scss";
 

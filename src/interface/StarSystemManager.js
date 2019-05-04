@@ -1,4 +1,5 @@
 import StarSystemEntry from "./StarSystemEntry";
+import { StarSystem } from "./star-system";
 
 export default class StarSystemManager {
     constructor() {
@@ -6,8 +7,8 @@ export default class StarSystemManager {
         this._loadedIdx = null;
 
         // The first one loads by default
-        this.add("solar_system", "SolarSystem", "Solar System");
-        this.add("ksp", "KSP", "KSP System");
+        this.add(StarSystem.SolarSystem);
+        this.add(StarSystem.Ksp);
     }
 
     get starSystems() {
@@ -22,10 +23,10 @@ export default class StarSystemManager {
         return this._starSystems[this.defaultStarSystemIdx];
     }
 
-    add(alias, module, label) {
+    add({ alias, moduleName, label }) {
         const idx = this._starSystems.length;
 
-        this._starSystems.push(new StarSystemEntry(idx, alias, label, module));
+        this._starSystems.push(new StarSystemEntry(idx, alias, label, moduleName));
     }
 
     loadDefault(callback) {

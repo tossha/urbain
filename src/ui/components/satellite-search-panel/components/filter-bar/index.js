@@ -1,14 +1,14 @@
 import React from "react";
 import PropTypes from "prop-types";
 import Select from "../../../common/select/select";
-import SatelliteFinder from "../../../../../application/services/satellite-finder/satellite-finder";
-import { FieldType } from "../../../../../application/services/satellite-finder/api-config";
+import SatelliteLookup, { FieldType } from "../../../../../application/services/satellite-finder";
 
 import "./index.scss";
 
+//TODO: Kill me
 class FilterBar extends React.Component {
     static propTypes = {
-        satelliteFinder: PropTypes.instanceOf(SatelliteFinder).isRequired,
+        satelliteFinder: PropTypes.instanceOf(SatelliteLookup).isRequired,
     };
 
     state = {

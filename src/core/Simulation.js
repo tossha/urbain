@@ -1,6 +1,5 @@
 import * as THREE from "three";
 import $ from "jquery";
-import { computed, observable } from "mobx";
 import EventHandler from "./EventHandler";
 import { Vector } from "./algebra";
 import Events from "./Events";
@@ -27,14 +26,11 @@ class Simulation {
     }
 
     /**
-     * @param {AppModel} appModel
-     * @param {string} viewPortId
-     * @param renderLoopFunction
+     * @param {SimulationModel} simulationModel
+     * @param {function} renderLoopFunction
      */
-    init(appModel, viewPortId, renderLoopFunction) {
-        this._appModel = appModel;
-        this.renderLoopFunction = renderLoopFunction;
-
+    init(simulationModel, renderLoopFunction) {
+        this._simulationModel = simulationModel;
         this.scene = new THREE.Scene();
         this.scene.add(new THREE.AmbientLight(0xFFEFD5, 0.15));
 
@@ -42,7 +38,7 @@ class Simulation {
 
         this.renderer = new THREE.WebGLRenderer({antialias: true, logarithmicDepthBuffer: true});
 
-        this.domElement = document.getElementById(viewPortId);
+        this.domElement = document.getElementById(this._simulationModel.viewportId);
         this._setRenderSize();
         this.domElement.appendChild(this.renderer.domElement);
         window.addEventListener("resize", this.onWindowResize.bind(this));
@@ -108,7 +104,7 @@ class Simulation {
     }
 
     get settings() {
-        const showBodyLabels = this._appModel ? this._appModel.visualObjects.bodyLabels.isVisible : true;
+        const showBodyLabels = this._simulationModel ? this._simulationModel.isBodyLabelsVisible : true;
 
         return {
             ui: {
@@ -160,30 +156,30 @@ class Simulation {
     }
 
     /**
-     * @param alias
+     * @param moduleName
      * @param callback
      * @return {Promise}
      */
-    loadModule(alias, callback) {
-        const className = 'Module' + alias;
+    loadModule(moduleName, callback) {
+        const className = 'Module' + moduleName;
 
-        return import('../modules/' + alias + '/' + className).then((module) => {
-            this.modules[alias] = new module.default();
-            this.modules[alias].init();
-            callback && callback(this.modules[alias]);
+        return import('../modules/' + moduleName + '/' + className).then((module) => {
+            this.modules[moduleName] = new module.default();
+            this.modules[moduleName].init();
+            callback && callback(this.modules[moduleName]);
         });
     }
 
-    getModule(alias) {
-        if (this.modules[alias] === undefined) {
-            throw new Error('Unknown module: ' + alias);
+    getModule(moduleName) {
+        if (this.modules[moduleName] === undefined) {
+            throw new Error('Unknown module: ' + moduleName);
         }
 
-        return this.modules[alias];
+        return this.modules[moduleName];
     }
 
-    isModuleLoaded(alias) {
-        return this.modules[alias] !== undefined;
+    isModuleLoaded(moduleName) {
+        return this.modules[moduleName] !== undefined;
     }
 
     getClass(alias) {

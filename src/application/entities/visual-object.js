@@ -1,19 +1,17 @@
-import { action, observable, runInAction } from "mobx";
+import { action, computed, observable, runInAction } from "mobx";
 
 export class VisualObject {
-    constructor(isVisible = false, metaData = null) {
-        this._meta = metaData;
-
-        runInAction(() => {
-            this._isVisible = isVisible;
-        });
-    }
-
     /**
      * @private
      */
     @observable
     _isVisible = false;
+
+    constructor(isVisible = false) {
+        runInAction(() => {
+            this._isVisible = isVisible;
+        });
+    }
 
     /**
      * @public
@@ -25,15 +23,10 @@ export class VisualObject {
 
     /**
      * @public
+     * @return {boolean}
      */
+    @computed
     get isVisible() {
         return this._isVisible;
-    }
-
-    /**
-     * @public
-     */
-    get meta() {
-        return this._meta;
     }
 }
