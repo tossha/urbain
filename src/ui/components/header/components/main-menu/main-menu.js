@@ -1,10 +1,12 @@
 import React from "react";
+import PropTypes from "prop-types";
+import { inject, observer } from "mobx-react";
 import cn from "classnames";
 
 import "./main-menu.scss";
+import { MenuItemType, AppStore } from "../../../../stores";
 import DropDownMenu from "./components/drop-down-menu";
 import MenuLink from "./components/menu-link";
-import { RootContext, MenuItemType } from "../../../../store";
 
 function MainMenuItem({ menuItem, clickable }) {
     return (
@@ -17,18 +19,18 @@ function MainMenuItem({ menuItem, clickable }) {
     );
 }
 
-function MainMenu() {
+function MainMenu({ appStore }) {
     return (
         <nav className="main-menu">
-            <RootContext.Consumer>
-                {({ store }) =>
-                    store.topMenu.map(menuItem => (
-                        <MainMenuItem key={menuItem.label} menuItem={menuItem} clickable={menuItem.isClickable} />
-                    ))
-                }
-            </RootContext.Consumer>
+            {appStore.header.mainMenu.map(menuItem => (
+                <MainMenuItem key={menuItem.label} menuItem={menuItem} clickable={menuItem.isClickable} />
+            ))}
         </nav>
     );
 }
 
-export default MainMenu;
+MainMenu.propTypes = {
+    appStore: PropTypes.instanceOf(AppStore),
+};
+
+export default inject("appStore")(observer(MainMenu));

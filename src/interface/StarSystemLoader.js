@@ -58,6 +58,11 @@ export default class StarSystemLoader
         starSystem.addStars(new VisualStarsModel(config.stars));
     }
 
+    /**
+     * @param starSystem
+     * @param {string} url
+     * @return {Promise<any>}
+     */
     static loadObjectByUrl(starSystem, url) {
         return Promise.resolve($.getJSON(url, (objectConfig) => {
             this._loadObject(starSystem, objectConfig);

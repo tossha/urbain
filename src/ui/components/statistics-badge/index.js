@@ -1,34 +1,14 @@
-import React, { Component } from "react";
-import Stats from "stats.js";
+import React from "react";
+import { inject, observer } from "mobx-react";
 
-import { RootContext } from "../../store/index";
+import { StatisticsBadge } from "./statistics-badge";
 import "./index.scss";
 
-class StatisticsBadge extends Component {
-    elementRef = React.createRef();
-
-    componentDidMount() {
-        this.elementRef.current.appendChild(this.props.stats.dom);
-    }
-
-    componentWillUnmount() {
-        this.elementRef = null;
-    }
-
-    render() {
-        return <div ref={this.elementRef} className="statistics-badge" />;
-    }
-}
-
-export default () => (
-    <RootContext.Consumer>
-        {({ store, stats }) => (store.viewSettings.showStatistics ? <StatisticsBadge stats={stats} /> : null)}
-    </RootContext.Consumer>
+export default inject(({ statisticsBadgeStore }) => ({
+    isStatisticsBadgeVisible: statisticsBadgeStore.isStatisticsBadgeVisible,
+    statistics: statisticsBadgeStore.statistics,
+}))(
+    observer(({ isStatisticsBadgeVisible, statistics }) => {
+        return isStatisticsBadgeVisible ? <StatisticsBadge domElement={statistics.dom} /> : null;
+    }),
 );
-
-export function createStatsBadge() {
-    const statsBadge = new Stats();
-    statsBadge.dom.classList.add("stats-badge");
-
-    return statsBadge;
-}

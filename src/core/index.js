@@ -1,18 +1,23 @@
 import { sim } from "./Simulation";
 import Events from "./Events";
 
-function init(statistics, viewPortId = "viewport-id") {
+/**
+ * @param {SimulationModel} simulationModel
+ */
+export function init(simulationModel) {
+    const { simulation } = simulationModel;
+
     let globalTime;
 
     function render(curTime) {
-        if (!sim.renderLoopActive) {
+        if (!simulation.renderLoopActive) {
             return;
         }
 
-        sim.tick((curTime - globalTime) / 1000);
+        simulation.tick((curTime - globalTime) / 1000);
 
         globalTime = curTime;
-        statistics.update();
+        simulationModel.statisticsModel.updateStatistics();
         requestAnimationFrame(render);
     }
 
@@ -21,12 +26,11 @@ function init(statistics, viewPortId = "viewport-id") {
         requestAnimationFrame(render);
     }
 
-    sim.init(document.getElementById(viewPortId), firstRender);
-    sim.loadModule('PatchedConics');
+    simulation.init(simulationModel, firstRender);
+    simulation.loadModule("PatchedConics");
 }
 
 export {
-    init,
     sim,
     Events,
 }

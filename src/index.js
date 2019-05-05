@@ -1,11 +1,11 @@
-import { sim } from "./core/index";
-import { renderUi, statsBadge } from "./ui/index";
+import { configure } from "mobx";
 import Application from "./application";
 
-const app = new Application(sim);
-const initialState = app.getInitialState();
+configure({ enforceActions: "always" });
+
+const app = new Application();
+
+app.renderUi();
+app.initSimulation();
+
 window.api = app.getApi();
-
-renderUi(initialState);
-
-app.init(statsBadge);
