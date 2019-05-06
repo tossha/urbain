@@ -49,9 +49,14 @@ const customSelectStyles = {
         background: Color.DarkGray,
     }),
 
-    option: (base, state) => ({
+    option: (base, { isSelected, isFocused, isDisabled }) => ({
         ...base,
-        backgroundColor: state.isFocused ? Color.DarkGray : "transparent",
+        ":active": {
+            ...base[":active"],
+            backgroundColor: !isDisabled && (isSelected ? Color.Gray : Color.DarkGray),
+        },
+        backgroundColor: isSelected ? Color.Gray : isFocused ? Color.DarkGray : null,
+        cursor: "pointer",
     }),
 
     singleValue: (base, state) => {
