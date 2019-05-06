@@ -5,9 +5,16 @@ import cn from "classnames";
 
 import DropdownIndicator from "./components/dropdown-indicator";
 
+const Color = {
+    Black: "var(--black)",
+    Gray: "var(--gray)",
+    DarkGray: "var(--dark-gray)",
+    WhiteText: "var(--white-text)",
+};
+
 const DEFAULT = {
-    background: "var(--black)",
-    color: "var(--white-text)",
+    background: Color.Black,
+    color: Color.WhiteText,
     containerHeight: 24,
 };
 
@@ -39,12 +46,12 @@ const customSelectStyles = {
 
     menuList: base => ({
         ...base,
-        background: "var(--dark-gray)",
+        background: Color.DarkGray,
     }),
 
     option: (base, state) => ({
         ...base,
-        backgroundColor: state.isFocused ? "var(--gray)" : "transparent",
+        backgroundColor: state.isFocused ? Color.DarkGray : "transparent",
     }),
 
     singleValue: (base, state) => {
@@ -59,6 +66,10 @@ const customSelectStyles = {
 
     indicatorSeparator: () => ({
         display: "none",
+    }),
+
+    dropdownIndicator: () => ({
+        padding: 0,
     }),
 };
 
