@@ -3,7 +3,7 @@ import PropTypes from "prop-types";
 import { inject } from "mobx-react";
 
 import Select, { optionPropTypes } from "../../../common/select/select";
-import "./star-system-selector.scss";
+import "./index.scss";
 
 function StarSystemSelector({ options, defaultValue, onSelect }) {
     return (
