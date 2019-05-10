@@ -5,7 +5,6 @@ import Dialog from "../../../../common/dialog";
 import { FieldSet, Field, FieldLabel, FieldControl, Dimension } from "../../../../common/panel";
 import KeplerianView from "./keplerian-view";
 import CartesianVectorView from "./cartesian-vector-view";
-import "../index.scss";
 
 const MetricsPanel = ({ onMetricsPanelClose }) => (
     <Dialog
