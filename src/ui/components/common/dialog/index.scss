@@ -2,6 +2,8 @@
 @import "../z-index";
 
 .dialog {
+	$b: &;
+
 	background-color: $gray;
 	border: 1px solid #555;
 	display: none;
@@ -10,6 +12,12 @@
 
 	&--open {
 		display: block;
+	}
+
+	&--draggable {
+		#{$b}__header {
+			cursor: move;
+		}
 	}
 
 	&__header {
