@@ -6,6 +6,7 @@
 
 	background-color: $gray;
 	border: 1px solid #555;
+	border-radius: $border-radius;
 	display: none;
 
 	@include z-index(modal-dialog);
@@ -21,6 +22,8 @@
 	}
 
 	&__header {
+		border-top-left-radius: $border-radius;
+		border-top-right-radius: $border-radius;
 		display: flex;
 		justify-content: space-between;
 		padding: $default-gap-size / 2 $default-gap-size 0;
@@ -43,6 +46,8 @@
 	}
 
 	&__body {
+		border-bottom-left-radius: $border-radius;
+		border-bottom-right-radius: $border-radius;
 		padding: 2 / 3 * $default-gap-size;
 	}
 }
