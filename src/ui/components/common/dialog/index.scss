@@ -45,6 +45,17 @@
 		width: $size;
 	}
 
+	&__caption {
+		align-items: center;
+		display: flex;
+	}
+
+	&__caption-icon {
+		color: $gray-text;
+		margin-left: 0.5rem;
+		margin-right: 0.5rem;
+	}
+
 	&__body {
 		border-bottom-left-radius: $border-radius;
 		border-bottom-right-radius: $border-radius;

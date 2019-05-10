@@ -8,15 +8,18 @@ import "./index.scss";
 
 class Dialog extends React.Component {
     static propTypes = {
+        id: PropTypes.string,
         className: PropTypes.string,
         caption: PropTypes.string,
         draggable: PropTypes.bool,
         onClose: PropTypes.func,
         isOpen: PropTypes.bool,
+        titleIcon: PropTypes.node,
         children: PropTypes.node,
     };
 
     static defaultProps = {
+        id: "",
         caption: "Dialog",
         draggable: false,
         onClose() {},
@@ -28,7 +31,7 @@ class Dialog extends React.Component {
     };
 
     render() {
-        const { className, caption, isOpen, children, draggable } = this.props;
+        const { id, className, caption, isOpen, children, draggable, titleIcon } = this.props;
         const classNames = cn(
             "dialog",
             {
@@ -37,12 +40,16 @@ class Dialog extends React.Component {
             },
             className,
         );
+        const headerClass = "dialog__header";
 
         return (
-            <Draggable handle=".dialog__header" disabled={!draggable}>
-                <div className={classNames}>
-                    <div className="dialog__header">
-                        <div className="dialog__caption">{caption}</div>
+            <Draggable handle={`.${headerClass}`} disabled={!draggable}>
+                <div id={id} className={classNames}>
+                    <div className={headerClass}>
+                        <div className="dialog__caption">
+                            {titleIcon && <span className="dialog__caption-icon">{titleIcon}</span>}
+                            {caption}
+                        </div>
                         <div className="dialog__close-button" onClick={this._handleClose}>
                             <CloseIcon className="dialog__close-button-icon" />
                         </div>
