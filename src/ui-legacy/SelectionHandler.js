@@ -133,7 +133,7 @@ export default class SelectionHandler extends VisualModelAbstract
         this.selectedObject = object;
         this.selectedObject.select();
 
-        Events.dispatch(Events.SELECT, {object: this.selectedObject});
+        Events.dispatch(Events.SELECT, { object: this.selectedObject });
     }
 
     deselect() {
@@ -141,7 +141,7 @@ export default class SelectionHandler extends VisualModelAbstract
             return;
         }
 
-        Events.dispatch(Events.DESELECT, {object: this.selectedObject});
+        Events.dispatch(Events.DESELECT, { object: this.selectedObject });
 
         this.selectedObject.deselect();
         this.selectedObject = null;

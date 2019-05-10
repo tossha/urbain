@@ -1,7 +1,6 @@
 import $ from "jquery";
 
-export default class UIPanel
-{
+export default class UIPanel {
     constructor(panelDom, isCollapsed) {
         this.jqDom = $(panelDom);
         this.name = this.jqDom.data('panelName');
@@ -9,7 +8,11 @@ export default class UIPanel
         this.jqCollapseButton.click(() => this.toggleCollapse());
         this.isCollapsed = !!isCollapsed;
 
-        this.isCollapsed ? this.collapse() : this.expand();
+        if (this.isCollapsed) {
+            this.collapse();
+        } else {
+            this.expand();
+        }
     }
 
     show() {
@@ -28,21 +31,11 @@ export default class UIPanel
         this.jqCollapseButton.html('Show');
         this.isCollapsed = true;
         this.jqDom.find(".panelContent[data-panel-name='" + this.name + "']").hide();
-
-        // this.jqCollapseButton.attr('disabled', 'true');
-        // this.jqDom.find(".panelContent[data-panel-name='" + this.name + "']").fadeToggle(200, 'swing', () => {
-        //     this.jqCollapseButton.removeAttr('disabled');
-        // });
     }
 
     expand() {
         this.jqCollapseButton.html('Hide');
         this.isCollapsed = false;
         this.jqDom.find(".panelContent[data-panel-name='" + this.name + "']").show();
-
-        // this.jqCollapseButton.attr('disabled', 'true');
-        // this.jqDom.find(".panelContent[data-panel-name='" + this.name + "']").fadeToggle(200, 'swing', () => {
-        //     this.jqCollapseButton.removeAttr('disabled');
-        // });
     }
 }

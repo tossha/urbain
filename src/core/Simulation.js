@@ -53,7 +53,7 @@ class Simulation {
 
         this.raycaster = new VisualRaycaster(this.renderer.domElement, this.camera.threeCamera, 7);
 
-        this.ui = new UI();
+        this.ui = new UI(this);
 
         this.starSystemManager.loadDefault(() => requestAnimationFrame(renderLoopFunction));
 
