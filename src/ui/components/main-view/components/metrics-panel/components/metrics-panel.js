@@ -1,18 +1,20 @@
 import React from "react";
-import { ReactComponent as BarsIcon } from "../../../common/images/menu.svg";
+import { ReactComponent as BarsIcon } from "../../../../common/images/menu.svg";
 
-import Panel, { FieldSet, Field, FieldLabel, FieldControl, Dimension } from "../../../common/panel";
-import KeplerianView from "./components/keplerian-view";
-import CartesianVectorView from "./components/cartesian-vector-view";
-import "./index.scss";
+import Dialog from "../../../../common/dialog";
+import { FieldSet, Field, FieldLabel, FieldControl, Dimension } from "../../../../common/panel";
+import KeplerianView from "./keplerian-view";
+import CartesianVectorView from "./cartesian-vector-view";
+import "../index.scss";
 
-const MetricsPanel = () => (
-    <Panel
+const MetricsPanel = ({ onMetricsPanelClose }) => (
+    <Dialog
+        draggable
         id="metricsPanel"
-        className="metrics-panel"
+        className="panel metrics-panel"
         caption="Metrics"
         titleIcon={<BarsIcon className="metrics-panel__icon" />}
-        collapseDirection="right"
+        onClose={onMetricsPanelClose}
     >
         <div className="metrics-panel__content">
             <FieldSet>
@@ -95,7 +97,7 @@ const MetricsPanel = () => (
                 />
             </FieldSet>
         </div>
-    </Panel>
+    </Dialog>
 );
 
 export default MetricsPanel;
