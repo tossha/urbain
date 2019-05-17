@@ -1,20 +1,13 @@
 import UIPanel from "../Panel";
 import Events from "../../core/Events";
-import EphemerisObject from "../../core/EphemerisObject";
-import TrajectoryKeplerianBasic from "../../core/Trajectory/KeplerianBasic";
-import ReferenceFrameFactory, {ReferenceFrame} from "../../core/ReferenceFrame/Factory";
-import VisualTrajectoryModelKeplerian from "../../core/visual/Trajectory/Keplerian";
-import KeplerianObject from "../../core/KeplerianObject";
 import TrajectoryDynamic from "../../core/Trajectory/Dynamic";
-import { sim } from "../../core/Simulation";
-import VisualTrajectoryDynamic from "../../core/visual/Trajectory/Dynamic";
 
 export default class UIPanelDynamicTrajectory extends UIPanel {
     constructor(panelDom) {
         super(panelDom);
 
-        document.addEventListener(Events.SELECT, this.handleSelect.bind(this));
-        document.addEventListener(Events.DESELECT, this.handleDeselect.bind(this));
+        Events.addListener(Events.SELECT, this.handleSelect);
+        Events.addListener(Events.DESELECT, this.handleDeselect);
 
         this.jqDump = this.jqDom.find('#dump');
         this.jqDump.click(() => {
@@ -26,8 +19,8 @@ export default class UIPanelDynamicTrajectory extends UIPanel {
         this.hide();
     }
 
-    handleSelect(event) {
-        const object = event.detail.object;
+    handleSelect = ({ detail }) => {
+        const object = detail.object;
 
         if (!(object.trajectory instanceof TrajectoryDynamic)) {
             return;
@@ -36,10 +29,10 @@ export default class UIPanelDynamicTrajectory extends UIPanel {
         this.trajectory = object.trajectory;
 
         this.show();
-    }
+    };
 
-    handleDeselect() {
+    handleDeselect = () => {
         delete this.trajectory;
         this.hide();
-    }
+    };
 }

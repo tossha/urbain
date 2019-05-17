@@ -2,8 +2,11 @@
 @import "../z-index";
 
 .dialog {
+	$b: &;
+
 	background-color: $gray;
 	border: 1px solid #555;
+	border-radius: $border-radius;
 	display: none;
 
 	@include z-index(modal-dialog);
@@ -12,7 +15,15 @@
 		display: block;
 	}
 
+	&--draggable {
+		#{$b}__header {
+			cursor: move;
+		}
+	}
+
 	&__header {
+		border-top-left-radius: $border-radius;
+		border-top-right-radius: $border-radius;
 		display: flex;
 		justify-content: space-between;
 		padding: $default-gap-size / 2 $default-gap-size 0;
@@ -34,7 +45,20 @@
 		width: $size;
 	}
 
+	&__caption {
+		align-items: center;
+		display: flex;
+	}
+
+	&__caption-icon {
+		color: $gray-text;
+		margin-left: 0.5rem;
+		margin-right: 0.5rem;
+	}
+
 	&__body {
+		border-bottom-left-radius: $border-radius;
+		border-bottom-right-radius: $border-radius;
 		padding: 2 / 3 * $default-gap-size;
 	}
 }

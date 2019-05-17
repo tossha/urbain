@@ -7,11 +7,9 @@ import UIPanelLambert from "./Panels/Lambert";
 import UIPanelCreation from "./Panels/Creation";
 import UIPanelManeuver from "./Panels/Maneuver";
 import UIPanelDynamicTrajectory from "./Panels/DynamicTrajectory";
-import { sim } from "../core/Simulation";
 
-export default class UI
-{
-    constructor() {
+export default class UI {
+    constructor(sim) {
         this.timePanel     = new UIPanelTime    ($('#timePanel'));
         this.cameraPanel   = new UIPanelCamera  ($('#cameraPanel'),  sim.camera);
         this.metricsPanel  = new UIPanelMetrics ($('#metricsPanel'), sim.selection);

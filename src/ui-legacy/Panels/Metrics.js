@@ -7,22 +7,23 @@ import {presentNumberWithSuffix, rad2deg} from "../../core/algebra";
 import EphemerisObject from "../../core/EphemerisObject";
 import { sim } from "../../core/Simulation";
 
-export default class UIPanelMetrics extends UIPanel
-{
-    constructor(panelDom, selection) {
+export default class UIPanelMetrics extends UIPanel {
+    /**
+     * @param panelDom
+     * @param {SelectionHandler} selectionHandler
+     */
+    constructor(panelDom, selectionHandler) {
         super(panelDom);
 
-        this.selection = selection;
+        this.selection = selectionHandler;
         this.precision = 5;
 
-        this.renderListener = this.render.bind(this);
-
-        document.addEventListener(Events.SELECT, this.handleSelect.bind(this));
-        document.addEventListener(Events.DESELECT, this.handleDeselect.bind(this));
+        Events.addListener(Events.SELECT, this.handleSelect);
+        Events.addListener(Events.DESELECT, this.handleDeselect);
 
         this.jqDom.find('#unloadObject').on('click', function() {
-            let wasSelected = selection.getSelectedObject();
-            selection.deselect();
+            let wasSelected = selectionHandler.getSelectedObject();
+            selectionHandler.deselect();
             sim.starSystem.deleteObject(wasSelected.id);
         });
         this.jqDom.find('#showAnglesOfSelectedOrbit').on('change', function() {
@@ -36,7 +37,7 @@ export default class UIPanelMetrics extends UIPanel
         this.hide();
     }
 
-    render(event) {
+    render = event => {
         const selectedTrajectory = this.selection.getSelectedObject().trajectory;
         let parent = null;
         if (!selectedTrajectory) {
@@ -56,7 +57,7 @@ export default class UIPanelMetrics extends UIPanel
         } catch (e) {
 
         }
-    }
+    };
 
     updateMain(selectedObject, epoch, parent) {
         const keplerianObject = selectedObject.getKeplerianObjectByEpoch(epoch);
@@ -99,10 +100,10 @@ export default class UIPanelMetrics extends UIPanel
         this.jqDom.find('#elements-period').html('' + (keplerianObject.period / 86400).toPrecision(this.precision));
     }
 
-    handleSelect() {
+    handleSelect = ({ detail }) => {
         this.show();
 
-        const object = this.selection.getSelectedObject();
+        const object = detail.object;
         if (object) {
             $('#metricsOf').html(object.name);
         } else {
@@ -115,11 +116,11 @@ export default class UIPanelMetrics extends UIPanel
             this.jqDom.find('#unloadObject').hide();
         }
 
-        document.addEventListener(Events.RENDER, this.renderListener);
-    }
+        Events.addListener(Events.RENDER, this.render);
+    };
 
-    handleDeselect() {
+    handleDeselect = () => {
         this.hide();
-        document.removeEventListener(Events.RENDER, this.renderListener);
-    }
+        Events.removeListener(Events.RENDER, this.render);
+    };
 }
