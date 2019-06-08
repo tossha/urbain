@@ -37,7 +37,7 @@
     "react-draggable": "3.3.0",
     "react-scripts": "2.1.8",
     "react-select": "3.0.4",
-    "simplebar": "3.1.0",
+    "simplebar": "4.0.0",
     "stats.js": "0.17.0",
     "three": "0.100.0"
   },
