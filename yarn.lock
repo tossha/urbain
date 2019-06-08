@@ -6719,18 +6719,18 @@ mkdirp@0.5.1, mkdirp@0.5.x, "mkdirp@>=0.5 0", mkdirp@^0.5.0, mkdirp@^0.5.1, mkdi
   dependencies:
     minimist "0.0.8"
 
-mobx-react@5.4.3:
-  version "5.4.3"
-  resolved "https://registry.yarnpkg.com/mobx-react/-/mobx-react-5.4.3.tgz#6709b7dd89670c40e9815914ac2ca49cc02bfb47"
-  integrity sha512-WC8yFlwvJ91hy8j6CrydAuFteUafcuvdITFQeHl3LRIf5ayfT/4W3M/byhEYD2BcJWejeXr8y4Rh2H26RunCRQ==
+mobx-react@5.4.4:
+  version "5.4.4"
+  resolved "https://registry.yarnpkg.com/mobx-react/-/mobx-react-5.4.4.tgz#b3de9c6eabcd0ed8a40036888cb0221ab9568b80"
+  integrity sha512-2mTzpyEjVB/RGk2i6KbcmP4HWcAUFox5ZRCrGvSyz49w20I4C4qql63grPpYrS9E9GKwgydBHQlA4y665LuRCQ==
   dependencies:
     hoist-non-react-statics "^3.0.0"
     react-lifecycles-compat "^3.0.2"
 
-mobx@4.9.1:
-  version "4.9.1"
-  resolved "https://registry.yarnpkg.com/mobx/-/mobx-4.9.1.tgz#c4ec3fdc935fac821bedb2406dc183b34669f620"
-  integrity sha512-w4JzH2ND1iNiPA2BI6DIw/7LVFtv529k5Ue8yLT1ycRYMqTLwgw2HBdd9t/+jv6/hXwSxRd9zPTT2C14WV/Qng==
+mobx@4.10.0:
+  version "4.10.0"
+  resolved "https://registry.yarnpkg.com/mobx/-/mobx-4.10.0.tgz#59985ad25735f5d0f00565550d7f6cd01ae33179"
+  integrity sha512-mqsvg1fc62dsn82C0A3uQKioCJmQTAP1YFBaSRsiiQRmoeRfGtVFgRXoguas9BlrOg27xwPdjjL8LG18shijBg==
 
 move-concurrently@^1.0.1:
   version "1.0.1"
