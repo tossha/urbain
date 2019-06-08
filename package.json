@@ -28,7 +28,7 @@
     "axios": "0.19.0",
     "classnames": "2.2.6",
     "intro.js": "2.9.3",
-    "jquery": "3.3.1",
+    "jquery": "3.4.1",
     "lodash.throttle": "4.1.1",
     "lodash.uniqueid": "4.0.1",
     "react": "16.7.0",
