@@ -4,19 +4,27 @@
 $urbain-simplebar-scroll-size: 0.4rem;
 
 .simplebar-track {
-	&.horizontal {
+	&.simplebar-horizontal {
 		height: $urbain-simplebar-scroll-size;
 
 		.simplebar-scrollbar {
 			height: $urbain-simplebar-scroll-size;
 		}
+
+		&.simplebar-hover {
+			height: $urbain-simplebar-scroll-size * 4;
+		}
 	}
 
-	&.vertical {
+	&.simplebar-vertical {
 		width: $urbain-simplebar-scroll-size;
 
 		.simplebar-scrollbar {
 			width: $urbain-simplebar-scroll-size;
+		}
+
+		&.simplebar-hover {
+			width: $urbain-simplebar-scroll-size * 4;
 		}
 	}
 }
@@ -28,7 +36,7 @@ $urbain-simplebar-scroll-size: 0.4rem;
 	border-radius: $urbain-simplebar-scroll-size;
 	opacity: 1;
 
-	&:hover {
+	&.simplebar-hover {
 		background-color: $bg-color;
 		opacity: 1;
 	}
