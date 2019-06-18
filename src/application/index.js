@@ -17,6 +17,7 @@ class Application {
 
     initSimulation() {
         initSimulationEngine(this._simulationModel);
+        this._simulationModel.runTime();
     }
 
     getApi() {

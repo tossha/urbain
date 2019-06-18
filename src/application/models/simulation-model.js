@@ -1,5 +1,6 @@
 import { StarSystem } from "../../interface/star-system";
 import StatisticsModel from "./statistics-model";
+import TimeModel from "./time-model";
 
 export class SimulationModel {
     /**
@@ -12,6 +13,7 @@ export class SimulationModel {
         this._simulation = sim;
         this._appModel = appModel;
         this._statisticsModel = new StatisticsModel();
+        this._timeModel = new TimeModel();
     }
 
     /**
@@ -43,6 +45,13 @@ export class SimulationModel {
     }
 
     /**
+     * @return {TimeModel}
+     */
+    get timeModel() {
+        return this._timeModel;
+    }
+
+    /**
      * @param {number} noradId
      * @return {Promise<any>}
      */
@@ -57,5 +66,9 @@ export class SimulationModel {
      */
     loadKSP() {
         return this._simulation.loadModule(StarSystem.Ksp.moduleName);
+    }
+
+    runTime() {
+        this._timeModel.run();
     }
 }

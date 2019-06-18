@@ -47,7 +47,7 @@ class Simulation {
 
         this.selection = new SelectionHandler();
 
-        this.time = new TimeLine(0, 1, true);
+        this.time = new TimeLine(0, 1, simulationModel.timeModel);
 
         this.camera = new Camera(this.renderer.domElement);
 
@@ -60,8 +60,6 @@ class Simulation {
         VisualFlightEventImpulsiveBurn.preloadTexture();
         VisualMarkerPericenter.preloadTexture();
         VisualMarkerApocenter.preloadTexture();
-
-        Events.dispatch(Events.INIT_DONE);
     }
 
     loadStarSystem(jsonFile, onLoadFinish) {
