@@ -3,7 +3,7 @@ import { DropDownMenuItem } from "./menu-items/drop-down-menu-item";
 import { TOP_MENU_ITEMS } from "./constants";
 import { HELP_PAGE_URL } from "../../constants";
 import { LinkMenuItem } from "./menu-items/link-menu-item";
-import { showWizard, wizardIds } from "../../components/tutorials";
+import { showWizard, wizardIds } from "../../tutorials";
 import { openLinkInNewTab } from "../../utils";
 
 export class HeaderStore {

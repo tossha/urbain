@@ -2,7 +2,7 @@ import React from "react";
 import PropTypes from "prop-types";
 import cn from "classnames";
 
-import "./footer.scss";
+import "./index.scss";
 
 const Footer = ({ className }) => <footer id="app-footer" className={cn("footer", className)} />;
 

@@ -3,10 +3,10 @@ import PropTypes from "prop-types";
 import { inject, observer } from "mobx-react";
 import cn from "classnames";
 
-import "./main-menu.scss";
 import { MenuItemType, AppStore } from "../../../../stores";
 import DropDownMenu from "./components/drop-down-menu";
 import MenuLink from "./components/menu-link";
+import "./index.scss";
 
 function MainMenuItem({ menuItem, clickable }) {
     return (
