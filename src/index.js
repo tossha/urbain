@@ -7,5 +7,6 @@ const app = new Application();
 
 app.renderUi();
 app.initSimulation();
+app.registerShortcuts();
 
 window.api = app.getApi();

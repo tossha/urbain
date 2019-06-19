@@ -32,12 +32,6 @@ export default class TimeLine
         window                       .addEventListener("mousemove",  this.onMouseMove  .bind(this));
         this.timeLineCanvasDomElement.addEventListener("wheel",      this.onMouseWheel .bind(this));
 
-        window.addEventListener('keypress', e => {
-            if (e.key === ' ') {
-                this._timeModel.togglePause();
-            }
-        });
-
         window.addEventListener("resize", this.updateCanvasStyle.bind(this));
         window.oncontextmenu = () => false;
     }

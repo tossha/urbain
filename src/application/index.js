@@ -2,6 +2,7 @@ import { init as initSimulationEngine } from "../core";
 import { renderUi } from "../ui";
 import { createServices } from "./services";
 import { AppModel } from "./models/app-model";
+import ShortcutManager from "./shortcut-manager";
 
 const VIEWPORT_ENTRY_ID = "viewport-id";
 
@@ -9,6 +10,7 @@ class Application {
     constructor() {
         const services = createServices();
         this._appModel = new AppModel(services, VIEWPORT_ENTRY_ID);
+        this._shortcutManager = new ShortcutManager();
     }
 
     renderUi() {
@@ -25,6 +27,15 @@ class Application {
             loadTLE: noradId => this._simulationModel.loadTLE(noradId),
             loadKSP: () => this._simulationModel.loadKSP(),
         };
+    }
+
+    registerShortcuts() {
+        this._shortcutManager.register({
+            key: " ",
+            handler: () => {
+                this._simulationModel.timeModel.togglePause();
+            },
+        });
     }
 
     /**
