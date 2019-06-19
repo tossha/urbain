@@ -26,7 +26,6 @@ export default class Events
     static LOADING_TRAJECTORIES_DONE = 'urb_load_traj_done';
 
     static RENDER = 'urb_render';
-    static INIT_DONE = 'urb_init_done';
     static STAR_SYSTEM_LOADED = 'urb_star_system_loading_done';
     static SELECT = 'urb_select';
     static DESELECT = 'urb_deselect';
@@ -34,7 +33,5 @@ export default class Events
     static CAMERA_RF_CHANGED = 'urb_camera_rf_change';
     static OBJECT_ADDED = 'urb_object_added';
     static TIME_SCALE_CHANGED = 'urb_time_scale_change';
-    static TIME_PAUSED = 'urb_time_paused';
-    static TIME_UNPAUSED = 'urb_time_unpaused';
     static EPOCH_CHANGED = 'urb_epoch_change';
 }

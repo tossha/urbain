@@ -4,10 +4,15 @@ export const J2000_TIMESTAMP = 946728000;
 
 export default class TimeLine
 {
-    constructor(epoch, timeScale, isTimeRunning) {
+    /**
+     * @param epoch
+     * @param timeScale
+     * @param {TimeModel} timeModel
+     */
+    constructor(epoch, timeScale, timeModel) {
         this.epoch = epoch;
         this.timeScale = timeScale;
-        this.isTimeRunning = isTimeRunning;
+        this._timeModel = timeModel;
 
         this.mouseState = {
             x: 0,
@@ -29,7 +34,7 @@ export default class TimeLine
 
         window.addEventListener('keypress', e => {
             if (e.key === ' ') {
-                this.togglePause();
+                this._timeModel.togglePause();
             }
         });
 
@@ -73,11 +78,6 @@ export default class TimeLine
     setTimeScale(newScale) {
         Events.dispatch(Events.TIME_SCALE_CHANGED, {old: this.timeScale, new: newScale});
         this.timeScale = newScale;
-    }
-
-    togglePause() {
-        this.isTimeRunning = !this.isTimeRunning;
-        Events.dispatch(this.isTimeRunning ? Events.TIME_UNPAUSED : Events.TIME_PAUSED);
     }
 
     tick(timePassed) {
@@ -227,6 +227,10 @@ export default class TimeLine
 
         this.updateScaleType();
         return false;
+    }
+
+    get isTimeRunning() {
+        return !this._timeModel.isPaused;
     }
 
     static getDateByEpoch(epoch) {
