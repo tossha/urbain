@@ -1,7 +1,7 @@
 import { inject, observer } from "mobx-react";
 
 import "./index.scss";
-import SatelliteSearchPanel from "./satellite-search-panel";
+import SatelliteSearchPanel from "./components/satellite-search-panel";
 
 export default inject(({ satelliteSearchPanelStore }) => ({
     isVisible: satelliteSearchPanelStore.isVisible,

@@ -11,7 +11,7 @@ import ManeuverPanel from "./components/maneuver-panel";
 import DynamicTrajectoryPanel from "./components/dynamic-trajectory-panel";
 import SatelliteSearchPanel from "../satellite-search-panel";
 
-import "./main-view.scss";
+import "./index.scss";
 
 const MainView = ({ className, viewportId }) => (
     <main className={cn(className, "main-view")}>

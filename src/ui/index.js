@@ -3,7 +3,7 @@ import ReactDOM from "react-dom";
 import { Provider } from "mobx-react";
 
 import { createStores, AppStore } from "./stores";
-import AppComponent from "./app";
+import AppComponent from "./components/app";
 
 /**
  * @param {AppModel} appModel

@@ -1,12 +1,12 @@
 import React from "react";
 import PropTypes from "prop-types";
 
-import { showWizard, wizardIds } from "./components/tutorials/index";
-import Header from "./components/header/header";
-import MainView from "./components/main-view/main-view";
-import Footer from "./components/footer/footer";
-import { config } from "../configuration";
-import "./components/common/app-layout.scss";
+import { config } from "../../configuration";
+import { showWizard, wizardIds } from "../tutorials";
+import Header from "./header";
+import MainView from "./main-view";
+import Footer from "./footer";
+import "./common/app-layout.scss";
 
 const IS_FOOTER_VISIBLE = config.isFooterVisible;
 
