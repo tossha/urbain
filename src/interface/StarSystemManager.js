@@ -1,5 +1,5 @@
 import StarSystemEntry from "./StarSystemEntry";
-import { StarSystem } from "./star-system";
+import { StarSystem } from "../constants/star-system";
 
 export default class StarSystemManager {
     constructor() {

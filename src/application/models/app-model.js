@@ -1,17 +1,16 @@
 import { observable } from "mobx";
 import { VisualObject } from "../entities/visual-object";
 import { SimulationModel } from "./simulation-model";
-import { sim } from "../../core";
-import SatelliteSearchModel from "./satellite-search-model";
+import { StarSystem } from "../../constants/star-system";
 
 export class AppModel {
     /**
-     * @param services
      * @param {string} viewportId
+     * @param {Universe} universe
      */
-    constructor(services, viewportId) {
-        this._simulationModel = new SimulationModel(this, sim, viewportId);
-        this._satelliteSearchModel = new SatelliteSearchModel(this, services.satelliteFinder);
+    constructor(viewportId, universe) {
+        this._activeUniverse = universe;
+        this._simulationModel = new SimulationModel(this, universe, viewportId);
     }
 
     @observable
@@ -30,9 +29,12 @@ export class AppModel {
     }
 
     /**
-     * @return {SatelliteSearchModel}
+     * @param {number} noradId
+     * @return {Promise<any>}
      */
-    get satelliteSearchModel() {
-        return this._satelliteSearchModel;
+    loadTLE(noradId) {
+        return this._activeUniverse.moduleManager
+            .getModule(StarSystem.SolarSystem.moduleName)
+            .loadTLE(this._activeUniverse.activeStarSystem, noradId);
     }
 }

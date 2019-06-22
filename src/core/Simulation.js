@@ -16,57 +16,92 @@ import VisualFlightEventImpulsiveBurn from "./visual/FlightEvent/ImpulsiveBurn";
 import VisualMarkerApocenter from "./visual/Marker/Apocenter";
 import VisualMarkerPericenter from "./visual/Marker/Pericenter";
 
-
-class Simulation {
-    constructor() {
-        this.modules = {};
+class SimulationEngine {
+    /**
+     * @param {SimulationModel} simulationModel
+     */
+    constructor(simulationModel) {
+        this._simulationModel = simulationModel;
         this.propagators = {};
         this.renderLoopActive = false;
         this.starSystemManager = new StarSystemManager();
+        this.scene = new THREE.Scene();
+        this.scene.add(new THREE.AmbientLight(0xFFEFD5, 0.15));
+        this.textureLoader = new THREE.TextureLoader();
+        this.renderer = new THREE.WebGLRenderer({antialias: true, logarithmicDepthBuffer: true});
+    }
+
+    startRenderLoop() {
+        if (!this._simulationModel) {
+            throw new Error("SimulationModel must be initialized");
+        }
+
+        let globalTime;
+
+        const render = curTime => {
+            if (!this.renderLoopActive) {
+                return;
+            }
+
+            this.tick((curTime - globalTime) / 1000);
+
+            globalTime = curTime;
+            this._simulationModel.statisticsModel.updateStatistics();
+            requestAnimationFrame(render);
+        };
+
+        function firstRender(curTime) {
+            globalTime = curTime;
+            requestAnimationFrame(render);
+        }
+
+        this.init(this._simulationModel);
+
+        this.starSystemManager.loadDefault(() => requestAnimationFrame(firstRender));
+        this.loadModule("PatchedConics");
     }
 
     /**
      * @param {SimulationModel} simulationModel
-     * @param {function} renderLoopFunction
      */
-    init(simulationModel, renderLoopFunction) {
-        this._simulationModel = simulationModel;
-        this.scene = new THREE.Scene();
-        this.scene.add(new THREE.AmbientLight(0xFFEFD5, 0.15));
-
-        this.textureLoader = new THREE.TextureLoader();
-
-        this.renderer = new THREE.WebGLRenderer({antialias: true, logarithmicDepthBuffer: true});
-
+    init(simulationModel) {
         this.domElement = document.getElementById(this._simulationModel.viewportId);
         this._setRenderSize();
         this.domElement.appendChild(this.renderer.domElement);
-        window.addEventListener("resize", this.onWindowResize.bind(this));
 
         this.rendererEvents = new EventHandler(this.renderer.domElement);
-
         this.selection = new SelectionHandler();
-
-        this.time = new TimeLine(0, 1, simulationModel.timeModel);
-
         this.camera = new Camera(this.renderer.domElement);
-
         this.raycaster = new VisualRaycaster(this.renderer.domElement, this.camera.threeCamera, 7);
 
+        this.time = new TimeLine(0, 1, simulationModel.timeModel);
         this.ui = new UI(this);
 
-        this.starSystemManager.loadDefault(() => requestAnimationFrame(renderLoopFunction));
+        window.addEventListener("resize", this.onWindowResize);
 
         VisualFlightEventImpulsiveBurn.preloadTexture();
         VisualMarkerPericenter.preloadTexture();
         VisualMarkerApocenter.preloadTexture();
     }
 
+    tick(timeDelta) {
+        this.time.tick(timeDelta);
+        this.camera.update(this.time.epoch);
+
+        Events.dispatch(Events.RENDER, {epoch: this.time.epoch});
+
+        if (this.renderLoopActive) {
+            this.renderer.render(this.scene, this.camera.threeCamera);
+        }
+    }
+
     loadStarSystem(jsonFile, onLoadFinish) {
         return Promise.resolve($.getJSON("./star_systems/" + jsonFile, starSystemConfig => {
+            this.stopRendering();
             this.selection.deselect();
             this.starSystem && this.starSystem.unload();
-            this.starSystem = new StarSystem(starSystemConfig.id);
+
+            this._simulationModel.activeUniverse.reselectStarSystem(new StarSystem(starSystemConfig.id));
 
             StarSystemLoader.loadFromConfig(this.starSystem, starSystemConfig);
 
@@ -116,6 +151,10 @@ class Simulation {
         }
     };
 
+    get starSystem() {
+        return this._simulationModel.activeUniverse.activeStarSystem;
+    }
+
     forceEpoch(epoch) {
         return this.time.forceEpoch(epoch);
     }
@@ -128,22 +167,10 @@ class Simulation {
         this.rendererEvents.removeListener(eventName, listener);
     }
 
-    onWindowResize() {
+    onWindowResize = () => {
         this._setRenderSize();
         this.camera.onResize();
-    }
-
-    tick(timeDelta) {
-        this.time.tick(timeDelta);
-
-        this.camera.update(this.time.epoch);
-
-        Events.dispatch(Events.RENDER, {epoch: this.time.epoch});
-
-        if (this.renderLoopActive) {
-            this.renderer.render(this.scene, this.camera.threeCamera);
-        }
-    }
+    };
 
     getVisualCoords(simCoords) {
         return (new THREE.Vector3()).fromArray(simCoords.sub(this.camera.lastPosition));
@@ -153,32 +180,29 @@ class Simulation {
         return (new Vector(visualCoords.toArray())).add_(this.camera.lastPosition);
     }
 
+
+
+
     /**
      * @param moduleName
      * @param callback
      * @return {Promise}
      */
     loadModule(moduleName, callback) {
-        const className = 'Module' + moduleName;
-
-        return import('../modules/' + moduleName + '/' + className).then((module) => {
-            this.modules[moduleName] = new module.default();
-            this.modules[moduleName].init();
-            callback && callback(this.modules[moduleName]);
-        });
+        return this._simulationModel.activeUniverse.moduleManager.loadModule(moduleName, callback);
     }
 
     getModule(moduleName) {
-        if (this.modules[moduleName] === undefined) {
-            throw new Error('Unknown module: ' + moduleName);
-        }
-
-        return this.modules[moduleName];
+        return this._simulationModel.activeUniverse.moduleManager.getModule(moduleName);
     }
 
     isModuleLoaded(moduleName) {
-        return this.modules[moduleName] !== undefined;
+        return this._simulationModel.activeUniverse.moduleManager.isModuleLoaded(moduleName);
     }
+
+
+
+
 
     getClass(alias) {
         const periodPos = alias.indexOf(".");
@@ -208,4 +232,11 @@ class Simulation {
     }
 }
 
-export const sim = new Simulation();
+/**
+ * @type {SimulationEngine | null}
+ */
+export let sim = null;
+
+export function createSimulationEngine(simulationModel) {
+    sim = new SimulationEngine(simulationModel)
+}

@@ -1,19 +1,18 @@
-import { StarSystem } from "../../interface/star-system";
+import { computed } from "mobx";
 import StatisticsModel from "./statistics-model";
-import TimeModel from "./time-model";
+import { sim } from "../../core/Simulation";
 
 export class SimulationModel {
     /**
      * @param {AppModel} appModel
-     * @param {Simulation} sim
+     * @param {Universe} universe
      * @param {string} viewportId
      */
-    constructor(appModel, sim, viewportId) {
-        this._viewportId = viewportId;
-        this._simulation = sim;
+    constructor(appModel, universe, viewportId) {
         this._appModel = appModel;
+        this._activeUniverse = universe;
+        this._viewportId = viewportId;
         this._statisticsModel = new StatisticsModel();
-        this._timeModel = new TimeModel();
     }
 
     /**
@@ -24,10 +23,10 @@ export class SimulationModel {
     }
 
     /**
-     * @return {Simulation}
+     * @return {SimulationEngine | null}
      */
     get simulation() {
-        return this._simulation;
+        return sim;
     }
 
     /**
@@ -47,28 +46,19 @@ export class SimulationModel {
     /**
      * @return {TimeModel}
      */
+    @computed
     get timeModel() {
-        return this._timeModel;
+        return this._activeUniverse.timeModel;
     }
 
     /**
-     * @param {number} noradId
-     * @return {Promise<any>}
+     * @return {Universe}
      */
-    loadTLE(noradId) {
-        return this._simulation
-            .getModule(StarSystem.SolarSystem.moduleName)
-            .loadTLE(this._simulation.starSystem, noradId);
-    }
-
-    /**
-     * @return {Promise}
-     */
-    loadKSP() {
-        return this._simulation.loadModule(StarSystem.Ksp.moduleName);
+    get activeUniverse() {
+        return this._activeUniverse;
     }
 
     runTime() {
-        this._timeModel.run();
+        this.timeModel.run();
     }
 }

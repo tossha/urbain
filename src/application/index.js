@@ -1,31 +1,52 @@
-import { init as initSimulationEngine } from "../core";
+import { observable, runInAction } from "mobx";
 import { renderUi } from "../ui";
 import { createServices } from "./services";
 import { AppModel } from "./models/app-model";
+import { StarSystem } from "../constants/star-system";
+import { createSimulationEngine, sim } from "../core/Simulation";
 import ShortcutManager from "./shortcut-manager";
 
 const VIEWPORT_ENTRY_ID = "viewport-id";
+const services = createServices();
 
 class Application {
-    constructor() {
-        const services = createServices();
-        this._appModel = new AppModel(services, VIEWPORT_ENTRY_ID);
+    /**
+     * @type {Universe}
+     */
+    @observable
+    activeUniverse = null;
+
+    async loadDefaultUniverse() {
+        const universe = await services.universeService.getDefaultUniverse();
+        const appModel = new AppModel(VIEWPORT_ENTRY_ID, universe);
+        const simulationModel = appModel.simulationModel;
+
+        createSimulationEngine(simulationModel);
+
+        this._appModel = appModel;
+        this._simulationEngine = sim;
         this._shortcutManager = new ShortcutManager();
+
+        this._selectUniverse(universe);
     }
 
     renderUi() {
         renderUi(this._appModel, this._simulationModel, this._simulationModel.viewportId);
     }
 
-    initSimulation() {
-        initSimulationEngine(this._simulationModel);
+    renderSimulation() {
+        this._simulationEngine.startRenderLoop();
         this._simulationModel.runTime();
     }
 
     getApi() {
         return {
-            loadTLE: noradId => this._simulationModel.loadTLE(noradId),
-            loadKSP: () => this._simulationModel.loadKSP(),
+            loadTLE: noradId => this._appModel.loadTLE(noradId),
+            loadKSP: () => {
+                if (this.activeUniverse) {
+                    return this.activeUniverse.moduleManager.loadModule(StarSystem.Ksp.moduleName);
+                }
+            },
         };
     }
 
@@ -38,12 +59,28 @@ class Application {
         });
     }
 
+    configureGlobalSettings() {
+        window.oncontextmenu = () => false;
+    }
+
     /**
      * @return {SimulationModel}
      * @private
      */
     get _simulationModel() {
         return this._appModel.simulationModel;
+    }
+
+    /**
+     * @param {Universe} universe
+     * @private
+     */
+    _selectUniverse(universe) {
+        universe.initializeFeatures(this._appModel);
+
+        runInAction(() => {
+            this.activeUniverse = universe;
+        });
     }
 }
 
