@@ -27,7 +27,6 @@ class ModuleManager {
      * @return {Promise}
      */
     async loadModule(moduleName, callback) {
-        console.log(getModuleFullPath(moduleName));
         const module = await import(`./${getModuleFullPath(moduleName)}`);
 
         this.modules[moduleName] = new module.default();
