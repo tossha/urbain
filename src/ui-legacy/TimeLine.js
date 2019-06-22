@@ -1,6 +1,8 @@
 import Events from "../core/Events";
 
-export const J2000_TIMESTAMP = 946728000;
+const J2000_TIMESTAMP = 946728000;
+const LEFT_BUTTON_KEY_CODE = 0;
+const RIGHT_BUTTON_KEY_CODE = 2;
 
 export default class TimeLine
 {
@@ -33,7 +35,6 @@ export default class TimeLine
         this.timeLineCanvasDomElement.addEventListener("wheel",      this.onMouseWheel .bind(this));
 
         window.addEventListener("resize", this.updateCanvasStyle.bind(this));
-        window.oncontextmenu = () => false;
     }
 
     initValues() {
@@ -174,18 +175,18 @@ export default class TimeLine
     }
 
     onMouseDown(e) {
-        if (e.button === 0) {
+        if (e.button === LEFT_BUTTON_KEY_CODE) {
             this.mouseState.leftButton = true;
-        } else if (e.button === 2) {
+        } else if (e.button === RIGHT_BUTTON_KEY_CODE) {
             this.mouseState.rightButton = true;
         }
         return false;
     }
 
     onMouseUp(e) {
-        if (e.button === 0) {
+        if (e.button === LEFT_BUTTON_KEY_CODE) {
             this.mouseState.leftButton = false;
-        } else if (e.button === 2) {
+        } else if (e.button === RIGHT_BUTTON_KEY_CODE) {
             this.mouseState.rightButton = false;
         }
         return false;
@@ -202,11 +203,11 @@ export default class TimeLine
     }
 
     getMinScale() {
-        return Object.keys(this.scales).reduce((a, b) => { return this.scales[a] < this.scales[b] ? a : b });
+        return Object.keys(this.scales).reduce((a, b) => this.scales[a] < this.scales[b] ? a : b);
     }
 
     getMaxScale() {
-        return Object.keys(this.scales).reduce((a, b) => { return this.scales[a] > this.scales[b] ? a : b });
+        return Object.keys(this.scales).reduce((a, b) => this.scales[a] > this.scales[b] ? a : b);
     }
 
     onMouseWheel(e) {
