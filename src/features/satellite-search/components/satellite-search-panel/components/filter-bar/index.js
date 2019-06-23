@@ -1,7 +1,7 @@
 import React from "react";
 import PropTypes from "prop-types";
-import Select from "../../../common/select/select";
-import SatelliteLookup, { FieldType } from "../../../../../application/services/satellite-finder";
+import Select from "../../../../../../ui/components/common/select/select";
+import SatelliteLookup, { FieldType } from "../../../../satellite-finder";
 
 import "./index.scss";
 

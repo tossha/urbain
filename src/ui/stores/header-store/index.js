@@ -9,11 +9,11 @@ import { openLinkInNewTab } from "../../utils";
 export class HeaderStore {
     /**
      * @param {AppModel} appModel
-     * @param {SatelliteSearchPanelStore} satelliteSearchPanelStore
+     * @param {AppStore} appStore
      */
-    constructor(appModel, satelliteSearchPanelStore) {
+    constructor(appModel, appStore) {
         this._appModel = appModel;
-        this._satelliteSearchPanelStore = satelliteSearchPanelStore;
+        this._appStore = appStore;
         this._statisticsModel = this._appModel.simulationModel.statisticsModel;
     }
 
@@ -21,62 +21,67 @@ export class HeaderStore {
      * @return {MenuItem[]}
      */
     get mainMenu() {
-        return [
-            new DropDownMenuItem(TOP_MENU_ITEMS.SIMULATION, [
-                {
-                    label: "Orbit creation panel",
-                    selected: this._appModel.visualObjects.creationPanel.isVisible,
-                    onUpdate: ({ selected }) => {
-                        this._appModel.visualObjects.creationPanel.toggle(selected);
-                    },
+        const menuViewOptions = [
+            {
+                label: "Body Labels",
+                selected: this._appModel.bodyLabels.isVisible,
+                onUpdate: ({ selected }) => {
+                    this._appModel.bodyLabels.toggle(selected);
                 },
-                {
-                    label: "Transfer calculation panel",
-                    selected: this._appModel.visualObjects.transferCalculationPanel.isVisible,
-                    onUpdate: ({ selected }) => {
-                        this._appModel.visualObjects.transferCalculationPanel.toggle(selected);
-                    },
+            },
+            {
+                label: "Statistics badge",
+                selected: this._statisticsModel.isBadgeVisible,
+                onUpdate: ({ selected }) => {
+                    this._statisticsModel.toggleBadge(selected);
                 },
-            ]),
-            new LinkMenuItem(TOP_MENU_ITEMS.EDIT),
-            new DropDownMenuItem(TOP_MENU_ITEMS.VIEW, [
-                {
-                    label: "Body Labels",
-                    selected: this._appModel.bodyLabels.isVisible,
-                    onUpdate: ({ selected }) => {
-                        this._appModel.bodyLabels.toggle(selected);
-                    },
-                },
-                {
-                    label: "Statistics badge",
-                    selected: this._statisticsModel.isBadgeVisible,
-                    onUpdate: ({ selected }) => {
-                        this._statisticsModel.toggleBadge(selected);
-                    },
-                },
-                {
-                    label: "Satellite search panel",
-                    selected: this._satelliteSearchPanelStore.isVisible,
-                    onUpdate: ({ selected }) => {
-                        this._satelliteSearchPanelStore.toggle(selected);
-                    },
-                },
-            ]),
-            new DropDownMenuItem(TOP_MENU_ITEMS.HELP, [
-                new MenuItem({
-                    label: "Urbain Wiki",
-                    onClick: () => {
-                        openLinkInNewTab(HELP_PAGE_URL);
-                    },
-                }),
-                new MenuItem({
-                    label: "Show tutorial",
-                    onClick: () => {
-                        showWizard({ wizardId: wizardIds.GETTING_STARTED_WIZARD, ignoreWatchStatusCheck: true });
-                    },
-                }),
-            ]),
+            },
         ];
+
+        if (this._appStore.satelliteSearchPanel) {
+            menuViewOptions.push({
+                label: "Satellite search panel",
+                selected: this._appStore.satelliteSearchPanel.isVisible,
+                onUpdate: ({ selected }) => {
+                    this._appStore.satelliteSearchPanel.toggle(selected);
+                },
+            });
+        }
+
+        const menuSimulation = new DropDownMenuItem(TOP_MENU_ITEMS.SIMULATION, [
+            {
+                label: "Orbit creation panel",
+                selected: this._appModel.visualObjects.creationPanel.isVisible,
+                onUpdate: ({ selected }) => {
+                    this._appModel.visualObjects.creationPanel.toggle(selected);
+                },
+            },
+            {
+                label: "Transfer calculation panel",
+                selected: this._appModel.visualObjects.transferCalculationPanel.isVisible,
+                onUpdate: ({ selected }) => {
+                    this._appModel.visualObjects.transferCalculationPanel.toggle(selected);
+                },
+            },
+        ]);
+        const menuEdit = new LinkMenuItem(TOP_MENU_ITEMS.EDIT);
+        const menuView = new DropDownMenuItem(TOP_MENU_ITEMS.VIEW, menuViewOptions);
+        const menuHelp = new DropDownMenuItem(TOP_MENU_ITEMS.HELP, [
+            new MenuItem({
+                label: "Urbain Wiki",
+                onClick: () => {
+                    openLinkInNewTab(HELP_PAGE_URL);
+                },
+            }),
+            new MenuItem({
+                label: "Show tutorial",
+                onClick: () => {
+                    showWizard({ wizardId: wizardIds.GETTING_STARTED_WIZARD, ignoreWatchStatusCheck: true });
+                },
+            }),
+        ]);
+
+        return [menuSimulation, menuEdit, menuView, menuHelp];
     }
 }
 

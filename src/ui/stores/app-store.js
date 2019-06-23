@@ -1,5 +1,6 @@
 import { HeaderStore } from "./header-store";
-import SatelliteSearchPanelStore from "./satellite-search-panel-store";
+import { SatelliteSearchPanelStore } from "../../features/satellite-search";
+import { SATELLITE_SEARCH_MODEL_NAME } from "../../universes/solar-system/solar-system-universe";
 
 class AppStore {
     /**
@@ -9,8 +10,9 @@ class AppStore {
     constructor(appModel, simulationModel) {
         this._appModel = appModel;
         this._simulationModel = simulationModel;
-        this.satelliteSearchPanelStore = new SatelliteSearchPanelStore(appModel.satelliteSearchModel);
-        this._headerStore = new HeaderStore(appModel, this.satelliteSearchPanelStore);
+        this._headerStore = new HeaderStore(appModel, this);
+        this._satelliteSearchPanelStore = null;
+        this._initSearchPanelIfExist();
     }
 
     /**
@@ -35,6 +37,23 @@ class AppStore {
             defaultValue: starSystemManager.defaultStarSystem,
             onSelect: item => starSystemManager.loadByIdx(item.idx),
         };
+    }
+
+    get satelliteSearchPanel() {
+        return this._satelliteSearchPanelStore;
+    }
+
+    _initSearchPanelIfExist() {
+        const hasSatelliteSearchPanel = this._appModel.simulationModel.activeUniverse.hasFeature(
+            SATELLITE_SEARCH_MODEL_NAME,
+        );
+
+        if (hasSatelliteSearchPanel) {
+            const satelliteSearchModel = this._appModel.simulationModel.activeUniverse.getFeature(
+                SATELLITE_SEARCH_MODEL_NAME,
+            );
+            this._satelliteSearchPanelStore = new SatelliteSearchPanelStore(satelliteSearchModel);
+        }
     }
 }
 

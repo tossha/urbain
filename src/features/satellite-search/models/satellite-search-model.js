@@ -1,11 +1,12 @@
+import SatelliteLookup from "../satellite-finder";
+
 class SatelliteSearchModel {
     /**
      * @param {AppModel} appModel
-     * @param {SatelliteLookup} satelliteLookup
      */
-    constructor(appModel, satelliteLookup) {
+    constructor(appModel) {
         this._appModel = appModel;
-        this._satelliteLookup = satelliteLookup;
+        this._satelliteLookup = new SatelliteLookup("/api");
     }
 
     findSatellites(searchParams) {
@@ -17,7 +18,7 @@ class SatelliteSearchModel {
      * @return {Promise<any>}
      */
     loadSatellite(noradId) {
-        return this._appModel.simulationModel.loadTLE(noradId);
+        return this._appModel.loadTLE(noradId);
     }
 
     unloadSatellite(noradId) {

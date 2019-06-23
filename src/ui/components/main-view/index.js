@@ -1,5 +1,6 @@
-import React from "react";
+import React, { Suspense } from "react";
 import PropTypes from "prop-types";
+import { inject, observer } from "mobx-react";
 import cn from "classnames";
 
 import SideBar from "../common/side-bar";
@@ -9,11 +10,12 @@ import TransferCalculationPanel from "./components/transfer-calculation-panel";
 import MetricsPanel from "./components/metrics-panel";
 import ManeuverPanel from "./components/maneuver-panel";
 import DynamicTrajectoryPanel from "./components/dynamic-trajectory-panel";
-import SatelliteSearchPanel from "../satellite-search-panel";
+import AppStore from "../../stores/app-store";
 
 import "./index.scss";
+const SatelliteSearchPanel = React.lazy(() => import("../../../features/satellite-search"));
 
-const MainView = ({ className, viewportId }) => (
+const MainView = ({ className, viewportId, appStore }) => (
     <main className={cn(className, "main-view")}>
         <div id={viewportId} className="main-view__viewport-entry" />
         <SideBar className="main-view__left-side-bar">
@@ -25,7 +27,11 @@ const MainView = ({ className, viewportId }) => (
             <MetricsPanel />
             <DynamicTrajectoryPanel />
         </SideBar>
-        <SatelliteSearchPanel className="main-view__satellite-search-panel" />
+        {appStore.satelliteSearchPanel && (
+            <Suspense fallback={<div />}>
+                <SatelliteSearchPanel className="main-view__satellite-search-panel" />
+            </Suspense>
+        )}
         <BottomPanel className="main-view__bottom-panel" />
     </main>
 );
@@ -33,6 +39,7 @@ const MainView = ({ className, viewportId }) => (
 MainView.propTypes = {
     className: PropTypes.string,
     viewportId: PropTypes.string.isRequired,
+    appStore: PropTypes.instanceOf(AppStore),
 };
 
-export default MainView;
+export default inject("appStore")(observer(MainView));

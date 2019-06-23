@@ -1,7 +1,7 @@
 import React from "react";
 import PropTypes from "prop-types";
 
-import Satellite from "../../../../../application/services/satellite-finder/satelite";
+import Satellite from "../../../../satellite-finder/satelite";
 import ActionButton from "../action-button";
 import "./satellites-grid.scss";
 

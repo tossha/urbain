@@ -1,9 +1,9 @@
 import React from "react";
 import PropTypes from "prop-types";
 
-import ProgressButton from "../../../common/progress-button";
-import { AsyncAutocomplete } from "../../../common/autocomplete";
-import { ReactComponent as SearchLogo } from "../../../common/images/search.svg";
+import ProgressButton from "../../../../../../ui/components/common/progress-button";
+import { AsyncAutocomplete } from "../../../../../../ui/components/common/autocomplete";
+import { ReactComponent as SearchLogo } from "../../../../../../ui/components/common/images/search.svg";
 
 import "./index.scss";
 

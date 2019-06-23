@@ -2,12 +2,12 @@ import React from "react";
 import PropTypes from "prop-types";
 import cn from "classnames";
 
-import { createSimplebar } from "../../common/simplebar";
+import Dialog from "../../../../../ui/components/common/dialog";
+import { createSimplebar } from "../../../../../ui/components/common/simplebar";
 import SatellitesGrid from "./satellites-grid/satellites-grid";
 import Searcher from "./searcher";
 import { FilterItem } from "./filter-item";
 
-import Dialog from "../../common/dialog";
 import "../index.scss";
 
 class SatelliteSearchPanel extends React.Component {

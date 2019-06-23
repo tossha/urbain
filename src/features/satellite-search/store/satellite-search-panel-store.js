@@ -1,4 +1,4 @@
-import { VisualObject } from "../../application/entities/visual-object";
+import { VisualObject } from "../../../application/entities/visual-object";
 
 class SatelliteSearchPanelStore extends VisualObject {
     /**
