@@ -12,7 +12,7 @@ import VisualBodyModelRings from "../core/visual/BodyModel/Rings";
 import VisualBodyModelBasic from "../core/visual/BodyModel/Basic";
 import VisualShapeSphere from "../core/visual/Shape/Sphere";
 import Events from "../core/Events";
-import { sim } from "../core/Simulation";
+import { sim } from "../core/simulation-engine";
 import {STAR_SYSTEM_BARYCENTER} from "../core/StarSystem";
 
 export default class StarSystemLoader

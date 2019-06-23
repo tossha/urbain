@@ -1,6 +1,6 @@
 import {deg2rad} from "../core/algebra";
 import TimeLine from "../ui-legacy/TimeLine";
-import { sim } from "../core/Simulation";
+import { sim } from "../core/simulation-engine";
 
 export default class TLE
 {

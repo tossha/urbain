@@ -3,7 +3,7 @@ import { renderUi } from "../ui";
 import { createServices } from "./services";
 import { AppModel } from "./models/app-model";
 import { StarSystem } from "../constants/star-system";
-import { createSimulationEngine, sim } from "../core/Simulation";
+import { createSimulationEngine } from "../core/simulation-engine";
 import ShortcutManager from "./shortcut-manager";
 
 const VIEWPORT_ENTRY_ID = "viewport-id";
@@ -21,20 +21,15 @@ class Application {
         const appModel = new AppModel(VIEWPORT_ENTRY_ID, universe);
         const simulationModel = appModel.simulationModel;
 
-        createSimulationEngine(simulationModel);
-
         this._appModel = appModel;
-        this._simulationEngine = sim;
+        this._simulationEngine = createSimulationEngine(simulationModel);
         this._shortcutManager = new ShortcutManager();
 
         this._selectUniverse(universe);
     }
 
-    renderUi() {
+    startRendering() {
         renderUi(this._appModel, this._simulationModel, this._simulationModel.viewportId);
-    }
-
-    renderSimulation() {
         this._simulationEngine.startRenderLoop();
         this._simulationModel.runTime();
     }

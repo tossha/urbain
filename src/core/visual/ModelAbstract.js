@@ -1,5 +1,5 @@
 import Events from "../Events";
-import { sim } from "../Simulation";
+import { sim } from "../simulation-engine";
 
 export default class VisualModelAbstract
 {

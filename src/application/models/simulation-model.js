@@ -1,6 +1,6 @@
 import { computed } from "mobx";
 import StatisticsModel from "./statistics-model";
-import { sim } from "../../core/Simulation";
+import { sim } from "../../core/simulation-engine";
 
 export class SimulationModel {
     /**

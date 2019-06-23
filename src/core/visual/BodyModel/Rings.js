@@ -2,7 +2,7 @@ import * as THREE from "three";
 
 import VisualBodyModelAbstract from "./Abstract";
 import VisualModelAbstract from "../ModelAbstract"
-import { sim } from "../../Simulation";
+import { sim } from "../../simulation-engine";
 
 export default class VisualBodyModelRings extends VisualBodyModelAbstract
 {

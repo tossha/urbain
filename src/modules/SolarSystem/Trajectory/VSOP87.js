@@ -5,7 +5,7 @@ import KeplerianObject from "../../../core/KeplerianObject";
 import {Vector} from "../../../core/algebra";
 import StateVector from "../../../core/StateVector";
 import ModuleSolarSystem from "../ModuleSolarSystem";
-import { sim } from "../../../core/Simulation";
+import { sim } from "../../../core/simulation-engine";
 
 export default class TrajectoryVSOP87 extends TrajectoryKeplerianAbstract
 {

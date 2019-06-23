@@ -5,7 +5,7 @@ import ReferenceFrameFactory, {ReferenceFrame} from "../../core/ReferenceFrame/F
 import VisualTrajectoryModelKeplerian from "../../core/visual/Trajectory/Keplerian";
 import KeplerianObject from "../../core/KeplerianObject";
 import TrajectoryDynamic from "../../core/Trajectory/Dynamic";
-import { sim } from "../../core/Simulation";
+import { sim } from "../../core/simulation-engine";
 import VisualTrajectoryDynamic from "../../core/visual/Trajectory/Dynamic";
 import FlightEventSOIDeparture from "../../modules/PatchedConics/FlightEvent/SOIDeparture";
 import FlightEventSOIArrival from "../../modules/PatchedConics/FlightEvent/SOIArrival";

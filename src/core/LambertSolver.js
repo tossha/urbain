@@ -6,7 +6,7 @@ import Body from "./Body";
 import StateVector from "./StateVector";
 import TrajectoryComposite from "./Trajectory/Composite";
 import TrajectoryKeplerianBasic from "./Trajectory/KeplerianBasic";
-import { sim } from "./Simulation";
+import { sim } from "./simulation-engine";
 
 export default class LambertSolver
 {

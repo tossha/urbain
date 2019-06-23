@@ -5,7 +5,7 @@ import Events from "../../core/Events";
 import UIPanelVector from "./Vector";
 import {presentNumberWithSuffix, rad2deg} from "../../core/algebra";
 import EphemerisObject from "../../core/EphemerisObject";
-import { sim } from "../../core/Simulation";
+import { sim } from "../../core/simulation-engine";
 
 export default class UIPanelMetrics extends UIPanel {
     /**

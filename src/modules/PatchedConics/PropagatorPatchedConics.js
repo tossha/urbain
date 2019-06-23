@@ -5,7 +5,7 @@ import TrajectoryKeplerianBasic from "../../core/Trajectory/KeplerianBasic";
 import KeplerianObject from "../../core/KeplerianObject";
 import VisualTrajectoryModelKeplerian from "../../core/visual/Trajectory/Keplerian";
 import {getAngleIntervalsIntersection, getEpochIntervalsIntersection, Quaternion, TWO_PI} from "../../core/algebra";
-import { sim } from "../../core/Simulation";
+import { sim } from "../../core/simulation-engine";
 import FlightEventSOIArrival from "./FlightEvent/SOIArrival";
 import FlightEventSOIDeparture from "./FlightEvent/SOIDeparture";
 import EphemerisObject from "../../core/EphemerisObject";

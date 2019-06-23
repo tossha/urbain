@@ -4,7 +4,7 @@ import {Quaternion, Vector} from "../core/algebra";
 import {ReferenceFrame, RF_BASE} from "../core/ReferenceFrame/Factory";
 import Events from "../core/Events";
 import ReferenceFrameFactory from "../core/ReferenceFrame/Factory";
-import { sim } from "../core/Simulation";
+import { sim } from "../core/simulation-engine";
 
 export default class Camera
 {

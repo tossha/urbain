@@ -3,7 +3,7 @@ import Events from "../../core/Events";
 import EphemerisObject from "../../core/EphemerisObject";
 import Body from "../../core/Body";
 import PropagatorPatchedConics from "./PropagatorPatchedConics";
-import { sim } from "../../core/Simulation";
+import { sim } from "../../core/simulation-engine";
 import VisualFlightEventSOIArrival from "./visual/FlightEvent/SOIArrival";
 import VisualFlightEventSOIDeparture from "./visual/FlightEvent/SOIDeparture";
 

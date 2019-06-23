@@ -3,7 +3,7 @@ import * as THREE from "three";
 import VisualModelAbstract from "./ModelAbstract";
 import {Quaternion, Vector} from "../algebra";
 import {RF_BASE} from "../ReferenceFrame/Factory";
-import { sim } from "../Simulation";
+import { sim } from "../simulation-engine";
 
 export default class VisualVector extends VisualModelAbstract
 {

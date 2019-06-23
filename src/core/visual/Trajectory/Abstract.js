@@ -2,7 +2,7 @@ import * as THREE from "three";
 
 import VisualModelAbstract from "../ModelAbstract";
 import LineObject from "../LineObject";
-import { sim } from "../../Simulation";
+import { sim } from "../../simulation-engine";
 
 export default class VisualTrajectoryAbstract extends VisualModelAbstract
 {

@@ -6,8 +6,7 @@ configure({ enforceActions: "always" });
 const app = new Application();
 
 app.loadDefaultUniverse().then(() => {
-    app.renderUi();
-    app.renderSimulation();
+    app.startRendering();
     app.registerShortcuts();
     app.configureGlobalSettings();
 

@@ -4,7 +4,7 @@ import VisualTrajectoryModelAbstract from "./Abstract";
 import {RF_BASE_OBJ} from "../../ReferenceFrame/Factory";
 import {acosSigned, isInInterval, TWO_PI, Vector} from "../../algebra";
 import ReferenceFrameInertial from "../../ReferenceFrame/Inertial";
-import { sim } from "../../Simulation";
+import { sim } from "../../simulation-engine";
 import Constant from "../../FunctionOfEpoch/Constant";
 import StateVector from "../../StateVector";
 import VisualMarkerPericenter from "../Marker/Pericenter";

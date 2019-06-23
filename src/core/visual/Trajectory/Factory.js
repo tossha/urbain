@@ -1,6 +1,6 @@
 import VisualTrajectoryKeplerian from "./Keplerian";
 import VisualTrajectoryPointArray from "./PointArray";
-import { sim } from "../../Simulation";
+import { sim } from "../../simulation-engine";
 
 export default class VisualTrajectoryFactory
 {

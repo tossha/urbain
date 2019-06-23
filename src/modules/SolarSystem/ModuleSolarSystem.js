@@ -1,5 +1,5 @@
 import Module from "../../core/Module";
-import { sim } from "../../core/Simulation";
+import { sim } from "../../core/simulation-engine";
 import StarSystemLoader from "../../interface/StarSystemLoader";
 import TrajectoryELP2000 from "./Trajectory/ELP2000";
 import TrajectoryVSOP87 from "./Trajectory/VSOP87";

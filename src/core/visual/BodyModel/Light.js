@@ -1,7 +1,7 @@
 import * as THREE from "three";
 
 import VisualBodyModelBasic from "./Basic";
-import { sim } from "../../Simulation";
+import { sim } from "../../simulation-engine";
 
 export default class VisualBodyModelLight extends VisualBodyModelBasic
 {

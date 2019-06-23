@@ -8,7 +8,7 @@ import VisualTrajectoryModelPointArray from "../core/visual/Trajectory/PointArra
 import VisualTrajectoryModelKeplerian from "../core/visual/Trajectory/Keplerian";
 import TrajectoryStaticPosition from "../core/Trajectory/StaticPosition";
 import {Vector} from "../core/algebra";
-import { sim } from "../core/Simulation";
+import { sim } from "../core/simulation-engine";
 
 export default class TrajectoryLoader
 {

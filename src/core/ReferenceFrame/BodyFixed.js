@@ -2,7 +2,7 @@ import ReferenceFrameAbstract from "./Abstract";
 import {RF_BASE} from "./Factory";
 import {Vector} from "../algebra";
 import StateVector from "../StateVector";
-import { sim } from "../Simulation";
+import { sim } from "../simulation-engine";
 
 export default class ReferenceFrameBodyFixed extends ReferenceFrameAbstract
 {

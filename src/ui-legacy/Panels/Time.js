@@ -1,6 +1,6 @@
 import Events from "../../core/Events";
 import UIPanel from "../Panel";
-import { sim } from "../../core/Simulation"
+import { sim } from "../../core/simulation-engine"
 
 export default class UIPanelTime extends UIPanel
 {

@@ -4,7 +4,7 @@ import VisualModelAbstract from "../ModelAbstract";
 import VisualLabel from "../Label";
 import EphemerisObject from "../../EphemerisObject";
 import FunctionOfEpochCustom from "../../FunctionOfEpoch/Custom";
-import { sim } from "../../Simulation";
+import { sim } from "../../simulation-engine";
 
 export default class VisualBodyModelAbstract extends VisualModelAbstract
 {

@@ -2,7 +2,7 @@ import UIPanel from "../Panel";
 import Events from "../../core/Events";
 import TrajectoryDynamic from "../../core/Trajectory/Dynamic";
 import FlightEventImpulsiveBurn from "../../core/FlightEvent/ImpulsiveBurn";
-import { sim } from "../../core/Simulation";
+import { sim } from "../../core/simulation-engine";
 
 export default class UIPanelManeuver extends UIPanel {
     constructor(panelDom) {
