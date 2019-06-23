@@ -6,7 +6,7 @@ import { sim } from '../simulation-engine';
 export default class VisualSprite extends VisualModelAbstract
 {
     constructor(positionOfEpoch, texturePath, color, verticalAlign, horizontalAlign, scale) {
-        super();
+        super(sim);
         this.positionOfEpoch = positionOfEpoch;
         this.verticalAlign = verticalAlign || 'center';
         this.horizontalAlign = horizontalAlign || 'center';

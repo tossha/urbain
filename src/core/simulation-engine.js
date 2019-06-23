@@ -22,66 +22,63 @@ class SimulationEngine {
      */
     constructor(simulationModel) {
         this._simulationModel = simulationModel;
+        this._globalTime = null;
         this.propagators = {};
-        this.renderLoopActive = false;
+        this._renderLoopActive = false;
         this.starSystemManager = new StarSystemManager();
+
         this.scene = new THREE.Scene();
         this.scene.add(new THREE.AmbientLight(0xFFEFD5, 0.15));
         this.textureLoader = new THREE.TextureLoader();
-        this.renderer = new THREE.WebGLRenderer({antialias: true, logarithmicDepthBuffer: true});
+        this.renderer = new THREE.WebGLRenderer({ antialias: true, logarithmicDepthBuffer: true });
+
+        this.rendererEvents = new EventHandler(this.renderer.domElement);
+        this.selection = new SelectionHandler(this);
     }
+
+    _render = curTime => {
+        if (!this._renderLoopActive) {
+            return;
+        }
+
+        this.tick((curTime - this._globalTime) / 1000);
+
+        this._globalTime = curTime;
+        this._simulationModel.statisticsModel.updateStatistics();
+
+        requestAnimationFrame(this._render);
+    };
+
+    _firstRender = curTime => {
+        this._globalTime = curTime;
+        requestAnimationFrame(this._render);
+    };
 
     startRenderLoop() {
         if (!this._simulationModel) {
             throw new Error("SimulationModel must be initialized");
         }
 
-        let globalTime;
-
-        const render = curTime => {
-            if (!this.renderLoopActive) {
-                return;
-            }
-
-            this.tick((curTime - globalTime) / 1000);
-
-            globalTime = curTime;
-            this._simulationModel.statisticsModel.updateStatistics();
-            requestAnimationFrame(render);
-        };
-
-        function firstRender(curTime) {
-            globalTime = curTime;
-            requestAnimationFrame(render);
-        }
-
-        this.init(this._simulationModel);
-
-        this.starSystemManager.loadDefault(() => requestAnimationFrame(firstRender));
-        this.loadModule("PatchedConics");
-    }
-
-    /**
-     * @param {SimulationModel} simulationModel
-     */
-    init(simulationModel) {
         this.domElement = document.getElementById(this._simulationModel.viewportId);
         this._setRenderSize();
         this.domElement.appendChild(this.renderer.domElement);
 
-        this.rendererEvents = new EventHandler(this.renderer.domElement);
-        this.selection = new SelectionHandler();
+
+
         this.camera = new Camera(this.renderer.domElement);
-        this.raycaster = new VisualRaycaster(this.renderer.domElement, this.camera.threeCamera, 7);
+        this.raycaster = new VisualRaycaster(this, this.renderer.domElement, this.camera.threeCamera, /* pixelPrecision */ 7);
 
-        this.time = new TimeLine(0, 1, simulationModel.timeModel);
+        this.time = new TimeLine(0, 1, this._simulationModel.timeModel);
         this.ui = new UI(this);
-
-        window.addEventListener("resize", this.onWindowResize);
 
         VisualFlightEventImpulsiveBurn.preloadTexture();
         VisualMarkerPericenter.preloadTexture();
         VisualMarkerApocenter.preloadTexture();
+
+        this.starSystemManager.loadDefault(() => requestAnimationFrame(this._firstRender));
+        this.loadModule("PatchedConics");
+
+        window.addEventListener("resize", this.onWindowResize);
     }
 
     tick(timeDelta) {
@@ -90,14 +87,14 @@ class SimulationEngine {
 
         Events.dispatch(Events.RENDER, {epoch: this.time.epoch});
 
-        if (this.renderLoopActive) {
+        if (this._renderLoopActive) {
             this.renderer.render(this.scene, this.camera.threeCamera);
         }
     }
 
     loadStarSystem(jsonFile, onLoadFinish) {
         return Promise.resolve($.getJSON("./star_systems/" + jsonFile, starSystemConfig => {
-            this.stopRendering();
+            this._stopRendering();
             this.selection.deselect();
             this.starSystem && this.starSystem.unload();
 
@@ -116,16 +113,16 @@ class SimulationEngine {
             onLoadFinish && onLoadFinish(this.starSystem);
             Events.dispatch(Events.STAR_SYSTEM_LOADED, {starSystem: this.starSystem});
 
-            this.startRendering();
+            this._startRendering();
         }));
     }
 
-    startRendering() {
-        this.renderLoopActive = true;
+    _startRendering() {
+        this._renderLoopActive = true;
     }
 
-    stopRendering() {
-        this.renderLoopActive = false;
+    _stopRendering() {
+        this._renderLoopActive = false;
     }
 
     get currentEpoch() {

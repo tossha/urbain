@@ -18,7 +18,7 @@ export default class VisualTrajectoryAbstract extends VisualModelAbstract
      *                         ('copy')  minEpoch/maxEpoch of the trajectory is used
      */
     constructor(trajectory, config) {
-        super();
+        super(sim);
 
         this.trajectory = trajectory;
         this.color = config.color;

@@ -6,7 +6,7 @@ import { sim } from "../simulation-engine";
 export default class HelperGrid extends VisualModelAbstract
 {
     constructor(referenceFrame) {
-        super();
+        super(sim);
 
         this.referenceFrame = referenceFrame;
 

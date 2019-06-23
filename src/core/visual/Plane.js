@@ -1,11 +1,12 @@
 import * as THREE from "three";
 import VisualModelAbstract from "./ModelAbstract";
 import FunctionOfEpochAbstract from "../FunctionOfEpoch/Abstract";
+import { sim } from "../simulation-engine";
 
 export default class VisualPlane extends VisualModelAbstract
 {
     constructor(position, quaternion, size, color, opacity) {
-        super();
+        super(sim);
 
         this._position = position;
         this._quaternion = quaternion;

@@ -8,7 +8,7 @@ import { sim } from "../simulation-engine";
 export default class VisualVector extends VisualModelAbstract
 {
     constructor(vector, referenceFrameId) {
-        super();
+        super(sim);
         if (referenceFrameId === undefined) {
             referenceFrameId = RF_BASE;
         }

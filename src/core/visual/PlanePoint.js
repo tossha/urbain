@@ -8,7 +8,7 @@ import { sim } from "../simulation-engine";
 export default class VisualPlanePoint extends VisualModelAbstract
 {
     constructor(referenceFrame, value, color, size, editingCallback, minBound, maxBound) {
-        super();
+        super(sim);
 
         this._referenceFrame = referenceFrame;
         this._value = value;

@@ -11,7 +11,7 @@ import { sim } from "../simulation-engine";
 export default class VisualAngle extends VisualModelAbstract
 {
     constructor(referenceFrame, position, orientation, value, color, size, type, editingCallback) {
-        super();
+        super(sim);
 
         this._referenceFrame = referenceFrame;
         this._position = position;

@@ -5,7 +5,7 @@ import { sim } from "../simulation-engine";
 
 export default class VisualLabel extends VisualModelAbstract {
     constructor(positionOfEpoch, parameters) {
-        super();
+        super(sim);
 
         this.visible = true;
 

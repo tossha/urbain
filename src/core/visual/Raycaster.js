@@ -1,11 +1,16 @@
 import * as THREE from "three";
 
-import {deg2rad} from "../algebra";
-import { sim } from "../simulation-engine";
+import { deg2rad } from "../algebra";
 
-export default class VisualRaycaster
-{
-    constructor(domElement, threeCamera, pixelPrecision) {
+export default class VisualRaycaster {
+    /**
+     * @param {SimulationEngine} simulationEngine
+     * @param domElement
+     * @param threeCamera
+     * @param pixelPrecision
+     */
+    constructor(simulationEngine, domElement, threeCamera, pixelPrecision) {
+        this._simulationEngine = simulationEngine;
         this.raycaster = new THREE.Raycaster();
         this.mouse = new THREE.Vector2();
         this.camera = threeCamera;
@@ -45,7 +50,7 @@ export default class VisualRaycaster
 
         const pointDirection = (new THREE.Vector3()).subVectors(
             point,
-            sim.camera.lastPosition
+            this._simulationEngine.camera.lastPosition
         );
 
         const angle = Math.acos(

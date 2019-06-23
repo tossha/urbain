@@ -2,11 +2,12 @@ import * as THREE from "three";
 
 import { deg2rad, Quaternion } from "../algebra";
 import VisualModelAbstract from "./ModelAbstract";
+import { sim } from "../simulation-engine";
 
 export default class VisualStarsModel extends VisualModelAbstract
 {
     constructor(data) {
-        super();
+        super(sim);
 
         let threeGeometry = new THREE.Geometry();
 
