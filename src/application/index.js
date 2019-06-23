@@ -6,7 +6,6 @@ import { StarSystem } from "../constants/star-system";
 import { createSimulationEngine } from "../core/simulation-engine";
 import ShortcutManager from "./shortcut-manager";
 
-const VIEWPORT_ENTRY_ID = "viewport-id";
 const services = createServices();
 
 class Application {
@@ -18,7 +17,7 @@ class Application {
 
     async loadDefaultUniverse() {
         const universe = await services.universeService.getDefaultUniverse();
-        const appModel = new AppModel(VIEWPORT_ENTRY_ID, universe);
+        const appModel = new AppModel(universe);
         const simulationModel = appModel.simulationModel;
 
         this._appModel = appModel;
@@ -29,8 +28,9 @@ class Application {
     }
 
     startRendering() {
-        renderUi(this._appModel, this._simulationModel, this._simulationModel.viewportId);
-        this._simulationEngine.startRenderLoop();
+        renderUi(this._appModel);
+
+        this._simulationEngine.startRenderLoop(this._appModel.simulationModel.viewportElement);
         this._simulationModel.runTime();
     }
 

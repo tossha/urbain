@@ -6,20 +6,19 @@ export class SimulationModel {
     /**
      * @param {AppModel} appModel
      * @param {Universe} universe
-     * @param {string} viewportId
      */
-    constructor(appModel, universe, viewportId) {
+    constructor(appModel, universe) {
         this._appModel = appModel;
         this._activeUniverse = universe;
-        this._viewportId = viewportId;
         this._statisticsModel = new StatisticsModel();
+        this._viewportElement = null;
     }
 
     /**
-     * @return {string}
+     * @return {{HTMLDivElement}}
      */
-    get viewportId() {
-        return this._viewportId;
+    get viewportElement() {
+        return this._viewportElement;
     }
 
     /**
@@ -60,5 +59,12 @@ export class SimulationModel {
 
     runTime() {
         this.timeModel.run();
+    }
+
+    /**
+     * @param {HTMLDivElement} element
+     */
+    setViewportElement(element) {
+        this._viewportElement = element;
     }
 }

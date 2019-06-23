@@ -43,6 +43,10 @@ class AppStore {
         return this._satelliteSearchPanelStore;
     }
 
+    setViewportElement = element => {
+        this._simulationModel.setViewportElement(element);
+    };
+
     _initSearchPanelIfExist() {
         const hasSatelliteSearchPanel = this._appModel.simulationModel.activeUniverse.hasFeature(
             SATELLITE_SEARCH_MODEL_NAME,

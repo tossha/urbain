@@ -7,15 +7,13 @@ import AppComponent from "./components/app";
 
 /**
  * @param {AppModel} appModel
- * @param {SimulationModel} simulationModel
- * @param {string} viewportId
  */
-function renderUi(appModel, simulationModel, viewportId) {
-    const stores = createStores(appModel, simulationModel);
+function renderUi(appModel) {
+    const stores = createStores(appModel);
 
     ReactDOM.render(
         <Provider {...stores}>
-            <AppComponent viewportId={viewportId} />
+            <AppComponent />
         </Provider>,
         document.getElementById("root"),
     );

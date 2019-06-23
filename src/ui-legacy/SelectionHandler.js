@@ -74,7 +74,7 @@ export default class SelectionHandler extends VisualModelAbstract {
         }
     }
 
-    onMouseDown(event) {
+    onMouseDown = (event) => {
         if (event.button === this.selectionMouseButton) {
             document.addEventListener('mousemove', this.onMouseMove);
             document.addEventListener('mouseup', this.onMouseUp);

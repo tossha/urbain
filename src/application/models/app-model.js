@@ -5,12 +5,11 @@ import { StarSystem } from "../../constants/star-system";
 
 export class AppModel {
     /**
-     * @param {string} viewportId
      * @param {Universe} universe
      */
-    constructor(viewportId, universe) {
+    constructor(universe) {
         this._activeUniverse = universe;
-        this._simulationModel = new SimulationModel(this, universe, viewportId);
+        this._simulationModel = new SimulationModel(this, universe);
     }
 
     @observable

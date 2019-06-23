@@ -5,10 +5,10 @@ import TimeStore from "./time-store";
 
 /**
  * @param {AppModel} appModel
- * @param {SimulationModel} simulationModel
  * @return {{appStore: AppStore, statisticsBadgeStore: StatisticsBadgeStore}}
  */
-export function createStores(appModel, simulationModel) {
+export function createStores(appModel) {
+    const simulationModel = appModel.simulationModel;
     const appStore = new AppStore(appModel, simulationModel);
     const statisticsBadgeStore = new StatisticsBadgeStore(simulationModel);
     const selectedObjectMetricsStore = new SelectedObjectMetricsStore(simulationModel);

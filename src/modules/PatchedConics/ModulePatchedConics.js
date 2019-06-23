@@ -18,8 +18,8 @@ export default class ModulePatchedConics extends Module
             this.fillSoiTree();
         }
 
-        VisualFlightEventSOIArrival.preloadTexture();
-        VisualFlightEventSOIDeparture.preloadTexture();
+        VisualFlightEventSOIArrival.preloadTexture(sim.textureLoader);
+        VisualFlightEventSOIDeparture.preloadTexture(sim.textureLoader);
     }
 
     fillSoiTree() {
