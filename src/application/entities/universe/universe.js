@@ -1,6 +1,6 @@
 import ModuleManager from "../../../modules/module-manager";
 import FeaturesList from "./features-list";
-import TimeModel from "../../models/time-model";
+import TimeModel from "./time-model";
 
 class Universe {
     constructor() {

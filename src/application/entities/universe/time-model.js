@@ -1,6 +1,7 @@
 import { observable, action, computed } from "mobx";
+import EpochModel from "./epoch-model";
 
-class TimeModel {
+class TimeModel extends EpochModel {
     /**
      * @type {boolean}
      * @private

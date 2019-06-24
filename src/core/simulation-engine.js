@@ -26,6 +26,8 @@ class SimulationEngine {
         }
 
         this._simulationModel = simulationModel;
+        this._timeModel = simulationModel.timeModel;
+
         this._globalTime = null;
         this.propagators = {};
         this._renderLoopActive = false;
@@ -150,11 +152,11 @@ class SimulationEngine {
 
 
     get currentEpoch() {
-        return this.time.epoch;
+        return this._timeModel.epoch;
     }
 
     get currentDate() {
-        return this.time.getDateByEpoch(this.time.epoch);
+        return this.time.getDateByEpoch(this._timeModel.epoch);
     }
 
     get settings() {
@@ -196,9 +198,9 @@ class SimulationEngine {
 
     _tick(timeDelta) {
         this.time.tick(timeDelta);
-        this.camera.update(this.time.epoch);
+        this.camera.update(this._timeModel.epoch);
 
-        Events.dispatch(Events.RENDER, {epoch: this.time.epoch});
+        Events.dispatch(Events.RENDER, {epoch: this._timeModel.epoch});
 
         if (this._renderLoopActive) {
             this.renderer.render(this.scene, this.camera.threeCamera);
