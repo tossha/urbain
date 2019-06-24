@@ -3,7 +3,7 @@ import PropTypes from "prop-types";
 import cn from "classnames";
 
 import CameraPanel from "./components/camera-panel/camera-panel";
-import TimeLine from "./components/time-line";
+import TimeLine from "../../../time-line";
 import PauseButton from "./components/pause-button";
 import TimeSettingsPanel from "./components/time-settings-panel";
 import StatisticsBadge from "../../../statistics-badge";

@@ -2,6 +2,7 @@ import AppStore from "./app-store";
 import StatisticsBadgeStore from "./statistics-badge-store";
 import SelectedObjectMetricsStore from "./selected-object-metrics-store";
 import TimeStore from "./time-store";
+import TimeLineStore from "./time-line-store";
 
 /**
  * @param {AppModel} appModel
@@ -13,13 +14,14 @@ export function createStores(appModel) {
     const statisticsBadgeStore = new StatisticsBadgeStore(simulationModel);
     const selectedObjectMetricsStore = new SelectedObjectMetricsStore(simulationModel);
     const timeStore = new TimeStore(simulationModel.timeModel);
+    const timeLineStore = new TimeLineStore(simulationModel);
 
     return {
         appStore,
         statisticsBadgeStore,
         selectedObjectMetricsStore,
-        satelliteSearchPanelStore: appStore.satelliteSearchPanelStore,
         timeStore,
+        timeLineStore,
     };
 }
 
