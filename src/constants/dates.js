@@ -1,0 +1,1 @@
+export const TWENTY_FOUR_HOURS_IN_SECONDS = 86400;

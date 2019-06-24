@@ -6,6 +6,7 @@ import {Vector} from "../../../core/algebra";
 import StateVector from "../../../core/StateVector";
 import ModuleSolarSystem from "../ModuleSolarSystem";
 import { sim } from "../../../core/simulation-engine";
+import { TWENTY_FOUR_HOURS_IN_SECONDS } from "../../../constants/dates";
 
 export default class TrajectoryVSOP87 extends TrajectoryKeplerianAbstract
 {
@@ -32,7 +33,7 @@ export default class TrajectoryVSOP87 extends TrajectoryKeplerianAbstract
     }
 
     getStateInOwnFrameByEpoch(epoch) {
-        const T = epoch / 86400 / 365250;
+        const T = epoch / TWENTY_FOUR_HOURS_IN_SECONDS / 365250;
         let position = new Vector(3);
         let velocity = new Vector(3);
 
@@ -52,6 +53,6 @@ export default class TrajectoryVSOP87 extends TrajectoryKeplerianAbstract
             }
         }
 
-        return new StateVector(position.mul_(149597870.7), velocity.mul_(149597870.7 / 86400 / 365250));
+        return new StateVector(position.mul_(149597870.7), velocity.mul_(149597870.7 / TWENTY_FOUR_HOURS_IN_SECONDS / 365250));
     }
 }

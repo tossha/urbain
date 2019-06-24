@@ -1,6 +1,7 @@
 import {deg2rad} from "../core/algebra";
 import TimeLine from "../ui-legacy/TimeLine";
 import { sim } from "../core/simulation-engine";
+import { TWENTY_FOUR_HOURS_IN_SECONDS } from "../constants/dates";
 
 export default class TLE
 {
@@ -32,7 +33,7 @@ export default class TLE
     }
 
     getMeanMotion() {
-        return parseFloat(this.lineTwo.substr(52, 11)) / 86400; //day^(-1)/86400 (s/day)=s^(-1)
+        return parseFloat(this.lineTwo.substr(52, 11)) / TWENTY_FOUR_HOURS_IN_SECONDS; //day^(-1)/86400 (s/day)=s^(-1)
     }
 
     getSma() {
@@ -45,6 +46,6 @@ export default class TLE
         const days = parseFloat(this.lineOne.substr(20, 12));
         const year = (yearDigit > 50) ? 1900 + yearDigit : 2000 + yearDigit;
 
-        return TimeLine.getEpochByDate(new Date(Date.UTC(year, 0, 0, 0, 0, days * 86400, 0)));
+        return TimeLine.getEpochByDate(new Date(Date.UTC(year, 0, 0, 0, 0, days * TWENTY_FOUR_HOURS_IN_SECONDS, 0)));
     }
 }

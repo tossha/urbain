@@ -1,5 +1,6 @@
 import OrientationAbstract from "../../../core/Orientation/Abstract";
 import {deg2rad, Quaternion} from "../../../core/algebra";
+import { TWENTY_FOUR_HOURS_IN_SECONDS } from "../../../constants/dates";
 
 export default class OrientationIAUModel extends OrientationAbstract
 {
@@ -14,7 +15,7 @@ export default class OrientationIAUModel extends OrientationAbstract
 
     getQuaternionByEpoch(epoch) {
         const centuries = epoch / 3155760000;
-        const days = epoch / 86400;
+        const days = epoch / TWENTY_FOUR_HOURS_IN_SECONDS;
 
         const rightAscension = 90 + this.rightAscension[0] +
             centuries * this.rightAscension[1] +

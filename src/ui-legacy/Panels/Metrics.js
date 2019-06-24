@@ -6,6 +6,7 @@ import UIPanelVector from "./Vector";
 import {presentNumberWithSuffix, rad2deg} from "../../core/algebra";
 import EphemerisObject from "../../core/EphemerisObject";
 import { sim } from "../../core/simulation-engine";
+import { TWENTY_FOUR_HOURS_IN_SECONDS } from "../../constants/dates";
 
 export default class UIPanelMetrics extends UIPanel {
     /**
@@ -78,7 +79,7 @@ export default class UIPanelMetrics extends UIPanel {
 
         if (parent.physicalModel && parent.physicalModel.j2 && parent.physicalModel.j2) {
             this.jqDom.find('#elements-precession').html('' + (
-                rad2deg(keplerianObject.getNodalPrecessionRate(parent.physicalModel.eqRadius, parent.physicalModel.j2) * 86400)
+                rad2deg(keplerianObject.getNodalPrecessionRate(parent.physicalModel.eqRadius, parent.physicalModel.j2) * TWENTY_FOUR_HOURS_IN_SECONDS)
             ).toPrecision(this.precision));
         }
     }
@@ -97,7 +98,7 @@ export default class UIPanelMetrics extends UIPanel {
         this.jqDom.find('#elements-aop' ).html('' + rad2deg( keplerianObject.aop ).toPrecision(this.precision));
         this.jqDom.find('#elements-raan').html('' + rad2deg( keplerianObject.raan).toPrecision(this.precision));
         this.jqDom.find('#elements-ta'  ).html('' + rad2deg( keplerianObject.getTrueAnomalyByEpoch(epoch)  ).toPrecision(this.precision));
-        this.jqDom.find('#elements-period').html('' + (keplerianObject.period / 86400).toPrecision(this.precision));
+        this.jqDom.find('#elements-period').html('' + (keplerianObject.period / TWENTY_FOUR_HOURS_IN_SECONDS).toPrecision(this.precision));
     }
 
     handleSelect = ({ detail }) => {

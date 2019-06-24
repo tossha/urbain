@@ -8,13 +8,14 @@ import VisualVector from "../../core/visual/Vector";
 import EphemerisObject from "../../core/EphemerisObject";
 import { sim } from "../../core/simulation-engine";
 import Events from "../../core/Events";
+import { TWENTY_FOUR_HOURS_IN_SECONDS } from "../../constants/dates";
 
 export default class UIPanelLambert extends UIPanel
 {
     constructor(panelDom) {
         super(panelDom, true);
 
-        this.maxTransferTime = 86400 * 365.25 * 40;
+        this.maxTransferTime = TWENTY_FOUR_HOURS_IN_SECONDS * 365.25 * 40;
 
         this.jqSlider = this.jqDom.find('#transferTimeSlider');
         this.jqSlider.on('input change', () => this.changeTransferTime(this.getCurrentTransferTime()));
@@ -212,12 +213,12 @@ export default class UIPanelLambert extends UIPanel
             return prefix + (abs / 60).toPrecision(precision) + ' min';
         }
 
-        if (abs < 86400) {
+        if (abs < TWENTY_FOUR_HOURS_IN_SECONDS) {
             return prefix + (abs / 3600).toPrecision(precision) + ' h';
         }
 
         if (abs < 2592000) {
-            return prefix + (abs / 86400).toPrecision(precision) + ' days';
+            return prefix + (abs / TWENTY_FOUR_HOURS_IN_SECONDS).toPrecision(precision) + ' days';
         }
 
         if (abs < 31557600) {

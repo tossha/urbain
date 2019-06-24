@@ -1,13 +1,13 @@
 import Events from "../../core/Events";
 import UIPanel from "../Panel";
 import { sim } from "../../core/simulation-engine"
+import { TWENTY_FOUR_HOURS_IN_SECONDS } from "../../constants/dates";
 
-export default class UIPanelTime extends UIPanel
-{
+const MAX_TIME_SCALE = TWENTY_FOUR_HOURS_IN_SECONDS * 30 * 6;
+
+export default class UIPanelTime extends UIPanel {
     constructor(panelDom) {
         super(panelDom);
-
-        this.maxTimeScale = 6 * 30 * 86400;
 
         this.jqSlider = this.jqDom.find('#timeScaleSlider');
         this.jqSlider.on('input change', () => sim.time.setTimeScale(this.getCurrentTimeScale()));
@@ -37,11 +37,11 @@ export default class UIPanelTime extends UIPanel
      */
     getCurrentTimeScale() {
         const val = this.jqSlider.val();
-        return Math.sign(val) * val * val * val * val * this.maxTimeScale;
+        return Math.sign(val) * val * val * val * val * MAX_TIME_SCALE;
     }
 
     getNeededSliderValue(timeScale) {
-        const val = Math.sqrt(Math.sqrt(Math.abs(timeScale) / this.maxTimeScale));
+        const val = Math.sqrt(Math.sqrt(Math.abs(timeScale) / MAX_TIME_SCALE));
         return Math.sign(timeScale) * Math.min(1, val);
     }
 
@@ -62,12 +62,12 @@ export default class UIPanelTime extends UIPanel
             return prefix + (abs / 60).toPrecision(precision) + ' min/s';
         }
 
-        if (abs < 86400) {
+        if (abs < TWENTY_FOUR_HOURS_IN_SECONDS) {
             return prefix + (abs / 3600).toPrecision(precision) + ' h/s';
         }
 
         if (abs < 2592000) {
-            return prefix + (abs / 86400).toPrecision(precision) + ' days/s';
+            return prefix + (abs / TWENTY_FOUR_HOURS_IN_SECONDS).toPrecision(precision) + ' days/s';
         }
 
         if (abs < 31557600) {
