@@ -3,6 +3,7 @@ import StatisticsBadgeStore from "./statistics-badge-store";
 import SelectedObjectMetricsStore from "./selected-object-metrics-store";
 import TimeStore from "./time-store";
 import TimeLineStore from "./time-line-store";
+import TimeSettingsPanelStore from "../components/main-view/components/bottom-panel/components/time-settings-panel/store/time-settings-panel-store";
 
 /**
  * @param {AppModel} appModel
@@ -15,6 +16,10 @@ export function createStores(appModel) {
     const selectedObjectMetricsStore = new SelectedObjectMetricsStore(simulationModel);
     const timeStore = new TimeStore(simulationModel.timeModel);
     const timeLineStore = new TimeLineStore(simulationModel);
+    const timeSettingsPanelStore = new TimeSettingsPanelStore(
+        simulationModel.timeModel,
+        simulationModel.activeUniverse,
+    );
 
     return {
         appStore,
@@ -22,6 +27,7 @@ export function createStores(appModel) {
         selectedObjectMetricsStore,
         timeStore,
         timeLineStore,
+        timeSettingsPanelStore,
     };
 }
 

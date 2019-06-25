@@ -1,5 +1,5 @@
 import Events from "../core/Events";
-import { TWENTY_FOUR_HOURS_IN_SECONDS } from "../constants/dates";
+import { ONE_HOUR_IN_SECONDS, ONE_MINUTE_IN_SECONDS, TWENTY_FOUR_HOURS_IN_SECONDS } from "../constants/dates";
 
 const LEFT_BUTTON_KEY_CODE = 0;
 const RIGHT_BUTTON_KEY_CODE = 2;
@@ -27,22 +27,16 @@ class TimeLine {
         this._canvasRect = {};
         this._updateCanvasStyle();
         this.initValues();
-
-        this._timeLineCanvasDomElement.addEventListener("mousedown", this._onMouseDown);
-        window                       .addEventListener("mouseup", this._onMouseUp);
-        window                       .addEventListener("mousemove", this._onMouseMove);
-        this._timeLineCanvasDomElement.addEventListener("wheel", this._onMouseWheel);
-
-        window.addEventListener("resize", this._updateCanvasStyle);
+        this._addListeners();
     }
 
     initValues() {
         this.scales = {
-            minute: 60,
+            minute: ONE_MINUTE_IN_SECONDS,
             fiveMinutes: 300,
             tenMinutes: 600,
             thirtyMinutes: 1800,
-            hour: 3600,
+            hour: ONE_HOUR_IN_SECONDS,
             threeHours: 10800,
             sixHours: 21600,
             day: TWENTY_FOUR_HOURS_IN_SECONDS,
@@ -69,14 +63,6 @@ class TimeLine {
         this.formatDateFull = this._universe.dataTransforms.formatDateFull;
     }
 
-    /**
-     * @param {number} newScale
-     */
-    setTimeScale(newScale) {
-        Events.dispatch(Events.TIME_SCALE_CHANGED, { new: newScale });
-        this._timeModel.setTimeScale(newScale);
-    }
-
     tick(timePassed) {
         if (this._mouseState.leftButton) {
             this._timeModel.setEpoch(
@@ -92,22 +78,31 @@ class TimeLine {
             this._timeModel.setEpoch(this.epoch + this.timeScale * timePassed);
         }
 
-        Events.dispatch(Events.EPOCH_CHANGED, {
-            epoch: this.epoch,
-            date: this.getDateByEpoch(this.epoch)
-        });
-
         this._redraw();
     }
 
-    forceEpoch(newEpoch) {
-        this._leftEpoch += newEpoch - this.epoch;
-        this._timeModel.setEpoch(newEpoch);
-        this.tick(0);
+    useCurrentTime() {
+        this._timeModel.setCurrentTimeEpoch();
     }
 
-    useCurrentTime() {
-        this.forceEpoch(this.getEpochByDate(new Date()));
+    updateScaleType() {
+        const secondsPerPeriod = this._markDistance * this._span / this._timeLineCanvasDomElement.width;
+        let bestScale = false;
+
+        for (const scale in this.scales) {
+            if (!bestScale) {
+                bestScale = scale;
+                continue;
+            }
+
+            if (Math.abs(this.scales[bestScale] / secondsPerPeriod - 1)
+                > Math.abs(this.scales[scale] / secondsPerPeriod - 1)
+            ) {
+                bestScale = scale;
+            }
+        }
+
+        this._scaleType = bestScale;
     }
 
     _redraw() {
@@ -140,26 +135,6 @@ class TimeLine {
         this._timeLineCanvasDomElement.width  = this._canvasRect.right  - this._canvasRect.left;
         this._timeLineCanvasDomElement.height = this._canvasRect.bottom - this._canvasRect.top;
     };
-
-    updateScaleType() {
-        const secondsPerPeriod = this._markDistance * this._span / this._timeLineCanvasDomElement.width;
-        let bestScale = false;
-
-        for (const scale in this.scales) {
-            if (!bestScale) {
-                bestScale = scale;
-                continue;
-            }
-
-            if (Math.abs(this.scales[bestScale] / secondsPerPeriod - 1)
-                > Math.abs(this.scales[scale] / secondsPerPeriod - 1)
-            ) {
-                bestScale = scale;
-            }
-        }
-
-        this._scaleType = bestScale;
-    }
 
     _drawMark(x, text) {
         this._canvasContext.beginPath();
@@ -226,6 +201,21 @@ class TimeLine {
         this.updateScaleType();
         return false;
     };
+
+    _addListeners() {
+        this._timeLineCanvasDomElement.addEventListener("wheel", this._onMouseWheel);
+        this._timeLineCanvasDomElement.addEventListener("mousedown", this._onMouseDown);
+        window.addEventListener("mouseup", this._onMouseUp);
+        window.addEventListener("mousemove", this._onMouseMove);
+        window.addEventListener("resize", this._updateCanvasStyle);
+
+        Events.addListener(Events.FORCE_EPOCH_CHANGED, event => {
+            const { newEpoch } = event.detail;
+
+            this._leftEpoch += newEpoch - this._timeModel.epoch;
+            this.tick(0);
+        })
+    }
 
     /**
      * @return {number}

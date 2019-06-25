@@ -5,7 +5,7 @@ import TimeModel from "./time-model";
 class Universe {
     constructor() {
         this.moduleManager = new ModuleManager();
-        this.timeModel = new TimeModel();
+        this.timeModel = new TimeModel(this);
         this._features = new FeaturesList();
         this._starSystem = null;
     }
@@ -16,12 +16,24 @@ class Universe {
 
     get dataTransforms() {
         return {
-            getDateByEpoch() {},
-            getEpochByDate() {},
-            roundDateUp() {},
-            nextRenderingDate() {},
-            formatDate() {},
-            formatDateFull() {},
+            getDateByEpoch() {
+                throw new Error("This method must be overridden");
+            },
+            getEpochByDate() {
+                throw new Error("This method must be overridden");
+            },
+            roundDateUp() {
+                throw new Error("This method must be overridden");
+            },
+            nextRenderingDate() {
+                throw new Error("This method must be overridden");
+            },
+            formatDate() {
+                throw new Error("This method must be overridden");
+            },
+            formatDateFull() {
+                throw new Error("This method must be overridden");
+            },
         };
     }
 

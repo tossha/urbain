@@ -89,7 +89,7 @@ class SimulationEngine {
     }
 
     forceEpoch(epoch) {
-        return this.time.forceEpoch(epoch);
+        return this._timeModel.forceEpoch(epoch);
     }
 
     addEventListener(eventName, listener, priority) {
