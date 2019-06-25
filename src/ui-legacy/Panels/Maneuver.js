@@ -2,11 +2,15 @@ import UIPanel from "../Panel";
 import Events from "../../core/Events";
 import TrajectoryDynamic from "../../core/Trajectory/Dynamic";
 import FlightEventImpulsiveBurn from "../../core/FlightEvent/ImpulsiveBurn";
-import { sim } from "../../core/simulation-engine";
 
 export default class UIPanelManeuver extends UIPanel {
-    constructor(panelDom) {
+    /**
+     * @param panelDom
+     * @param {SimulationEngine} simulationEngine
+     */
+    constructor(panelDom, simulationEngine) {
         super(panelDom);
+        this._sim = simulationEngine;
 
         this.increment = 1;
 
@@ -124,7 +128,7 @@ export default class UIPanelManeuver extends UIPanel {
     }
 
     update() {
-        this.jqDom.find('#burn-date')    .html(sim.time.formatDateFull(sim.time.getDateByEpoch(this.burn.epoch)));
+        this.jqDom.find('#burn-date')    .html(this._sim.time.formatDateFull(this._sim.time.getDateByEpoch(this.burn.epoch)));
         this.jqDom.find('#burn-epoch')   .html(this.burn.epoch.toFixed(2));
         this.jqDom.find('#burn-prograde').html((this.burn.prograde * 1000).toFixed(2));
         this.jqDom.find('#burn-normal')  .html((this.burn.normal * 1000).toFixed(2));

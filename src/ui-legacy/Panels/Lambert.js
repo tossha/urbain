@@ -6,14 +6,18 @@ import ReferenceFrameFactory, {ReferenceFrame} from "../../core/ReferenceFrame/F
 import VisualTrajectoryModelKeplerian from "../../core/visual/Trajectory/Keplerian";
 import VisualVector from "../../core/visual/Vector";
 import EphemerisObject from "../../core/EphemerisObject";
-import { sim } from "../../core/simulation-engine";
 import Events from "../../core/Events";
 import { TWENTY_FOUR_HOURS_IN_SECONDS } from "../../constants/dates";
 
 export default class UIPanelLambert extends UIPanel
 {
-    constructor(panelDom) {
+    /**
+     * @param panelDom
+     * @param {SimulationEngine} sim
+     */
+    constructor(panelDom, sim) {
         super(panelDom, true);
+        this._sim = sim;
 
         this.maxTransferTime = TWENTY_FOUR_HOURS_IN_SECONDS * 365.25 * 40;
 
@@ -55,15 +59,15 @@ export default class UIPanelLambert extends UIPanel
             return;
         }
 
-        const parentObject = sim.getModule('PatchedConics').getCommonParent(this.origin, this.target);
+        const parentObject = this._sim.getModule('PatchedConics').getCommonParent(this.origin, this.target);
 
         if (parentObject === null || parentObject.id == this.origin || parentObject.id == this.target) {
             return;
         }
 
         const referenceFrameId = ReferenceFrameFactory.buildId(parentObject.id, ReferenceFrame.INERTIAL_ECLIPTIC);
-        const origin = sim.starSystem.getObject(this.origin);
-        const target = sim.starSystem.getObject(this.target);
+        const origin = this._sim.starSystem.getObject(this.origin);
+        const target = this._sim.starSystem.getObject(this.target);
         const state1 = origin.trajectory.getStateByEpoch(this.departureTime, referenceFrameId);
         const state2 = target.trajectory.getStateByEpoch(this.departureTime + this.transferTime, referenceFrameId);
 
@@ -117,8 +121,8 @@ export default class UIPanelLambert extends UIPanel
     }
 
     useCurrentTime() {
-        this.departureTime = sim.currentEpoch;
-        this.updateTime(sim.currentDate);
+        this.departureTime = this._sim.currentEpoch;
+        this.updateTime(this._sim.currentDate);
         this.solve();
     }
 
@@ -139,7 +143,7 @@ export default class UIPanelLambert extends UIPanel
             return;
         }
 
-        const periods = sim.getModule('PatchedConics').getRelativePeriod(this.origin, this.target, this.departureTime);
+        const periods = this._sim.getModule('PatchedConics').getRelativePeriod(this.origin, this.target, this.departureTime);
 
         if (periods === null) {
             return;
@@ -167,7 +171,7 @@ export default class UIPanelLambert extends UIPanel
     }
 
     buildListData() {
-        const root = sim.getModule('PatchedConics').getRootSoi();
+        const root = this._sim.getModule('PatchedConics').getRootSoi();
 
         if (!root) {
             return null;
@@ -192,7 +196,7 @@ export default class UIPanelLambert extends UIPanel
     }
 
     updateTime(date) {
-        this.jqDateText.html(sim.time.formatDateFull(date));
+        this.jqDateText.html(this._sim.time.formatDateFull(date));
     }
 
 

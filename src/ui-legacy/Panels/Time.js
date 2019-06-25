@@ -1,51 +1,55 @@
 import Events from "../../core/Events";
 import UIPanel from "../Panel";
-import { sim } from "../../core/simulation-engine"
 import { TWENTY_FOUR_HOURS_IN_SECONDS } from "../../constants/dates";
 
 const MAX_TIME_SCALE = TWENTY_FOUR_HOURS_IN_SECONDS * 30 * 6;
 
 export default class UIPanelTime extends UIPanel {
-    constructor(panelDom) {
+    /**
+     * @param panelDom
+     * @param {SimulationEngine} simulationEngine
+     */
+    constructor(panelDom, simulationEngine) {
         super(panelDom);
 
         this.jqSlider = this.jqDom.find('#timeScaleSlider');
-        this.jqSlider.on('input change', () => sim.time.setTimeScale(this.getCurrentTimeScale()));
-        this.jqSlider.val(this.getNeededSliderValue(sim.time.timeScale));
+        this.jqSlider.on('input change', () => simulationEngine.time.setTimeScale(this._getCurrentTimeScale()));
+        this.jqSlider.val(this._getNeededSliderValue(simulationEngine.time.timeScale));
 
         this.jqScaleText = this.jqDom.find('#timeScaleValue');
-        this.jqScaleText.html(this.formatTimeScale(sim.time.timeScale));
+        this.jqScaleText.html(this._formatTimeScale(simulationEngine.time.timeScale));
 
         document.addEventListener(Events.TIME_SCALE_CHANGED, (event) => {
-            this.jqSlider.val(this.getNeededSliderValue(event.detail.new));
-            this.jqScaleText.html(this.formatTimeScale(event.detail.new));
+            this.jqSlider.val(this._getNeededSliderValue(event.detail.new));
+            this.jqScaleText.html(this._formatTimeScale(event.detail.new));
         });
 
         this.jqDateText = this.jqDom.find('#currentDateValue');
-        document.addEventListener(Events.EPOCH_CHANGED, (event) => this.updateTime(event.detail.date));
 
-        this.jqDom.find('#setRealTimeScale').click(() => sim.time.setTimeScale(1));
-        this.jqDom.find('#useCurrentTime').click(() => sim.time.useCurrentTime());
-    }
+        const updateTime = date => {
+            this.jqDateText.html(simulationEngine.time.formatDateFull(date));
+        };
 
-    updateTime(date) {
-        this.jqDateText.html(sim.time.formatDateFull(date));
+        document.addEventListener(Events.EPOCH_CHANGED, (event) => updateTime(event.detail.date));
+
+        this.jqDom.find('#setRealTimeScale').click(() => simulationEngine.time.setTimeScale(1));
+        this.jqDom.find('#useCurrentTime').click(() => simulationEngine.time.useCurrentTime());
     }
 
     /**
      * @returns {number} — simulation seconds per 1 real life second
      */
-    getCurrentTimeScale() {
+    _getCurrentTimeScale() {
         const val = this.jqSlider.val();
         return Math.sign(val) * val * val * val * val * MAX_TIME_SCALE;
     }
 
-    getNeededSliderValue(timeScale) {
+    _getNeededSliderValue(timeScale) {
         const val = Math.sqrt(Math.sqrt(Math.abs(timeScale) / MAX_TIME_SCALE));
         return Math.sign(timeScale) * Math.min(1, val);
     }
 
-    formatTimeScale(scale) {
+    _formatTimeScale(scale) {
         const precision = 2;
 
         const prefix = (scale < 0) ? '-' : '';

@@ -51,7 +51,7 @@ class SimulationEngine {
         this._setRenderSize();
         this.viewportDomElement.appendChild(this.renderer.domElement);
 
-        this.camera = new Camera(this.renderer.domElement);
+        this.camera = new Camera(this.renderer.domElement, this);
         this.raycaster = new VisualRaycaster(this, this.renderer.domElement, this.camera.threeCamera, /* pixelPrecision */ 7);
         this.time = new TimeLine(0, 1, this._simulationModel.timeModel);
         this.ui = new UI(this);

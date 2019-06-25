@@ -4,11 +4,14 @@ import {Quaternion, Vector} from "../core/algebra";
 import {ReferenceFrame, RF_BASE} from "../core/ReferenceFrame/Factory";
 import Events from "../core/Events";
 import ReferenceFrameFactory from "../core/ReferenceFrame/Factory";
-import { sim } from "../core/simulation-engine";
 
 export default class Camera
 {
-    constructor(domElement) {
+    /**
+     * @param domElement
+     * @param {SimulationEngine} sim
+     */
+    constructor(domElement, sim) {
         this.settings = {
             fov: 60,
             animationDuration: 200,
@@ -20,17 +23,18 @@ export default class Camera
         this.threeCamera.position.fromArray([0, 0, 0]);
 
         this.listenersAdded = false;
+        this._sim = sim;
     }
 
     init(initialReferenceFrame, initialPosition) {
         this.position = initialPosition;
 
-        this.referenceFrame = sim.starSystem.getReferenceFrame(initialReferenceFrame);
+        this.referenceFrame = this._sim.starSystem.getReferenceFrame(initialReferenceFrame);
         this.orbitingPoint = this.referenceFrame.originId;
         this.frameType = this.referenceFrame.type;
         this.quaternion = this._getQuaternionByPosition(this.position);
 
-        this.lastPosition = this.referenceFrame.transformPositionByEpoch(sim.currentEpoch, this.position, RF_BASE);
+        this.lastPosition = this.referenceFrame.transformPositionByEpoch(this._sim.currentEpoch, this.position, RF_BASE);
 
         this.currentMousePos = new Vector([0, 0]);
         this.accountedMousePos = new Vector([0, 0]);
@@ -43,10 +47,10 @@ export default class Camera
         this.isAnimnating = false;
 
         if (!this.listenersAdded) {
-            sim.addEventListener('mousedown', this.onMouseDown.bind(this), 1);
-            sim.addEventListener('mousemove', this.onMouseMove.bind(this), 1);
-            sim.addEventListener('mouseup', this.onMouseUp.bind(this), 1);
-            sim.addEventListener('wheel', this.onMouseWheel.bind(this), 1);
+            this._sim.addEventListener('mousedown', this.onMouseDown.bind(this), 1);
+            this._sim.addEventListener('mousemove', this.onMouseMove.bind(this), 1);
+            this._sim.addEventListener('mouseup', this.onMouseUp.bind(this), 1);
+            this._sim.addEventListener('wheel', this.onMouseWheel.bind(this), 1);
             this.listenersAdded = true;
         }
     }
@@ -83,7 +87,7 @@ export default class Camera
             return [ReferenceFrame.INERTIAL_ECLIPTIC];
         }
 
-        const isBody = sim.starSystem.isBody(orbitingPoint);
+        const isBody = this._sim.starSystem.isBody(orbitingPoint);
 
         if (isBody === null) {
             return [];
@@ -114,9 +118,9 @@ export default class Camera
     }
 
     changeReferenceFrame(newFrameId, animate) {
-        const newFrame = sim.starSystem.getReferenceFrame(newFrameId);
+        const newFrame = this._sim.starSystem.getReferenceFrame(newFrameId);
 
-        this.position = this.referenceFrame.transformPositionByEpoch(sim.currentEpoch, this.position, newFrame);
+        this.position = this.referenceFrame.transformPositionByEpoch(this._sim.currentEpoch, this.position, newFrame);
         this.isLookingAside = false;
         this.zoomingAside = 0;
         this.orbitingPoint = newFrame.originId;
@@ -135,7 +139,7 @@ export default class Camera
 
     startAnimation(newFrame) {
         if (newFrame) {
-            let transferQuaternion = this.referenceFrame.getQuaternionByEpoch(sim.currentEpoch).invert_().mul_(newFrame.getQuaternionByEpoch(sim.currentEpoch));
+            let transferQuaternion = this.referenceFrame.getQuaternionByEpoch(this._sim.currentEpoch).invert_().mul_(newFrame.getQuaternionByEpoch(this._sim.currentEpoch));
             this.quaternion = transferQuaternion.invert_().mul_(this.quaternion);
         }
 
@@ -163,9 +167,9 @@ export default class Camera
     findObjectUnderMouse() {
         let biggestRadius = 0;
         let biggestObject = false;
-        for (const body of sim.starSystem.getBodies()) {
-            const dist = sim.raycaster.getPixelDistance(
-                body.getPositionByEpoch(sim.currentEpoch, RF_BASE)
+        for (const body of this._sim.starSystem.getBodies()) {
+            const dist = this._sim.raycaster.getPixelDistance(
+                body.getPositionByEpoch(this._sim.currentEpoch, RF_BASE)
             );
             if (dist < this.settings.pixelsToObjectUnderMouse) {
                 if (biggestObject === false) {
@@ -186,7 +190,7 @@ export default class Camera
             return;
         }
 
-        const defaultFactor = event.shiftKey ? (1 + (sim.settings.ui.camera.zoomFactor - 1) / 10) : sim.settings.ui.camera.zoomFactor;
+        const defaultFactor = event.shiftKey ? (1 + (this._sim.settings.ui.camera.zoomFactor - 1) / 10) : this._sim.settings.ui.camera.zoomFactor;
         const factor = event.deltaY < 0
             ? 1 / defaultFactor
             : defaultFactor;
@@ -198,21 +202,21 @@ export default class Camera
         }
 
         if (objectToZoomTo !== false) {
-            this.position = this.referenceFrame.transformPositionByEpoch(sim.currentEpoch, this.position, objectToZoomTo * 100000 + 1000);
+            this.position = this.referenceFrame.transformPositionByEpoch(this._sim.currentEpoch, this.position, objectToZoomTo * 100000 + 1000);
             zoomingTo = objectToZoomTo;
         } else {
             this.zoomingAside = 0;
         }
 
-        if (sim.starSystem.getObject(zoomingTo).physicalModel && sim.starSystem.getObject(zoomingTo).physicalModel.radius) {
+        if (this._sim.starSystem.getObject(zoomingTo).physicalModel && this._sim.starSystem.getObject(zoomingTo).physicalModel.radius) {
             const currentMag = this.position.mag;
-            this.position.mul_((sim.starSystem.getObject(zoomingTo).physicalModel.radius + (currentMag - sim.starSystem.getObject(zoomingTo).physicalModel.radius) * factor) / currentMag);
+            this.position.mul_((this._sim.starSystem.getObject(zoomingTo).physicalModel.radius + (currentMag - this._sim.starSystem.getObject(zoomingTo).physicalModel.radius) * factor) / currentMag);
         } else {
             this.position.mul_(factor);
         }
 
         if (objectToZoomTo !== false) {
-            this.position = sim.starSystem.getReferenceFrame(objectToZoomTo * 100000 + 1000).transformPositionByEpoch(sim.currentEpoch, this.position, this.referenceFrame);
+            this.position = this._sim.starSystem.getReferenceFrame(objectToZoomTo * 100000 + 1000).transformPositionByEpoch(this._sim.currentEpoch, this.position, this.referenceFrame);
             this.isLookingAside = true;
             this.zoomingAside++;
 
@@ -273,7 +277,7 @@ export default class Camera
 
         if (mouseShift[0] || mouseShift[1]) {
             const polarConstraint = 0.00001;
-            const sensitivity = (this.isShiftDown ? 0.1 : 1) * sim.settings.ui.camera.mouseSensitivity;
+            const sensitivity = (this.isShiftDown ? 0.1 : 1) * this._sim.settings.ui.camera.mouseSensitivity;
             const pole = new Vector([0, 0, 1]);
             let poleAngle = this.position.angle(pole);
             let verticalRotationAxis = this.rightButtonDown
