@@ -1,19 +1,18 @@
 import Events from "../core/Events";
 import { TWENTY_FOUR_HOURS_IN_SECONDS } from "../constants/dates";
 
-const J2000_TIMESTAMP = 946728000;
 const LEFT_BUTTON_KEY_CODE = 0;
 const RIGHT_BUTTON_KEY_CODE = 2;
 
 class TimeLine {
     /**
      * @param {number} initialEpoch
-     * @param {number} initialTimeScale
      * @param {TimeModel} timeModel
+     * @param {Universe} universe
      */
-    constructor(initialEpoch, initialTimeScale, timeModel) {
-        this._timeScale = initialTimeScale;
+    constructor(initialEpoch, timeModel, universe) {
         this._timeModel = timeModel;
+        this._universe = universe;
         this._timeModel.setEpoch(initialEpoch);
 
         this._mouseState = {
@@ -61,21 +60,21 @@ class TimeLine {
 
         this.updateScaleType();
 
-        this.getDateByEpoch = TimeLine.getDateByEpoch;
-        this.getEpochByDate = TimeLine.getEpochByDate;
+        this.getDateByEpoch = this._universe.dataTransforms.getDateByEpoch;
+        this.getEpochByDate = this._universe.dataTransforms.getEpochByDate;
 
-        this.roundDateUp = TimeLine.roundDateUp;
-        this.nextRenderingDate = TimeLine.nextRenderingDate;
-        this.formatDate = TimeLine.formatDate;
-        this.formatDateFull = TimeLine.formatDateFull;
+        this.roundDateUp = this._universe.dataTransforms.roundDateUp;
+        this.nextRenderingDate = this._universe.dataTransforms.nextRenderingDate;
+        this.formatDate = this._universe.dataTransforms.formatDate;
+        this.formatDateFull = this._universe.dataTransforms.formatDateFull;
     }
 
     /**
      * @param {number} newScale
      */
     setTimeScale(newScale) {
-        Events.dispatch(Events.TIME_SCALE_CHANGED, { old: this.timeScale, new: newScale });
-        this._timeScale = newScale;
+        Events.dispatch(Events.TIME_SCALE_CHANGED, { new: newScale });
+        this._timeModel.setTimeScale(newScale);
     }
 
     tick(timePassed) {
@@ -239,7 +238,7 @@ class TimeLine {
      * @return {number}
      */
     get timeScale() {
-        return this._timeScale;
+        return this._timeModel.timeScale;
     }
 
     /**
@@ -247,161 +246,6 @@ class TimeLine {
      */
     get isTimeRunning() {
         return !this._timeModel.isPaused;
-    }
-
-    /**
-     * @param {number} epoch
-     * @return {Date}
-     */
-    static getDateByEpoch(epoch) {
-        return new Date((J2000_TIMESTAMP + epoch) * 1000);
-    }
-
-    /**
-     * @param {Date} date
-     * @return {number}
-     */
-    static getEpochByDate(date) {
-        return date / 1000 - J2000_TIMESTAMP;
-    }
-
-    /**
-     * @param {Date} date
-     * @param scaleType
-     * @return {*}
-     */
-    static roundDateUp(date, scaleType) {
-        const d = new Date(date);
-        if (scaleType === "minute") {
-            d.setSeconds(60, 0);
-        } else if (scaleType === "fiveMinutes") {
-            d.setMinutes(5 + d.getMinutes() - d.getMinutes() % 5, 0, 0);
-        } else if (scaleType === "tenMinutes") {
-            d.setMinutes(10 + d.getMinutes() - d.getMinutes() % 10, 0, 0);
-        } else if (scaleType === "thirtyMinutes") {
-            d.setMinutes(30 + d.getMinutes() - d.getMinutes() % 30, 0, 0);
-        } else if (scaleType === "hour") {
-            d.setMinutes(60, 0, 0);
-        } else if (scaleType === "threeHours") {
-            d.setHours(3 + d.getHours() - d.getHours() % 3, 0, 0, 0);
-        } else if (scaleType === "sixHours") {
-            d.setHours(6 + d.getHours() - d.getHours() % 6, 0, 0, 0);
-        } else if (scaleType === "day") {
-            d.setHours(24, 0, 0, 0);
-        } else if (scaleType === "week") {
-            d.setHours(0, 0, 0, 0);
-            d.setDate(7 + d.getDate() - d.getDay());
-        } else if (scaleType === "month") {
-            d.setHours(0, 0, 0, 0);
-            d.setDate(1);
-            d.setMonth(d.getMonth() + 1);
-        } else if (scaleType === "threeMonths") {
-            d.setHours(0, 0, 0, 0);
-            d.setDate(1);
-            d.setMonth(3 + d.getMonth() - d.getMonth() % 3);
-        } else if (scaleType === "year") {
-            d.setHours(0, 0, 0, 0);
-            d.setMonth(0, 1);
-        } else if (scaleType === "fiveYears") {
-            d.setHours(0, 0, 0, 0);
-            d.setFullYear(5 + d.getFullYear() - d.getFullYear() % 5, 0, 1);
-        } else {
-            return;
-        }
-        return d;
-    }
-
-    /**
-     * @param {Date} date
-     * @param scaleType
-     * @return {*}
-     */
-    static nextRenderingDate(date, scaleType) {
-        const d = new Date(date);
-        if (scaleType === "minute") {
-            d.setMinutes(d.getMinutes() + 1);
-        } else if (scaleType === "fiveMinutes") {
-            d.setMinutes(d.getMinutes() + 5);
-        } else if (scaleType === "tenMinutes") {
-            d.setMinutes(d.getMinutes() + 10);
-        } else if (scaleType === "thirtyMinutes") {
-            d.setMinutes(d.getMinutes() + 30);
-        } else if (scaleType === "hour") {
-            d.setHours(d.getHours() + 1);
-        } else if (scaleType === "threeHours") {
-            d.setHours(d.getHours() + 3);
-        } else if (scaleType === "sixHours") {
-            d.setHours(d.getHours() + 6);
-        } else if (scaleType === "day") {
-            d.setDate(d.getDate() + 1);
-        } else if (scaleType === "week") {
-            d.setDate(d.getDate() + 7);
-        } else if (scaleType === "month") {
-            d.setMonth(d.getMonth() + 1);
-        } else if (scaleType === "threeMonths") {
-            d.setMonth(d.getMonth() + 3);
-        } else if (scaleType === "year") {
-            d.setFullYear(d.getFullYear() + 1, d.getMonth(), d.getDate());
-        } else if (scaleType === "fiveYears") {
-            d.setFullYear(d.getFullYear() + 5, d.getMonth(), d.getDate());
-        } else {
-            return;
-        }
-        return d;
-    }
-
-    /**
-     * @param {Date} date
-     * @param scaleType
-     * @return {string|*}
-     */
-    static formatDate(date, scaleType) {
-        if ((scaleType === "minute")
-            || (scaleType === "fiveMinutes")
-            || (scaleType === "tenMinutes")
-            || (scaleType === "thirtyMinutes")
-            || (scaleType === "hour")
-            || (scaleType === "threeHours")
-            || (scaleType === "sixHours")
-        ) {
-            let string = date.getYear() + 1900;
-            string += '-' + ((date.getMonth() + 1) + '').padStart(2, '0');
-            string += '-' + (date.getDate() + '').padStart(2, '0');
-            string += ' ' + (date.getHours() + '').padStart(2, '0');
-            string += ':' + (date.getMinutes() + '').padStart(2, '0');
-            return string;
-        } else if ((scaleType === "day")
-            || (scaleType === "week")
-        ) {
-            let string = date.getYear() + 1900;
-            string += '-' + ((date.getMonth() + 1) + '').padStart(2, '0');
-            string += '-' + (date.getDate() + '').padStart(2, '0');
-            return string;
-        } else if ((scaleType === "month")
-            || (scaleType === "threeMonths")
-        ) {
-            const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
-            return months[date.getMonth()] + ' ' + (date.getYear() + 1900);
-        } else if ((scaleType === "year")
-            || (scaleType === "fiveYears")
-        ) {
-            return (date.getYear() + 1900) + '';
-        }
-        return date.toString();
-    }
-
-    /**
-     * @param {Date} date
-     * @return {string}
-     */
-    static formatDateFull(date) {
-        let string = date.getYear() + 1900;
-        string += '-' + ((date.getMonth() + 1) + '').padStart(2, '0');
-        string += '-' + (date.getDate() + '').padStart(2, '0');
-        string += ' ' + (date.getHours() + '').padStart(2, '0');
-        string += ':' + (date.getMinutes() + '').padStart(2, '0');
-        string += ':' + (date.getSeconds() + '').padStart(2, '0');
-        return string;
     }
 }
 

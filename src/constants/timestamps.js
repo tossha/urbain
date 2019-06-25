@@ -1,0 +1,1 @@
+export const J2000_TIMESTAMP = 946728000;

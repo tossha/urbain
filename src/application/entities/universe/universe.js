@@ -14,6 +14,17 @@ class Universe {
         return this._starSystem;
     }
 
+    get dataTransforms() {
+        return {
+            getDateByEpoch() {},
+            getEpochByDate() {},
+            roundDateUp() {},
+            nextRenderingDate() {},
+            formatDate() {},
+            formatDateFull() {},
+        };
+    }
+
     /**
      * @param {AppModel} appModel
      */

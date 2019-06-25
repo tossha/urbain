@@ -53,7 +53,7 @@ class SimulationEngine {
 
         this.camera = new Camera(this.renderer.domElement, this);
         this.raycaster = new VisualRaycaster(this, this.renderer.domElement, this.camera.threeCamera, /* pixelPrecision */ 7);
-        this.time = new TimeLine(0, 1, this._simulationModel.timeModel);
+        this.time = new TimeLine(0, this._simulationModel.timeModel, this._simulationModel.activeUniverse);
         this.ui = new UI(this);
 
         this.starSystemManager.loadDefault(() => requestAnimationFrame(this._firstRender));
