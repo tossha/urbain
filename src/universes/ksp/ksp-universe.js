@@ -5,8 +5,11 @@ import roundDateUp from "./helpers/round-date-up";
 import nextRenderingDate from "./helpers/next-rendering-date";
 import formatDate from "./helpers/format-date";
 import formatDateFull from "./helpers/format-date-full";
+import { timeScales } from "./constants";
 
 class KspUniverse extends Universe {
+    scales = timeScales;
+
     /**
      * @param {AppModel} appModel
      */

@@ -1,6 +1,14 @@
 import ModuleManager from "../../../modules/module-manager";
 import FeaturesList from "./features-list";
 import TimeModel from "./time-model";
+import {
+    SECONDS_PER_DAY,
+    SECONDS_PER_HOUR,
+    SECONDS_PER_MINUTE,
+    SECONDS_PER_MONTH,
+    SECONDS_PER_WEEK,
+    SECONDS_PER_YEAR,
+} from "../../../constants/dates";
 
 class Universe {
     constructor() {
@@ -9,6 +17,22 @@ class Universe {
         this._features = new FeaturesList();
         this._starSystem = null;
     }
+
+    scales = {
+        minute: SECONDS_PER_MINUTE,
+        fiveMinutes: SECONDS_PER_MINUTE * 5,
+        tenMinutes: SECONDS_PER_MINUTE * 10,
+        thirtyMinutes: SECONDS_PER_MINUTE * 30,
+        hour: SECONDS_PER_HOUR,
+        threeHours: SECONDS_PER_HOUR * 3,
+        sixHours: SECONDS_PER_HOUR * 6,
+        day: SECONDS_PER_DAY,
+        week: SECONDS_PER_WEEK,
+        month: SECONDS_PER_MONTH,
+        threeMonths: SECONDS_PER_MONTH * 3,
+        year: SECONDS_PER_YEAR,
+        fiveYears: SECONDS_PER_YEAR * 5,
+    };
 
     get activeStarSystem() {
         return this._starSystem;

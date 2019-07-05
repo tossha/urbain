@@ -1,11 +1,5 @@
 import Events from "../core/Events";
-import {
-    SECONDS_PER_HOUR,
-    SECONDS_PER_MINUTE,
-    SECONDS_PER_DAY,
-    SECONDS_PER_WEEK,
-    SECONDS_PER_MONTH, SECONDS_PER_YEAR
-} from "../constants/dates";
+import { SECONDS_PER_DAY } from "../constants/dates";
 
 const LEFT_BUTTON_KEY_CODE = 0;
 const RIGHT_BUTTON_KEY_CODE = 2;
@@ -37,22 +31,6 @@ class TimeLine {
     }
 
     initValues() {
-        this.scales = {
-            minute: SECONDS_PER_MINUTE,
-            fiveMinutes: SECONDS_PER_MINUTE * 5,
-            tenMinutes: SECONDS_PER_MINUTE * 10,
-            thirtyMinutes: SECONDS_PER_MINUTE * 30,
-            hour: SECONDS_PER_HOUR,
-            threeHours: SECONDS_PER_HOUR * 3,
-            sixHours: SECONDS_PER_HOUR * 6,
-            day: SECONDS_PER_DAY,
-            week: SECONDS_PER_WEEK,
-            month: SECONDS_PER_MONTH,
-            threeMonths: SECONDS_PER_MONTH * 3,
-            year: SECONDS_PER_YEAR,
-            fiveYears: SECONDS_PER_YEAR * 5,
-        };
-
         this._span = this.timeScale * SECONDS_PER_DAY * 5;
         this._markDistance = 300;
         this._scaleType = "month";
@@ -75,9 +53,7 @@ class TimeLine {
                 this._leftEpoch + (this._mouseState.x - this._canvasRect.left) * this._span / this._timeLineCanvasDomElement.width
             );
         } else if (this.isTimeRunning) {
-            if ((this._leftEpoch < this.epoch)
-                && (this.epoch < this._leftEpoch + this._span)
-            ) {
+            if ((this._leftEpoch < this.epoch) && (this.epoch < this._leftEpoch + this._span)) {
                 this._leftEpoch += this.timeScale * timePassed;
             }
 
@@ -242,6 +218,10 @@ class TimeLine {
      */
     get isTimeRunning() {
         return !this._timeModel.isPaused;
+    }
+
+    get scales() {
+        return this._universe.scales;
     }
 }
 

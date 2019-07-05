@@ -20,10 +20,12 @@ export default class UIPanelLambert extends UIPanel
     /**
      * @param panelDom
      * @param {SimulationEngine} sim
+     * @param {Universe} activeUniverse
      */
-    constructor(panelDom, sim) {
+    constructor(panelDom, sim, activeUniverse) {
         super(panelDom, true);
         this._sim = sim;
+        this._activeUniverse = activeUniverse;
 
         this.maxTransferTime = SECONDS_PER_DAY * 365.25 * 40;
 
@@ -202,7 +204,8 @@ export default class UIPanelLambert extends UIPanel
     }
 
     updateTime(date) {
-        this.jqDateText.html(this._sim.time.formatDateFull(date));
+        const formattedDate = this._activeUniverse.dataTransforms.formatDateFull(date);
+        this.jqDateText.html(formattedDate);
     }
 
 

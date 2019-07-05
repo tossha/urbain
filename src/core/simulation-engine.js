@@ -16,6 +16,9 @@ import VisualFlightEventImpulsiveBurn from "./visual/FlightEvent/ImpulsiveBurn";
 import VisualMarkerApocenter from "./visual/Marker/Apocenter";
 import VisualMarkerPericenter from "./visual/Marker/Pericenter";
 
+/**
+ * @property {TimeLine} time
+ */
 class SimulationEngine {
     /**
      * @param {SimulationModel} simulationModel
@@ -53,7 +56,7 @@ class SimulationEngine {
         this.camera = new Camera(this.renderer.domElement, this);
         this.raycaster = new VisualRaycaster(this, this.renderer.domElement, this.camera.threeCamera, /* pixelPrecision */ 7);
         this.time = new TimeLine(0, this._simulationModel.timeModel, this._simulationModel.activeUniverse);
-        this.ui = new UI(this);
+        this.ui = new UI(this, this._simulationModel.activeUniverse);
 
         this.starSystemManager.loadDefault(() => requestAnimationFrame(this._firstRender));
 
@@ -155,7 +158,7 @@ class SimulationEngine {
     }
 
     get currentDate() {
-        return this.time.getDateByEpoch(this._timeModel.epoch);
+        return this._simulationModel.activeUniverse.dataTransforms.getDateByEpoch(this._timeModel.epoch);
     }
 
     get settings() {
