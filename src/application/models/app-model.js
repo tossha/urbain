@@ -1,4 +1,3 @@
-import { observable } from "mobx";
 import { VisualObject } from "../entities/visual-object";
 import { SimulationModel } from "./simulation-model";
 import { StarSystem } from "../../constants/star-system";
@@ -11,12 +10,6 @@ export class AppModel {
         this._activeUniverse = universe;
         this._simulationModel = new SimulationModel(this, universe);
     }
-
-    @observable
-    visualObjects = {
-        creationPanel: new VisualObject(false),
-        transferCalculationPanel: new VisualObject(false),
-    };
 
     bodyLabels = new VisualObject(true);
 

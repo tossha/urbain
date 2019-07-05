@@ -51,16 +51,16 @@ export class HeaderStore {
         const menuSimulation = new DropDownMenuItem(TOP_MENU_ITEMS.SIMULATION, [
             {
                 label: "Orbit creation panel",
-                selected: this._appModel.visualObjects.creationPanel.isVisible,
+                selected: this._appStore.visualObjects.creationPanel.isVisible,
                 onUpdate: ({ selected }) => {
-                    this._appModel.visualObjects.creationPanel.toggle(selected);
+                    this._appStore.visualObjects.creationPanel.toggle(selected);
                 },
             },
             {
                 label: "Transfer calculation panel",
-                selected: this._appModel.visualObjects.transferCalculationPanel.isVisible,
+                selected: this._appStore.visualObjects.transferCalculationPanel.isVisible,
                 onUpdate: ({ selected }) => {
-                    this._appModel.visualObjects.transferCalculationPanel.toggle(selected);
+                    this._appStore.visualObjects.transferCalculationPanel.toggle(selected);
                 },
             },
         ]);

@@ -31,8 +31,8 @@ class SimulationEngine {
         this._simulationModel = simulationModel;
         this._timeModel = simulationModel.timeModel;
 
-        this.propagators = {};
         this._renderLoopActive = false;
+        this.propagators = {};
         this.starSystemManager = new StarSystemManager();
 
         this.scene = new THREE.Scene();
@@ -55,8 +55,8 @@ class SimulationEngine {
 
         this.camera = new Camera(this.renderer.domElement, this);
         this.raycaster = new VisualRaycaster(this, this.renderer.domElement, this.camera.threeCamera, /* pixelPrecision */ 7);
-        this.time = new TimeLine(0, this._simulationModel.timeModel, this._simulationModel.activeUniverse);
-        this.ui = new UI(this, this._simulationModel.activeUniverse);
+        this.time = new TimeLine(0, this._simulationModel.timeModel, this.activeUniverse);
+        this.ui = new UI(this, this.activeUniverse);
 
         this.starSystemManager.loadDefault(() => requestAnimationFrame(this._firstRender));
 
@@ -71,7 +71,7 @@ class SimulationEngine {
             this.selection.deselect();
             this.starSystem && this.starSystem.unload();
 
-            this._simulationModel.activeUniverse.changeStarSystem(new StarSystem(starSystemConfig.id));
+            this.activeUniverse.changeStarSystem(new StarSystem(starSystemConfig.id));
 
             StarSystemLoader.loadFromConfig(this.starSystem, starSystemConfig);
 
@@ -116,7 +116,7 @@ class SimulationEngine {
      * @return {Promise}
      */
     loadModule(moduleName, callback) {
-        return this._simulationModel.activeUniverse.moduleManager.loadModule(moduleName, callback);
+        return this.activeUniverse.moduleManager.loadModule(moduleName, callback);
     }
 
     /**
@@ -124,7 +124,7 @@ class SimulationEngine {
      * @return {*}
      */
     getModule(moduleName) {
-        return this._simulationModel.activeUniverse.moduleManager.getModule(moduleName);
+        return this.activeUniverse.moduleManager.getModule(moduleName);
     }
 
     /**
@@ -132,9 +132,8 @@ class SimulationEngine {
      * @return {boolean}
      */
     isModuleLoaded(moduleName) {
-        return this._simulationModel.activeUniverse.moduleManager.isModuleLoaded(moduleName);
+        return this.activeUniverse.moduleManager.isModuleLoaded(moduleName);
     }
-
 
     getClass(alias) {
         const periodPos = alias.indexOf(".");
@@ -152,13 +151,12 @@ class SimulationEngine {
         return this.propagators[alias];
     }
 
-
     get currentEpoch() {
         return this._timeModel.epoch;
     }
 
     get currentDate() {
-        return this._simulationModel.activeUniverse.dataTransforms.getDateByEpoch(this._timeModel.epoch);
+        return this.activeUniverse.dataTransforms.getDateByEpoch(this._timeModel.epoch);
     }
 
     get settings() {
@@ -177,7 +175,14 @@ class SimulationEngine {
     };
 
     get starSystem() {
-        return this._simulationModel.activeUniverse.activeStarSystem;
+        return this.activeUniverse.activeStarSystem;
+    }
+
+    /**
+     * @return {Universe}
+     */
+    get activeUniverse() {
+        return this._simulationModel.activeUniverse;
     }
 
     _render = curTime => {

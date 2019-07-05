@@ -1,3 +1,5 @@
+import { observable } from "mobx";
+import { VisualObject } from "../../application";
 import { HeaderStore } from "./header-store";
 import { SatelliteSearchPanelStore } from "../../features/satellite-search";
 import { SATELLITE_SEARCH_MODEL_NAME } from "../../universes/solar-system/solar-system-universe";
@@ -15,12 +17,11 @@ class AppStore {
         this._initSearchPanelIfExist();
     }
 
-    /**
-     * @return {{creationPanel, transferCalculationPanel}}
-     */
-    get visualObjects() {
-        return this._appModel.visualObjects;
-    }
+    @observable
+    visualObjects = {
+        creationPanel: new VisualObject(false),
+        transferCalculationPanel: new VisualObject(false),
+    };
 
     /**
      * @return {HeaderStore}
