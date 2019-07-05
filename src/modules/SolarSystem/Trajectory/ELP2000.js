@@ -5,7 +5,7 @@ import {deg2rad, Vector} from "../../../core/algebra";
 import StateVector from "../../../core/StateVector";
 import ModuleSolarSystem from "../ModuleSolarSystem";
 import { sim } from "../../../core/simulation-engine";
-import { TWENTY_FOUR_HOURS_IN_SECONDS } from "../../../constants/dates";
+import { SECONDS_PER_DAY } from "../../../constants/dates";
 
 export default class TrajectoryELP2000 extends TrajectoryKeplerianAbstract
 {
@@ -17,7 +17,7 @@ export default class TrajectoryELP2000 extends TrajectoryKeplerianAbstract
     }
 
     getStateInOwnFrameByEpoch(epoch) {
-        const model = this._calcAll(epoch / TWENTY_FOUR_HOURS_IN_SECONDS / 36525);
+        const model = this._calcAll(epoch / SECONDS_PER_DAY / 36525);
         const sinLon = Math.sin(model.lon);
         const sinLat = Math.sin(model.lat);
         const cosLon = Math.cos(model.lon);
@@ -30,9 +30,9 @@ export default class TrajectoryELP2000 extends TrajectoryKeplerianAbstract
                 model.r * sinLat
             ]),
             new Vector([
-                (model.dr * cosLon * cosLat - model.r * sinLon * cosLat * model.dlon - model.r * cosLon * sinLat * model.dlat) / 36525 / TWENTY_FOUR_HOURS_IN_SECONDS,
-                (model.dr * sinLon * cosLat + model.r * cosLon * cosLat * model.dlon - model.r * sinLon * sinLat * model.dlat) / 36525 / TWENTY_FOUR_HOURS_IN_SECONDS,
-                (model.dr * sinLat + model.r * cosLat * model.dlat) / 36525 / TWENTY_FOUR_HOURS_IN_SECONDS
+                (model.dr * cosLon * cosLat - model.r * sinLon * cosLat * model.dlon - model.r * cosLon * sinLat * model.dlat) / 36525 / SECONDS_PER_DAY,
+                (model.dr * sinLon * cosLat + model.r * cosLon * cosLat * model.dlon - model.r * sinLon * sinLat * model.dlat) / 36525 / SECONDS_PER_DAY,
+                (model.dr * sinLat + model.r * cosLat * model.dlat) / 36525 / SECONDS_PER_DAY
             ])
         );
     }

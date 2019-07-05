@@ -1,8 +1,8 @@
 import { computed } from "mobx";
-import { TWENTY_FOUR_HOURS_IN_SECONDS } from "../../../../../../../../constants/dates";
+import { SECONDS_PER_DAY } from "../../../../../../../../constants/dates";
 import { formatTimeScale } from "./helpers/format-time-scale";
 
-const MAX_TIME_SCALE = TWENTY_FOUR_HOURS_IN_SECONDS * 30 * 6;
+const MAX_TIME_SCALE = SECONDS_PER_DAY * 30 * 6;
 
 /**
  * @returns {number} — simulation seconds per 1 real life second

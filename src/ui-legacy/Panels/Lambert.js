@@ -7,7 +7,13 @@ import VisualTrajectoryModelKeplerian from "../../core/visual/Trajectory/Kepleri
 import VisualVector from "../../core/visual/Vector";
 import EphemerisObject from "../../core/EphemerisObject";
 import Events from "../../core/Events";
-import { TWENTY_FOUR_HOURS_IN_SECONDS } from "../../constants/dates";
+import {
+    SECONDS_PER_DAY,
+    SECONDS_PER_HOUR,
+    SECONDS_PER_MINUTE,
+    SECONDS_PER_MONTH,
+    SECONDS_PER_YEAR
+} from "../../constants/dates";
 
 export default class UIPanelLambert extends UIPanel
 {
@@ -19,7 +25,7 @@ export default class UIPanelLambert extends UIPanel
         super(panelDom, true);
         this._sim = sim;
 
-        this.maxTransferTime = TWENTY_FOUR_HOURS_IN_SECONDS * 365.25 * 40;
+        this.maxTransferTime = SECONDS_PER_DAY * 365.25 * 40;
 
         this.jqSlider = this.jqDom.find('#transferTimeSlider');
         this.jqSlider.on('input change', () => this.changeTransferTime(this.getCurrentTransferTime()));
@@ -209,26 +215,26 @@ export default class UIPanelLambert extends UIPanel
             return '0';
         }
 
-        if (abs < 60) {
+        if (abs < SECONDS_PER_MINUTE) {
             return prefix + abs.toPrecision(precision) + ' s';
         }
 
-        if (abs < 3600) {
-            return prefix + (abs / 60).toPrecision(precision) + ' min';
+        if (abs < SECONDS_PER_HOUR) {
+            return prefix + (abs / SECONDS_PER_MINUTE).toPrecision(precision) + ' min';
         }
 
-        if (abs < TWENTY_FOUR_HOURS_IN_SECONDS) {
-            return prefix + (abs / 3600).toPrecision(precision) + ' h';
+        if (abs < SECONDS_PER_DAY) {
+            return prefix + (abs / SECONDS_PER_HOUR).toPrecision(precision) + ' h';
         }
 
-        if (abs < 2592000) {
-            return prefix + (abs / TWENTY_FOUR_HOURS_IN_SECONDS).toPrecision(precision) + ' days';
+        if (abs < SECONDS_PER_MONTH) {
+            return prefix + (abs / SECONDS_PER_DAY).toPrecision(precision) + ' days';
         }
 
-        if (abs < 31557600) {
-            return prefix + (abs / 2592000).toPrecision(precision) + ' months';
+        if (abs < SECONDS_PER_YEAR) {
+            return prefix + (abs / SECONDS_PER_MONTH).toPrecision(precision) + ' months';
         }
 
-        return prefix + (abs / 31557600).toPrecision(precision) + ' years';
+        return prefix + (abs / SECONDS_PER_YEAR).toPrecision(precision) + ' years';
     }
 }

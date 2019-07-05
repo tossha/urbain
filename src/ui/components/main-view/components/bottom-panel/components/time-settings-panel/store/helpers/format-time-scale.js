@@ -1,7 +1,9 @@
 import {
-    ONE_HOUR_IN_SECONDS,
-    ONE_MINUTE_IN_SECONDS,
-    TWENTY_FOUR_HOURS_IN_SECONDS,
+    SECONDS_PER_HOUR,
+    SECONDS_PER_MINUTE,
+    SECONDS_PER_DAY,
+    SECONDS_PER_MONTH,
+    SECONDS_PER_YEAR,
 } from "../../../../../../../../../constants/dates";
 
 export function formatTimeScale(scale) {
@@ -13,25 +15,25 @@ export function formatTimeScale(scale) {
         return "0";
     }
 
-    if (abs < ONE_MINUTE_IN_SECONDS) {
+    if (abs < SECONDS_PER_MINUTE) {
         return prefix + abs.toPrecision(precision) + " s/s";
     }
 
-    if (abs < ONE_HOUR_IN_SECONDS) {
-        return prefix + (abs / ONE_MINUTE_IN_SECONDS).toPrecision(precision) + " min/s";
+    if (abs < SECONDS_PER_HOUR) {
+        return prefix + (abs / SECONDS_PER_MINUTE).toPrecision(precision) + " min/s";
     }
 
-    if (abs < TWENTY_FOUR_HOURS_IN_SECONDS) {
-        return prefix + (abs / ONE_HOUR_IN_SECONDS).toPrecision(precision) + " h/s";
+    if (abs < SECONDS_PER_DAY) {
+        return prefix + (abs / SECONDS_PER_HOUR).toPrecision(precision) + " h/s";
     }
 
-    if (abs < 2592000) {
-        return prefix + (abs / TWENTY_FOUR_HOURS_IN_SECONDS).toPrecision(precision) + " days/s";
+    if (abs < SECONDS_PER_MONTH) {
+        return prefix + (abs / SECONDS_PER_DAY).toPrecision(precision) + " days/s";
     }
 
-    if (abs < 31557600) {
-        return prefix + (abs / 2592000).toPrecision(precision) + " months/s";
+    if (abs < SECONDS_PER_YEAR) {
+        return prefix + (abs / SECONDS_PER_MONTH).toPrecision(precision) + " months/s";
     }
 
-    return prefix + (abs / 31557600).toPrecision(precision) + " years/s";
+    return prefix + (abs / SECONDS_PER_YEAR).toPrecision(precision) + " years/s";
 }
