@@ -54,7 +54,7 @@ class Universe {
         return this._features.get(featureId);
     }
 
-    reselectStarSystem(starSystem) {
+    changeStarSystem(starSystem) {
         this._starSystem = starSystem;
     }
 }

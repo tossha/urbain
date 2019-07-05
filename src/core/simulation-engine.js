@@ -69,7 +69,7 @@ class SimulationEngine {
             this.selection.deselect();
             this.starSystem && this.starSystem.unload();
 
-            this._simulationModel.activeUniverse.reselectStarSystem(new StarSystem(starSystemConfig.id));
+            this._simulationModel.activeUniverse.changeStarSystem(new StarSystem(starSystemConfig.id));
 
             StarSystemLoader.loadFromConfig(this.starSystem, starSystemConfig);
 
