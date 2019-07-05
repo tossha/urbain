@@ -22,7 +22,9 @@ class SatelliteSearchModel {
     }
 
     unloadSatellite(noradId) {
-        return this._appModel.simulationModel.simulation.starSystem.deleteObject(-(100000 + (0 | noradId)));
+        const { activeStarSystem } = this._appModel.simulationModel.activeUniverse;
+
+        return activeStarSystem.deleteObject(-(100000 + (0 | noradId)));
     }
 }
 

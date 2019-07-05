@@ -1,6 +1,5 @@
 import { computed } from "mobx";
 import StatisticsModel from "./statistics-model";
-import { sim } from "../../core/simulation-engine";
 
 export class SimulationModel {
     /**
@@ -11,21 +10,6 @@ export class SimulationModel {
         this._appModel = appModel;
         this._activeUniverse = universe;
         this._statisticsModel = new StatisticsModel();
-        this._viewportElement = null;
-    }
-
-    /**
-     * @return {{HTMLDivElement}}
-     */
-    get viewportElement() {
-        return this._viewportElement;
-    }
-
-    /**
-     * @return {SimulationEngine | null}
-     */
-    get simulation() {
-        return sim;
     }
 
     /**
@@ -59,12 +43,5 @@ export class SimulationModel {
 
     runTime() {
         this.timeModel.run();
-    }
-
-    /**
-     * @param {HTMLDivElement} element
-     */
-    setViewportElement(element) {
-        this._viewportElement = element;
     }
 }

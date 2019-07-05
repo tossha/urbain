@@ -252,6 +252,7 @@ class SimulationEngine {
 export let sim = null;
 
 export function createSimulationEngine(simulationModel) {
-    sim = new SimulationEngine(simulationModel)
+    sim = new SimulationEngine(simulationModel);
+
     return sim;
 }

@@ -3,7 +3,6 @@ import { renderUi } from "../ui";
 import { createServices } from "./services";
 import { AppModel } from "./models/app-model";
 import { StarSystem } from "../constants/star-system";
-import { createSimulationEngine } from "../core/simulation-engine";
 import ShortcutManager from "./shortcut-manager";
 
 const services = createServices();
@@ -17,11 +16,7 @@ class Application {
 
     async loadDefaultUniverse() {
         const universe = await services.universeService.getDefaultUniverse();
-        const appModel = new AppModel(universe);
-        const simulationModel = appModel.simulationModel;
-
-        this._appModel = appModel;
-        this._simulationEngine = createSimulationEngine(simulationModel);
+        this._appModel = new AppModel(universe);
         this._shortcutManager = new ShortcutManager();
 
         this._selectUniverse(universe);
@@ -30,8 +25,7 @@ class Application {
     startRendering() {
         renderUi(this._appModel);
 
-        this._simulationEngine.startRenderLoop(this._appModel.simulationModel.viewportElement);
-        this._simulationModel.runTime();
+        this._appModel.simulationModel.runTime();
     }
 
     getApi() {
@@ -49,21 +43,13 @@ class Application {
         this._shortcutManager.register({
             key: " ",
             handler: () => {
-                this._simulationModel.timeModel.togglePause();
+                this._appModel.simulationModel.timeModel.togglePause();
             },
         });
     }
 
     configureGlobalSettings() {
         window.oncontextmenu = () => false;
-    }
-
-    /**
-     * @return {SimulationModel}
-     * @private
-     */
-    get _simulationModel() {
-        return this._appModel.simulationModel;
     }
 
     /**

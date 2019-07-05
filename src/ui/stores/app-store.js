@@ -7,11 +7,11 @@ import { SATELLITE_SEARCH_MODEL_NAME } from "../../universes/solar-system/solar-
 class AppStore {
     /**
      * @param {AppModel} appModel
-     * @param {SimulationModel} simulationModel
+     * @param {SimulationEngine} simulationEngine
      */
-    constructor(appModel, simulationModel) {
+    constructor(appModel, simulationEngine) {
         this._appModel = appModel;
-        this._simulationModel = simulationModel;
+        this._simulationEngine = simulationEngine;
         this._headerStore = new HeaderStore(appModel, this);
         this._satelliteSearchPanelStore = null;
         this._initSearchPanelIfExist();
@@ -31,7 +31,7 @@ class AppStore {
     }
 
     get starSystemSelectorSettings() {
-        const { starSystemManager } = this._simulationModel.simulation;
+        const { starSystemManager } = this._simulationEngine;
 
         return {
             options: starSystemManager.starSystems,
@@ -44,19 +44,12 @@ class AppStore {
         return this._satelliteSearchPanelStore;
     }
 
-    setViewportElement = element => {
-        this._simulationModel.setViewportElement(element);
-    };
-
     _initSearchPanelIfExist() {
-        const hasSatelliteSearchPanel = this._appModel.simulationModel.activeUniverse.hasFeature(
-            SATELLITE_SEARCH_MODEL_NAME,
-        );
+        const { activeUniverse } = this._appModel.simulationModel;
+        const hasSatelliteSearchPanel = activeUniverse.hasFeature(SATELLITE_SEARCH_MODEL_NAME);
 
         if (hasSatelliteSearchPanel) {
-            const satelliteSearchModel = this._appModel.simulationModel.activeUniverse.getFeature(
-                SATELLITE_SEARCH_MODEL_NAME,
-            );
+            const satelliteSearchModel = activeUniverse.getFeature(SATELLITE_SEARCH_MODEL_NAME);
             this._satelliteSearchPanelStore = new SatelliteSearchPanelStore(satelliteSearchModel);
         }
     }

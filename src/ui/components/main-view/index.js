@@ -11,21 +11,26 @@ import MetricsPanel from "./components/metrics-panel";
 import ManeuverPanel from "./components/maneuver-panel";
 import DynamicTrajectoryPanel from "./components/dynamic-trajectory-panel";
 import AppStore from "../../stores/app-store";
+import SimulationStore from "../../stores/simulation-store";
 
 import "./index.scss";
 
 const SatelliteSearchPanel = React.lazy(() => import("../../../features/satellite-search"));
 
-@inject("appStore")
+@inject(({ appStore, simulationStore }) => ({
+    appStore,
+    simulationStore,
+}))
 @observer
 class MainView extends Component {
     static propTypes = {
         className: PropTypes.string,
         appStore: PropTypes.instanceOf(AppStore),
+        simulationStore: PropTypes.instanceOf(SimulationStore),
     };
 
     componentDidMount() {
-        this.props.appStore.setViewportElement(this._viewportElementRef.current);
+        this.props.simulationStore.startRenderLoop(this._viewportElementRef.current);
     }
 
     _viewportElementRef = React.createRef();
