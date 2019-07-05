@@ -14,11 +14,26 @@ class EpochModel {
     _epoch = 0;
 
     /**
+     * @type {number}
+     * @private
+     */
+    @observable
+    _globalTime = 0;
+
+    /**
      * @return {number}
      */
     @computed
     get epoch() {
         return this._epoch;
+    }
+
+    /**
+     * @return {number}
+     */
+    @computed
+    get globalTime() {
+        return this._globalTime;
     }
 
     /**
@@ -44,6 +59,14 @@ class EpochModel {
         const epoch = this._universe.dataTransforms.getEpochByDate(new Date());
 
         this.forceEpoch(epoch);
+    }
+
+    /**
+     * @param {number} newTime
+     */
+    @action
+    setGlobalTime(newTime) {
+        this._globalTime = newTime;
     }
 }
 

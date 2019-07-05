@@ -28,7 +28,6 @@ class SimulationEngine {
         this._simulationModel = simulationModel;
         this._timeModel = simulationModel.timeModel;
 
-        this._globalTime = null;
         this.propagators = {};
         this._renderLoopActive = false;
         this.starSystemManager = new StarSystemManager();
@@ -183,16 +182,16 @@ class SimulationEngine {
             return;
         }
 
-        this._tick((curTime - this._globalTime) / 1000);
+        this._tick((curTime - this._timeModel.globalTime) / 1000);
 
-        this._globalTime = curTime;
+        this._timeModel.setGlobalTime(curTime);
         this._simulationModel.statisticsModel.updateStatistics();
 
         requestAnimationFrame(this._render);
     };
 
     _firstRender = curTime => {
-        this._globalTime = curTime;
+        this._timeModel.setGlobalTime(curTime);
         requestAnimationFrame(this._render);
     };
 
