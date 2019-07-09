@@ -6,6 +6,7 @@ import TimeLineStore from "./time-line-store";
 import TimeSettingsPanelStore from "../components/main-view/components/bottom-panel/components/time-settings-panel/store/time-settings-panel-store";
 import { createSimulationEngine } from "../../core/simulation-engine";
 import SimulationStore from "./simulation-store";
+import UniverseSelectorStore from "./universe-selector-store";
 
 /**
  * @param {AppModel} appModel
@@ -25,6 +26,7 @@ export function createStores(appModel) {
     );
 
     const simulationStore = new SimulationStore(simulationEngine);
+    const universeSelectorStore = new UniverseSelectorStore(appModel);
 
     return {
         appStore,
@@ -34,6 +36,7 @@ export function createStores(appModel) {
         timeLineStore,
         timeSettingsPanelStore,
         simulationStore,
+        universeSelectorStore,
     };
 }
 

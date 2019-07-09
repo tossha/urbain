@@ -2,7 +2,7 @@ import { observable } from "mobx";
 import { VisualObject } from "../../application";
 import { HeaderStore } from "./header-store";
 import { SatelliteSearchPanelStore } from "../../features/satellite-search";
-import { SATELLITE_SEARCH_MODEL_NAME } from "../../universes/solar-system/solar-system-universe";
+import { SATELLITE_SEARCH_MODEL_NAME } from "../../universes/universe-registry";
 
 class AppStore {
     /**
@@ -28,16 +28,6 @@ class AppStore {
      */
     get header() {
         return this._headerStore;
-    }
-
-    get starSystemSelectorSettings() {
-        const { starSystemManager } = this._simulationEngine;
-
-        return {
-            options: starSystemManager.starSystems,
-            defaultValue: starSystemManager.defaultStarSystem,
-            onSelect: item => starSystemManager.loadByIdx(item.idx),
-        };
     }
 
     get satelliteSearchPanel() {

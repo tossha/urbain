@@ -4,6 +4,8 @@ class SimulationStore {
      */
     constructor(simulationEngine) {
         this._simulationEngine = simulationEngine;
+
+        window.addEventListener("resize", this._handleWindowResize);
     }
 
     /**
@@ -12,6 +14,10 @@ class SimulationStore {
     startRenderLoop(viewportElement) {
         this._simulationEngine.startRenderLoop(viewportElement);
     }
+
+    _handleWindowResize = event => {
+        this._simulationEngine.onWindowResize(event);
+    };
 }
 
 export default SimulationStore;
