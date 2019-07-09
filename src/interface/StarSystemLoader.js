@@ -2,7 +2,6 @@ import $ from "jquery";
 
 import ReferenceFrameFactory, {RF_BASE_OBJ} from "../core/ReferenceFrame/Factory";
 import Body from "../core/Body";
-import OrientationConstantAxis from "../core/Orientation/ConstantAxis";
 import PhysicalBodyModel from "../core/PhysicalBodyModel";
 import EphemerisObject from "../core/EphemerisObject";
 import TrajectoryLoader from "./TrajectoryLoader";
@@ -12,11 +11,10 @@ import VisualBodyModelRings from "../core/visual/BodyModel/Rings";
 import VisualBodyModelBasic from "../core/visual/BodyModel/Basic";
 import VisualShapeSphere from "../core/visual/Shape/Sphere";
 import Events from "../core/Events";
-import { sim } from "../core/simulation-engine";
-import {STAR_SYSTEM_BARYCENTER} from "../core/StarSystem";
+import OrientationFactory from "../core/Orientation/factory";
+import { OrientationType, STAR_SYSTEM_BARYCENTER } from "../core/constants";
 
-export default class StarSystemLoader
-{
+export default class StarSystemLoader {
     static loadFromConfig(starSystem, config) {
         // Loading name
         starSystem.name = config.name;
@@ -95,19 +93,14 @@ export default class StarSystemLoader
         if (config.physical || config.orientation) {
             if (!config.orientation) {
                 config.orientation = {
-                    type: 'constantAxis',
+                    type: OrientationType.ConstantAxis,
                     config: {
                         vector: [0, 0, 1e-11]
                     }
                 };
             }
-            let className;
-            if (config.orientation.type === 'constantAxis') {
-                className = OrientationConstantAxis;
-            } else {
-                className = sim.getClass(config.orientation.type);
-            }
-            orientation = new className(config.orientation.config);
+
+            orientation = OrientationFactory.createOrientation(config.orientation.type, config.orientation.config);
         }
 
         if (config.physical) {

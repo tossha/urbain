@@ -1,18 +1,16 @@
+import { VisualModelType } from "../../constants";
 import VisualTrajectoryKeplerian from "./Keplerian";
 import VisualTrajectoryPointArray from "./PointArray";
-import { sim } from "../../simulation-engine";
 
-export default class VisualTrajectoryFactory
-{
-    static createFromConfig(trajectory, config) {
-        let className;
-        if (config.visual.model === 'keplerian') {
-            className = VisualTrajectoryKeplerian;
-        } else if (config.visual.model === 'pointArray') {
-            className = VisualTrajectoryPointArray;
-        } else {
-            className = sim.getClass(config.visual.model);
+export default class VisualTrajectoryFactory {
+    static createFromConfig(trajectory, { model, config }) {
+        switch (model) {
+            case VisualModelType.Keplerian:
+                return new VisualTrajectoryKeplerian(trajectory, config);
+            case VisualModelType.PointArray:
+                return new VisualTrajectoryPointArray(trajectory, config);
+            default:
+                throw new Error("This type of visual model isn't found");
         }
-        return new className(trajectory, config.visual.config);
     }
 }

@@ -2,8 +2,6 @@ import ReferenceFrameFactory from "./ReferenceFrame/Factory";
 import Body from "./Body";
 import Events from "./Events";
 
-export const STAR_SYSTEM_BARYCENTER = 0;
-
 export default class StarSystem
 {
     constructor(id) {
