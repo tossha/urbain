@@ -1,4 +1,4 @@
-import FeaturesList from "./features-list";
+import FeaturesList from "../features-list";
 import TimeModel from "./time-model";
 import {
     SECONDS_PER_DAY,
