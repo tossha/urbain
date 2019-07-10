@@ -6,8 +6,8 @@ import VisualTrajectoryModelKeplerian from "../../core/visual/Trajectory/Kepleri
 import KeplerianObject from "../../core/KeplerianObject";
 import TrajectoryDynamic from "../../core/Trajectory/Dynamic";
 import VisualTrajectoryDynamic from "../../core/visual/Trajectory/Dynamic";
-import FlightEventSOIDeparture from "../../modules/PatchedConics/FlightEvent/SOIDeparture";
-import FlightEventSOIArrival from "../../modules/PatchedConics/FlightEvent/SOIArrival";
+import FlightEventSOIDeparture from "../../core/PatchedConics/FlightEvent/SOIDeparture";
+import FlightEventSOIArrival from "../../core/PatchedConics/FlightEvent/SOIArrival";
 import FlightEventImpulsiveBurn from "../../core/FlightEvent/ImpulsiveBurn";
 import {Vector} from "../../core/algebra";
 

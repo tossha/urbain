@@ -9,8 +9,8 @@ import {Quaternion} from "../algebra";
 import ReferenceFrameAbstract from "../ReferenceFrame/Abstract";
 import { sim } from "../simulation-engine";
 import Events from "../Events";
-import FlightEventSOIDeparture from "../../modules/PatchedConics/FlightEvent/SOIDeparture";
-import FlightEventSOIArrival from "../../modules/PatchedConics/FlightEvent/SOIArrival";
+import FlightEventSOIDeparture from "../PatchedConics/FlightEvent/SOIDeparture";
+import FlightEventSOIArrival from "../PatchedConics/FlightEvent/SOIArrival";
 
 /**
  * Fields:

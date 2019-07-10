@@ -1,15 +1,15 @@
-import PropagatorAbstract from "../../core/Propagator/Abstract";
-import ReferenceFrameFactory, {ReferenceFrame} from "../../core/ReferenceFrame/Factory";
-import TrajectoryKeplerianBasic from "../../core/Trajectory/KeplerianBasic";
-import KeplerianObject from "../../core/KeplerianObject";
-import VisualTrajectoryModelKeplerian from "../../core/visual/Trajectory/Keplerian";
-import {getAngleIntervalsIntersection, getEpochIntervalsIntersection, Quaternion, TWO_PI} from "../../core/algebra";
-import { sim } from "../../core/simulation-engine";
+import PropagatorAbstract from "../Propagator/Abstract";
+import ReferenceFrameFactory, {ReferenceFrame} from "../ReferenceFrame/Factory";
+import TrajectoryKeplerianBasic from "../Trajectory/KeplerianBasic";
+import KeplerianObject from "../KeplerianObject";
+import VisualTrajectoryModelKeplerian from "../visual/Trajectory/Keplerian";
+import {getAngleIntervalsIntersection, getEpochIntervalsIntersection, Quaternion, TWO_PI} from "../algebra";
+import { sim } from "../simulation-engine";
 import FlightEventSOIArrival from "./FlightEvent/SOIArrival";
 import FlightEventSOIDeparture from "./FlightEvent/SOIDeparture";
-import EphemerisObject from "../../core/EphemerisObject";
-import TrajectoryDynamic from "../../core/Trajectory/Dynamic";
-import FlightEventImpulsiveBurn from "../../core/FlightEvent/ImpulsiveBurn";
+import EphemerisObject from "../EphemerisObject";
+import TrajectoryDynamic from "../Trajectory/Dynamic";
+import FlightEventImpulsiveBurn from "../FlightEvent/ImpulsiveBurn";
 
 export default class PropagatorPatchedConics extends PropagatorAbstract
 {

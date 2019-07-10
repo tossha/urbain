@@ -11,7 +11,7 @@ import Camera from "../ui-legacy/Camera";
 import VisualFlightEventImpulsiveBurn from "./visual/FlightEvent/ImpulsiveBurn";
 import VisualMarkerApocenter from "./visual/Marker/Apocenter";
 import VisualMarkerPericenter from "./visual/Marker/Pericenter";
-import PatchedConics from "../modules/PatchedConics/PatchedConics";
+import PatchedConics from "./PatchedConics/PatchedConics";
 
 /**
  * @property {TimeLine} time

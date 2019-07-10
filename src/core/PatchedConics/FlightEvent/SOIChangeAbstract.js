@@ -1,5 +1,5 @@
 
-import FlightEventAbstract from "../../../core/FlightEvent/Abstract";
+import FlightEventAbstract from "../../FlightEvent/Abstract";
 
 export default class FlightEventSOIChangeAbstract extends FlightEventAbstract
 {
