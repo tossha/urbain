@@ -1,5 +1,5 @@
-import TrajectoryFactory from "../core/Trajectory/factory";
-import VisualModelFactory from "../core/visual/visual-model-factory";
+import TrajectoryFactory from "./Trajectory/factory";
+import VisualModelFactory from "./visual/visual-model-factory";
 
 class TrajectoryLoader {
     static create(config) {

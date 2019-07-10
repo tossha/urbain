@@ -1,4 +1,4 @@
-import StarSystemLoader from "../../interface/StarSystemLoader";
+import StarSystemLoader from "../../core/StarSystemLoader";
 
 class TleLoader {
     /**

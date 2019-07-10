@@ -1,5 +1,5 @@
 import { sim as simulationEngine, sim } from "../../../core/simulation-engine";
-import StarSystemLoader from "../../../interface/StarSystemLoader";
+import StarSystemLoader from "../../../core/StarSystemLoader";
 import StarSystem from "../../../core/StarSystem";
 
 export default class DefaultKspStarSystem extends StarSystem {

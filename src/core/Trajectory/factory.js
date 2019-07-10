@@ -10,7 +10,7 @@ import TrajectoryVSOP87
     from "../../universes/solar-system/star-systems/default-solar-star-system/trajectory/trajectory-VSOP87";
 import TrajectoryELP2000
     from "../../universes/solar-system/star-systems/default-solar-star-system/trajectory/trajectory-elp2000";
-import TrajectoryLoader from "../../interface/TrajectoryLoader";
+import TrajectoryLoader from "../TrajectoryLoader";
 
 import { Vector } from "../algebra";
 

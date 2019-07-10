@@ -1,5 +1,5 @@
 import { sim as simulationEngine } from "../../../../core/simulation-engine";
-import StarSystemLoader from "../../../../interface/StarSystemLoader";
+import StarSystemLoader from "../../../../core/StarSystemLoader";
 import StarSystem from "../../../../core/StarSystem";
 
 const SOLAR_SYSTEM_NAME = "Solar System";

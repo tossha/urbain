@@ -1,18 +1,18 @@
 import $ from "jquery";
 
-import ReferenceFrameFactory, {RF_BASE_OBJ} from "../core/ReferenceFrame/Factory";
-import Body from "../core/Body";
-import PhysicalBodyModel from "../core/PhysicalBodyModel";
-import EphemerisObject from "../core/EphemerisObject";
+import ReferenceFrameFactory, {RF_BASE_OBJ} from "./ReferenceFrame/Factory";
+import Body from "./Body";
+import PhysicalBodyModel from "./PhysicalBodyModel";
+import EphemerisObject from "./EphemerisObject";
 import TrajectoryLoader from "./TrajectoryLoader";
-import VisualStarsModel from "../core/visual/StarsModel";
-import VisualBodyModelLight from "../core/visual/BodyModel/Light";
-import VisualBodyModelRings from "../core/visual/BodyModel/Rings";
-import VisualBodyModelBasic from "../core/visual/BodyModel/Basic";
-import VisualShapeSphere from "../core/visual/Shape/Sphere";
-import Events from "../core/Events";
-import OrientationFactory from "../core/Orientation/factory";
-import { OrientationType, STAR_SYSTEM_BARYCENTER } from "../core/constants";
+import VisualStarsModel from "./visual/StarsModel";
+import VisualBodyModelLight from "./visual/BodyModel/Light";
+import VisualBodyModelRings from "./visual/BodyModel/Rings";
+import VisualBodyModelBasic from "./visual/BodyModel/Basic";
+import VisualShapeSphere from "./visual/Shape/Sphere";
+import Events from "./Events";
+import OrientationFactory from "./Orientation/factory";
+import { OrientationType, STAR_SYSTEM_BARYCENTER } from "./constants";
 
 export default class StarSystemLoader {
     static loadFromConfig(starSystem, config) {
