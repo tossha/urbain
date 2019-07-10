@@ -14,6 +14,7 @@ import {
     SECONDS_PER_MONTH,
     SECONDS_PER_YEAR
 } from "../../constants/dates";
+import { sim } from "../../core/simulation-engine";
 
 export default class UIPanelLambert extends UIPanel
 {
@@ -67,7 +68,7 @@ export default class UIPanelLambert extends UIPanel
             return;
         }
 
-        const parentObject = this._sim.getModule('PatchedConics').getCommonParent(this.origin, this.target);
+        const parentObject = this._sim.patchedConics.getCommonParent(this.origin, this.target);
 
         if (parentObject === null || parentObject.id == this.origin || parentObject.id == this.target) {
             return;
@@ -151,7 +152,7 @@ export default class UIPanelLambert extends UIPanel
             return;
         }
 
-        const periods = this._sim.getModule('PatchedConics').getRelativePeriod(this.origin, this.target, this.departureTime);
+        const periods = this._sim.patchedConics.getRelativePeriod(this.origin, this.target, this.departureTime);
 
         if (periods === null) {
             return;
@@ -179,7 +180,7 @@ export default class UIPanelLambert extends UIPanel
     }
 
     buildListData() {
-        const root = this._sim.getModule('PatchedConics').getRootSoi();
+        const root = this._sim.patchedConics.getRootSoi();
 
         if (!root) {
             return null;

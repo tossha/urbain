@@ -1,39 +1,37 @@
 import * as THREE from "three";
-import $ from "jquery";
 import EventHandler from "./EventHandler";
 import { Vector } from "./algebra";
 import Events from "./Events";
 import ReferenceFrameFactory, { ReferenceFrame } from "./ReferenceFrame/Factory";
 import TimeLine from "../ui-legacy/TimeLine";
-import StarSystemLoader from "../interface/StarSystemLoader";
 import VisualRaycaster from "./visual/Raycaster";
 import SelectionHandler from "../ui-legacy/SelectionHandler";
 import UI from "../ui-legacy/UI";
-import StarSystem from "./StarSystem";
 import Camera from "../ui-legacy/Camera";
-import StarSystemManager from "../interface/StarSystemManager";
 import VisualFlightEventImpulsiveBurn from "./visual/FlightEvent/ImpulsiveBurn";
 import VisualMarkerApocenter from "./visual/Marker/Apocenter";
 import VisualMarkerPericenter from "./visual/Marker/Pericenter";
+import PatchedConics from "../modules/PatchedConics/PatchedConics";
 
 /**
  * @property {TimeLine} time
+ * @property {THREE.TextureLoader} textureLoader
  */
 class SimulationEngine {
     /**
      * @param {SimulationModel} simulationModel
+     * @param {StatisticsModel} statisticsModel
      */
-    constructor(simulationModel) {
+    constructor(simulationModel, statisticsModel) {
         if (!simulationModel) {
             throw new Error("SimulationModel must be initialized");
         }
 
         this._simulationModel = simulationModel;
+        this._statisticsModel = statisticsModel;
         this._timeModel = simulationModel.timeModel;
 
-        this._renderLoopActive = false;
         this.propagators = {};
-        this.starSystemManager = new StarSystemManager();
 
         this.scene = new THREE.Scene();
         this.scene.add(new THREE.AmbientLight(0xFFEFD5, 0.15));
@@ -42,6 +40,10 @@ class SimulationEngine {
 
         this.rendererEvents = new EventHandler(this.renderer.domElement);
         this.selection = new SelectionHandler(this);
+
+        this.patchedConics = new PatchedConics(this);
+
+        Events.addListener(Events.FIRST_RENDER,() => requestAnimationFrame(this._firstRender));
     }
 
     startRenderLoop(viewportElement) {
@@ -55,39 +57,37 @@ class SimulationEngine {
 
         this.camera = new Camera(this.renderer.domElement, this);
         this.raycaster = new VisualRaycaster(this, this.renderer.domElement, this.camera.threeCamera, /* pixelPrecision */ 7);
-        this.time = new TimeLine(0, this._simulationModel.timeModel, this.activeUniverse);
-        this.ui = new UI(this, this.activeUniverse);
+        this.time = new TimeLine(0, this._simulationModel.timeModel, this._activeUniverse);
+        this.ui = new UI(this, this._activeUniverse);
 
-        this.starSystemManager.loadDefault(() => requestAnimationFrame(this._firstRender));
-
+        this.patchedConics.init();
         this._preloadTexture();
-        this.loadModule("PatchedConics");
-        window.addEventListener("resize", this._onWindowResize);
     }
 
-    loadStarSystem(jsonFile, onLoadFinish) {
-        return Promise.resolve($.getJSON("./star_systems/" + jsonFile, starSystemConfig => {
-            this._stopRendering();
-            this.selection.deselect();
-            this.starSystem && this.starSystem.unload();
+    stopSimulation() {
+        this._simulationModel.stopSimulation();
+    }
 
-            this.activeUniverse.changeStarSystem(new StarSystem(starSystemConfig.id));
+    /* TODO: Move out this method and use Events to subscribe StarSystem changing */
+    loadStarSystem(newStarSystem, onLoadFinish) {
+        this._simulationModel.stopSimulation();
+        this.selection.deselect();
 
-            StarSystemLoader.loadFromConfig(this.starSystem, starSystemConfig);
+        this._activeUniverse.changeStarSystem(newStarSystem);
 
-            this.camera.init(
-                ReferenceFrameFactory.buildId(
-                    this.starSystem.mainObject,
-                    ReferenceFrame.INERTIAL_BODY_EQUATORIAL
-                ),
-                new Vector([30000, 30000, 20000])
-            );
+        onLoadFinish && onLoadFinish(newStarSystem);
 
-            onLoadFinish && onLoadFinish(this.starSystem);
-            Events.dispatch(Events.STAR_SYSTEM_LOADED, {starSystem: this.starSystem});
+        this.camera.init(
+            ReferenceFrameFactory.buildId(
+                this.starSystem.mainObject,
+                ReferenceFrame.INERTIAL_BODY_EQUATORIAL
+            ),
+            new Vector([30000, 30000, 20000])
+        );
 
-            this._startRendering();
-        }));
+        Events.dispatch(Events.STAR_SYSTEM_LOADED, {starSystem: newStarSystem});
+
+        this._simulationModel.startSimulation();
     }
 
     forceEpoch(epoch) {
@@ -110,39 +110,6 @@ class SimulationEngine {
         return (new Vector(visualCoords.toArray())).add_(this.camera.lastPosition);
     }
 
-    /**
-     * @param {string} moduleName
-     * @param callback
-     * @return {Promise}
-     */
-    loadModule(moduleName, callback) {
-        return this.activeUniverse.moduleManager.loadModule(moduleName, callback);
-    }
-
-    /**
-     * @param {string} moduleName
-     * @return {*}
-     */
-    getModule(moduleName) {
-        return this.activeUniverse.moduleManager.getModule(moduleName);
-    }
-
-    /**
-     * @param {string} moduleName
-     * @return {boolean}
-     */
-    isModuleLoaded(moduleName) {
-        return this.activeUniverse.moduleManager.isModuleLoaded(moduleName);
-    }
-
-    getClass(alias) {
-        const periodPos = alias.indexOf(".");
-        if (periodPos === -1) {
-            throw new Error('Incorrect class alias! Period expected in ' + alias);
-        }
-        return this.getModule(alias.substr(0, periodPos)).getClass(alias.substr(periodPos + 1));
-    }
-
     addPropagator(alias, propagatorClass) {
         this.propagators[alias] = propagatorClass;
     }
@@ -151,12 +118,17 @@ class SimulationEngine {
         return this.propagators[alias];
     }
 
+    onWindowResize = () => {
+        this._setRenderSize();
+        this.camera.onResize();
+    };
+
     get currentEpoch() {
         return this._timeModel.epoch;
     }
 
     get currentDate() {
-        return this.activeUniverse.dataTransforms.getDateByEpoch(this._timeModel.epoch);
+        return this._activeUniverse.dataTransforms.getDateByEpoch(this._timeModel.epoch);
     }
 
     get settings() {
@@ -175,25 +147,25 @@ class SimulationEngine {
     };
 
     get starSystem() {
-        return this.activeUniverse.activeStarSystem;
+        return this._activeUniverse.activeStarSystem;
     }
 
     /**
      * @return {Universe}
      */
-    get activeUniverse() {
+    get _activeUniverse() {
         return this._simulationModel.activeUniverse;
     }
 
     _render = curTime => {
-        if (!this._renderLoopActive) {
+        if (!this._simulationModel.isSimulationActive) {
             return;
         }
 
         this._tick((curTime - this._timeModel.globalTime) / 1000);
 
         this._timeModel.setGlobalTime(curTime);
-        this._simulationModel.statisticsModel.updateStatistics();
+        this._statisticsModel.updateStatistics();
 
         requestAnimationFrame(this._render);
     };
@@ -209,23 +181,10 @@ class SimulationEngine {
 
         Events.dispatch(Events.RENDER, {epoch: this._timeModel.epoch});
 
-        if (this._renderLoopActive) {
+        if (this._simulationModel.isSimulationActive) {
             this.renderer.render(this.scene, this.camera.threeCamera);
         }
     }
-
-    _startRendering() {
-        this._renderLoopActive = true;
-    }
-
-    _stopRendering() {
-        this._renderLoopActive = false;
-    }
-
-    _onWindowResize = () => {
-        this._setRenderSize();
-        this.camera.onResize();
-    };
 
 
     _setRenderSize() {
@@ -243,6 +202,7 @@ class SimulationEngine {
         VisualFlightEventImpulsiveBurn.preloadTexture(this.textureLoader);
         VisualMarkerPericenter.preloadTexture(this.textureLoader);
         VisualMarkerApocenter.preloadTexture(this.textureLoader);
+        this.patchedConics.preloadTexture();
     }
 }
 
@@ -251,8 +211,13 @@ class SimulationEngine {
  */
 export let sim = null;
 
-export function createSimulationEngine(simulationModel) {
-    sim = new SimulationEngine(simulationModel);
+/**
+ * @param {SimulationModel} simulationModel
+ * @param {StatisticsModel} statisticsModel
+ * @return {SimulationEngine}
+ */
+export function createSimulationEngine(simulationModel, statisticsModel) {
+    sim = new SimulationEngine(simulationModel, statisticsModel);
 
     return sim;
 }

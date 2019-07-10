@@ -18,13 +18,13 @@ class SatelliteSearchModel {
      * @return {Promise<any>}
      */
     loadSatellite(noradId) {
-        return this._appModel.loadTLE(noradId);
+        return this._appModel.simulationModel.loadTLE(noradId);
     }
 
     unloadSatellite(noradId) {
-        const { activeStarSystem } = this._appModel.simulationModel.activeUniverse;
+        const { starSystemModel } = this._appModel.simulationModel.activeUniverse;
 
-        return activeStarSystem.deleteObject(-(100000 + (0 | noradId)));
+        return starSystemModel.get().deleteObject(-(100000 + (0 | noradId)));
     }
 }
 

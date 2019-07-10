@@ -14,7 +14,7 @@ export class HeaderStore {
     constructor(appModel, appStore) {
         this._appModel = appModel;
         this._appStore = appStore;
-        this._statisticsModel = this._appModel.simulationModel.statisticsModel;
+        this._statisticsModel = this._appModel.statisticsModel;
     }
 
     /**
@@ -24,9 +24,9 @@ export class HeaderStore {
         const menuViewOptions = [
             {
                 label: "Body Labels",
-                selected: this._appModel.bodyLabels.isVisible,
+                selected: this._appModel.simulationModel.bodyLabels.isVisible,
                 onUpdate: ({ selected }) => {
-                    this._appModel.bodyLabels.toggle(selected);
+                    this._appModel.simulationModel.bodyLabels.toggle(selected);
                 },
             },
             {

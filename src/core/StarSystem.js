@@ -2,16 +2,30 @@ import ReferenceFrameFactory from "./ReferenceFrame/Factory";
 import Body from "./Body";
 import Events from "./Events";
 
-export default class StarSystem
-{
-    constructor(id) {
+export default class StarSystem {
+    /**
+     * @param {string} id
+     * @param {string} name
+     */
+    constructor(id, name) {
         this.id = id;
-        this.name = null;
+        this.name = name;
         this.stars = null;
         this.mainObject = null;
         this.referenceFrames = {};
         this.objects = {};
         this.created = 0;
+    }
+
+    /**
+     * @return {StarSystem}
+     */
+    get instance() {
+        return this;
+    }
+
+    get fileName() {
+        return `${this.id}.json`;
     }
 
     unload() {

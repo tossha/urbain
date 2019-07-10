@@ -1,4 +1,3 @@
-import ModuleManager from "../../../modules/module-manager";
 import FeaturesList from "./features-list";
 import TimeModel from "./time-model";
 import {
@@ -11,14 +10,19 @@ import {
 } from "../../../constants/dates";
 
 class Universe {
-    constructor() {
-        this.moduleManager = new ModuleManager();
+    /**
+     * @param {string} id - Universe id which is stored in the UniverseRegistry
+     * @param options
+     */
+    constructor(id, options) {
+        this.id = id;
         this.timeModel = new TimeModel(this);
+        this._starSystemLoader = options.starSystemLoader;
+        this._defaultStarSystem = null;
         this._features = new FeaturesList();
-        this._starSystem = null;
     }
 
-    scales = {
+    timeScales = {
         minute: SECONDS_PER_MINUTE,
         fiveMinutes: SECONDS_PER_MINUTE * 5,
         tenMinutes: SECONDS_PER_MINUTE * 10,
@@ -34,9 +38,15 @@ class Universe {
         fiveYears: SECONDS_PER_YEAR * 5,
     };
 
-    get activeStarSystem() {
-        return this._starSystem;
-    }
+    /**
+     * @type {Array<StarSystem>}
+     */
+    starSystems = [];
+
+    /**
+     * @type {StarSystem | null}
+     */
+    activeStarSystem = null;
 
     get dataTransforms() {
         return {
@@ -61,25 +71,75 @@ class Universe {
         };
     }
 
+    get defaultStarSystem() {
+        return this._defaultStarSystem ? this._defaultStarSystem : this.starSystems[0];
+    }
+
     /**
      * @param {AppModel} appModel
      */
     initializeFeatures(appModel) {}
 
+    /**
+     * @param {string} featureId
+     * @return {boolean}
+     */
     hasFeature(featureId) {
         return this._features.has(featureId);
     }
 
+    /**
+     * @param {string} featureId
+     * @param feature
+     */
     addFeature(featureId, feature) {
         this._features.add(featureId, feature);
     }
 
+    /**
+     * @param {string} featureId
+     * @return {*}
+     */
     getFeature(featureId) {
         return this._features.get(featureId);
     }
 
+    loadDefaultStarSystem(onLoaded) {
+        const starSystemName = this.defaultStarSystem.name;
+
+        this.loadStarSystem(starSystemName, onLoaded);
+    }
+
+    loadStarSystem(starSystemName, onLoaded) {
+        const starSystem = this.starSystems.find(system => system.name === starSystemName);
+
+        if (starSystem) {
+            starSystem.instance.load(this._starSystemLoader, onLoaded);
+        }
+    }
+
+    unload() {
+        if (this.activeStarSystem !== null) {
+            this.activeStarSystem.unload();
+        }
+    }
+
+    /**
+     * @param {StarSystem} starSystem
+     */
     changeStarSystem(starSystem) {
-        this._starSystem = starSystem;
+        if (this.activeStarSystem !== null) {
+            this.activeStarSystem.unload();
+        }
+
+        this.activeStarSystem = starSystem;
+    }
+
+    /**
+     * @param {StarSystem} defaultStarSystem
+     */
+    setDefaultStarSystem(defaultStarSystem) {
+        this._defaultStarSystem = defaultStarSystem;
     }
 }
 

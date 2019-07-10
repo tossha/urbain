@@ -1,5 +1,4 @@
 import PropagatorAbstract from "../../core/Propagator/Abstract";
-import TrajectoryComposite from "../../core/Trajectory/Composite";
 import ReferenceFrameFactory, {ReferenceFrame} from "../../core/ReferenceFrame/Factory";
 import TrajectoryKeplerianBasic from "../../core/Trajectory/KeplerianBasic";
 import KeplerianObject from "../../core/KeplerianObject";
@@ -11,8 +10,6 @@ import FlightEventSOIDeparture from "./FlightEvent/SOIDeparture";
 import EphemerisObject from "../../core/EphemerisObject";
 import TrajectoryDynamic from "../../core/Trajectory/Dynamic";
 import FlightEventImpulsiveBurn from "../../core/FlightEvent/ImpulsiveBurn";
-// import VisualPoint from "../../visual/Point";
-// import Constant from "../../core/FunctionOfEpoch/Constant";
 
 export default class PropagatorPatchedConics extends PropagatorAbstract
 {

@@ -1,8 +1,10 @@
 class SimulationStore {
     /**
      * @param {SimulationEngine} simulationEngine
+     * @param {SimulationModel} simulationModel
      */
-    constructor(simulationEngine) {
+    constructor(simulationModel, simulationEngine) {
+        this._simulationModel = simulationModel;
         this._simulationEngine = simulationEngine;
 
         window.addEventListener("resize", this._handleWindowResize);

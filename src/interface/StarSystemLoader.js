@@ -68,6 +68,11 @@ export default class StarSystemLoader {
         }));
     }
 
+    /**
+     * @param {StarSystem} starSystem
+     * @param config
+     * @private
+     */
     static _loadObject(starSystem, config) {
         let object;
         let visualModel = null;

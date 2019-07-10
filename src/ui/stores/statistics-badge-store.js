@@ -1,17 +1,17 @@
 class StatisticsBadgeStore {
     /**
-     * @param {SimulationModel} simulationModel
+     * @param {StatisticsModel} statisticsModel
      */
-    constructor(simulationModel) {
-        this._simulationModel = simulationModel;
+    constructor(statisticsModel) {
+        this._statisticsModel = statisticsModel;
     }
 
     get isStatisticsBadgeVisible() {
-        return this._simulationModel.statisticsModel.isBadgeVisible;
+        return this._statisticsModel.isBadgeVisible;
     }
 
     get statistics() {
-        return this._simulationModel.statisticsModel.statistics;
+        return this._statisticsModel.statistics;
     }
 }
 

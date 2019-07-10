@@ -1,17 +1,15 @@
-import { VisualObject } from "../entities/visual-object";
 import { SimulationModel } from "./simulation-model";
-import { StarSystem } from "../../constants/star-system";
+import StatisticsModel from "./statistics-model";
 
 export class AppModel {
     /**
-     * @param {Universe} universe
+     * @param {UniverseService} universeService
+     * @param {StarSystemLoaderService} starSystemLoader
      */
-    constructor(universe) {
-        this._activeUniverse = universe;
-        this._simulationModel = new SimulationModel(this, universe);
+    constructor(universeService, starSystemLoader) {
+        this._simulationModel = new SimulationModel(this, universeService, starSystemLoader);
+        this._statisticsModel = new StatisticsModel();
     }
-
-    bodyLabels = new VisualObject(true);
 
     /**
      * @return {SimulationModel}
@@ -21,12 +19,9 @@ export class AppModel {
     }
 
     /**
-     * @param {number} noradId
-     * @return {Promise<any>}
+     * @return {StatisticsModel}
      */
-    loadTLE(noradId) {
-        return this._activeUniverse.moduleManager
-            .getModule(StarSystem.SolarSystem.moduleName)
-            .loadTLE(this._activeUniverse.activeStarSystem, noradId);
+    get statisticsModel() {
+        return this._statisticsModel;
     }
 }

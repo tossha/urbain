@@ -14,9 +14,9 @@ import UniverseSelectorStore from "./universe-selector-store";
  */
 export function createStores(appModel) {
     const simulationModel = appModel.simulationModel;
-    const simulationEngine = createSimulationEngine(simulationModel);
+    const simulationEngine = createSimulationEngine(simulationModel, appModel.statisticsModel);
     const appStore = new AppStore(appModel, simulationEngine);
-    const statisticsBadgeStore = new StatisticsBadgeStore(simulationModel);
+    const statisticsBadgeStore = new StatisticsBadgeStore(appModel.statisticsModel);
     const selectedObjectMetricsStore = new SelectedObjectMetricsStore(simulationEngine);
     const timeStore = new TimeStore(simulationModel.timeModel);
     const timeLineStore = new TimeLineStore(simulationModel);
@@ -25,8 +25,8 @@ export function createStores(appModel) {
         simulationModel.activeUniverse,
     );
 
-    const simulationStore = new SimulationStore(simulationEngine);
-    const universeSelectorStore = new UniverseSelectorStore(appModel);
+    const simulationStore = new SimulationStore(simulationModel, simulationEngine);
+    const universeSelectorStore = new UniverseSelectorStore(simulationModel);
 
     return {
         appStore,

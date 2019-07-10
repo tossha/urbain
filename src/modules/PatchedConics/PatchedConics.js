@@ -3,27 +3,35 @@ import Events from "../../core/Events";
 import EphemerisObject from "../../core/EphemerisObject";
 import Body from "../../core/Body";
 import PropagatorPatchedConics from "./PropagatorPatchedConics";
-import { sim } from "../../core/simulation-engine";
 import VisualFlightEventSOIArrival from "./visual/FlightEvent/SOIArrival";
 import VisualFlightEventSOIDeparture from "./visual/FlightEvent/SOIDeparture";
 
-export default class ModulePatchedConics extends Module
-{
-    init() {
+export default class PatchedConics extends Module {
+    /**
+     * @param {SimulationEngine} simulationEngine
+     */
+    constructor(simulationEngine) {
+        super();
+        this._simulationEngine = simulationEngine;
         this.root = null;
+    }
 
-        sim.addPropagator('patchedConics', PropagatorPatchedConics);
+    init() {
+        this._simulationEngine.addPropagator('patchedConics', PropagatorPatchedConics);
         Events.addListener(Events.LOADING_BODIES_DONE, () => this.fillSoiTree());
-        if (sim.starSystem) {
+
+        if (this._simulationEngine.starSystem) {
             this.fillSoiTree();
         }
+    }
 
-        VisualFlightEventSOIArrival.preloadTexture(sim.textureLoader);
-        VisualFlightEventSOIDeparture.preloadTexture(sim.textureLoader);
+    preloadTexture() {
+        VisualFlightEventSOIArrival.preloadTexture(this._simulationEngine.textureLoader);
+        VisualFlightEventSOIDeparture.preloadTexture(this._simulationEngine.textureLoader);
     }
 
     fillSoiTree() {
-        let ss = sim.starSystem;
+        let ss = this._simulationEngine.starSystem;
 
         for (let bodyId in ss.objects) {
             let obj = ss.objects[bodyId];
@@ -52,16 +60,16 @@ export default class ModulePatchedConics extends Module
         let chain1 = [body1];
         let parent;
 
-        while (parent = sim.starSystem.getObject(chain1[chain1.length - 1]).data.patchedConics.parentSoiId) {
+        while (parent = this._simulationEngine.starSystem.getObject(chain1[chain1.length - 1]).data.patchedConics.parentSoiId) {
             chain1.push(parent);
         }
 
         parent = body2;
         do {
             if (chain1.indexOf(parent) !== -1) {
-                return sim.starSystem.getObject(parent);
+                return this._simulationEngine.starSystem.getObject(parent);
             }
-            parent = sim.starSystem.getObject(parent).data.patchedConics.parentSoiId;
+            parent = this._simulationEngine.starSystem.getObject(parent).data.patchedConics.parentSoiId;
         } while (parent);
 
         return null;
@@ -71,7 +79,7 @@ export default class ModulePatchedConics extends Module
         let chain1 = [body1];
         let parent, idx;
 
-        while (parent = sim.starSystem.getObject(chain1[chain1.length - 1]).data.patchedConics.parentSoiId) {
+        while (parent = this._simulationEngine.starSystem.getObject(chain1[chain1.length - 1]).data.patchedConics.parentSoiId) {
             if (parent == body2) {
                 return null;
             }
@@ -79,14 +87,14 @@ export default class ModulePatchedConics extends Module
         }
 
         let obj = body2;
-        while (parent = sim.starSystem.getObject(obj).data.patchedConics.parentSoiId) {
+        while (parent = this._simulationEngine.starSystem.getObject(obj).data.patchedConics.parentSoiId) {
             if ((idx = chain1.indexOf(parent)) !== -1) {
                 if (idx === 0) {
                     return null;
                 }
 
-                let period1 = sim.starSystem.getObject(chain1[idx - 1]).trajectory.getKeplerianObjectByEpoch(epoch).period;
-                let period2 = sim.starSystem.getObject(obj).trajectory.getKeplerianObjectByEpoch(epoch).period;
+                let period1 = this._simulationEngine.starSystem.getObject(chain1[idx - 1]).trajectory.getKeplerianObjectByEpoch(epoch).period;
+                let period2 = this._simulationEngine.starSystem.getObject(obj).trajectory.getKeplerianObjectByEpoch(epoch).period;
 
                 return {
                     period1: period1,
@@ -98,6 +106,5 @@ export default class ModulePatchedConics extends Module
         }
 
         return null;
-
     }
 }

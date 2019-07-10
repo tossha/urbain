@@ -221,7 +221,7 @@ class TimeLine {
     }
 
     get scales() {
-        return this._universe.scales;
+        return this._universe.timeScales;
     }
 }
 

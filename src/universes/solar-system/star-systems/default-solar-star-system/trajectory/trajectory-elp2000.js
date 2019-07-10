@@ -40,6 +40,11 @@ export default class TrajectoryELP2000 extends TrajectoryKeplerianAbstract {
         );
     }
 
+    /**
+     * @param {number} fileIdx
+     * @return {number[]}
+     * @private
+     */
     _calc1_3(fileIdx) {
         let value = 0;
         let derivative = 0;
@@ -49,8 +54,8 @@ export default class TrajectoryELP2000 extends TrajectoryKeplerianAbstract {
             const dArg = k[0] * this.dD + k[1] * this.dl_ + k[2] * this.dl + k[3] * this.dF;
             const sin = Math.sin(arg);
             const cos = Math.cos(arg);
-            value += k[4] * (fileIdx == 2 ? cos : sin);
-            derivative += k[4] * (fileIdx == 2 ? -sin : cos) * deg2rad(dArg / 3600);
+            value += k[4] * (fileIdx === 2 ? cos : sin);
+            derivative += k[4] * (fileIdx === 2 ? -sin : cos) * deg2rad(dArg / 3600);
         }
 
         return [value, derivative];

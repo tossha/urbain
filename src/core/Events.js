@@ -26,6 +26,7 @@ export default class Events
     static LOADING_TRAJECTORIES_DONE = 'urb_load_traj_done';
 
     static RENDER = 'urb_render';
+    static FIRST_RENDER = 'urb_first_render';
     static STAR_SYSTEM_LOADED = 'urb_star_system_loading_done';
     static SELECT = 'urb_select';
     static DESELECT = 'urb_deselect';

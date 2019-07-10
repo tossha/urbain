@@ -6,9 +6,17 @@ import nextRenderingDate from "./helpers/next-rendering-date";
 import formatDate from "./helpers/format-date";
 import formatDateFull from "./helpers/format-date-full";
 import { timeScales } from "./constants";
+import DefaultKspStarSystem from "./star-systems/default-ksp-star-system";
+import { UniverseRegistry } from "../universe-registry";
 
 class KspUniverse extends Universe {
-    scales = timeScales;
+    constructor(options) {
+        super(UniverseRegistry.Ksp.id, options);
+        this.setDefaultStarSystem(this.starSystems[0]);
+    }
+
+    timeScales = timeScales;
+    starSystems = [new DefaultKspStarSystem()];
 
     /**
      * @param {AppModel} appModel

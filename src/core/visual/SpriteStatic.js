@@ -7,6 +7,9 @@ export default class VisualSpriteStatic extends VisualSprite
     static _alignVertical = 'center';
     static _alignHorizontal = 'center';
 
+    /**
+     * @param {THREE.TextureLoader} textureLoader
+     */
     static preloadTexture(textureLoader) {
         textureLoader.load('images/' + this._textureName, texture => {this._texture = texture});
     }
