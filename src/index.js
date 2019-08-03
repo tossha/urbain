@@ -5,8 +5,10 @@ configure({ enforceActions: "always" });
 
 const app = new Application();
 
-app.renderUi();
-app.initSimulation();
-app.registerShortcuts();
+app.loadDefaultUniverse().then(() => {
+    app.startRendering();
+    app.registerShortcuts();
+    app.configureGlobalSettings();
 
-window.api = app.getApi();
+    window.api = app.getApi();
+});

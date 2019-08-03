@@ -1,10 +1,15 @@
 import React from "react";
+import PropTypes from "prop-types";
+import { inject, observer } from "mobx-react";
 
 import Panel, { Field, FieldLabel, FieldControl, PanelButton } from "../../../../../common/panel";
+import TimeSettingsPanelStore from "./store/time-settings-panel-store";
 import Logo from "./logo";
 import "./index.scss";
 
-function TimeSettingsPanel({ className }) {
+function TimeSettingsPanel({ className, timeSettingsPanelStore }) {
+    const formattedDate = timeSettingsPanelStore.formattedDate || "01.01.2000 12:00:00";
+
     return (
         <Panel
             className={`time-settings-panel ${className}`}
@@ -15,26 +20,25 @@ function TimeSettingsPanel({ className }) {
             <Field>
                 <FieldLabel middle>Current</FieldLabel>
                 <FieldControl>
-                    <time id="currentDateValue">01.01.2000 12:00:00</time>
+                    <time dateTime={formattedDate}>{formattedDate}</time>
                 </FieldControl>
-                <PanelButton id="useCurrentTime">Now</PanelButton>
+                <PanelButton onClick={timeSettingsPanelStore.onSetCurrentTime}>Now</PanelButton>
             </Field>
             <Field>
                 <FieldLabel middle>Rate</FieldLabel>
-                <FieldControl id="timeScaleValue" />
-                <PanelButton id="setRealTimeScale">Real</PanelButton>
+                <FieldControl>{timeSettingsPanelStore.formattedTimeScale}</FieldControl>
+                <PanelButton onClick={timeSettingsPanelStore.onSetRealTimeScale}>Real</PanelButton>
             </Field>
             <Field centered>
                 <FieldControl fullSize>
                     <input
-                        id="timeScaleSlider"
                         type="range"
                         className="time-settings-panel__scale-slider"
-                        min="-1"
-                        max="1"
-                        step="0.001"
-                        defaultValue="0.001"
-                        style={{ width: "100%" }}
+                        min={-1}
+                        max={1}
+                        step={0.001}
+                        value={timeSettingsPanelStore.sliderValue}
+                        onChange={timeSettingsPanelStore.onTimeScaleSliderChange}
                     />
                 </FieldControl>
             </Field>
@@ -42,4 +46,9 @@ function TimeSettingsPanel({ className }) {
     );
 }
 
-export default TimeSettingsPanel;
+TimeSettingsPanel.propTypes = {
+    className: PropTypes.string,
+    timeSettingsPanelStore: PropTypes.instanceOf(TimeSettingsPanelStore),
+};
+
+export default inject("timeSettingsPanelStore")(observer(TimeSettingsPanel));

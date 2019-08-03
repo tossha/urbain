@@ -6,15 +6,29 @@ import ReferenceFrameFactory, {ReferenceFrame} from "../../core/ReferenceFrame/F
 import VisualTrajectoryModelKeplerian from "../../core/visual/Trajectory/Keplerian";
 import VisualVector from "../../core/visual/Vector";
 import EphemerisObject from "../../core/EphemerisObject";
-import { sim } from "../../core/Simulation";
 import Events from "../../core/Events";
+import {
+    SECONDS_PER_DAY,
+    SECONDS_PER_HOUR,
+    SECONDS_PER_MINUTE,
+    SECONDS_PER_MONTH,
+    SECONDS_PER_YEAR
+} from "../../constants/dates";
+import { sim } from "../../core/simulation-engine";
 
 export default class UIPanelLambert extends UIPanel
 {
-    constructor(panelDom) {
+    /**
+     * @param panelDom
+     * @param {SimulationEngine} sim
+     * @param {Universe} activeUniverse
+     */
+    constructor(panelDom, sim, activeUniverse) {
         super(panelDom, true);
+        this._sim = sim;
+        this._activeUniverse = activeUniverse;
 
-        this.maxTransferTime = 86400 * 365.25 * 40;
+        this.maxTransferTime = SECONDS_PER_DAY * 365.25 * 40;
 
         this.jqSlider = this.jqDom.find('#transferTimeSlider');
         this.jqSlider.on('input change', () => this.changeTransferTime(this.getCurrentTransferTime()));
@@ -54,15 +68,15 @@ export default class UIPanelLambert extends UIPanel
             return;
         }
 
-        const parentObject = sim.getModule('PatchedConics').getCommonParent(this.origin, this.target);
+        const parentObject = this._sim.patchedConics.getCommonParent(this.origin, this.target);
 
         if (parentObject === null || parentObject.id == this.origin || parentObject.id == this.target) {
             return;
         }
 
         const referenceFrameId = ReferenceFrameFactory.buildId(parentObject.id, ReferenceFrame.INERTIAL_ECLIPTIC);
-        const origin = sim.starSystem.getObject(this.origin);
-        const target = sim.starSystem.getObject(this.target);
+        const origin = this._sim.starSystem.getObject(this.origin);
+        const target = this._sim.starSystem.getObject(this.target);
         const state1 = origin.trajectory.getStateByEpoch(this.departureTime, referenceFrameId);
         const state2 = target.trajectory.getStateByEpoch(this.departureTime + this.transferTime, referenceFrameId);
 
@@ -116,8 +130,8 @@ export default class UIPanelLambert extends UIPanel
     }
 
     useCurrentTime() {
-        this.departureTime = sim.currentEpoch;
-        this.updateTime(sim.currentDate);
+        this.departureTime = this._sim.currentEpoch;
+        this.updateTime(this._sim.currentDate);
         this.solve();
     }
 
@@ -138,7 +152,7 @@ export default class UIPanelLambert extends UIPanel
             return;
         }
 
-        const periods = sim.getModule('PatchedConics').getRelativePeriod(this.origin, this.target, this.departureTime);
+        const periods = this._sim.patchedConics.getRelativePeriod(this.origin, this.target, this.departureTime);
 
         if (periods === null) {
             return;
@@ -166,7 +180,7 @@ export default class UIPanelLambert extends UIPanel
     }
 
     buildListData() {
-        const root = sim.getModule('PatchedConics').getRootSoi();
+        const root = this._sim.patchedConics.getRootSoi();
 
         if (!root) {
             return null;
@@ -191,7 +205,8 @@ export default class UIPanelLambert extends UIPanel
     }
 
     updateTime(date) {
-        this.jqDateText.html(sim.time.formatDateFull(date));
+        const formattedDate = this._activeUniverse.dataTransforms.formatDateFull(date);
+        this.jqDateText.html(formattedDate);
     }
 
 
@@ -204,26 +219,26 @@ export default class UIPanelLambert extends UIPanel
             return '0';
         }
 
-        if (abs < 60) {
+        if (abs < SECONDS_PER_MINUTE) {
             return prefix + abs.toPrecision(precision) + ' s';
         }
 
-        if (abs < 3600) {
-            return prefix + (abs / 60).toPrecision(precision) + ' min';
+        if (abs < SECONDS_PER_HOUR) {
+            return prefix + (abs / SECONDS_PER_MINUTE).toPrecision(precision) + ' min';
         }
 
-        if (abs < 86400) {
-            return prefix + (abs / 3600).toPrecision(precision) + ' h';
+        if (abs < SECONDS_PER_DAY) {
+            return prefix + (abs / SECONDS_PER_HOUR).toPrecision(precision) + ' h';
         }
 
-        if (abs < 2592000) {
-            return prefix + (abs / 86400).toPrecision(precision) + ' days';
+        if (abs < SECONDS_PER_MONTH) {
+            return prefix + (abs / SECONDS_PER_DAY).toPrecision(precision) + ' days';
         }
 
-        if (abs < 31557600) {
-            return prefix + (abs / 2592000).toPrecision(precision) + ' months';
+        if (abs < SECONDS_PER_YEAR) {
+            return prefix + (abs / SECONDS_PER_MONTH).toPrecision(precision) + ' months';
         }
 
-        return prefix + (abs / 31557600).toPrecision(precision) + ' years';
+        return prefix + (abs / SECONDS_PER_YEAR).toPrecision(precision) + ' years';
     }
 }

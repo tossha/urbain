@@ -26,12 +26,12 @@ export default class Events
     static LOADING_TRAJECTORIES_DONE = 'urb_load_traj_done';
 
     static RENDER = 'urb_render';
+    static FIRST_RENDER = 'urb_first_render';
     static STAR_SYSTEM_LOADED = 'urb_star_system_loading_done';
     static SELECT = 'urb_select';
     static DESELECT = 'urb_deselect';
     static SHOW_ORBIT_ANGLES_CHANGED = 'urb_show_orbit_angles_change';
     static CAMERA_RF_CHANGED = 'urb_camera_rf_change';
     static OBJECT_ADDED = 'urb_object_added';
-    static TIME_SCALE_CHANGED = 'urb_time_scale_change';
-    static EPOCH_CHANGED = 'urb_epoch_change';
+    static FORCE_EPOCH_CHANGED = 'urb_force_epoch_change';
 }

@@ -6,7 +6,7 @@ import Body from "./Body";
 import StateVector from "./StateVector";
 import TrajectoryComposite from "./Trajectory/Composite";
 import TrajectoryKeplerianBasic from "./Trajectory/KeplerianBasic";
-import { sim } from "./Simulation";
+import { sim } from "./simulation-engine";
 
 export default class LambertSolver
 {
@@ -142,7 +142,7 @@ export default class LambertSolver
             return null;
         }
 
-        const parentObject = sim.getModule('PatchedConics').getCommonParent(originObject.id, targetObject.id);
+        const parentObject = sim.patchedConics.getCommonParent(originObject.id, targetObject.id);
 
         if (!(parentObject instanceof Body)) {
             return null;

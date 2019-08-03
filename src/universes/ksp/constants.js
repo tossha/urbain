@@ -1,0 +1,16 @@
+export const timeScales = {
+    minute: 60,
+    fiveMinutes: 300,
+    tenMinutes: 600,
+    thirtyMinutes: 1800,
+    hour: 3600,
+    threeHours: 10800,
+    day: 21600,
+    threeDays: 64800,
+    tenDays: 216000,
+    thirtyDays: 648000,
+    hundredDays: 2160000,
+    year: 9201600,
+    fiveYears: 46008000,
+    twentyYears: 184032000,
+};

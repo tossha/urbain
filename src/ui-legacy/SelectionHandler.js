@@ -1,13 +1,16 @@
 import * as THREE from "three";
 
 import VisualModelAbstract from "../core/visual/ModelAbstract";
-import { sim, Events } from "../core/index";
+import Events from "../core/Events";
 
-export default class SelectionHandler extends VisualModelAbstract
-{
-    constructor() {
-        super();
+export default class SelectionHandler extends VisualModelAbstract {
+    /**
+     * @param {SimulationEngine} simulationEngine
+     */
+    constructor(simulationEngine) {
+        super(simulationEngine);
 
+        this._simulationEngine = simulationEngine;
         this.selectableObjects = [];
 
         this.selectedObject = null;
@@ -21,10 +24,7 @@ export default class SelectionHandler extends VisualModelAbstract
             new THREE.MeshBasicMaterial({color: 0xFFFF00})
         ));
 
-        sim.addEventListener('mousedown', this.onMouseDown.bind(this), 1);
-
-        this.mouseMoveListener = this.onMouseMove.bind(this);
-        this.mouseUpListener = this.onMouseUp.bind(this);
+        simulationEngine.addEventListener('mousedown', this.onMouseDown, 1);
     }
 
     /**
@@ -48,7 +48,7 @@ export default class SelectionHandler extends VisualModelAbstract
     }
 
     render() {
-        const intersections = sim.raycaster.intersectObjects(this.selectableObjects);
+        const intersections = this._simulationEngine.raycaster.intersectObjects(this.selectableObjects);
 
         if (intersections.length > 0) {
             this.bestIntersection = intersections[0];
@@ -62,7 +62,7 @@ export default class SelectionHandler extends VisualModelAbstract
             this.threeObj.visible = true;
             this.threeObj.position.copy(this.bestIntersection.point);
 
-            const scaleKoeff = this.pointSize * this.bestIntersection.point.length() * sim.raycaster.getPixelAngleSize();
+            const scaleKoeff = this.pointSize * this.bestIntersection.point.length() * this._simulationEngine.raycaster.getPixelAngleSize();
 
             this.threeObj.scale.x = scaleKoeff;
             this.threeObj.scale.y = scaleKoeff;
@@ -74,30 +74,30 @@ export default class SelectionHandler extends VisualModelAbstract
         }
     }
 
-    onMouseDown(event) {
+    onMouseDown = (event) => {
         if (event.button === this.selectionMouseButton) {
-            document.addEventListener('mousemove', this.mouseMoveListener);
-            document.addEventListener('mouseup', this.mouseUpListener);
+            document.addEventListener('mousemove', this.onMouseMove);
+            document.addEventListener('mouseup', this.onMouseUp);
             this.hasMouseMoved = false;
             this.mouseClickStart = [event.clientX, event.clientY];
         }
     }
 
-    onMouseMove(event) {
+    onMouseMove = (event) => {
         if (this.mouseClickStart[0] !== event.clientX || this.mouseClickStart[1] !== event.clientY) {
             this.hasMouseMoved = true;
         }
-    }
+    };
 
-    onMouseUp(event) {
+    onMouseUp = (event) => {
         const wasSelected = this.selectedObject;
 
         if (event.button !== this.selectionMouseButton) {
             return;
         }
 
-        document.removeEventListener('mousemove', this.mouseMoveListener);
-        document.removeEventListener('mouseup', this.mouseUpListener);
+        document.removeEventListener('mousemove', this.onMouseMove);
+        document.removeEventListener('mouseup', this.onMouseUp);
 
         if (this.hasMouseMoved) {
             return;
@@ -118,7 +118,7 @@ export default class SelectionHandler extends VisualModelAbstract
         } else if (selectionObject && this.bestIntersection.object.userData.onClick) {
             this.bestIntersection.object.userData.onClick(this.bestIntersection);
         }
-    }
+    };
 
     forceSelection(object) {
         this.deselect();

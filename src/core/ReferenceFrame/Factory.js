@@ -7,7 +7,7 @@ import ReferenceFrameInertial from "./Inertial";
 import ReferenceFrameInertialDynamic from "./InertialDynamic";
 import Body from "../Body";
 import ReferenceFrameTopocentric from "./Topocentric";
-import { sim } from "../Simulation";
+import { sim } from "../simulation-engine";
 
 export default class ReferenceFrameFactory
 {

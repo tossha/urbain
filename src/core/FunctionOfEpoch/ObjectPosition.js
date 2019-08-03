@@ -1,5 +1,5 @@
 import FunctionOfEpochAbstract from "./Abstract";
-import { sim } from "../Simulation";
+import { sim } from "../simulation-engine";
 
 export default class FunctionOfEpochObjectPosition extends FunctionOfEpochAbstract
 {

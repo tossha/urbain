@@ -1,0 +1,29 @@
+@import "../../../../../../ui/components/common/variables";
+
+.filter-bar {
+	width: 100%;
+
+	&__search-query-input {
+		width: 100%;
+	}
+
+	&__filters {
+		margin-top: 0.5rem;
+	}
+
+	&__filter-pair {
+		display: flex;
+		justify-content: space-between;
+		margin: 0.5rem 0;
+	}
+
+	&__filter-pair-input {
+		min-width: calc(50% - #{$default-gap-size} / 2);
+		margin-right: $default-gap-size / 2;
+	}
+
+	&__filter-pair-select {
+		margin-left: $default-gap-size / 2;
+		width: calc(50% - #{$default-gap-size} / 2);
+	}
+}

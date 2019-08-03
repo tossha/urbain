@@ -6,12 +6,12 @@ import {RF_BASE} from "../ReferenceFrame/Factory";
 import VirtualPlane from "./VirtualPlane";
 import {TWO_PI, rad2deg, deg2rad} from "../algebra";
 import ArrowObject from "./Arrow";
-import { sim } from "../Simulation";
+import { sim } from "../simulation-engine";
 
 export default class VisualAngle extends VisualModelAbstract
 {
     constructor(referenceFrame, position, orientation, value, color, size, type, editingCallback) {
-        super();
+        super(sim);
 
         this._referenceFrame = referenceFrame;
         this._position = position;

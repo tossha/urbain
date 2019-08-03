@@ -3,7 +3,7 @@ import {Quaternion, Vector} from "./algebra";
 import VisualAngle from "./visual/Angle";
 import Constant from "./FunctionOfEpoch/Constant";
 import VisualPlanePoint from "./visual/PlanePoint";
-import { sim } from "./Simulation";
+import { sim } from "./simulation-engine";
 
 export default class KeplerianEditor
 {

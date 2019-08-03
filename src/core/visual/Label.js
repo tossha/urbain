@@ -1,11 +1,11 @@
 import * as THREE from "three";
 
 import VisualModelAbstract from "./ModelAbstract";
-import { sim } from "../Simulation";
+import { sim } from "../simulation-engine";
 
 export default class VisualLabel extends VisualModelAbstract {
     constructor(positionOfEpoch, parameters) {
-        super();
+        super(sim);
 
         this.visible = true;
 

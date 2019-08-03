@@ -1,13 +1,13 @@
 class SelectedObjectMetricsStore {
     /**
-     * @param {SimulationModel} simulationModel
+     * @param {SimulationEngine} simulationEngine
      */
-    constructor(simulationModel) {
-        this._simulationModel = simulationModel;
+    constructor(simulationEngine) {
+        this._simulationEngine = simulationEngine;
     }
 
     closeMetricsPanel = () => {
-        this._simulationModel.simulation.selection.deselect();
+        this._simulationEngine.selection.deselect();
     };
 }
 

@@ -5,29 +5,29 @@ import Events from "../../core/Events";
 import UIPanelVector from "./Vector";
 import {presentNumberWithSuffix, rad2deg} from "../../core/algebra";
 import EphemerisObject from "../../core/EphemerisObject";
-import { sim } from "../../core/Simulation";
+import { SECONDS_PER_DAY } from "../../constants/dates";
 
 export default class UIPanelMetrics extends UIPanel {
     /**
      * @param panelDom
-     * @param {SelectionHandler} selectionHandler
+     * @param {SimulationEngine} simulationEngine
      */
-    constructor(panelDom, selectionHandler) {
+    constructor(panelDom, simulationEngine) {
         super(panelDom);
 
-        this.selection = selectionHandler;
         this.precision = 5;
+        this._simulationEngine = simulationEngine;
 
         Events.addListener(Events.SELECT, this.handleSelect);
         Events.addListener(Events.DESELECT, this.handleDeselect);
 
         this.jqDom.find('#unloadObject').on('click', function() {
-            let wasSelected = selectionHandler.getSelectedObject();
-            selectionHandler.deselect();
-            sim.starSystem.deleteObject(wasSelected.id);
+            let wasSelected = simulationEngine.selection.getSelectedObject();
+            simulationEngine.selection.deselect();
+            simulationEngine.starSystem.deleteObject(wasSelected.id);
         });
         this.jqDom.find('#showAnglesOfSelectedOrbit').on('change', function() {
-            sim.settings.ui.showAnglesOfSelectedOrbit = this.checked;
+            simulationEngine.settings.ui.showAnglesOfSelectedOrbit = this.checked;
             Events.dispatch(Events.SHOW_ORBIT_ANGLES_CHANGED, {value: this.checked});
         });
 
@@ -38,7 +38,7 @@ export default class UIPanelMetrics extends UIPanel {
     }
 
     render = event => {
-        const selectedTrajectory = this.selection.getSelectedObject().trajectory;
+        const selectedTrajectory = this._simulationEngine.selection.getSelectedObject().trajectory;
         let parent = null;
         if (!selectedTrajectory) {
             return;
@@ -47,7 +47,7 @@ export default class UIPanelMetrics extends UIPanel {
         try {
             const referenceFrame = selectedTrajectory.getReferenceFrameByEpoch(event.detail.epoch);
             if (referenceFrame) {
-                parent = sim.starSystem.getObject(referenceFrame.originId);
+                parent = this._simulationEngine.starSystem.getObject(referenceFrame.originId);
                 this.jqDom.find('#relativeTo').html(parent.name);
             }
 
@@ -78,7 +78,7 @@ export default class UIPanelMetrics extends UIPanel {
 
         if (parent.physicalModel && parent.physicalModel.j2 && parent.physicalModel.j2) {
             this.jqDom.find('#elements-precession').html('' + (
-                rad2deg(keplerianObject.getNodalPrecessionRate(parent.physicalModel.eqRadius, parent.physicalModel.j2) * 86400)
+                rad2deg(keplerianObject.getNodalPrecessionRate(parent.physicalModel.eqRadius, parent.physicalModel.j2) * SECONDS_PER_DAY)
             ).toPrecision(this.precision));
         }
     }
@@ -97,7 +97,7 @@ export default class UIPanelMetrics extends UIPanel {
         this.jqDom.find('#elements-aop' ).html('' + rad2deg( keplerianObject.aop ).toPrecision(this.precision));
         this.jqDom.find('#elements-raan').html('' + rad2deg( keplerianObject.raan).toPrecision(this.precision));
         this.jqDom.find('#elements-ta'  ).html('' + rad2deg( keplerianObject.getTrueAnomalyByEpoch(epoch)  ).toPrecision(this.precision));
-        this.jqDom.find('#elements-period').html('' + (keplerianObject.period / 86400).toPrecision(this.precision));
+        this.jqDom.find('#elements-period').html('' + (keplerianObject.period / SECONDS_PER_DAY).toPrecision(this.precision));
     }
 
     handleSelect = ({ detail }) => {

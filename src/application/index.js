@@ -1,31 +1,38 @@
-import { init as initSimulationEngine } from "../core";
 import { renderUi } from "../ui";
 import { createServices } from "./services";
 import { AppModel } from "./models/app-model";
+import { UniverseRegistry } from "../universes/universe-registry";
 import ShortcutManager from "./shortcut-manager";
 
-const VIEWPORT_ENTRY_ID = "viewport-id";
+const { universeService, starSystemLoader } = createServices();
 
 class Application {
     constructor() {
-        const services = createServices();
-        this._appModel = new AppModel(services, VIEWPORT_ENTRY_ID);
+        this._appModel = new AppModel(universeService, starSystemLoader);
+        this._simulationModel = this._appModel.simulationModel;
         this._shortcutManager = new ShortcutManager();
     }
 
-    renderUi() {
-        renderUi(this._appModel, this._simulationModel, this._simulationModel.viewportId);
+    async loadDefaultUniverse() {
+        const universeId = universeService.getDefaultUniverseId();
+
+        await this._simulationModel.loadUniverseById(universeId);
     }
 
-    initSimulation() {
-        initSimulationEngine(this._simulationModel);
+    startRendering() {
+        renderUi(this._appModel);
+
         this._simulationModel.runTime();
     }
 
     getApi() {
         return {
-            loadTLE: noradId => this._simulationModel.loadTLE(noradId),
-            loadKSP: () => this._simulationModel.loadKSP(),
+            loadTLE: noradId => {
+                return this._simulationModel.loadTLE(noradId);
+            },
+            loadKSP: () => {
+                return this._simulationModel.loadUniverseById(UniverseRegistry.Ksp.id);
+            },
         };
     }
 
@@ -38,12 +45,8 @@ class Application {
         });
     }
 
-    /**
-     * @return {SimulationModel}
-     * @private
-     */
-    get _simulationModel() {
-        return this._appModel.simulationModel;
+    configureGlobalSettings() {
+        window.oncontextmenu = () => false;
     }
 }
 

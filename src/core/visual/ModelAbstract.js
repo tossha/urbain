@@ -1,12 +1,14 @@
 import Events from "../Events";
-import { sim } from "../Simulation";
 
-export default class VisualModelAbstract
-{
-    constructor() {
-        this.threeObj = null;
-        this.scene = sim.scene;
+export default class VisualModelAbstract {
+    /**
+     * @param {SimulationEngine} simulationEngine
+     */
+    constructor(simulationEngine) {
+        this._sim = simulationEngine;
         this._isHidden = false;
+        this.threeObj = null;
+        this.scene = this._sim.scene;
     }
 
     setThreeObj(obj) {
@@ -23,14 +25,14 @@ export default class VisualModelAbstract
     setPosition(simCoords) {
         if (simCoords) {
             this.threeObj.visible = true;
-            this.threeObj.position.copy(sim.getVisualCoords(simCoords));
+            this.threeObj.position.copy(this._sim.getVisualCoords(simCoords));
         } else {
             this.threeObj.visible = false;
         }
     }
 
     get pixelAngleSize() {
-        return sim.raycaster.getPixelAngleSize();
+        return this._sim.raycaster.getPixelAngleSize();
     }
 
     _onRender(event) {

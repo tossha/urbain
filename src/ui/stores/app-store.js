@@ -1,24 +1,27 @@
+import { observable } from "mobx";
+import { VisualObject } from "../../application";
 import { HeaderStore } from "./header-store";
-import SatelliteSearchPanelStore from "./satellite-search-panel-store";
+import { SatelliteSearchPanelStore } from "../../features/satellite-search";
+import { SATELLITE_SEARCH_MODEL_NAME } from "../../universes/universe-registry";
 
 class AppStore {
     /**
      * @param {AppModel} appModel
-     * @param {SimulationModel} simulationModel
+     * @param {SimulationEngine} simulationEngine
      */
-    constructor(appModel, simulationModel) {
+    constructor(appModel, simulationEngine) {
         this._appModel = appModel;
-        this._simulationModel = simulationModel;
-        this.satelliteSearchPanelStore = new SatelliteSearchPanelStore(appModel.satelliteSearchModel);
-        this._headerStore = new HeaderStore(appModel, this.satelliteSearchPanelStore);
+        this._simulationEngine = simulationEngine;
+        this._headerStore = new HeaderStore(appModel, this);
+        this._satelliteSearchPanelStore = null;
+        this._initSearchPanelIfExist();
     }
 
-    /**
-     * @return {{creationPanel, transferCalculationPanel}}
-     */
-    get visualObjects() {
-        return this._appModel.visualObjects;
-    }
+    @observable
+    visualObjects = {
+        creationPanel: new VisualObject(false),
+        transferCalculationPanel: new VisualObject(false),
+    };
 
     /**
      * @return {HeaderStore}
@@ -27,14 +30,18 @@ class AppStore {
         return this._headerStore;
     }
 
-    get starSystemSelectorSettings() {
-        const { starSystemManager } = this._simulationModel.simulation;
+    get satelliteSearchPanel() {
+        return this._satelliteSearchPanelStore;
+    }
 
-        return {
-            options: starSystemManager.starSystems,
-            defaultValue: starSystemManager.defaultStarSystem,
-            onSelect: item => starSystemManager.loadByIdx(item.idx),
-        };
+    _initSearchPanelIfExist() {
+        const { activeUniverse } = this._appModel.simulationModel;
+        const hasSatelliteSearchPanel = activeUniverse.hasFeature(SATELLITE_SEARCH_MODEL_NAME);
+
+        if (hasSatelliteSearchPanel) {
+            const satelliteSearchModel = activeUniverse.getFeature(SATELLITE_SEARCH_MODEL_NAME);
+            this._satelliteSearchPanelStore = new SatelliteSearchPanelStore(satelliteSearchModel);
+        }
     }
 }
 

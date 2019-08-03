@@ -1,26 +1,15 @@
-import { observable } from "mobx";
-import { VisualObject } from "../entities/visual-object";
 import { SimulationModel } from "./simulation-model";
-import { sim } from "../../core";
-import SatelliteSearchModel from "./satellite-search-model";
+import StatisticsModel from "./statistics-model";
 
 export class AppModel {
     /**
-     * @param services
-     * @param {string} viewportId
+     * @param {UniverseService} universeService
+     * @param {StarSystemLoaderService} starSystemLoader
      */
-    constructor(services, viewportId) {
-        this._simulationModel = new SimulationModel(this, sim, viewportId);
-        this._satelliteSearchModel = new SatelliteSearchModel(this, services.satelliteFinder);
+    constructor(universeService, starSystemLoader) {
+        this._simulationModel = new SimulationModel(this, universeService, starSystemLoader);
+        this._statisticsModel = new StatisticsModel();
     }
-
-    @observable
-    visualObjects = {
-        creationPanel: new VisualObject(false),
-        transferCalculationPanel: new VisualObject(false),
-    };
-
-    bodyLabels = new VisualObject(true);
 
     /**
      * @return {SimulationModel}
@@ -30,9 +19,9 @@ export class AppModel {
     }
 
     /**
-     * @return {SatelliteSearchModel}
+     * @return {StatisticsModel}
      */
-    get satelliteSearchModel() {
-        return this._satelliteSearchModel;
+    get statisticsModel() {
+        return this._statisticsModel;
     }
 }

@@ -3,12 +3,12 @@ import VisualModelAbstract from "./ModelAbstract";
 import {RF_BASE, RF_BASE_OBJ} from "../ReferenceFrame/Factory";
 import VirtualPlane from "./VirtualPlane";
 import {Vector} from "../algebra";
-import { sim } from "../Simulation";
+import { sim } from "../simulation-engine";
 
 export default class VisualPlanePoint extends VisualModelAbstract
 {
     constructor(referenceFrame, value, color, size, editingCallback, minBound, maxBound) {
-        super();
+        super(sim);
 
         this._referenceFrame = referenceFrame;
         this._value = value;

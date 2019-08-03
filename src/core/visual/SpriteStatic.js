@@ -1,6 +1,4 @@
-
 import VisualSprite from "./Sprite";
-import { sim } from '../Simulation';
 
 export default class VisualSpriteStatic extends VisualSprite
 {
@@ -9,8 +7,11 @@ export default class VisualSpriteStatic extends VisualSprite
     static _alignVertical = 'center';
     static _alignHorizontal = 'center';
 
-    static preloadTexture() {
-        sim.textureLoader.load('images/' + this._textureName, texture => {this._texture = texture});
+    /**
+     * @param {THREE.TextureLoader} textureLoader
+     */
+    static preloadTexture(textureLoader) {
+        textureLoader.load('images/' + this._textureName, texture => {this._texture = texture});
     }
 
     constructor(color) {

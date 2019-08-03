@@ -1,0 +1,85 @@
+@import "../../../../ui/components/common/variables";
+@import "../../../../ui/components/common/simplebar/index";
+
+.satellite-search-panel {
+	&__searcher {
+		width: 100%;
+	}
+
+	&__filter {
+		margin-top: 1rem;
+	}
+
+	&__satellites {
+		margin-top: 2 * $default-gap-size;
+	}
+}
+
+.satellites {
+	&__header {
+		color: $blue-text;
+		display: flex;
+		justify-content: space-between;
+		margin-bottom: $default-gap-size;
+	}
+
+	&__header-line {
+		align-self: center;
+		border-bottom: 1px solid $gray-text;
+		flex-grow: 1;
+		margin-left: $default-gap-size;
+	}
+
+	&__grid {
+		max-height: 35rem;
+		overflow: auto;
+		width: 100%;
+	}
+}
+
+.satellite-option {
+	display: flex;
+	justify-content: space-between;
+
+	&__norad-id {
+		border: 1px solid $gray;
+		color: $gray-text;
+		padding: $default-gap-size / 4;
+	}
+
+	&__name {
+		flex-grow: 1;
+		margin-left: $default-gap-size;
+		text-decoration: underline;
+	}
+
+	&__launch-date {
+		margin-left: $default-gap-size;
+	}
+}
+
+.filter-selector {
+	align-items: center;
+	color: $gray-text;
+	display: flex;
+
+	&__item {
+		align-items: center;
+		display: flex;
+		margin-left: 1rem;
+
+		&--active {
+			color: $white-text;
+		}
+	}
+
+	&__radio {
+		cursor: pointer;
+		padding: 0;
+	}
+
+	&__label {
+		cursor: pointer;
+		padding-left: 1rem;
+	}
+}

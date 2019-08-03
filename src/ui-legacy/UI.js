@@ -1,6 +1,5 @@
 import $ from "jquery";
 
-import UIPanelTime from "./Panels/Time";
 import UIPanelCamera from "./Panels/Camera";
 import UIPanelMetrics from "./Panels/Metrics";
 import UIPanelLambert from "./Panels/Lambert";
@@ -9,14 +8,17 @@ import UIPanelManeuver from "./Panels/Maneuver";
 import UIPanelDynamicTrajectory from "./Panels/DynamicTrajectory";
 
 export default class UI {
-    constructor(sim) {
-        this.timePanel     = new UIPanelTime    ($('#timePanel'));
-        this.cameraPanel   = new UIPanelCamera  ($('#cameraPanel'),  sim.camera);
-        this.metricsPanel  = new UIPanelMetrics ($('#metricsPanel'), sim.selection);
-        this.creationPanel = new UIPanelCreation($('#creationPanel'));
-        this.lambertPanel  = new UIPanelLambert ($('#lambertPanel'));
-        this.maneuverPanel = new UIPanelManeuver($('#maneuverPanel'));
+    /**
+     * @param {SimulationEngine} simulationEngine
+     * @param {Universe} activeUniverse
+     */
+    constructor(simulationEngine, activeUniverse) {
+        const cameraPanel   = new UIPanelCamera  ($('#cameraPanel'), simulationEngine.camera);
+        const metricsPanel  = new UIPanelMetrics ($('#metricsPanel'), simulationEngine);
+        const creationPanel = new UIPanelCreation($('#creationPanel'), simulationEngine);
+        this.lambertPanel   = new UIPanelLambert ($('#lambertPanel'), simulationEngine, activeUniverse);
+        const maneuverPanel = new UIPanelManeuver($('#maneuverPanel'), simulationEngine);
 
-        this.dynamicTrajectoryPanel = new UIPanelDynamicTrajectory($('#dynamicTrajectoryPanel'));
+        const dynamicTrajectoryPanel = new UIPanelDynamicTrajectory($('#dynamicTrajectoryPanel'));
     }
 }

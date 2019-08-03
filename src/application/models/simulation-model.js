@@ -1,54 +1,73 @@
-import { StarSystem } from "../../interface/star-system";
-import StatisticsModel from "./statistics-model";
-import TimeModel from "./time-model";
+import { action, computed, observable } from "mobx";
+import { getModuleNameById, TLE_LOADER, UniverseRegistry } from "../../universes/universe-registry";
+import { VisualObject } from "..";
+import Events from "../../core/Events";
 
 export class SimulationModel {
     /**
      * @param {AppModel} appModel
-     * @param {Simulation} sim
-     * @param {string} viewportId
+     * @param {UniverseService} universeService
+     * @param {StarSystemLoaderService} starSystemLoader
      */
-    constructor(appModel, sim, viewportId) {
-        this._viewportId = viewportId;
-        this._simulation = sim;
+    constructor(appModel, universeService, starSystemLoader) {
         this._appModel = appModel;
-        this._statisticsModel = new StatisticsModel();
-        this._timeModel = new TimeModel();
+        this._universeService = universeService;
+        this._starSystemLoader = starSystemLoader;
     }
 
     /**
-     * @return {string}
+     * @type {Universe}
      */
-    get viewportId() {
-        return this._viewportId;
-    }
-
-    /**
-     * @return {Simulation}
-     */
-    get simulation() {
-        return this._simulation;
-    }
+    @observable
+    activeUniverse = null;
+    availableUniverses = UniverseRegistry.allValues;
+    isSimulationActive = false;
+    bodyLabels = new VisualObject(true);
 
     /**
      * @return {boolean}
      */
     get isBodyLabelsVisible() {
-        return this._appModel.bodyLabels.isVisible;
-    }
-
-    /**
-     * @return {StatisticsModel}
-     */
-    get statisticsModel() {
-        return this._statisticsModel;
+        return this.bodyLabels.isVisible;
     }
 
     /**
      * @return {TimeModel}
      */
+    @computed
     get timeModel() {
-        return this._timeModel;
+        return this.activeUniverse.timeModel;
+    }
+    /**
+     * @param {string} universeId
+     * @return {Promise}
+     */
+    async loadUniverseById(universeId) {
+        const universeModuleName = getModuleNameById(universeId);
+
+        if (this.activeUniverse) {
+            this._unloadUniverse(universeId);
+        }
+
+        const universe = await this._universeService.loadUniverseModule(universeModuleName, {
+            starSystemLoader: this._starSystemLoader,
+        });
+
+        this._selectUniverse(universe);
+
+        return universe;
+    }
+
+    runTime() {
+        this.timeModel.run();
+    }
+
+    startSimulation() {
+        this.isSimulationActive = true;
+    }
+
+    stopSimulation() {
+        this.isSimulationActive = false;
     }
 
     /**
@@ -56,19 +75,36 @@ export class SimulationModel {
      * @return {Promise<any>}
      */
     loadTLE(noradId) {
-        return this._simulation
-            .getModule(StarSystem.SolarSystem.moduleName)
-            .loadTLE(this._simulation.starSystem, noradId);
+        if (!this.activeUniverse.hasFeature(TLE_LOADER)) {
+            return Promise.resolve();
+        }
+
+        const loader = this.activeUniverse.getFeature(TLE_LOADER);
+
+        return loader.loadTLE(noradId);
     }
 
     /**
-     * @return {Promise}
+     * @param {Universe} universe
+     * @private
      */
-    loadKSP() {
-        return this._simulation.loadModule(StarSystem.Ksp.moduleName);
+    @action
+    _selectUniverse(universe) {
+        universe.initializeFeatures(this._appModel);
+
+        if (!this.activeUniverse) {
+            universe.loadDefaultStarSystem(() => {
+                Events.dispatch(Events.FIRST_RENDER);
+            });
+        }
+
+        this.activeUniverse = universe;
     }
 
-    runTime() {
-        this._timeModel.run();
+    _unloadUniverse(universeId) {
+        if (universeId !== this.activeUniverse.id) {
+            this.stopSimulation();
+            this.activeUniverse.unload();
+        }
     }
 }

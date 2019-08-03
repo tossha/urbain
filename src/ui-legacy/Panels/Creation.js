@@ -5,47 +5,50 @@ import ReferenceFrameFactory, {ReferenceFrame} from "../../core/ReferenceFrame/F
 import VisualTrajectoryModelKeplerian from "../../core/visual/Trajectory/Keplerian";
 import KeplerianObject from "../../core/KeplerianObject";
 import TrajectoryDynamic from "../../core/Trajectory/Dynamic";
-import { sim } from "../../core/Simulation";
 import VisualTrajectoryDynamic from "../../core/visual/Trajectory/Dynamic";
-import FlightEventSOIDeparture from "../../modules/PatchedConics/FlightEvent/SOIDeparture";
-import FlightEventSOIArrival from "../../modules/PatchedConics/FlightEvent/SOIArrival";
+import FlightEventSOIDeparture from "../../core/PatchedConics/FlightEvent/SOIDeparture";
+import FlightEventSOIArrival from "../../core/PatchedConics/FlightEvent/SOIArrival";
 import FlightEventImpulsiveBurn from "../../core/FlightEvent/ImpulsiveBurn";
 import {Vector} from "../../core/algebra";
 
 export default class UIPanelCreation extends UIPanel {
-    constructor(panelDom) {
+    /**
+     * @param panelDom
+     * @param {SimulationEngine} simulationEngine
+     */
+    constructor(panelDom, simulationEngine) {
         super(panelDom);
 
         this.jqCreate = this.jqDom.find('#createOrbit');
         this.jqCreate.click(() => {
-            const center = sim.camera.orbitingPoint;
-            const object = sim.starSystem.getObject(center);
+            const center = simulationEngine.camera.orbitingPoint;
+            const object = simulationEngine.starSystem.getObject(center);
             if (!object.physicalModel) {
                 return;
             }
             const sma = object.physicalModel.radius * 2;
-            const id = -11000000 - sim.starSystem.created;
-            sim.starSystem.created += 1;
+            const id = -11000000 - simulationEngine.starSystem.created;
+            simulationEngine.starSystem.created += 1;
 
             let traj = new TrajectoryKeplerianBasic(
                 ReferenceFrameFactory.buildId(center, ReferenceFrame.INERTIAL_BODY_EQUATORIAL),
                 new KeplerianObject(
-                    0.2, sma, Math.PI / 6, Math.PI / 3, Math.PI / 6, 0, sim.currentEpoch, object.physicalModel.mu
+                    0.2, sma, Math.PI / 6, Math.PI / 3, Math.PI / 6, 0, simulationEngine.currentEpoch, object.physicalModel.mu
                 )
             );
             traj.setVisualModel(new VisualTrajectoryModelKeplerian(traj, {color: 'yellow'}));
             traj.minEpoch = false;
             traj.maxEpoch = false;
 
-            const propagatorClass = sim.getPropagator('patchedConics');
+            const propagatorClass = simulationEngine.getPropagator('patchedConics');
             let pTraj = new TrajectoryDynamic(new propagatorClass());
             pTraj.setVisualModel(new VisualTrajectoryDynamic(pTraj, {color: 'yellow'}));
             pTraj.addComponent(traj);
 
-            let ephObject = new EphemerisObject(id, EphemerisObject.TYPE_UNKNOWN, "Created #" + sim.starSystem.created);
+            let ephObject = new EphemerisObject(id, EphemerisObject.TYPE_UNKNOWN, "Created #" + simulationEngine.starSystem.created);
             ephObject.setTrajectory(pTraj);
-            sim.starSystem.addObject(id, ephObject);
-            sim.selection.forceSelection(ephObject);
+            simulationEngine.starSystem.addObject(id, ephObject);
+            simulationEngine.selection.forceSelection(ephObject);
 
             pTraj.propagate(traj.epoch);
         });
@@ -62,7 +65,7 @@ export default class UIPanelCreation extends UIPanel {
                 return;
             }
 
-            const propagatorClass = sim.getPropagator('patchedConics');
+            const propagatorClass = simulationEngine.getPropagator('patchedConics');
             let pTraj = new TrajectoryDynamic(new propagatorClass());
             pTraj.setVisualModel(new VisualTrajectoryDynamic(pTraj, dump.visualModel));
             let lastComponent = false;
@@ -87,8 +90,8 @@ export default class UIPanelCreation extends UIPanel {
                 traj.maxEpoch = componentDump.maxEpoch;
 
                 if (lastComponent && lastComponent.referenceFrame.id !== traj.referenceFrame.id) {
-                    const oldSoi = sim.starSystem.getObject(lastComponent.referenceFrame.originId);
-                    const newSoi = sim.starSystem.getObject(traj.referenceFrame.originId);
+                    const oldSoi = simulationEngine.starSystem.getObject(lastComponent.referenceFrame.originId);
+                    const newSoi = simulationEngine.starSystem.getObject(traj.referenceFrame.originId);
                     lastComponent.addFlightEvent(new FlightEventSOIDeparture(
                         traj.minEpoch,
                         oldSoi,
@@ -115,12 +118,12 @@ export default class UIPanelCreation extends UIPanel {
                 }));
             }
 
-            const id = -11000000 - sim.starSystem.created;
-            sim.starSystem.created++;
-            let ephObject = new EphemerisObject(id, EphemerisObject.TYPE_UNKNOWN, "Created #" + sim.starSystem.created);
+            const id = -11000000 - simulationEngine.starSystem.created;
+            simulationEngine.starSystem.created++;
+            let ephObject = new EphemerisObject(id, EphemerisObject.TYPE_UNKNOWN, "Created #" + simulationEngine.starSystem.created);
             ephObject.setTrajectory(pTraj);
-            sim.starSystem.addObject(id, ephObject);
-            sim.selection.forceSelection(ephObject);
+            simulationEngine.starSystem.addObject(id, ephObject);
+            simulationEngine.selection.forceSelection(ephObject);
         });
     }
 }

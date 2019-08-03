@@ -1,10 +1,11 @@
 import * as THREE from "three";
 import VisualModelAbstract from "./ModelAbstract";
+import { sim } from "../simulation-engine";
 
 export default class VisualPoint extends VisualModelAbstract
 {
     constructor(positionOfEpoch, color, size) {
-        super();
+        super(sim);
         this.positionOfEpoch = positionOfEpoch;
         this.color = color;
         this.size = size;

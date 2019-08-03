@@ -4,8 +4,8 @@ import cn from "classnames";
 
 import Button from "../../button";
 
-const PanelButton = ({ id, className, children }) => (
-    <Button className={cn("panel__button", className)} id={id}>
+const PanelButton = ({ id, className, onClick, children }) => (
+    <Button className={cn("panel__button", className)} id={id} onClick={onClick}>
         {children}
     </Button>
 );
@@ -13,6 +13,7 @@ const PanelButton = ({ id, className, children }) => (
 PanelButton.propTypes = {
     id: PropTypes.string,
     className: PropTypes.string,
+    onClick: PropTypes.func,
     children: PropTypes.string,
 };
 

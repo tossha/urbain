@@ -1,12 +1,12 @@
 import * as THREE from "three";
 
 import VisualModelAbstract from "./ModelAbstract";
-import { sim } from "../Simulation";
+import { sim } from "../simulation-engine";
 
 export default class HelperGrid extends VisualModelAbstract
 {
     constructor(referenceFrame) {
-        super();
+        super(sim);
 
         this.referenceFrame = referenceFrame;
 
