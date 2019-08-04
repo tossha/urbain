@@ -104,17 +104,21 @@ class Universe {
         return this._features.get(featureId);
     }
 
+    /**
+     * @param onLoaded
+     * @returns {Promise}
+     */
     loadDefaultStarSystem(onLoaded) {
         const starSystemName = this.defaultStarSystem.name;
 
-        this.loadStarSystem(starSystemName, onLoaded);
+        return this.loadStarSystem(starSystemName, onLoaded);
     }
 
-    loadStarSystem(starSystemName, onLoaded) {
+    async loadStarSystem(starSystemName, onLoaded) {
         const starSystem = this.starSystems.find(system => system.name === starSystemName);
 
         if (starSystem) {
-            starSystem.instance.load(this._starSystemLoader, onLoaded);
+            return starSystem.instance.load(this._starSystemLoader, onLoaded);
         }
     }
 

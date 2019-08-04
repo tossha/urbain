@@ -28,6 +28,15 @@ export default class StarSystem {
         return `${this.id}.json`;
     }
 
+    /**
+     * @param starSystemLoader
+     * @param onLoaded
+     * @returns {Promise}
+     */
+    load(starSystemLoader, onLoaded) {
+        return Promise.resolve();
+    }
+
     unload() {
         Object.entries(this.objects).map(entry => entry[1].drop());
         this.stars && this.stars.drop();

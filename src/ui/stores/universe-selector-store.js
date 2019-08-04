@@ -22,7 +22,9 @@ class UniverseSelectorStore {
         return this.options.find(universe => universe.id === this._simulationModel.activeUniverse.id);
     }
 
-    onSelect = item => this._simulationModel.loadUniverseById(item.id);
+    onSelect = item => {
+        this._simulationModel.loadUniverseById(item.id);
+    };
 }
 
 export default UniverseSelectorStore;

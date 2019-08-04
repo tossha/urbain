@@ -10,13 +10,13 @@ import UIPanelDynamicTrajectory from "./Panels/DynamicTrajectory";
 export default class UI {
     /**
      * @param {SimulationEngine} simulationEngine
-     * @param {Universe} activeUniverse
+     * @param {SimulationModel} simulationModel
      */
-    constructor(simulationEngine, activeUniverse) {
+    constructor(simulationEngine, simulationModel) {
         const cameraPanel   = new UIPanelCamera  ($('#cameraPanel'), simulationEngine.camera);
         const metricsPanel  = new UIPanelMetrics ($('#metricsPanel'), simulationEngine);
         const creationPanel = new UIPanelCreation($('#creationPanel'), simulationEngine);
-        this.lambertPanel   = new UIPanelLambert ($('#lambertPanel'), simulationEngine, activeUniverse);
+        this.lambertPanel   = new UIPanelLambert ($('#lambertPanel'), simulationEngine, simulationModel);
         const maneuverPanel = new UIPanelManeuver($('#maneuverPanel'), simulationEngine);
 
         const dynamicTrajectoryPanel = new UIPanelDynamicTrajectory($('#dynamicTrajectoryPanel'));

@@ -14,7 +14,7 @@ export default class SolarStarSystem extends StarSystem {
     /**
      * @param {StarSystemLoaderService} starSystemLoader
      * @param onLoaded
-     * @return {Promise<any>}
+     * @return {Promise}
      */
     load(starSystemLoader, onLoaded) {
         return starSystemLoader.fetchStarSystemConfig(this.fileName, starSystemConfig => {

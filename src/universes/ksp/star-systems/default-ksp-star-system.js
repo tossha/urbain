@@ -1,4 +1,4 @@
-import { sim as simulationEngine, sim } from "../../../core/simulation-engine";
+import { sim as simulationEngine } from "../../../core/simulation-engine";
 import StarSystemLoader from "../../../core/StarSystemLoader";
 import StarSystem from "../../../core/StarSystem";
 
@@ -7,9 +7,12 @@ export default class DefaultKspStarSystem extends StarSystem {
         super("ksp", "KSP System");
     }
 
+    /**
+     * @param starSystemLoader
+     * @param onLoaded
+     * @returns {Promise}
+     */
     load(starSystemLoader, onLoaded) {
-        simulationEngine.stopSimulation();
-
         return starSystemLoader.fetchStarSystemConfig(this.fileName, starSystemConfig => {
             simulationEngine.loadStarSystem(this, starSystem => {
                 StarSystemLoader.loadFromConfig(starSystem, starSystemConfig);
@@ -21,8 +24,8 @@ export default class DefaultKspStarSystem extends StarSystem {
     }
 
     _onSystemLoaded() {
-        sim.forceEpoch(0);
-        sim.time.updateScaleType();
-        sim.ui.lambertPanel.useCurrentTime();
+        simulationEngine.forceEpoch(0);
+        simulationEngine.time.updateScaleType();
+        simulationEngine.ui.lambertPanel.useCurrentTime();
     }
 }

@@ -21,6 +21,8 @@ export class SimulationModel {
     @observable
     activeUniverse = null;
     availableUniverses = UniverseRegistry.allValues;
+
+    @observable
     isSimulationActive = false;
     bodyLabels = new VisualObject(true);
 
@@ -40,13 +42,18 @@ export class SimulationModel {
     }
     /**
      * @param {string} universeId
-     * @return {Promise}
+     * @return {Promise<Universe>}
      */
     async loadUniverseById(universeId) {
         const universeModuleName = getModuleNameById(universeId);
+        const isUniverseLoaded = this.activeUniverse !== null;
 
-        if (this.activeUniverse) {
-            this._unloadUniverse(universeId);
+        if (isUniverseLoaded) {
+            if (universeId === this.activeUniverse.id) {
+                return this.activeUniverse;
+            } else {
+                this._unloadUniverse(this.activeUniverse.id);
+            }
         }
 
         const universe = await this._universeService.loadUniverseModule(universeModuleName, {
@@ -55,6 +62,14 @@ export class SimulationModel {
 
         this._selectUniverse(universe);
 
+        universe
+            .loadDefaultStarSystem(() => {
+                Events.dispatch(Events.FIRST_RENDER);
+            })
+            .then(() => {
+                this.startSimulation();
+            });
+
         return universe;
     }
 
@@ -62,10 +77,12 @@ export class SimulationModel {
         this.timeModel.run();
     }
 
+    @action
     startSimulation() {
         this.isSimulationActive = true;
     }
 
+    @action
     stopSimulation() {
         this.isSimulationActive = false;
     }
@@ -91,20 +108,11 @@ export class SimulationModel {
     @action
     _selectUniverse(universe) {
         universe.initializeFeatures(this._appModel);
-
-        if (!this.activeUniverse) {
-            universe.loadDefaultStarSystem(() => {
-                Events.dispatch(Events.FIRST_RENDER);
-            });
-        }
-
         this.activeUniverse = universe;
     }
 
-    _unloadUniverse(universeId) {
-        if (universeId !== this.activeUniverse.id) {
-            this.stopSimulation();
-            this.activeUniverse.unload();
-        }
+    _unloadUniverse() {
+        this.stopSimulation();
+        this.activeUniverse.unload();
     }
 }
