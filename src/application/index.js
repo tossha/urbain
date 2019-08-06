@@ -16,7 +16,7 @@ class Application {
     async loadDefaultUniverse() {
         const universeId = universeService.getDefaultUniverseId();
 
-        await this._simulationModel.loadUniverseById(universeId);
+        return await this._simulationModel.loadUniverseById(universeId);
     }
 
     startRendering() {

@@ -14,19 +14,18 @@ import {
     SECONDS_PER_MONTH,
     SECONDS_PER_YEAR
 } from "../../constants/dates";
-import { sim } from "../../core/simulation-engine";
 
 export default class UIPanelLambert extends UIPanel
 {
     /**
      * @param panelDom
      * @param {SimulationEngine} sim
-     * @param {Universe} activeUniverse
+     * @param simulationModel
      */
-    constructor(panelDom, sim, activeUniverse) {
+    constructor(panelDom, sim, simulationModel) {
         super(panelDom, true);
+        this._simulationModel = simulationModel;
         this._sim = sim;
-        this._activeUniverse = activeUniverse;
 
         this.maxTransferTime = SECONDS_PER_DAY * 365.25 * 40;
 
@@ -205,7 +204,7 @@ export default class UIPanelLambert extends UIPanel
     }
 
     updateTime(date) {
-        const formattedDate = this._activeUniverse.dataTransforms.formatDateFull(date);
+        const formattedDate = this._simulationModel.activeUniverse.dataTransforms.formatDateFull(date);
         this.jqDateText.html(formattedDate);
     }
 
