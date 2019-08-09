@@ -1,18 +1,21 @@
 import React from "react";
 import PropTypes from "prop-types";
 import { inject, observer } from "mobx-react";
+import cn from "classnames";
 
 import Panel, { Field, FieldLabel, FieldControl, PanelButton } from "../../../../../common/panel";
 import TimeSettingsPanelStore from "./store/time-settings-panel-store";
 import Logo from "./logo";
+import TimeScaleSlider from "./components/time-scale-slider";
+import Timer from "./components/timer";
 import "./index.scss";
 
 function TimeSettingsPanel({ className, timeSettingsPanelStore }) {
-    const formattedDate = timeSettingsPanelStore.formattedDate || "01.01.2000 12:00:00";
+    const classNames = cn("time-settings-panel", className);
 
     return (
         <Panel
-            className={`time-settings-panel ${className}`}
+            className={classNames}
             id="timePanel"
             caption="Time"
             titleIcon={<Logo className="time-settings-panel__logo" />}
@@ -20,7 +23,7 @@ function TimeSettingsPanel({ className, timeSettingsPanelStore }) {
             <Field>
                 <FieldLabel middle>Current</FieldLabel>
                 <FieldControl>
-                    <time dateTime={formattedDate}>{formattedDate}</time>
+                    <Timer />
                 </FieldControl>
                 <PanelButton onClick={timeSettingsPanelStore.onSetCurrentTime}>Now</PanelButton>
             </Field>
@@ -31,15 +34,7 @@ function TimeSettingsPanel({ className, timeSettingsPanelStore }) {
             </Field>
             <Field centered>
                 <FieldControl fullSize>
-                    <input
-                        type="range"
-                        className="time-settings-panel__scale-slider"
-                        min={-1}
-                        max={1}
-                        step={0.001}
-                        value={timeSettingsPanelStore.sliderValue}
-                        onChange={timeSettingsPanelStore.onTimeScaleSliderChange}
-                    />
+                    <TimeScaleSlider className="time-settings-panel__scale-slider" />
                 </FieldControl>
             </Field>
         </Panel>
